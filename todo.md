@@ -5,6 +5,25 @@ All items are documentation/agent-instruction work — no code required unless n
 
 ---
 
+## Priority 1 — Pipeline Gaps
+
+### Observer Agent Operational Cadence
+**What it is:** The Observer role and output format are well-defined but its trigger is not. Currently it "runs alongside" the pipeline with no specified cadence — making it easy to never dispatch in practice.
+**What to add:**
+- Define trigger conditions in `agents/coordinator/skills.md`: dispatch Observer after every 3rd feature completion, after any convergence escalation, and on explicit Coordinator request
+- Define what "weekly pattern report" means: manual trigger via slash command or Coordinator initiates after N features
+- Add Observer dispatch to the Coordinator's post-Done workflow
+
+### Git Branching and PR Strategy
+**What it is:** The pipeline produces merge-ready code but says nothing about git workflow — feature branches, PR naming, review process, or merge strategy. The human is left to figure this out.
+**What to add:**
+- Recommended branch naming convention per feature: `feature/<SPEC-ID>-<feature-name>`
+- PR description template that references spec hash, ADR path, and security sign-off status
+- Coordinator guidance: when to create a branch (at TDD dispatch), when to signal PR-ready (at Done State)
+- Note on merge strategy trade-offs (squash vs merge commit vs rebase) relative to spec traceability
+
+---
+
 ## Priority 3 — Interoperability
 
 ### Protocol Split: MCP + A2A

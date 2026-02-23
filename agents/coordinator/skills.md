@@ -48,6 +48,25 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
 - Human escalation requests with full context
 - Pipeline state file location and current status
 
+## Refactor Execution
+
+After receiving Refactor Agent proposals:
+1. Present all proposals to human with an accept/reject decision required per proposal
+2. For accepted proposals: dispatch Programmer with accepted proposals as the explicit scope and these constraints:
+   - No new TDD — tests must already exist and must stay green throughout
+   - No behavior changes — if a fix requires touching a test assertion, route through normal spec flow instead
+3. After Programmer completes: dispatch TestRunner to verify all tests still pass
+4. If any test breaks: the change was behavioral — revert that proposal and record in `.pipeline-state.md`; route the behavioral change back through normal spec flow
+5. Record refactor execution outcome in `.pipeline-state.md`
+
+## Cross-Feature Dependencies
+
+When a spec includes an `## Integration Contracts` section:
+1. Record the dependency in `.pipeline-state.md` under `Integration Dependencies`
+2. Track status of each referenced SPEC-ID
+3. When all referenced features reach Done: notify human that Integration Verification is available, and dispatch on request
+4. Integration Verification dispatches the Programmer and TestRunner against the combined system boundary defined in the integration contracts
+
 ## Red-Team Routing
 After every human spec approval, before dispatching Architect:
 1. Dispatch Red-Team Agent with full spec and spec hash
