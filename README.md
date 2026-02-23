@@ -2,18 +2,6 @@
 
 Drop this folder into any project. Point Claude Code, Codex, or Gemini at it. Tell the Coordinator what to build.
 
-## How It Works
-
-A structured multi-agent pipeline converts product intent into production code through specialized agents, each with a defined role, versioned operating procedure, and handoff contract.
-
-```
-Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
-```
-
-The Coordinator owns all routing. Agents never talk to each other directly. Specs are ground truth — everything downstream is traceable to a spec version and hash.
-
-Full operating manual: **`AI-Dev-Shop/AGENTS.md`**
-
 ## Dropping This Into a New Project
 
 Copy the `AI-Dev-Shop/` folder into your project root:
@@ -31,14 +19,9 @@ Each tool has a file it reads automatically on startup. Add one line to the righ
 Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 ```
 
-**Gemini CLI** — add to `GEMINI.md` at your project root (create if missing):
+**Gemini CLI / OpenAI Codex** — add to `GEMINI.md` (Gemini) or `AGENTS.md` (Codex) at your project root:
 ```
 Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
-```
-
-**OpenAI Codex** — add to `AGENTS.md` at your project root (create if missing):
-```
-Multi-agent pipeline: see AI-Dev-Shop/AGENTS.md
 ```
 
 **Cursor** — add to `.cursor/rules/ai-dev-shop.mdc` (create if missing):
@@ -59,6 +42,18 @@ Then:
 3. Approve the spec, then let the pipeline run
 
 The Coordinator will route between agents, enforce convergence, and stop at human checkpoints.
+
+## How It Works
+
+A structured multi-agent pipeline converts product intent into production code through specialized agents, each with a defined role, versioned operating procedure, and handoff contract.
+
+```
+[CodeBase Analyzer] → [Architecture Migration Plan] → Spec → [Red-Team] → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+```
+
+`[...]` stages are optional but recommended when dropping into an existing codebase. The Coordinator owns all routing. Agents never talk to each other directly. Specs are ground truth — everything downstream is traceable to a spec version and hash.
+
+Full operating manual: **`AI-Dev-Shop/AGENTS.md`**
 
 ## Repository Layout
 
