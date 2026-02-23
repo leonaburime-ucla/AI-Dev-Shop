@@ -1,0 +1,117 @@
+# AI Dev Shop Foundation
+
+Drop this folder into any project. Point Claude Code, Codex, or Gemini at it. Tell the Coordinator what to build.
+
+## How It Works
+
+A structured multi-agent pipeline converts product intent into production code through specialized agents, each with a defined role, versioned operating procedure, and handoff contract.
+
+```
+Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+```
+
+The Coordinator owns all routing. Agents never talk to each other directly. Specs are ground truth — everything downstream is traceable to a spec version and hash.
+
+Full operating manual: **`AI-Dev-Shop/AGENTS.md`**
+
+## Dropping This Into a New Project
+
+Copy the `AI-Dev-Shop/` folder into your project root:
+
+```bash
+cp -r AI-Dev-Shop/ your-project/
+```
+
+All internal paths are already prefixed with `AI-Dev-Shop/` — nothing breaks as a subfolder.
+
+**For Claude Code** — add one line to your existing `CLAUDE.md` (or create one):
+
+```
+Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
+```
+
+**For Codex** — add one line to your existing `AGENTS.md`:
+
+```
+Multi-agent pipeline: see AI-Dev-Shop/AGENTS.md
+```
+
+**For Gemini / other** — point the agent at `AI-Dev-Shop/AGENTS.md` as its first context document.
+
+Then:
+1. Fill in `AI-Dev-Shop/project-knowledge/project_memory.md` with your project's conventions and gotchas
+2. Start with: *"Act as Spec Agent. Here's what I want to build: [description]"*
+3. Approve the spec, then let the pipeline run
+
+The Coordinator will route between agents, enforce convergence, and stop at human checkpoints.
+
+## Repository Layout
+
+```
+CLAUDE.md                    ← Claude Code entry point (reads AGENTS.md)
+AGENTS.md                    ← Full operating manual for all agents and pipeline
+├── agents/                  ← One folder per agent — lean SOP referencing skills/
+│   ├── codebase-analyzer/   ← Pre-pipeline: analyzes existing codebases
+│   ├── coordinator/
+│   ├── spec/
+│   ├── red-team/
+│   ├── architect/
+│   ├── tdd/
+│   ├── programmer/
+│   ├── testrunner/
+│   ├── code-review/
+│   ├── refactor/
+│   ├── security/
+│   └── observer/
+├── codebase-analysis/       ← Analysis reports and migration plans (generated, starts empty)
+├── skills/                  ← SKILL.md format — each skill is a self-contained folder
+│   ├── spec-writing/SKILL.md
+│   ├── test-design/SKILL.md
+│   ├── architecture-decisions/SKILL.md
+│   ├── code-review/SKILL.md
+│   ├── security-review/SKILL.md
+│   ├── refactor-patterns/SKILL.md
+│   ├── coordination/SKILL.md
+│   ├── context-engineering/SKILL.md
+│   ├── memory-systems/SKILL.md
+│   ├── tool-design/SKILL.md
+│   ├── agent-evaluation/SKILL.md
+│   ├── codebase-analysis/SKILL.md
+│   ├── architecture-migration/SKILL.md
+│   └── design-patterns/     ← 19+ patterns with TypeScript examples
+│       ├── SKILL.md          ← index + pattern selection guide
+│       └── references/       ← individual pattern files
+├── project-knowledge/       ← Fill these in per project
+│   ├── project_memory.md    ← Conventions, gotchas, tribal knowledge
+│   ├── learnings.md         ← Failure log (append-only)
+│   ├── project_notes.md     ← Open questions, deferred decisions
+│   └── foundation.md        ← Source philosophy (read-only reference)
+├── specs/                   ← Versioned specs and ADRs go here (starts empty)
+├── templates/
+│   ├── spec-template.md
+│   ├── test-certification-template.md
+│   └── adr-template.md
+└── workflows/
+    └── multi-agent-pipeline.md  ← Stage-by-stage pipeline with context injection rules
+```
+
+## The Twelve Agents
+
+| Agent | Role |
+|---|---|
+| CodeBase Analyzer | Pre-pipeline: analyzes existing codebases, produces findings reports and migration plans |
+| Coordinator | Routes between agents, owns convergence, escalates to human |
+| Spec | Converts product intent into precise, versioned, testable specs |
+| Red-Team | Adversarially probes approved specs for ambiguity, contradictions, untestable requirements, and missing failure modes — runs after human approval, before Architect |
+| Architect | Selects architecture patterns, writes ADRs, defines module boundaries |
+| TDD | Writes tests against the spec before any implementation |
+| Programmer | Implements code to make certified tests pass |
+| TestRunner | Executes tests and reports evidence — no interpretation |
+| Code Review | Reviews spec alignment, architecture, test quality, security surface |
+| Refactor | Proposes (never implements) non-behavioral improvements |
+| Security | Analyzes threat surface; Critical/High findings require human sign-off |
+| Observer | Watches the pipeline, surfaces systemic patterns, recommends improvements |
+
+## Methodology
+
+This pipeline is built on Meta-Coding (ASTRA: AI + Specs + TDD + Reference Architecture). Full source reading and philosophy: `AI-Dev-Shop/project-knowledge/foundation.md`.
