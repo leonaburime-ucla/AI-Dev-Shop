@@ -69,6 +69,38 @@ Tests must be written before any structural migration begins.
 - Critical security findings (hardcoded credentials, exposed secrets) — escalate immediately to human before any pipeline work begins
 - Circular dependencies that span more than 3 modules — flag as requiring Architect Agent review before migration planning
 
+## Sampling Disclosure
+
+The CodeBase Analyzer operates on a sampled subset of files, not an exhaustive scan. Token budget and phased analysis mean that some files, directories, and modules will not be read. All outputs must make this explicit.
+
+**ANALYSIS-*.md outputs must include a "Sampling Notice" at the top of the report**, immediately after the metadata header, in the following format:
+
+```
+## Sampling Notice
+
+Files sampled: [list or description of what was read]
+Files excluded: [list or description of what was skipped, and why — token budget, low priority, explicitly out of scope, etc.]
+
+Confidence levels by finding category:
+- Architecture structure: High / Medium / Low
+- Dependency direction: High / Medium / Low
+- Test coverage signal: High / Medium / Low
+- Security surface: High / Medium / Low
+- Code quality indicators: High / Medium / Low
+
+Note: Confidence reflects sample coverage, not model certainty. A High-confidence finding means the sample was broad enough to support the conclusion. A Low-confidence finding is a hypothesis requiring human verification.
+```
+
+**MIGRATION-*.md outputs must include a "Coverage Caveat"** at the top of the migration plan, immediately after the metadata header:
+
+```
+## Coverage Caveat
+
+This migration plan is based on sampled codebase context. Files and modules not included in the analysis sample may contain architectural patterns, dependencies, or constraints not reflected in this plan. Before executing any migration phase, validate the plan against unsampled modules — especially any modules listed as excluded in the corresponding ANALYSIS report.
+```
+
+**Downstream agent requirements**: Architect Agent and Coordinator must treat all CodeBase Analyzer findings as informed estimates, not guarantees. Decisions that would be irreversible (deleting code, restructuring core modules, changing public API contracts) must be validated against the actual source files before execution, regardless of the confidence level stated in the analysis.
+
 ## Guardrails
 - Never modify source files — analysis only
 - Never run build tools, install dependencies, or execute any project scripts

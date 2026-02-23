@@ -358,11 +358,21 @@ Cross-domain communication happens through orchestrators, not between domain int
 
 **Cross-layer imports**: Business logic importing from state, hooks importing from API directly. All cross-layer wiring belongs in the orchestrator only.
 
+**Broad `useEffect` dependencies**: Passing objects, arrays, or the entire `deps` bag as `useEffect` dependencies causes unstable endless re-render cycles because these references are recreated on every render. Always depend on the specific primitive values or stable references you actually need, never on a whole object or the injected dependencies object.
+
+```typescript
+// ❌ Unstable — deps object is recreated every render, triggers infinite loop
+useEffect(() => { deps.fetchPost(postId); }, [deps]);
+
+// ✅ Stable — depend only on the specific value that should trigger the effect
+useEffect(() => { deps.fetchPost(postId); }, [postId]);
+```
+
 **Skipping the Business Logic Hook when React lifecycle is needed**: Calling service methods directly in the Integration Hook without wrapping in `useMemo`/`useCallback` when those methods have referential equality implications. Use the Business Logic sub-hook for any service interaction that needs lifecycle awareness.
 
 **Verbose dependency interface as ignored signal**: `UsePostDependencies` growing past 8–10 fields means the hook has too many responsibilities. Split it into domain-specific hooks.
 
 ## Full Implementation Reference
 
-See `AI-Dev-Shop/skills/frontend-react-orcbash/references/` for complete working examples:
+See `AI-Dev-Shop-speckit/skills/frontend-react-orcbash/references/` for complete working examples:
 - `post-feature-example.md` — full Reddit posts feature with all 6 layers including state adapter

@@ -177,6 +177,40 @@ A spec is ready when:
 | Lessons learned from past mistakes | `AI-Dev-Shop/project-knowledge/learnings.md` |
 | Open questions and parking lot items | `AI-Dev-Shop/project-knowledge/project_notes.md` |
 
+## Strict Mode — Spec Package
+
+In strict mode, a spec is a PACKAGE, not a single file. A feature that enters the delivery pipeline in strict mode must have all required files present and complete before any downstream agent (TDD, Architect, Programmer) is dispatched.
+
+**Required files for a strict-mode spec package:**
+
+| File | Purpose |
+|---|---|
+| `feature.spec.md` | Core spec: goals, requirements, acceptance criteria, invariants, edge cases |
+| `api.spec.ts` | TypeScript interfaces and types for all API contracts (request/response shapes, error envelopes) |
+| `state.spec.ts` | State machine definitions, valid transitions, invariants expressed as types |
+| `orchestrator.spec.ts` | Orchestration contracts: what the orchestrator receives, calls, and returns |
+| `ui.spec.ts` | UI component contracts, props, events, and observable behavior |
+| `errors.spec.ts` | All error types, codes, messages, and the conditions that produce them |
+| `behavior.spec.md` | Behavioral narratives: end-to-end user journeys and system behavior in plain language |
+| `traceability.spec.md` | Requirement-to-test mapping: each REQ/AC traced to the test(s) that verify it |
+| `checklists/spec-dod.md` | Definition-of-Done checklist with evidence (not just checked boxes) |
+
+**DoD checklist requirement**: Each item in `spec-dod.md` must include evidence of completion — a reference to the specific requirement, test name, or artifact that satisfies it. Checked boxes with no evidence are not accepted.
+
+**Banned vague language**: The following phrases are banned in strict-mode spec packages unless followed immediately by a measurable criterion:
+- "should work" — replace with a specific observable outcome
+- "remains unchanged" — replace with what specifically must not change and how it is verified
+- "consumer model only" — replace with the exact consumer constraints
+- "as needed" — replace with the specific condition that triggers the need
+- "appropriate" — replace with the specific standard or threshold that defines appropriate
+
+Example of banned usage: "The system should handle errors appropriately."
+Example of compliant usage: "The system must return HTTP 422 with body `{ error: { code: 'VALIDATION_ERROR', field: 'quantity', message: 'must be > 0' } }` when quantity is zero or negative."
+
+**Implementation-readiness test**: Before a strict-mode spec package is approved, apply this test: can a competent developer who has never seen this project implement the feature from these spec files alone, without asking any clarifying questions? If the answer is no — because something is missing, ambiguous, or requires assumed context — the spec is not done.
+
+**Reference**: `AI-Dev-Shop/project-knowledge/spec-definition-of-done.md` is the authoritative checklist template for strict-mode spec packages.
+
 ## Spec Change Protocol
 
 When requirements change mid-development:

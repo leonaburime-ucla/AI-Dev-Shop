@@ -61,6 +61,17 @@ Open questions, parking lot items, in-progress thinking.
 Update when: Questions are opened or resolved. Scope items are deferred.
 Governance: Resolved items should be closed (not deleted — mark as [RESOLVED]).
 
+## Memory Placement Authority
+
+When making any context engineering decision about where to write a memory entry, `AI-Dev-Shop/project-knowledge/knowledge-routing.md` is the authoritative source. It defines which file each category of memory belongs in and supersedes any informal judgment call.
+
+Rules:
+- Before writing any memory entry, consult `knowledge-routing.md` to confirm the correct destination file
+- Never write project-specific memory (conventions, gotchas, decisions, lessons) into framework files: `AGENTS.md`, any `skills.md`, or any `templates/` file. Framework files define agent behavior — they are not storage for project-specific state
+- If a memory entry does not clearly fit a category in `knowledge-routing.md`, add an Open Question to `project_notes.md` and escalate to the Coordinator to update the routing rules before writing the entry
+
+This rule exists to prevent knowledge files from becoming junk drawers and framework files from becoming contaminated with project-specific state that does not transfer to other projects.
+
 ## Scope Boundaries for Knowledge Files
 
 Getting this wrong turns knowledge files into junk drawers, which degrades every agent that reads them.

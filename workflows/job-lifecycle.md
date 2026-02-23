@@ -36,8 +36,8 @@ QUEUED → DISPATCHED → RUNNING → DONE
 | Stage | Max Retries | Backoff | Escalation Trigger |
 |-------|-------------|---------|-------------------|
 | `spec` | 2 | None — immediate | Unresolvable [NEEDS CLARIFICATION] after 2 passes |
-| `clarify` | 1 | None | Human must provide answers |
-| `architect` | 2 | None | Architecture pattern violation without documented rationale |
+| `clarify` | 1 | None | Human must provide answers directly |
+| `architect` | 2 | None | Constitution violation without Complexity Justification entry |
 | `tdd` | 3 | None | Same test failures after 3 cycles |
 | `programmer` | 5 total retries across all clusters | Inject failure cluster summary each retry | Same failing cluster after 3 retries (escalate that cluster even if total budget not exhausted) |
 | `testrunner` | 2 | None | Infrastructure/tooling failure (not test logic) |
@@ -57,6 +57,7 @@ A job output is rejected (triggers `RETRYING`) if any of the following are true:
 - Handoff contract is missing or incomplete (no input refs, output summary, risks, or suggested next)
 - Agent operated outside its assigned scope (e.g., Programmer refactored untouched code)
 - Output contains a known failure marker (e.g., "[NEEDS CLARIFICATION]" left unresolved by Spec Agent)
+- ADR is missing Constitution Check table or has unjustified EXCEPTION entries (speckit-specific)
 
 ---
 
@@ -69,6 +70,7 @@ Escalate to human (set state to `ESCALATED`) when:
 - Security: any Critical or High finding
 - Spec hash changes mid-run
 - Two agents produce directly conflicting guidance
+- Constitution violation in ADR without a corresponding Complexity Justification row (same severity as spec hash mismatch)
 
 ---
 
@@ -87,3 +89,12 @@ In `.pipeline-state.md`, update the Current Stage Detail block at every state tr
 ```
 
 When a job reaches `DONE`, move it to the Completed Stages table and clear the Current Stage Detail block for the next stage.
+
+---
+
+## Coordinator Modes and Job Lifecycle
+
+- Jobs only exist in **Pipeline Mode**. In Review Mode and Direct Mode, no jobs are created.
+- When user switches from Review Mode to Pipeline Mode, a new job is created at `QUEUED` state.
+- When user switches to Direct Mode, any in-progress jobs are `PAUSED` (not cancelled) — resumable on return to coordinator.
+- Debug mode does not affect job state — it only controls trace verbosity.

@@ -13,6 +13,9 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 
 - run_id: <uuid or timestamp-based ID, e.g. 2026-02-22T14:30:00Z>
 - feature: <NNN>-<feature-name>
+- output_root: <absolute path to project-local output directory>
+- coordinator_mode: review | pipeline | direct
+- debug_mode: on | off
 - spec_version: <version>
 - spec_hash: <sha256>
 - started_at: <ISO-8601 UTC>
@@ -52,14 +55,47 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 ## Human Checkpoints Cleared
 
 - [ ] Spec approval
-- [ ] Architecture sign-off
+- [ ] Architecture sign-off (includes Constitution Check)
 - [ ] Convergence escalation (if triggered)
 - [ ] Security sign-off
 
 ## Notes
 
-<free-form notes from Coordinator, e.g. "AC-05 deferred to next spec revision", "Security agent flagged Medium finding, tracked in adr.md">
+<free-form notes from Coordinator, e.g. "AC-05 deferred to next spec revision", "Security agent flagged Medium finding, tracked in adr.md", "Constitution Article III exception logged in ADR">
 ```
+
+---
+
+## Field Reference: New Required and Optional Fields
+
+### `output_root` (required)
+
+```
+output_root: <absolute path to project-local output directory>
+```
+
+- Must be set before any artifact is written
+- Coordinator validates it is not inside `AI-Dev-Shop/`
+- All artifact paths in the pipeline are resolved relative to this root
+
+### `coordinator_mode` (required)
+
+```
+coordinator_mode: review | pipeline | direct
+```
+
+Tracks the Coordinator's current operating mode:
+- `pipeline` — full multi-agent pipeline is active; jobs are created and tracked
+- `review` — Coordinator is reviewing artifacts or answering questions; no jobs are created
+- `direct` — user is working directly with a single agent; in-progress jobs are PAUSED, not cancelled
+
+### `debug_mode` (optional, default: off)
+
+```
+debug_mode: on | off
+```
+
+When `on`, the Observer emits `[DEBUG]` trace entries at every dispatch, gate check, and mode switch. Does not affect job state or pipeline logic — controls trace verbosity only.
 
 ---
 
@@ -107,6 +143,9 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 
 - run_id: 2026-02-22T14:30:00Z
 - feature: 003-csv-invoice-export
+- output_root: /Users/la/projects/my-app
+- coordinator_mode: pipeline
+- debug_mode: off
 - spec_version: 1.1.0
 - spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
 - started_at: 2026-02-22T14:30:00Z
@@ -121,6 +160,7 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 | spec | 2026-02-22T14:32:00Z | specs/003-csv-invoice-export/spec.md | sha256:a3f8... |
 | red-team | 2026-02-22T14:55:00Z | specs/003-csv-invoice-export/red-team-findings.md | sha256:b1c4... |
 | architect | 2026-02-22T15:30:00Z | specs/003-csv-invoice-export/adr.md | sha256:b9e2... |
+| tasks | 2026-02-22T15:32:00Z | specs/003-csv-invoice-export/tasks.md | sha256:c7d3... |
 | tdd | 2026-02-22T16:10:00Z | specs/003-csv-invoice-export/test-certification.md | sha256:c1d4... |
 
 ## Current Stage Detail
@@ -147,7 +187,7 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 ## Human Checkpoints Cleared
 
 - [x] Spec approval
-- [x] Architecture sign-off
+- [x] Architecture sign-off (includes Constitution Check)
 - [ ] Convergence escalation (if triggered)
 - [ ] Security sign-off
 

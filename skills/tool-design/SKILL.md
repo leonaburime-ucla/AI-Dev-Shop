@@ -132,6 +132,58 @@ Not every operation needs a tool. Agents should not call tools when:
 
 Unnecessary tool calls increase latency, cost, and the chance of errors. Design tools with a "cache result in context and don't re-call" assumption.
 
+## Inline Documentation Requirement
+
+All tools and functions generated using this skill must include language-appropriate inline documentation. Undocumented generated code is incomplete output — it is not acceptable to ship a tool function without documentation any more than it is acceptable to ship a tool without a description.
+
+**TypeScript / JavaScript** — TypeDoc / JSDoc:
+```typescript
+/**
+ * Retrieves invoice records matching the given filters.
+ *
+ * @param filters - Query criteria: one or more of invoiceId, customerId, status, dateRange.
+ * @param options - Optional query configuration.
+ * @param options.limit - Maximum number of records to return. Defaults to 20.
+ * @param options.offset - Number of records to skip for pagination. Defaults to 0.
+ * @param options.orderBy - Sort field and direction. Defaults to { field: 'createdAt', direction: 'desc' }.
+ * @returns Array of InvoiceView objects matching the filters. Empty array if no matches. Never null.
+ * @throws {InvoiceServiceUnavailableError} If the invoice service cannot be reached after 3 attempts.
+ * @example
+ * const invoices = await queryInvoices({ customerId: 'cust-001' }, { limit: 10 });
+ */
+```
+
+**Python** — Google or NumPy style docstrings:
+```python
+def query_invoices(filters: InvoiceFilters, options: QueryOptions | None = None) -> list[InvoiceView]:
+    """Retrieve invoice records matching the given filters.
+
+    Args:
+        filters: Query criteria — one or more of invoice_id, customer_id, status, date_range.
+        options: Optional query configuration (limit, offset, order_by).
+
+    Returns:
+        List of InvoiceView objects. Empty list if no matches. Never None.
+
+    Raises:
+        InvoiceServiceUnavailableError: If the invoice service cannot be reached after 3 attempts.
+
+    Example:
+        invoices = query_invoices(InvoiceFilters(customer_id='cust-001'), QueryOptions(limit=10))
+    """
+```
+
+**Other languages** — use the equivalent idiomatic format (Rustdoc, Javadoc, XML doc comments for C#, etc.).
+
+Every tool-related function must document:
+- **Purpose**: what the function does, precisely
+- **Parameters**: name, type, and meaning for every parameter (including optional ones and their defaults)
+- **Return value**: type and shape of what is returned, including null/undefined/empty cases
+- **Error conditions**: every exception or error type that can be thrown, and what causes it
+- **Example usage**: at least one concrete call with realistic values
+
+This applies to: tool wrapper functions, helper utilities, parameter validation functions, response transformation functions, and any other generated code — not only the top-level tool function.
+
 ## Common Failure Modes
 
 **Too many overlapping tools**: Agent cannot decide which tool to use for a given task. 12 invoice tools where 3 would suffice. Audit and merge.
