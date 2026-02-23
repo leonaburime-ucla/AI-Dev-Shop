@@ -12,16 +12,25 @@ cp -r AI-Dev-Shop/ your-project/
 
 All internal paths are already prefixed with `AI-Dev-Shop/` — nothing breaks as a subfolder.
 
-Each tool has a file it reads automatically on startup. Add one line to the right one:
+Each tool has a file it reads automatically on startup. Add the following to the right one:
 
 **Claude Code** — add to `CLAUDE.md` at your project root (create if missing):
 ```
 Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 ```
 
-**Gemini CLI / OpenAI Codex** — add to `GEMINI.md` (Gemini) or `AGENTS.md` (Codex) at your project root:
+**Gemini CLI / OpenAI Codex** — add to `GEMINI.md` (Gemini) or `AGENTS.md` (Codex) at your project root. Paste the following into your root file:
 ```
 Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
+
+# Mandatory Startup
+
+On the first user message in this repository (including greetings), before any reply:
+1. Open and read `AI-Dev-Shop/AGENTS.md`.
+2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and provide a short summary of what each mode does.
+3. If the file is missing or unreadable, state that explicitly and stop.
+
+Failure to perform Mandatory Startup is a blocking error. Do not proceed with task work until corrected.
 ```
 
 **Cursor** — add to `.cursor/rules/ai-dev-shop.mdc` (create if missing):

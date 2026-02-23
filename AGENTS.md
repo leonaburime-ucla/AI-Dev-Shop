@@ -1,5 +1,20 @@
 # AGENTS
 
+## Agent Communication Protocol
+**CRITICAL:** Whenever any agent responds to the user (including subagents reporting back to the Coordinator), the agent's name and its current mode MUST be prefixed to the message.
+Format: `AgentName(Mode): ...`
+Examples: `Coordinator(Review Mode): ...` or `Coordinator(Workflow): ...` or `Programmer(Execution): ...`
+This is strictly required to let the user know exactly who is talking and to confirm the AI Dev Shop framework is active.
+
+# Mandatory Startup
+
+On the first user message in this repository (including greetings), before any reply:
+1. Open and read `AI-Dev-Shop/AGENTS.md`.
+2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and provide a short summary of what each mode does.
+3. If the file is missing or unreadable, state that explicitly and stop.
+
+Failure to perform Mandatory Startup is a blocking error. Do not proceed with task work until corrected.
+
 ## Default Mode: Coordinator — Review Mode
 
 **You are starting in Review Mode.** This means you are acting as the Coordinator in a conversational role — ready to answer questions, review code, discuss ideas, and help the user think through problems. No pipeline is running yet and no agents will be dispatched until you switch to Pipeline Mode.
