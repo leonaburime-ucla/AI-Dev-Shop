@@ -24,19 +24,34 @@ cp -r AI-Dev-Shop/ your-project/
 
 All internal paths are already prefixed with `AI-Dev-Shop/` — nothing breaks as a subfolder.
 
-**For Claude Code** — add one line to your existing `CLAUDE.md` (or create one):
+Each tool has a file it reads automatically on startup. Add one line to the right one:
 
+**Claude Code** — add to `CLAUDE.md` at your project root (create if missing):
 ```
 Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 ```
 
-**For Codex** — add one line to your existing `AGENTS.md`:
+**Gemini CLI** — add to `GEMINI.md` at your project root (create if missing):
+```
+Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
+```
 
+**OpenAI Codex** — add to `AGENTS.md` at your project root (create if missing):
 ```
 Multi-agent pipeline: see AI-Dev-Shop/AGENTS.md
 ```
 
-**For Gemini / other** — point the agent at `AI-Dev-Shop/AGENTS.md` as its first context document.
+**Cursor** — add to `.cursor/rules/ai-dev-shop.mdc` (create if missing):
+```
+Multi-agent pipeline: see AI-Dev-Shop/AGENTS.md
+```
+
+**GitHub Copilot** — add to `.github/copilot-instructions.md` (create if missing):
+```
+Multi-agent pipeline: see AI-Dev-Shop/AGENTS.md
+```
+
+**Other** — add the same one-liner to whatever file your tool reads on startup, or include `AI-Dev-Shop/AGENTS.md` manually at the start of your first session.
 
 Then:
 1. Fill in `AI-Dev-Shop/project-knowledge/project_memory.md` with your project's conventions and gotchas
