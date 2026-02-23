@@ -172,10 +172,10 @@ A spec is ready when:
 | Content | Location |
 |---|---|
 | Requirements, acceptance criteria, invariants, edge cases | Spec file |
-| Architecture decisions and pattern choices | ADR in `AI-Dev-Shop/specs/` — see `AI-Dev-Shop/skills/architecture-decisions/SKILL.md` |
-| Project conventions and tribal knowledge | `AI-Dev-Shop/project-knowledge/project_memory.md` |
-| Lessons learned from past mistakes | `AI-Dev-Shop/project-knowledge/learnings.md` |
-| Open questions and parking lot items | `AI-Dev-Shop/project-knowledge/project_notes.md` |
+| Architecture decisions and pattern choices | ADR in `AI-Dev-Shop-speckit/specs/` — see `AI-Dev-Shop-speckit/skills/architecture-decisions/SKILL.md` |
+| Project conventions and tribal knowledge | `AI-Dev-Shop-speckit/project-knowledge/project_memory.md` |
+| Lessons learned from past mistakes | `AI-Dev-Shop-speckit/project-knowledge/learnings.md` |
+| Open questions and parking lot items | `AI-Dev-Shop-speckit/project-knowledge/project_notes.md` |
 
 ## Strict Mode — Spec Package
 
@@ -209,7 +209,27 @@ Example of compliant usage: "The system must return HTTP 422 with body `{ error:
 
 **Implementation-readiness test**: Before a strict-mode spec package is approved, apply this test: can a competent developer who has never seen this project implement the feature from these spec files alone, without asking any clarifying questions? If the answer is no — because something is missing, ambiguous, or requires assumed context — the spec is not done.
 
-**Reference**: `AI-Dev-Shop/project-knowledge/spec-definition-of-done.md` is the authoritative checklist template for strict-mode spec packages.
+**Reference**: `AI-Dev-Shop-speckit/project-knowledge/spec-definition-of-done.md` is the authoritative checklist template for strict-mode spec packages.
+
+## Brownfield / Legacy Code Rule
+
+When writing a spec for a new feature in a codebase that already exists, apply these rules without exception. Ignoring them produces "SpecFall" — an undeliverable attempt to comprehensively document a legacy system before any new work can begin.
+
+**Rule 1 — Narrow scope to the new feature and its immediate integration boundaries only.**
+The spec covers what is being built and the exact points where it touches existing code. It does not cover anything the existing system already does that is not being changed. If the new feature calls an existing `UserRepository.findById()` method, the spec references that method by name — it does not describe what `findById` does.
+
+**Rule 2 — Treat existing codebase patterns as constraints, not subjects.**
+Existing naming conventions, error formats, authentication patterns, and data shapes are inputs the new feature must conform to. They belong in the spec's Constraints or Agent Directives section as one-line references, not as requirements to be re-specified. Example: `"Errors must use the existing envelope format from error-types.ts"` — not a full redefinition of the error format.
+
+**Rule 3 — Reference legacy behavior by citation, never by restatement.**
+If the new feature has a boundary with legacy code, name the existing file, function, or interface it integrates with. Do not copy-paste or paraphrase what that code does. The Programmer Agent can read the existing code. Restating it creates a second source of truth that will drift.
+
+**Rule 4 — Explicitly list legacy areas that are out of scope.**
+The Out of Scope section must name adjacent legacy modules that are not being changed, even if they are related. This prevents agents from expanding work into unrelated parts of the codebase under the assumption that "while we're here" improvements are in scope.
+
+**Failure mode to avoid**: A spec that starts with "The existing system currently does X, Y, and Z..." is already in SpecFall. Stop. Delete everything before the first REQ line and start with the new feature's requirements only.
+
+---
 
 ## Spec Change Protocol
 
