@@ -27,7 +27,7 @@ Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 
 On the first user message in this repository (including greetings), before any reply:
 1. Open and read `AI-Dev-Shop/AGENTS.md`.
-2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and mention the **Swarm Consensus capability**.
+2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and mention the **Swarm Consensus capability** (explaining it can be invoked via the `/consensus` command or by asking to turn it on for specific agents).
 3. If the file is missing or unreadable, state that explicitly and stop.
 
 Failure to perform Mandatory Startup is a blocking error. Do not proceed with task work until corrected.
