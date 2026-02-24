@@ -4,10 +4,11 @@
 To orchestrate a multi-model swarm (Gemini, Claude, Codex) via their respective CLIs to analyze a complex problem, collate their independent reasoning, and synthesize a unified, superior solution.
 
 ## When to Use This Skill
+**CRITICAL: This skill is OFF by default.** To save compute and avoid unprompted CLI execution, only invoke this skill if explicitly instructed by the user or the Coordinator.
 - When the user explicitly requests a "consensus", "swarm analysis", or uses the `/consensus` command.
-- When an architecture decision (ADR) has profound consequences and requires rigorous, multi-perspective validation.
-- When Red-Team needs to aggressively probe a Spec for vulnerabilities.
-- When the Coordinator is faced with an ambiguous or highly complex directive.
+- When the Coordinator directs a specific subagent (like the Architect or Red-Team) to use Swarm Consensus for a single task.
+- When an architecture decision (ADR) has profound consequences and requires rigorous, multi-perspective validation (only if authorized).
+- When Red-Team needs to aggressively probe a Spec for vulnerabilities (only if authorized).
 
 ## Prerequisites & State Check
 Before executing a swarm query, you MUST verify which CLI tools are available and what versions/models they are configured to use.

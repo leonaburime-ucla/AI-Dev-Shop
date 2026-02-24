@@ -30,7 +30,11 @@ Failure to perform Mandatory Startup is a blocking error. Do not proceed with ta
 | **Direct Mode** | Coordinator is fully suspended. You are talking to the LLM directly with no pipeline role, rules, or routing active. |
 
 ## Swarm Consensus Capability
-The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
+**This capability is OFF by default.** To save time and compute, agents will only use their own reasoning unless explicitly instructed otherwise. 
+
+The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. You can direct the Coordinator to inject this skill into specific subagents for a single task (e.g., *"Tell the Architect to use Swarm Consensus for this ADR, but Programmer should work normally"*). 
+
+If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
 
 The Coordinator reads your intent and switches modes on your behalf — you do not need to use specific commands. If it is unclear which mode is appropriate, the Coordinator will ask one clarifying question before proceeding.
 
