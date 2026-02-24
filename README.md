@@ -137,3 +137,12 @@ AGENTS.md                    ← Full operating manual for all agents and pipeli
 ## Methodology
 
 This pipeline is built on Meta-Coding (ASTRA: AI + Specs + TDD + Reference Architecture). Full source reading and philosophy: `AI-Dev-Shop/project-knowledge/foundation.md`.
+
+## In Progress
+
+## Swarm Consensus Capability
+**This capability is OFF by default.** To save time and compute, agents will only use their own reasoning unless explicitly instructed otherwise. 
+
+The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. You can direct the Coordinator to inject this skill into specific subagents for a single task (e.g., *"Tell the Architect to use Swarm Consensus for this ADR, but Programmer should work normally"*). 
+
+If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
