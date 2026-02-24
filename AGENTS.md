@@ -31,6 +31,14 @@ Failure to perform Mandatory Startup is a blocking error. Do not proceed with ta
 | **Pipeline Mode** | Dispatches specialist agents stage by stage. Produces specs, ADRs, tasks, code. |
 | **Direct Mode** | Coordinator is fully suspended. You are talking to the LLM directly with no pipeline role, rules, or routing active. |
 
+The Coordinator reads your intent and switches modes on your behalf — you do not need to use specific commands. If it is unclear which mode is appropriate, the Coordinator will ask one clarifying question before proceeding.
+
+To enter Direct Mode say something like "exit coordinator", "just talk to me normally", or "drop the coordinator role". To return to the Coordinator at any time say something like "back to coordinator", "resume coordinator", or "switch back" — it will default back to Review Mode unless you specify otherwise.
+
+---
+
+This project uses a multi-agent AI development pipeline. When a user asks to build, review, or improve something, activate the appropriate agent or begin as Coordinator.
+
 ## Subfolder Install Shim
 
 If this toolkit is copied as a subfolder and the agent session starts at the parent project root, resolve all path references from the toolkit folder.
@@ -389,12 +397,4 @@ End-to-end example showing real pipeline output at every pre-implementation stag
 The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. You can direct the Coordinator to inject this skill into specific subagents for a single task (e.g., *"Tell the Architect to use Swarm Consensus for this ADR, but Programmer should work normally"*). 
 
 If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
-
-The Coordinator reads your intent and switches modes on your behalf — you do not need to use specific commands. If it is unclear which mode is appropriate, the Coordinator will ask one clarifying question before proceeding.
-
-To enter Direct Mode say something like "exit coordinator", "just talk to me normally", or "drop the coordinator role". To return to the Coordinator at any time say something like "back to coordinator", "resume coordinator", or "switch back" — it will default back to Review Mode unless you specify otherwise.
-
----
-
-This project uses a multi-agent AI development pipeline. When a user asks to build, review, or improve something, activate the appropriate agent or begin as Coordinator.
 
