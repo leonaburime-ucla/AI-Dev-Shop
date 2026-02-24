@@ -67,7 +67,7 @@ Keep it self-contained. The peer CLIs have no project context — everything the
 
 ## Step 3 — Swarm Dispatch
 
-**CRITICAL ANTI-HALLUCINATION RULE:** You MUST NOT fake, imagine, or hallucinate the responses from other models. If a CLI tool is not installed, or if the shell command fails or times out, you must strictly report that it failed or is unavailable. Do not invent a consensus or make up quotes from Claude or Codex. You are only allowed to synthesize the actual text captured from the `stdout` of the shell commands.
+**CRITICAL ANTI-HALLUCINATION RULE:** You MUST NOT fake, imagine, or hallucinate the responses from other models. If a CLI tool is not installed, or if the shell command fails or times out, you must strictly report that it failed or is unavailable. Do not invent a consensus or make up quotes from peer models. You are only allowed to synthesize the actual text captured from the `stdout` of the shell commands.
 
 Run in parallel where possible:
 
