@@ -3,6 +3,7 @@
 - Last Updated: 2026-02-22
 
 ## Skills
+- `AI-Dev-Shop/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `AI-Dev-Shop/skills/codebase-analysis/SKILL.md` — phased analysis protocol, token budget strategy, findings report format, flaw categories and severity
 - `AI-Dev-Shop/skills/architecture-migration/SKILL.md` — current state classification, target pattern selection, phase plan format, migration principles
 - `AI-Dev-Shop/skills/architecture-decisions/SKILL.md` — pattern catalog, system drivers analysis, DDD vocabulary, tradeoff framework

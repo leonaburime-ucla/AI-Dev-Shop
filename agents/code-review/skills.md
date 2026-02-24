@@ -3,6 +3,7 @@
 - Last Updated: 2026-02-22
 
 ## Skills
+- `AI-Dev-Shop/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `AI-Dev-Shop/skills/code-review/SKILL.md` — review dimensions, what tests cannot catch, finding classification, report format, anti-patterns
 - `AI-Dev-Shop/skills/architecture-decisions/SKILL.md` — what architectural boundaries to enforce
 - `AI-Dev-Shop/skills/security-review/SKILL.md` — security surface changes to flag for the Security Agent

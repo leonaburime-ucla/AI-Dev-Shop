@@ -3,6 +3,7 @@
 - Last Updated: 2026-02-22
 
 ## Skills
+- `AI-Dev-Shop/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `AI-Dev-Shop/skills/refactor-patterns/SKILL.md` — tech debt taxonomy, refactor proposal format, rules of safe refactoring, what not to refactor
 - `AI-Dev-Shop/skills/architecture-decisions/SKILL.md` — architectural boundary rules and ADR format; needed when a finding reveals a boundary violation to escalate to Architect
 - `AI-Dev-Shop/skills/design-patterns/SKILL.md` — pattern reference files; needed when proposing structural mismatch fixes that require knowledge of the correct pattern structure

@@ -3,6 +3,7 @@
 - Last Updated: 2026-02-22
 
 ## Skills
+- `AI-Dev-Shop/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `AI-Dev-Shop/skills/spec-writing/SKILL.md` — spec anatomy, AC format, invariants, edge cases, quality standards; required to recognize when a requirement is vague, incomplete, or missing a required element
 - `AI-Dev-Shop/skills/test-design/SKILL.md` — testability criteria, what makes an assertion deterministic and automatable, behavior vs implementation distinction; required for untestability probes
 - `AI-Dev-Shop/skills/architecture-decisions/SKILL.md` — pattern catalog and system drivers; required for scope creep probes involving architectural assumptions (e.g., spec implying a specific architectural pattern or dependency that was not chosen)

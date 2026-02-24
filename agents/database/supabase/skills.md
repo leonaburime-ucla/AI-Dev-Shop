@@ -3,6 +3,7 @@
 - Last Updated: 2026-02-23
 
 ## Skills
+- `AI-Dev-Shop/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `AI-Dev-Shop/skills/supabase/SKILL.md` — RLS policies, PostgREST conventions, Supabase client setup, realtime, storage, edge functions, auth integration, type generation, common gotchas
 - `AI-Dev-Shop/skills/postgresql/SKILL.md` — CTEs, window functions, JSONB, triggers, stored functions, extensions, full-text search; load for any non-trivial SQL logic in migrations or functions
 - `AI-Dev-Shop/skills/sql-data-modeling/SKILL.md` — reference for constraint syntax, index types, and naming conventions when implementing the data model received from Database Agent
