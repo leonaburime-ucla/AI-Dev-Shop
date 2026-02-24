@@ -13,7 +13,6 @@ On the first user message in this repository (including greetings), before any r
 2. Provide a comprehensive welcome message that MUST include:
    - "Booted with AI-Dev-Shop/AGENTS.md loaded."
    - A bulleted list of the 3 Coordinator modes (Review Mode, Pipeline Mode, Direct Mode) along with a 1-sentence summary explaining what each mode actually does.
-   - An explanation of the **Swarm Consensus capability** (what it is: orchestrating multiple LLMs to solve hard problems together). You MUST explicitly state that it tries to get consensus between 3 models, and you MUST list the specific model names and versions it will use (e.g., your own Gemini version, plus the Claude and Codex versions if available). Explicitly state it is OFF by default but can be invoked via the `/consensus` command or by asking to turn it on for specific agents.
 3. If the file is missing or unreadable, state that explicitly and stop.
 
 Failure to perform Mandatory Startup is a blocking error. Do not proceed with task work until corrected.
@@ -31,21 +30,6 @@ Failure to perform Mandatory Startup is a blocking error. Do not proceed with ta
 | **Review Mode** (default on start) | Converses, reviews, answers questions, spot-checks. No dispatch, no artifacts. |
 | **Pipeline Mode** | Dispatches specialist agents stage by stage. Produces specs, ADRs, tasks, code. |
 | **Direct Mode** | Coordinator is fully suspended. You are talking to the LLM directly with no pipeline role, rules, or routing active. |
-
-## Swarm Consensus Capability
-**This capability is OFF by default.** To save time and compute, agents will only use their own reasoning unless explicitly instructed otherwise. 
-
-The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. You can direct the Coordinator to inject this skill into specific subagents for a single task (e.g., *"Tell the Architect to use Swarm Consensus for this ADR, but Programmer should work normally"*). 
-
-If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
-
-The Coordinator reads your intent and switches modes on your behalf — you do not need to use specific commands. If it is unclear which mode is appropriate, the Coordinator will ask one clarifying question before proceeding.
-
-To enter Direct Mode say something like "exit coordinator", "just talk to me normally", or "drop the coordinator role". To return to the Coordinator at any time say something like "back to coordinator", "resume coordinator", or "switch back" — it will default back to Review Mode unless you specify otherwise.
-
----
-
-This project uses a multi-agent AI development pipeline. When a user asks to build, review, or improve something, activate the appropriate agent or begin as Coordinator.
 
 ## Subfolder Install Shim
 
@@ -101,7 +85,10 @@ If tests repeatedly fail (3+ cycles on same cluster), escalate to human — do n
 
 **Two ways to invoke each stage:**
 
-**Option A — Slash commands** (requires one-time setup): copy `AI-Dev-Shop/templates/commands/` to `.claude/commands/` in your project root. Then type the command directly.
+**Option A — Slash commands** (requires one-time setup): 
+- **Claude Code**: copy `AI-Dev-Shop/templates/commands/` to `.claude/commands/` in your project root.
+- **Gemini CLI**: copy `AI-Dev-Shop/templates/commands/gemini/` to `.gemini/commands/` in your project root. 
+Then type the command directly.
 
 **Option B — Manual protocol** (no setup, works with any LLM): paste the contents of the corresponding file from `AI-Dev-Shop/templates/commands/` as your message, replacing `$ARGUMENTS` with your input. Every command file is a standalone prompt — they don't require Claude Code to use.
 
@@ -392,3 +379,22 @@ All spec artifacts for a feature live in a single folder under `<OUTPUT_ROOT>`:
 
 End-to-end example showing real pipeline output at every pre-implementation stage (spec → red-team → ADR → tasks → test certification):
 `AI-Dev-Shop/examples/golden-sample/README.md`
+
+
+## In Progress
+
+## Swarm Consensus Capability
+**This capability is OFF by default.** To save time and compute, agents will only use their own reasoning unless explicitly instructed otherwise. 
+
+The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. You can direct the Coordinator to inject this skill into specific subagents for a single task (e.g., *"Tell the Architect to use Swarm Consensus for this ADR, but Programmer should work normally"*). 
+
+If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
+
+The Coordinator reads your intent and switches modes on your behalf — you do not need to use specific commands. If it is unclear which mode is appropriate, the Coordinator will ask one clarifying question before proceeding.
+
+To enter Direct Mode say something like "exit coordinator", "just talk to me normally", or "drop the coordinator role". To return to the Coordinator at any time say something like "back to coordinator", "resume coordinator", or "switch back" — it will default back to Review Mode unless you specify otherwise.
+
+---
+
+This project uses a multi-agent AI development pipeline. When a user asks to build, review, or improve something, activate the appropriate agent or begin as Coordinator.
+
