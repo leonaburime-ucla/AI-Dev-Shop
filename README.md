@@ -27,7 +27,7 @@ Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 
 On the first user message in this repository (including greetings), before any reply:
 1. Open and read `AI-Dev-Shop/AGENTS.md`.
-2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and provide a short summary of what each mode does.
+2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and mention the **Swarm Consensus capability**.
 3. If the file is missing or unreadable, state that explicitly and stop.
 
 Failure to perform Mandatory Startup is a blocking error. Do not proceed with task work until corrected.
@@ -97,6 +97,7 @@ AGENTS.md                    ← Full operating manual for all agents and pipeli
 │   ├── agent-evaluation/SKILL.md
 │   ├── codebase-analysis/SKILL.md
 │   ├── architecture-migration/SKILL.md
+│   ├── swarm-consensus/SKILL.md
 │   └── design-patterns/     ← 19+ patterns with TypeScript examples
 │       ├── SKILL.md          ← index + pattern selection guide
 │       └── references/       ← individual pattern files

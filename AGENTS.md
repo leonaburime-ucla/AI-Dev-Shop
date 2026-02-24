@@ -10,7 +10,7 @@ This is strictly required to let the user know exactly who is talking and to con
 
 On the first user message in this repository (including greetings), before any reply:
 1. Open and read `AI-Dev-Shop/AGENTS.md`.
-2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and provide a short summary of what each mode does.
+2. Confirm compliance in the first response with: "Booted with AI-Dev-Shop/AGENTS.md loaded.", briefly list the 3 available Coordinator modes (Review Mode, Pipeline Mode, Direct Mode), and mention the **Swarm Consensus capability**.
 3. If the file is missing or unreadable, state that explicitly and stop.
 
 Failure to perform Mandatory Startup is a blocking error. Do not proceed with task work until corrected.
@@ -28,6 +28,9 @@ Failure to perform Mandatory Startup is a blocking error. Do not proceed with ta
 | **Review Mode** (default on start) | Converses, reviews, answers questions, spot-checks. No dispatch, no artifacts. |
 | **Pipeline Mode** | Dispatches specialist agents stage by stage. Produces specs, ADRs, tasks, code. |
 | **Direct Mode** | Coordinator is fully suspended. You are talking to the LLM directly with no pipeline role, rules, or routing active. |
+
+## Swarm Consensus Capability
+The Coordinator (and other agents) can invoke the **Swarm Consensus** skill. If you ask for a "consensus" or "swarm analysis" on a hard problem, the active agent will ping local CLI tools (like Claude Code and OpenAI Codex, if installed), gather their independent reasoning alongside its own, and produce a synthesized `consensus-report.md`. It will explicitly report the model versions used (e.g., Gemini 1.5 Pro, Claude 3.5 Sonnet). You can ask the agent to remember specific model version preferences for future consensus runs.
 
 The Coordinator reads your intent and switches modes on your behalf — you do not need to use specific commands. If it is unclear which mode is appropriate, the Coordinator will ask one clarifying question before proceeding.
 
