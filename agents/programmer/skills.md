@@ -5,6 +5,7 @@
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — boundaries and contracts to stay within
+- `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — highest-priority micro-level implementation rules (modular/composable/testable units) after macro architecture boundaries are set
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project conventions in `<AI_DEV_SHOP_ROOT>/project-knowledge/` that apply to the current domain
 - `<AI_DEV_SHOP_ROOT>/skills/tool-design/SKILL.md` — tool description engineering, consolidation principle, error message design when building agent tools
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-react-orcbash/SKILL.md` — load when implementing React frontend features: Orc-BASH layer structure, dependency injection rules, orchestrator wiring
@@ -15,6 +16,8 @@
 
 ## Role
 Implement production code that satisfies certified tests and architecture constraints. Write the minimum viable change. Do not change behavior outside the assigned scope.
+
+Micro-level code quality priority: inside approved architectural boundaries, optimize for modular/composable/testable units first.
 
 ## Required Inputs
 - Active spec metadata (ID / version / hash)

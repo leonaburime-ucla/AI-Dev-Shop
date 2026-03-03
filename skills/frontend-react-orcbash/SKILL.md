@@ -25,19 +25,14 @@ Business Logic, API, and State Manager import from shared `types/` only. They ne
 2. Functions (API calls, business logic methods)
 3. Classes (store instances, service instances — last resort, harder to mock)
 
-## Parameter Convention (Required)
+## Shared Micro-Level Rules
 
-For functions/hooks/orchestrators in Orc-BASH, use a two-object signature:
+Use `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` for shared micro-level implementation rules:
 
-- First parameter: required values object
-- Second parameter: optional values object with defaults (`= {}`)
-
-```typescript
-const doThing = (
-  { requiredA, requiredB }: { requiredA: string; requiredB: number },
-  { optionalX = false }: { optionalX?: boolean } = {},
-): Result => { ... };
-```
+- required two-object parameter convention (required object + optional object)
+- explicit return types and TypeDoc/TSDoc expectations
+- testability-first boundaries for functions/hooks/orchestrators
+- `useEffect` coordination guidance and side-effect isolation
 
 ## Type Signature and TypeDoc Requirements
 
@@ -45,34 +40,6 @@ const doThing = (
 - Every exported function and hook must include TypeDoc/TSDoc with `@param` and `@returns`.
 - Internal/private hooks and helper functions must also be documented when they coordinate side-effects or domain behavior (especially UI-state hooks, logic hooks, and integration hooks).
 - Do not rely on inferred return types at Orc-BASH layer boundaries.
-
-## Testability-First Rule (Non-Negotiable)
-
-All code written in Orc-BASH layers must be easy to test.
-
-- API and logic layers should expose deterministic, assertion-friendly outputs.
-- Hooks and orchestrators should return stable, explicit state/action contracts that are straightforward to assert in tests.
-- Side effects must be isolated and injectable (network calls, storage, timers, random, date/time).
-- If a unit is hard to test, treat it as a design defect and refactor boundaries before proceeding.
-
-### Assertion-Friendly Return Contracts
-
-Prefer return shapes that are easy to verify:
-
-- Include explicit status/result objects over implicit side effects.
-- Return named fields for derived values (not only nested/transient state).
-- Return callable actions with explicit `Promise<void>` or typed result payloads.
-- Keep return contracts stable and typed so tests can assert behavior without peeking into internals.
-
-### `useEffect` Testability Guidance
-
-`useEffect` itself should coordinate, not own business logic.
-
-- Move business decisions into pure functions or logic hooks; call them from `useEffect`.
-- Keep effect dependencies minimal and explicit (primitive/stable refs only).
-- Inject effect dependencies (fetchers, adapters) so they can be mocked.
-- Prefer asserting observable outcomes (returned state/action effects) rather than "effect ran" internals.
-- For complex effects, expose a dedicated action (e.g. `initialize`, `refresh`) that the effect calls; test the action directly, then add a small integration test for effect wiring.
 
 ## File Structure
 
@@ -474,8 +441,10 @@ useEffect(() => { deps.fetchPost({ postId }); }, [postId]);
 
 ## Full Implementation Reference
 
+For shared testability/composability rules and generic examples, use:
+- `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`
+
 See `<AI_DEV_SHOP_ROOT>/skills/frontend-react-orcbash/references/` for complete working examples:
 - `post-feature-example.md` — full Reddit posts feature with all 6 layers including state adapter
 - `typedoc-return-types-example.md` — explicit return types and TypeDoc/TSDoc coverage for exported APIs plus internal hook internals
 - `feature-slice-drop-in-template.md` — DDD/vertical-slice drop-in feature structure with rationale, weaknesses, and improvement guidance
-- `testability-patterns-example.md` — general patterns for writing testable logic functions, API boundaries, hooks, and orchestrators
