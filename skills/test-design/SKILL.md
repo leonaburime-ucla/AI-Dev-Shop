@@ -110,6 +110,11 @@ The spec hash in the certification must match the hash in the spec file. CI enfo
 
 ## Coverage Targets
 
+### Coverage Terminology
+
+- **Big Four**: `% Stmts | % Branch | % Funcs | % Lines` (in this exact order)
+- **Big Five**: Big Four + `Uncovered Line #s`
+
 ### Hard Coverage Gates (non-negotiable; takes precedence over all other coverage guidance)
 
 The following suite-level gates are mandatory and evaluated per metric, not as an average:
