@@ -25,6 +25,7 @@ Encode the spec into executable tests before implementation. Certify each test s
    - Each acceptance criterion → one or more tests
    - Each invariant → dedicated assertion set
    - Each edge case → explicit scenario test
+2a. Alongside the requirement matrix, build an **Outcome Matrix** for each module being tested: for each distinct state + input combination, define the expected outcome (Given State X + Input Y → Outcome Z). This is not a structural branch map — do not specify how the Programmer must implement branches or conditionals. The matrix defines what must be true for every observable outcome. The Programmer is responsible for ensuring their implementation contains only the branches needed to produce those outcomes, with no dead defensive code beyond what the matrix defines.
 3. Write tests before code, prioritizing: unit tests for invariants, integration tests for boundary contracts, acceptance tests for criteria.
    - Place tests in `__tests__/unit/` and `__tests__/integration/` by type.
    - Enforce naming convention from test-design skill: `.unit.test.ts`, `.integration.test.ts`, `.e2e.test.ts` (if writing browser tests).

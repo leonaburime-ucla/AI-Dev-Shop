@@ -9,6 +9,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — security surface changes to flag for the Security Agent
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern implementation structure with TypeScript examples; required for Dimension 2 (Architecture Adherence) — cannot identify violations without knowing what the correct hexagonal/clean/modular layer structure looks like
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — test types, certification protocol, behavior vs implementation assertions; required for Dimension 3 (Test Quality) — assessing whether tests cover spec requirements, include unhappy paths, and are behavior-level not implementation-level
+- `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — coverage-friendly design rules and anti-pattern bans; required for Dimension 3 (Test Quality) — identifying coverage-killing structural violations in any module containing decision logic, data transformation, or side effects
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy: AC format, invariants, edge cases, scope boundaries; required for Dimension 1 (Spec Alignment) — mapping each AC, invariant, and edge case to its implementation path
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA checklist (activated when diff includes frontend components)
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — backward compatibility and contract validation
@@ -26,7 +27,7 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
 1. Review the diff against all six dimensions in `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md`:
    - Spec alignment
    - Architecture adherence
-   - Test quality
+   - Test quality — includes coverage-friendly structure: for changed in-scope files (per the Scope Boundary in `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`), verify compliance with the coverage rules in that skill. Coverage anti-patterns (broad catch without typed contract, logic in lifecycle wrappers, CC > 4, dead defensive branches, side effects in conditionals) are **Required** findings.
    - Code quality and maintainability
    - Security surface
    - Non-functional characteristics
