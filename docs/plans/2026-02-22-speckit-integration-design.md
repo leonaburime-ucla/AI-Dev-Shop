@@ -34,7 +34,7 @@ A fill-in template for establishing project-level engineering governance. Contai
 - Amendment process: how to change the constitution with documented rationale
 - Version + amendment date tracking
 
-### 2. `project-knowledge/constitution.md`
+### 2. `project-knowledge/governance/constitution.md`
 The default project constitution instance (pre-filled with sensible defaults, customized per project). This is the file agents actually read. Articles:
 - **Article I — Library-First**: Use existing libraries before writing custom implementations. Justify any custom code that replaces a well-maintained library.
 - **Article II — Test-First**: No implementation without certified tests. TDD Agent certifies before Programmer starts.
@@ -79,17 +79,17 @@ Add:
 
 ### 7. `agents/spec/skills.md`
 Add to Workflow:
-- Step 0: Read `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`. For any requirement that conflicts with a constitution article, inline a `[NEEDS CLARIFICATION]` marker with the specific article and what decision is needed.
+- Step 0: Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For any requirement that conflicts with a constitution article, inline a `[NEEDS CLARIFICATION]` marker with the specific article and what decision is needed.
 - Step: Before handing off, confirm zero unresolved `[NEEDS CLARIFICATION]` markers remain (all resolved or escalated to human).
 
 ### 8. `agents/architect/skills.md`
 Add to Workflow:
 - Step 0 (new): If spec involves library or technology choices, produce `research.md` using `<AI_DEV_SHOP_ROOT>/templates/research-template.md` before writing the ADR.
-- Step 1 (new, before current Step 1): Run Constitution Check — for each article in `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`, verify the proposed architecture complies. Any violation goes into the Complexity Justification table in the ADR, or triggers a revised architecture.
+- Step 1 (new, before current Step 1): Run Constitution Check — for each article in `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`, verify the proposed architecture complies. Any violation goes into the Complexity Justification table in the ADR, or triggers a revised architecture.
 
 ### 9. `agents/coordinator/skills.md`
 Add:
-- Inject `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` in Spec Agent and Architect Agent dispatches
+- Inject `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` in Spec Agent and Architect Agent dispatches
 - New escalation trigger: constitution violation without justification (same severity as spec hash mismatch)
 - After ADR approval: generate `tasks.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md` based on the ADR's parallel delivery plan
 

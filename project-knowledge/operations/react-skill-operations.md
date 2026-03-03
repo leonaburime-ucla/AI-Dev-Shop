@@ -36,7 +36,7 @@ Apply this priority order:
 5. Performance and rendering tactics (Vercel best-practices)
 6. Style/readability preferences
 
-If two items conflict at the same level, use `project-knowledge/skill-conflict-resolution.md`.
+If two items conflict at the same level, use `project-knowledge/governance/skill-conflict-resolution.md`.
 
 ## 3) Source Pin and Update Process
 
@@ -55,7 +55,7 @@ Refresh process:
 1. Pull latest into local mirror at `/Users/la/Desktop/Multi-Agent Swarm Foundation/vercel-agent-skills`
 2. Review upstream diff of `skills/*/rules`
 3. Copy changes into local `skills/vercel-*` folders
-4. Update `project-knowledge/skills-registry.md` only if folder names or ownership changed
+4. Update `project-knowledge/routing/skills-registry.md` only if folder names or ownership changed
 5. Record new commit hash and date in this file
 
 ## 4) Evaluation Loop (Benchmark Set)

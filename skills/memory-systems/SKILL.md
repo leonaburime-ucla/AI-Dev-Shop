@@ -30,11 +30,11 @@ In our pipeline:
 
 ## The Three Project Knowledge Files as Long-Term Memory
 
-`<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` — Stable facts about this project that do not change unless a convention is revised. Read by the Coordinator when injecting context per agent. No size limit but entries should be self-contained facts, not essays.
+`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` — Stable facts about this project that do not change unless a convention is revised. Read by the Coordinator when injecting context per agent. No size limit but entries should be self-contained facts, not essays.
 
-`<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md` — Failure log. Past mistakes and what to do instead. Append-only. Entries grow the system's "negative space" — what not to do. The most valuable entries are the ones that correct a mistake that happened more than once.
+`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` — Failure log. Past mistakes and what to do instead. Append-only. Entries grow the system's "negative space" — what not to do. The most valuable entries are the ones that correct a mistake that happened more than once.
 
-`<AI_DEV_SHOP_ROOT>/project-knowledge/project_notes.md` — Live working memory for the project: open questions, deferred decisions, in-progress thinking. Items graduate to `project_memory.md` when they become conventions, or are marked `[RESOLVED]` when answered.
+`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md` — Live working memory for the project: open questions, deferred decisions, in-progress thinking. Items graduate to `project_memory.md` when they become conventions, or are marked `[RESOLVED]` when answered.
 
 ## Invalidate, Don't Discard
 

@@ -94,12 +94,12 @@ When debug is OFF: silent operation, no log blocks.
 - `.pipeline-state.md` from active feature folder (if exists)
 
 ## Workflow
-0. **Session start:** Check for `.pipeline-state.md` in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` feature subfolders. If found with status `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md` before doing anything else. Check for `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-store.md` — if the file does not exist, create it now with the header: `# Memory Store\n\n_No entries yet. See memory-schema.md for entry format._`
+0. **Session start:** Check for `.pipeline-state.md` in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` feature subfolders. If found with status `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md` before doing anything else. Check for `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` — if the file does not exist, create it now with the header: `# Memory Store\n\n_No entries yet. See memory-schema.md for entry format._`
 1. Validate all incoming outputs reference the active spec version/hash. Reject stale references.
 2. Verify each output includes the full handoff contract (input refs, output summary, risks, suggested next).
 3. Build routing plan for this cycle using the decision tree in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`.
-4. **Before dispatching any agent**, scan `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-store.md` for relevant entries. Injection policy: (1) match tags against current feature domain and current stage, (2) rank results — FAILURE entries for the current stage first, then CONSTITUTION entries if dispatching Architect, then by most recent date, then by tag match count, (3) inject at most 5 entries, (4) skip entries older than 90 days unless tagged #architecture, #gotcha, or #constitution (those never expire). Prefix injected entries with "Relevant past memory:" in the dispatch. If more than 5 entries match, inject the top 5 by rank and discard the rest.
-5. Dispatch to agents with explicit scope, constraints, and deliverables. Always include `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` in Spec Agent, Red-Team Agent, and Architect Agent dispatches. Include the recommended model tier from `<AI_DEV_SHOP_ROOT>/project-knowledge/model-routing.md` in each dispatch. Record job state in `.pipeline-state.md` using `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`.
+4. **Before dispatching any agent**, scan `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` for relevant entries. Injection policy: (1) match tags against current feature domain and current stage, (2) rank results — FAILURE entries for the current stage first, then CONSTITUTION entries if dispatching Architect, then by most recent date, then by tag match count, (3) inject at most 5 entries, (4) skip entries older than 90 days unless tagged #architecture, #gotcha, or #constitution (those never expire). Prefix injected entries with "Relevant past memory:" in the dispatch. If more than 5 entries match, inject the top 5 by rank and discard the rest.
+5. Dispatch to agents with explicit scope, constraints, and deliverables. Always include `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` in Spec Agent, Red-Team Agent, and Architect Agent dispatches. Include the recommended model tier from `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/model-routing.md` in each dispatch. Record job state in `.pipeline-state.md` using `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`.
 6. After ADR is human-approved: generate `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md`, based on the ADR's parallel delivery plan.
    - If `system-blueprint.md` exists, enforce `Depends on` sequencing from the decomposition plan before applying `[P]` markers.
    - Do not parallelize tasks with schema/API/event dependencies across domains; schedule them in later waves.
@@ -115,7 +115,7 @@ When debug is OFF: silent operation, no log blocks.
 ### Memory Routing
 When the user says "remember this", "note this", "add this convention", or any similar instruction:
 1. Classify the content: is it a stable convention → project_memory.md, a failure/lesson → learnings.md, an open question → project_notes.md
-2. Follow project-knowledge/knowledge-routing.md — do not guess
+2. Follow project-knowledge/governance/knowledge-routing.md — do not guess
 3. NEVER write project memory into AGENTS.md, skills.md, or any framework file
 4. Confirm with the user where it will be written before writing
 

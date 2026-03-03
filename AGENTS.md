@@ -21,7 +21,7 @@ On the first user message in this repository (including greetings), before any r
    - One sentence explaining that Consultation Mode (default ON) exists and how to enable/disable it.
    - One sentence explaining that Agent Consensus Mode exists and how to enter/exit it, without explaining debate details.
 3. If the file is missing or unreadable, state that explicitly and stop.
-4. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt after the welcome message.
+4. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt after the welcome message.
 
 **slash-commands-setup** (skip if dismissed):
 Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/consensus`, and more)? Say **yes** and I'll walk you through it."
@@ -186,14 +186,14 @@ Cross-agent consultation is enabled by default. If consultation mode is disabled
   - `CONSULT-ACK` (owner accepted/rejected recommendation + reason)
   - `CONSULT-LEARNING` (reusable takeaway for memory)
 - Bounded exchange rule: maximum 2 back-and-forth rounds per consultation thread before owner decides or escalates to human.
-- Logging requirement: write summary to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`; route durable learnings using `project-knowledge/knowledge-routing.md`.
+- Logging requirement: write summary to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`; route durable learnings using `project-knowledge/governance/knowledge-routing.md`.
 
 ---
 
 ## Shared Rules (All Agents)
 
 - **Specs are ground truth.** Confirm spec hash before every dispatch. If specs are wrong, all downstream work is wrong.
-- **The constitution governs architecture.** Spec Agent flags compliance, Red-Team pre-flights it, Architect's ADR is the binding record. Unjustified violation = blocking escalation. See `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`.
+- **The constitution governs architecture.** Spec Agent flags compliance, Red-Team pre-flights it, Architect's ADR is the binding record. Unjustified violation = blocking escalation. See `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
 - **[NEEDS CLARIFICATION] markers block Architect dispatch.** Resolve or escalate to human first.
 - **Every artifact references the active spec version and hash.** No exceptions.
 - **Framework files are read-only.** Never modify `agents/`, `skills/`, `templates/`, or `workflows/` — these are toolkit source files. `reports/` and `project-knowledge/` are the project workspace and are writable under `<AI_DEV_SHOP_ROOT>/`. Spec files are written to the user-specified location outside `<AI_DEV_SHOP_ROOT>/`.
@@ -226,24 +226,24 @@ Full routing decision tree (Red-Team, Database, Supabase, test failures, securit
 ## Convergence Policy
 
 Threshold: ~90-95% acceptance tests passing. Single cluster: escalate after 3 consecutive failures.
-Full policy, retry budgets, escalation message format: `<AI_DEV_SHOP_ROOT>/project-knowledge/escalation-policy.md`
+Full policy, retry budgets, escalation message format: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/escalation-policy.md`
 
 ---
 
 ## Project Knowledge
 
 Per-project files (fill in for each project):
-- `project-knowledge/project_memory.md` — stable conventions and tribal knowledge
-- `project-knowledge/learnings.md` — failure log, append-only
-- `project-knowledge/project_notes.md` — open questions, deferred decisions
+- `project-knowledge/memory/project_memory.md` — stable conventions and tribal knowledge
+- `project-knowledge/memory/learnings.md` — failure log, append-only
+- `project-knowledge/memory/project_notes.md` — open questions, deferred decisions
 
-Routing authority for all memory writes: `<AI_DEV_SHOP_ROOT>/project-knowledge/knowledge-routing.md`
+Routing authority for all memory writes: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md`
 
 ---
 
 ## Skills Library
 
-Full map of skills to agents: `<AI_DEV_SHOP_ROOT>/project-knowledge/skills-registry.md`
+Full map of skills to agents: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md`
 
 ---
 

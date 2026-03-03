@@ -2,7 +2,7 @@
 
 Defines how agents treat sensitive data encountered during pipeline execution. All agents are bound by this policy. Violations are Constitution Article VI (Security-by-Default) concerns and are logged to memory-store.md.
 
-Supplements `<AI_DEV_SHOP_ROOT>/project-knowledge/tool-permission-policy.md`, which governs tool scope. This document governs data handling within those scopes.
+Supplements `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/tool-permission-policy.md`, which governs tool scope. This document governs data handling within those scopes.
 
 ---
 

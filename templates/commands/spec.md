@@ -36,7 +36,7 @@ All files below must be created under the user-specified location (`<user-specif
 
 ## Workflow
 
-1. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`.
+1. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
 2. Determine the next FEAT number by scanning `<AI_DEV_SHOP_ROOT>/reports/pipeline/` for existing feature folders (format: `NNN-feature-name/`). Use the next available three-digit number.
 3. Derive a short feature name (2-4 words, action-noun format, lowercase-hyphenated) from the description. Example: "add user auth", "export csv report".
 4. Ask the user two questions before writing anything:

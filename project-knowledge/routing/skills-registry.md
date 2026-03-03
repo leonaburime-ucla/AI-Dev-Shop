@@ -48,10 +48,10 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/change-management/SKILL.md` | Programmer, DevOps Agent, Architect, Database Agent |
 | `skills/infrastructure-as-code/SKILL.md` | DevOps Agent, Architect |
 | `skills/vibe-coding/SKILL.md` | VibeCoder Agent (optional, Agent Direct Mode) |
-| `project-knowledge/tool-permission-policy.md` | All agents (security guardrails) |
-| `project-knowledge/skill-conflict-resolution.md` | All agents (cross-skill conflict handling and user choice protocol) |
-| `project-knowledge/react-skill-operations.md` | Coordinator, Programmer, Code Review, QA/E2E (React skill preflight, precedence, and evaluation loop) |
-| `project-knowledge/data-classification.md` | All agents (PII and secret handling) |
-| `project-knowledge/model-routing.md` | Coordinator (dispatch tier selection) |
-| `project-knowledge/escalation-policy.md` | Coordinator (retry budgets and escalation triggers) |
-| `project-knowledge/agent-performance-scorecard.md` | Observer (quality tracking) |
+| `project-knowledge/governance/tool-permission-policy.md` | All agents (security guardrails) |
+| `project-knowledge/governance/skill-conflict-resolution.md` | All agents (cross-skill conflict handling and user choice protocol) |
+| `project-knowledge/operations/react-skill-operations.md` | Coordinator, Programmer, Code Review, QA/E2E (React skill preflight, precedence, and evaluation loop) |
+| `project-knowledge/governance/data-classification.md` | All agents (PII and secret handling) |
+| `project-knowledge/routing/model-routing.md` | Coordinator (dispatch tier selection) |
+| `project-knowledge/governance/escalation-policy.md` | Coordinator (retry budgets and escalation triggers) |
+| `project-knowledge/quality/agent-performance-scorecard.md` | Observer (quality tracking) |

@@ -16,7 +16,7 @@ After human spec approval, before Architect dispatch. Coordinator dispatches Red
 
 ## Required Inputs
 - Approved spec file (ID, version, hash) — human approval is required before Red-Team runs
-- `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Architect encounters it
+- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Architect encounters it
 - Coordinator directive
 
 ## Attack Vectors

@@ -23,6 +23,6 @@ Implementation has reached the convergence threshold. Run Code Review and Securi
 - Required Code Review findings → Programmer Agent (must fix before advancing)
 - Recommended Code Review findings → Refactor Agent (non-blocking proposals only)
 - Critical/High Security findings → surface to human for sign-off before merge (hard gate)
-- Medium/Low Security findings → log in `<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md`, continue
+- Medium/Low Security findings → log in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md`, continue
 
 Human must explicitly approve any Critical/High security finding before shipping.

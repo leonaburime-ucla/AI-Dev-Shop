@@ -7,6 +7,37 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ---
 
+## Quick Status Snapshot
+
+- Observer Agent Operational Cadence: **OPEN / PARTIAL** (Observer docs exist; explicit dispatch cadence still missing)
+- Git Branching and PR Strategy: **OPEN**
+- Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
+- Protocol Split: MCP + A2A: **OPEN**
+- Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
+
+---
+
+## Priority 0 — De-Noise and Effectiveness
+
+### Context De-Noise Hardening
+**What it is:** Reduce instruction noise and improve execution reliability by moving guardrails out of prose and into enforceable structure.
+**Current state:** **Framework complete** in `project-knowledge/skill-md-format/` (standards, gates, tracker, failure matrix, overlays).
+**Scope guardrail:** `skills/vercel-*` remains frozen unless explicitly re-scoped by human.
+**What to add next:**
+- Skill transformation rollout: rewrite skills in phases using the new format (`Execution` / `Guardrails` / `Output` / `Reference`).
+- Human-reference preservation: keep existing long-form skills as canonical human-readable references while overlays/new versions are validated.
+- Naming convention for rollout: preserve legacy long-form docs as `HUMANS.md` with a top note that it is human-readable; keep `SKILL.md` as AI/LLM execution-optimized.
+- Comparison workflow: for each rewritten skill, keep side-by-side diff notes and acceptance checks before promotion.
+
+**Note:** Skill-MD-Format framework is complete, but the transformation still needs to be applied across the `skills/` folder in controlled rollout phases.
+**Note:** `agents/*/skills.md` should be transformed in a second phase after `skills/` rollout is validated.
+**Rollout safety gates:**
+- Keep old long-form files as `HUMANS.md` while validating new execution-format `SKILL.md`.
+- Require a side-by-side promotion checklist (non-negotiable gates, routing correctness, handoff compatibility) before replacement.
+- Roll out by agent cluster with pilot validation before broad replacement.
+
+---
+
 ## Priority 1 — Pipeline Gaps
 
 ### Observer Agent Operational Cadence

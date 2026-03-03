@@ -76,7 +76,7 @@ Examples:
 - `__tests__/integration/req-004.model-selection.integration.test.ts`
 - `__tests__/e2e/chat-sidebar.e2e.test.ts`
 
-If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/project_memory.md` and referenced in the certification output. Without an explicit override, this directory rule is mandatory.
+If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/memory/project_memory.md` and referenced in the certification output. Without an explicit override, this directory rule is mandatory.
 
 Use explicit test-type suffixes in filenames:
 
@@ -90,7 +90,7 @@ Examples:
 - `req-004.model-selection.integration.test.ts`
 - `chat-sidebar.e2e.test.ts`
 
-If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/project_memory.md` and referenced in the certification output. Without an explicit override, this naming rule is mandatory.
+If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/memory/project_memory.md` and referenced in the certification output. Without an explicit override, this naming rule is mandatory.
 
 ## Test Certification Protocol
 
@@ -155,7 +155,7 @@ Coverage targets are risk-weighted by module class. Apply the correct threshold 
 
 **Touched-file non-regression rule:** Once a file reaches its threshold, a subsequent change to that file cannot drop coverage below that threshold. A PR that regresses a file must either add tests (route to TDD) or explicitly document the regression justification in the certification record.
 
-**Project-level override:** If the risk profile of a project justifies globally higher or lower thresholds (e.g., a payment processor requiring 100% branch coverage on business logic, or a prototype where 70% is acceptable across the board), document the override in `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` and reference it in the test certification record. Without a documented override, the table above governs.
+**Project-level override:** If the risk profile of a project justifies globally higher or lower thresholds (e.g., a payment processor requiring 100% branch coverage on business logic, or a prototype where 70% is acceptable across the board), document the override in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` and reference it in the test certification record. Without a documented override, the table above governs.
 
 **Integration and acceptance coverage (non-negotiable regardless of module class):**
 - All public API contracts and database boundaries: covered by integration tests

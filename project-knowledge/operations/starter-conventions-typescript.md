@@ -1,6 +1,6 @@
 # Starter Conventions: TypeScript Projects
 
-When starting a TypeScript project with this toolkit, copy the entries below into `project-knowledge/project_memory.md`. They capture TypeScript-specific conventions that the Programmer Agent and Code Review Agent should enforce across the codebase.
+When starting a TypeScript project with this toolkit, copy the entries below into `project-knowledge/memory/project_memory.md`. They capture TypeScript-specific conventions that the Programmer Agent and Code Review Agent should enforce across the codebase.
 
 ---
 

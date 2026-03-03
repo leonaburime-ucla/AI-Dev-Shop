@@ -60,8 +60,8 @@ open `AI-Dev-Shop-speckit/templates/commands/<command>.md`, copy the contents, a
 If you want these slash commands but do not want to set them up manually, ask the AI to install them for you.
 
 **First-time setup:**
-1. Edit `AI-Dev-Shop-speckit/project-knowledge/constitution.md` — replace the default articles with your project's engineering principles, or keep the defaults
-2. Fill in `AI-Dev-Shop-speckit/project-knowledge/project_memory.md` with your project's conventions and gotchas
+1. Edit `AI-Dev-Shop-speckit/project-knowledge/governance/constitution.md` — replace the default articles with your project's engineering principles, or keep the defaults
+2. Fill in `AI-Dev-Shop-speckit/project-knowledge/memory/project_memory.md` with your project's conventions and gotchas
 3. Tell the Coordinator what you want to build, or type `/spec [description]`
 
 The Coordinator will route between agents, enforce convergence, and stop at human checkpoints.
@@ -71,10 +71,10 @@ The Coordinator will route between agents, enforce convergence, and stop at huma
 ```
 AI-Dev-Shop-speckit/AGENTS.md                                    ← must exist
 AI-Dev-Shop-speckit/CLAUDE.md                                    ← must exist
-AI-Dev-Shop-speckit/project-knowledge/constitution.md            ← customize articles for your project
-AI-Dev-Shop-speckit/project-knowledge/project_memory.md          ← fill in before first spec
-AI-Dev-Shop-speckit/project-knowledge/knowledge-routing.md       ← memory routing rules
-AI-Dev-Shop-speckit/project-knowledge/spec-definition-of-done.md ← spec DoD checklist
+AI-Dev-Shop-speckit/project-knowledge/governance/constitution.md            ← customize articles for your project
+AI-Dev-Shop-speckit/project-knowledge/memory/project_memory.md          ← fill in before first spec
+AI-Dev-Shop-speckit/project-knowledge/governance/knowledge-routing.md       ← memory routing rules
+AI-Dev-Shop-speckit/project-knowledge/quality/spec-definition-of-done.md ← spec DoD checklist
 AI-Dev-Shop-speckit/templates/spec-system/feature.spec.md        ← strict-mode spec package templates
 AI-Dev-Shop-speckit/templates/adr-template.md                    ← must exist
 AI-Dev-Shop-speckit/templates/tasks-template.md                  ← must exist
@@ -96,7 +96,7 @@ Full operating manual: **`AI-Dev-Shop-speckit/AGENTS.md`**
 
 This toolkit deeply integrates concepts from [GitHub's spec-kit](https://github.com/github/spec-kit), a spec-driven development methodology. The following spec-kit ideas are incorporated and adapted for the multi-agent pipeline:
 
-- **Constitution framework** — `project-knowledge/constitution.md` with 8 governance articles. Every spec and ADR must comply. Violations are blocking escalations.
+- **Constitution framework** — `project-knowledge/governance/constitution.md` with 8 governance articles. Every spec and ADR must comply. Violations are blocking escalations.
 - **[NEEDS CLARIFICATION] markers** — inline ambiguity flags in specs, with a structured `/clarify` command to resolve them before Architect dispatch.
 - **Quality checklist gate** — Spec Agent generates `requirements.md` per feature and validates the spec against it before handoff.
 - **Per-feature artifact folders** — spec files live at the user-specified location in `<NNN>-<feature-name>/`; pipeline artifacts (ADR, research, tasks, test-certification, red-team findings, pipeline state) live in `AI-Dev-Shop-speckit/reports/pipeline/<NNN>-<feature-name>/`. The `spec_path` field in `.pipeline-state.md` links the two.
@@ -238,4 +238,4 @@ AGENTS.md                          ← Full operating manual for all agents and 
 
 ## Methodology
 
-This pipeline is built on Meta-Coding (ASTRA: AI + Specs + TDD + Reference Architecture). Full source reading and philosophy: `AI-Dev-Shop-speckit/project-knowledge/foundation.md`.
+This pipeline is built on Meta-Coding (ASTRA: AI + Specs + TDD + Reference Architecture). Full source reading and philosophy: `AI-Dev-Shop-speckit/project-knowledge/operations/foundation.md`.

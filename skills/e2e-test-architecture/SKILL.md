@@ -46,7 +46,7 @@ E2E tests validate what the user experiences, not what the code does internally.
 - Seed fixtures via API calls (not by manipulating DB directly) — this tests the API too.
 - Clean up fixtures in `afterEach` — do not rely on test order for cleanup.
 - Use factory functions for fixture creation — makes test setup readable.
-- Synthetic data only — follow `<AI_DEV_SHOP_ROOT>/project-knowledge/data-classification.md` PII patterns.
+- Synthetic data only — follow `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/data-classification.md` PII patterns.
 
 ## Auth in E2E Tests
 

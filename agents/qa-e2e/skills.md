@@ -48,4 +48,4 @@ Owns the E2E test layer. Writes browser-level tests (Playwright) that validate a
 - Never use hard waits (`waitForTimeout`) — use `waitForSelector`, `waitForResponse`, or role-based locators
 - Never use brittle CSS class selectors — use ARIA roles, labels, and test IDs
 - Never modify application source code
-- Test data must use synthetic PII patterns from `<AI_DEV_SHOP_ROOT>/project-knowledge/data-classification.md`
+- Test data must use synthetic PII patterns from `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/data-classification.md`

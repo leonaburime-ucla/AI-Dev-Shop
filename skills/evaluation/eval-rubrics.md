@@ -141,6 +141,6 @@ Return: score per dimension, weighted overall, biggest weakness.
 
 - After each pipeline run, run a judge pass on the Spec Agent output (highest value; most common failure point)
 - Weekly: run judge passes on all agent outputs from that week's features
-- Record each pass as a `[QUALITY]` entry in `project-knowledge/memory-store.md`
+- Record each pass as a `[QUALITY]` entry in `project-knowledge/memory/memory-store.md`
 - Flag regressions to the Coordinator immediately
 - Track constitution compliance scores separately — a declining trend on Architect's Constitution Compliance dimension signals ADR template or constitution clarity issues

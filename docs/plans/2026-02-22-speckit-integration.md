@@ -30,7 +30,7 @@
 
 ## How to Use This Template
 
-Copy this file to `project-knowledge/constitution.md`. Fill in each article with your project's specific rules. Delete placeholder comments. The Spec Agent and Architect Agent read this file on every run — every article they cannot comply with must be either justified in the ADR's Complexity Justification table or escalated to the human.
+Copy this file to `project-knowledge/governance/constitution.md`. Fill in each article with your project's specific rules. Delete placeholder comments. The Spec Agent and Architect Agent read this file on every run — every article they cannot comply with must be either justified in the ADR's Complexity Justification table or escalated to the human.
 
 ---
 
@@ -152,10 +152,10 @@ git commit -m "feat: add constitution-template.md"
 
 ---
 
-## Task 2: Create `project-knowledge/constitution.md`
+## Task 2: Create `project-knowledge/governance/constitution.md`
 
 **Files:**
-- Create: `project-knowledge/constitution.md`
+- Create: `project-knowledge/governance/constitution.md`
 
 This is the default project instance — pre-filled with sensible defaults. Users customize it per project. Agents read this file (not the template).
 
@@ -268,7 +268,7 @@ All production code paths emit structured, queryable signals. No silent failures
 
 **Step 2: Verify**
 
-Open `project-knowledge/constitution.md` and confirm:
+Open `project-knowledge/governance/constitution.md` and confirm:
 - All 8 articles present with Complies if + Exception process
 - Governance section includes blocking escalation rule
 - Amendment log present
@@ -276,7 +276,7 @@ Open `project-knowledge/constitution.md` and confirm:
 **Step 3: Commit**
 
 ```bash
-git add project-knowledge/constitution.md
+git add project-knowledge/governance/constitution.md
 git commit -m "feat: add default project constitution"
 ```
 
@@ -571,7 +571,7 @@ Insert before it:
 ```
 ## Constitution Compliance
 
-For each article in `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`, record status.
+For each article in `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`, record status.
 The Spec Agent completes this. The Architect verifies it.
 
 | Article | Status | Notes |
@@ -701,7 +701,7 @@ Replace with:
 ```
 ## Workflow
 1. Normalize request into clear scope and explicit non-goals.
-2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`. For any requirement that conflicts with or is unclear against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
+2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For any requirement that conflicts with or is unclear against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
 3. Write or revise spec using the format in `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md`. Assign FEAT number by scanning existing specs in `<AI_DEV_SHOP_ROOT>/specs/` for the next available increment.
 4. Complete the Constitution Compliance table in the spec. Mark each article COMPLIES, EXCEPTION (with one-line justification), or N/A.
 5. Assign/update metadata: Spec ID, FEAT number, Version, Last Edited (ISO-8601 UTC), Content Hash (sha256).
@@ -767,7 +767,7 @@ Replace with:
 ```
 ## Required Inputs
 - Active spec file (full content + hash) — must be human-approved
-- Constitution: `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`
+- Constitution: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`
 - Non-functional constraints (scale, reliability, latency, cost)
 - Existing system boundaries and dependencies (existing ADRs in `<AI_DEV_SHOP_ROOT>/specs/`)
 - Coordinator directive
@@ -792,7 +792,7 @@ Replace with:
 ```
 ## Workflow
 0. **Research** (conditional): If the spec involves library or technology choices (any requirement that implies selecting a library, framework, storage system, or messaging system), produce `<AI_DEV_SHOP_ROOT>/specs/RESEARCH-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/templates/research-template.md` before proceeding. Skip this step only if the spec has no technology choices.
-1. **Constitution Check**: Read `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`. For each article, determine if the proposed architecture complies. For any violation: either (a) revise the architecture to comply, or (b) document a justified exception in the ADR's Complexity Justification table. An unjustified violation is a blocking escalation — do not proceed to Step 2.
+1. **Constitution Check**: Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For each article, determine if the proposed architecture complies. For any violation: either (a) revise the architecture to comply, or (b) document a justified exception in the ADR's Complexity Justification table. An unjustified violation is a blocking escalation — do not proceed to Step 2.
 2. Review requirements and classify system drivers (complexity, scale, coupling, release cadence) using the framework in `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 3. Evaluate candidate patterns from the pattern catalog.
 4. Select primary pattern and optional secondary patterns. Justify against system drivers.
@@ -867,7 +867,7 @@ Replace with:
 1. Validate all incoming outputs reference the active spec version/hash. Reject stale references.
 2. Verify each output includes the full handoff contract (input refs, output summary, risks, suggested next).
 3. Build routing plan for this cycle using the decision tree in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`.
-4. Dispatch to agents with explicit scope, constraints, and deliverables. Include `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` in every Spec Agent and Architect Agent dispatch.
+4. Dispatch to agents with explicit scope, constraints, and deliverables. Include `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` in every Spec Agent and Architect Agent dispatch.
 5. After ADR is human-approved: generate `<AI_DEV_SHOP_ROOT>/specs/TASKS-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md`. Base the phase structure and [P] markers on the ADR's parallel delivery plan. Dispatch TDD Agent only after tasks.md is produced.
 6. Apply convergence policy — advance or escalate, never loop indefinitely.
 7. Publish cycle summary.
@@ -946,8 +946,8 @@ Find:
 ```
 ### Spec Agent
 - Product intent from human (verbatim)
-- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` (domain conventions)
-- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md` (recent failure patterns)
+- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` (domain conventions)
+- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` (recent failure patterns)
 - Existing specs in `<AI_DEV_SHOP_ROOT>/specs/` (to avoid ID collisions and detect overlap)
 ```
 
@@ -955,9 +955,9 @@ Replace with:
 ```
 ### Spec Agent
 - Product intent from human (verbatim)
-- `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
-- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` (domain conventions)
-- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md` (recent failure patterns)
+- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
+- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` (domain conventions)
+- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` (recent failure patterns)
 - Existing specs in `<AI_DEV_SHOP_ROOT>/specs/` (to avoid ID collisions, detect overlap, assign next FEAT number)
 ```
 
@@ -977,7 +977,7 @@ Replace with:
 ```
 ### Architect Agent
 - Active spec file (full content + hash) — must be human-approved, zero unresolved [NEEDS CLARIFICATION] markers
-- `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` (for Step 0 constitution check)
+- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` (for Step 0 constitution check)
 - Current system boundaries (existing ADRs in `<AI_DEV_SHOP_ROOT>/specs/`)
 - Non-functional constraints from spec
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`
@@ -1148,7 +1148,7 @@ Replace with:
 ## Shared Rules (All Agents)
 
 - **Specs are ground truth.** If specs are wrong, all downstream work is wrong. Confirm spec hash before every dispatch.
-- **The constitution governs architecture.** Every ADR must include a Constitution Check table. An unjustified violation is a blocking escalation — same severity as a spec hash mismatch. Constitution lives at `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`.
+- **The constitution governs architecture.** Every ADR must include a Constitution Check table. An unjustified violation is a blocking escalation — same severity as a spec hash mismatch. Constitution lives at `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
 - **[NEEDS CLARIFICATION] markers block Architect dispatch.** A spec with unresolved markers may not be handed to the Architect. Resolve or escalate to human first.
 - **Every artifact references the active spec version and hash.** No exceptions.
 - **Tests must include certification linkage.** Every test maps to a specific acceptance criterion or invariant.

@@ -340,7 +340,7 @@ Fix path: route to Programmer Agent with the failing test (or, if no test exists
 
 ### Step 2 — Record in learnings.md
 
-Every post-ship defect is recorded in `<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md` using this structure:
+Every post-ship defect is recorded in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` using this structure:
 
 ```
 [FAILURE] <ISO-8601 date> | Gap type: intent-to-spec | spec-to-implementation
@@ -485,7 +485,7 @@ This table extends the "What Belongs Where" table in `spec-writing`. Enterprise-
 | Work item to requirement mapping | `<spec-package>/work-items.md` |
 | Approval trail | `<spec-package>/approvals.md` |
 | Shift-left harness constraints (appended before Programmer dispatch) | `<spec-package>/tasks.md` — "Constraints" section |
-| Post-ship defect records and harness improvements | `project-knowledge/learnings.md` |
+| Post-ship defect records and harness improvements | `project-knowledge/memory/learnings.md` |
 
 ---
 

@@ -32,7 +32,7 @@ Maintain auditability and enable system learning. The Observer does not sit in t
 - Agent outputs and routing events
 - Spec and test certification metadata
 - Iteration budget consumption per cluster
-- `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-store.md` — prior decisions, failures, facts, constitution events
+- `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` — prior decisions, failures, facts, constitution events
 
 ## Workflow
 1. **Read memory before acting.** Before producing any recommendation or pattern analysis, scan `memory-store.md` for entries with tags matching the current feature domain or failure cluster. Surface relevant past context to inform analysis.
@@ -54,7 +54,7 @@ Maintain auditability and enable system learning. The Observer does not sit in t
 8. Produce weekly improvement recommendations, referencing specific memory entries and quality scores as evidence. Flag any benchmark regressions alongside skills.md change recommendations. Track constitution compliance score trends separately.
 
 ## Memory Guidelines
-- Use `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-schema.md` for entry format
+- Use `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-schema.md` for entry format
 - Tag entries consistently — tags are the primary query mechanism
 - If a FAILURE entry already exists for this cluster, add a new occurrence count entry rather than a duplicate
 - Track constitution article frequency in CONSTITUTION entries — a pattern of Article III exceptions may indicate over-engineering tendencies

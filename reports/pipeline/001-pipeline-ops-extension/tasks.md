@@ -39,7 +39,7 @@
 
 ## Phase 4 - Governance
 
-- [ ] Update `project-knowledge/skills-registry.md` mappings.
+- [ ] Update `project-knowledge/routing/skills-registry.md` mappings.
 - [ ] Add escalation triggers:
   - E2E flake rate above threshold
   - deployment runbook missing rollback path

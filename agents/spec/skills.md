@@ -18,7 +18,7 @@ Convert product intent into precise, versioned, testable specifications that bec
 
 ## Workflow
 1. Normalize request into clear scope and explicit non-goals.
-2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
+2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
 3. Assign FEAT number by scanning existing feature folders in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
 4. Ask the user two questions before writing anything:
 
@@ -83,9 +83,9 @@ Before signaling handoff readiness:
 1. Every file in the spec package must exist
 2. Fill out spec-dod.md — every item must be PASS or NA with a reason
 3. Zero unresolved [NEEDS CLARIFICATION] markers
-4. No banned vague language (see project-knowledge/spec-definition-of-done.md for banned list)
+4. No banned vague language (see project-knowledge/quality/spec-definition-of-done.md for banned list)
 5. Implementation-readiness self-check: "Can a new developer implement this feature from these specs alone?" If no, continue working.
-6. Reference: project-knowledge/spec-definition-of-done.md
+6. Reference: project-knowledge/quality/spec-definition-of-done.md
 
 ## Spec Placement
 

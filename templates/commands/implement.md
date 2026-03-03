@@ -16,7 +16,7 @@ The tasks.md is ready. Run the implementation pipeline:
    - Spec hash (must match TDD certification hash)
    - Certified test names and which ACs they cover
    - ADR constraints
-   - Relevant `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` entries
+   - Relevant `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` entries
 4. After each Programmer cycle, dispatch **TestRunner Agent**. Report pass/fail counts and failure clusters.
 5. Advance to Code Review when ≥90% acceptance tests pass (calibrate threshold to risk — payment/auth systems may require 100%).
 6. If the same tests fail after 3 cycles: escalate to human. This signals a spec gap or architecture mismatch, not a code problem.

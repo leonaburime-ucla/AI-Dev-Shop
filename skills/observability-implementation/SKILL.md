@@ -14,7 +14,7 @@ Observability is not logging. It is the ability to ask arbitrary questions about
 - **Log levels**: Use DEBUG for local dev, INFO for normal ops, WARN for expected errors, ERROR for unexpected errors, FATAL for unrecoverable failures.
 - **Structured log format**: always JSON in production, include `timestamp`, `level`, `service`, `trace_id`, `span_id`, `message`, `context` fields.
 - **What to log**: Log at each application layer (HTTP handler, service, repository).
-- **What never to log**: secrets, PII, full request bodies containing sensitive fields — reference `<AI_DEV_SHOP_ROOT>/project-knowledge/data-classification.md`.
+- **What never to log**: secrets, PII, full request bodies containing sensitive fields — reference `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/data-classification.md`.
 - **Correlation ID propagation**: inject at edge, forward through all downstream calls.
 
 ## Metrics

@@ -120,6 +120,6 @@ This applies to ALL functions including: nested functions, local helper function
 - Do not make changes outside the scope in the Coordinator directive
 - **Coverage self-check is blocking before handoff.** For every changed function in in-scope modules (per the Scope Boundary in `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`): verify compliance with the coverage rules in that skill — can every branch, statement, and function be directly asserted without combinatorial test effort? If not, refactor before reporting handoff complete. Do not hand off with known coverage-unfriendly code.
 - Prefer reversible, incremental changes
-- Check `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` for conventions before writing new patterns
+- Check `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` for conventions before writing new patterns
 - **Inline refactoring is permitted and expected** within files you are already modifying: rename for clarity, extract a duplicated helper, remove dead code you just replaced. All tests must stay green. This is good practice, not scope creep.
 - **Cross-file or out-of-scope structural refactoring is not your job.** If you notice tech debt in files you are not touching, flag it in your output as a Recommended finding for the Refactor Agent — do not go fix it. Mixing structural changes with feature implementation makes test failures undiagnosable.

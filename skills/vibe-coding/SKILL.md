@@ -31,5 +31,5 @@ Ship a rough prototype fast. Optimize for momentum and learning, not production 
 
 - Do not claim production readiness.
 - Do not modify security-critical auth/payment flows unless explicitly requested.
-- Do not use real secrets or real PII in examples, fixtures, or config — reference `<AI_DEV_SHOP_ROOT>/project-knowledge/data-classification.md` for what counts as PII.
+- Do not use real secrets or real PII in examples, fixtures, or config — reference `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/data-classification.md` for what counts as PII.
 - If the prototype should be hardened, promote to the structured pipeline: run `/spec` with the prototype as reference context. The prototype becomes input for the Spec Agent, not the spec itself.

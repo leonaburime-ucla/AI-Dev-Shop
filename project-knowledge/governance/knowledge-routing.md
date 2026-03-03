@@ -12,20 +12,20 @@ Any time a user says "remember this", "note this", "add this to memory", or give
 
 | Content Type | Destination File | Entry Format |
 |---|---|---|
-| Stable conventions that every agent must follow going forward | `project-knowledge/project_memory.md` | `- YYYY-MM-DD: [CONVENTION] <fact>` |
-| Project-specific gotchas, integration quirks, non-obvious platform behavior | `project-knowledge/project_memory.md` | `- YYYY-MM-DD: [GOTCHA] <fact>` |
-| Standing constraints (security, compliance, performance, platform limits) | `project-knowledge/project_memory.md` | `- YYYY-MM-DD: [CONSTRAINT] <fact>` |
-| Architectural patterns or tech decisions ratified for this project | `project-knowledge/project_memory.md` | `- YYYY-MM-DD: [PATTERN] <fact>` |
-| Failures, recurring error clusters, postmortems, what broke and why | `project-knowledge/learnings.md` | `- YYYY-MM-DD: [FAILURE] <what/why/resolution>` |
-| Agent output quality lessons — what a specific agent does wrong repeatedly | `project-knowledge/learnings.md` | `- YYYY-MM-DD: [AGENT-LESSON] <agent> — <what and why>` |
-| Spec gaps that caused downstream failures | `project-knowledge/learnings.md` | `- YYYY-MM-DD: [SPEC-GAP] <gap description and resolution>` |
-| Open questions awaiting a human decision | `project-knowledge/project_notes.md` | `- YYYY-MM-DD: [OPEN] <question — owner — target date>` |
-| Deferred decisions: known issue, not urgent, no owner yet | `project-knowledge/project_notes.md` | `- YYYY-MM-DD: [DEFERRED] <what is deferred and why>` |
-| Parking lot items: things to revisit after current work | `project-knowledge/project_notes.md` | `- YYYY-MM-DD: [PARKING] <item>` |
-| Significant pipeline decisions (architecture, technology, spec direction) | `project-knowledge/memory-store.md` | `[DECISION]` entry per schema in `memory-schema.md` |
-| Structured failure log for Observer pattern tracking | `project-knowledge/memory-store.md` | `[FAILURE]` entry per schema in `memory-schema.md` |
-| Constitution compliance events (exceptions, violations) | `project-knowledge/memory-store.md` | `[CONSTITUTION]` entry per schema in `memory-schema.md` |
-| Agent quality scores from LLM-as-judge passes | `project-knowledge/memory-store.md` | `[QUALITY]` entry per schema in `memory-schema.md` |
+| Stable conventions that every agent must follow going forward | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [CONVENTION] <fact>` |
+| Project-specific gotchas, integration quirks, non-obvious platform behavior | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [GOTCHA] <fact>` |
+| Standing constraints (security, compliance, performance, platform limits) | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [CONSTRAINT] <fact>` |
+| Architectural patterns or tech decisions ratified for this project | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [PATTERN] <fact>` |
+| Failures, recurring error clusters, postmortems, what broke and why | `project-knowledge/memory/learnings.md` | `- YYYY-MM-DD: [FAILURE] <what/why/resolution>` |
+| Agent output quality lessons — what a specific agent does wrong repeatedly | `project-knowledge/memory/learnings.md` | `- YYYY-MM-DD: [AGENT-LESSON] <agent> — <what and why>` |
+| Spec gaps that caused downstream failures | `project-knowledge/memory/learnings.md` | `- YYYY-MM-DD: [SPEC-GAP] <gap description and resolution>` |
+| Open questions awaiting a human decision | `project-knowledge/memory/project_notes.md` | `- YYYY-MM-DD: [OPEN] <question — owner — target date>` |
+| Deferred decisions: known issue, not urgent, no owner yet | `project-knowledge/memory/project_notes.md` | `- YYYY-MM-DD: [DEFERRED] <what is deferred and why>` |
+| Parking lot items: things to revisit after current work | `project-knowledge/memory/project_notes.md` | `- YYYY-MM-DD: [PARKING] <item>` |
+| Significant pipeline decisions (architecture, technology, spec direction) | `project-knowledge/memory/memory-store.md` | `[DECISION]` entry per schema in `memory-schema.md` |
+| Structured failure log for Observer pattern tracking | `project-knowledge/memory/memory-store.md` | `[FAILURE]` entry per schema in `memory-schema.md` |
+| Constitution compliance events (exceptions, violations) | `project-knowledge/memory/memory-store.md` | `[CONSTITUTION]` entry per schema in `memory-schema.md` |
+| Agent quality scores from LLM-as-judge passes | `project-knowledge/memory/memory-store.md` | `[QUALITY]` entry per schema in `memory-schema.md` |
 
 ---
 

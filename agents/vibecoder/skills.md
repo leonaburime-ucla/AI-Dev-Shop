@@ -42,7 +42,7 @@ Build quick-and-dirty prototypes when the user wants speed over structure. This 
 
 ## Guardrails
 - Non-production by default unless explicitly hardened in a structured pipeline.
-- No real secrets or real PII in prototype code/config — reference `<AI_DEV_SHOP_ROOT>/project-knowledge/data-classification.md`.
+- No real secrets or real PII in prototype code/config — reference `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/data-classification.md`.
 - Avoid irreversible/destructive operations.
 - Work on a scratch branch or scratch directory — do not commit exploratory code directly to main.
 - Architectural checks are intentionally shallow in this mode; deep architecture validation belongs to Architect/Refactor stages.

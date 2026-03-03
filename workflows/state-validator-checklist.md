@@ -35,7 +35,7 @@ Located at: `specs/<NNN>-<feature-name>/.pipeline-state.md`
 
 ---
 
-## 2. Memory Store Entries (`project-knowledge/memory-store.md`)
+## 2. Memory Store Entries (`project-knowledge/memory/memory-store.md`)
 
 Run this when reviewing entries written by the Observer, or when a human is promoting Observer recommendations to agent skills.md files.
 

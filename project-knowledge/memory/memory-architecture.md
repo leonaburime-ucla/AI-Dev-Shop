@@ -12,7 +12,7 @@ The pipeline cannot get smarter over time without a durable, queryable memory su
 
 ### Option A — Structured Markdown Schema (no new infrastructure)
 
-Upgrade `project_memory.md` and `learnings.md` from free-form notes to schema-driven entries that the Observer writes to and reads from in a consistent format. See `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-schema.md`.
+Upgrade `project_memory.md` and `learnings.md` from free-form notes to schema-driven entries that the Observer writes to and reads from in a consistent format. See `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-schema.md`.
 
 - **Requires:** Nothing new — just structured writing conventions
 - **Query method:** Agent reads the file and scans by tag, category, or date
@@ -67,7 +67,7 @@ Rationale:
 
 When ready to move from structured markdown to Mem0:
 
-1. Read all entries from `project-knowledge/memory-store.md`
+1. Read all entries from `project-knowledge/memory/memory-store.md`
 2. For each entry, call `mem0.add(entry_text, metadata={category, tags, date, feature})`
 3. Update Observer workflow to use `mem0.search()` instead of file scan
 4. Keep `memory-store.md` as a human-readable audit log — do not delete it
@@ -78,7 +78,7 @@ When ready to move from structured markdown to Mem0:
 
 | File | Purpose |
 |------|---------|
-| `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-schema.md` | Entry format, categories, tagging conventions |
-| `<AI_DEV_SHOP_ROOT>/project-knowledge/memory-store.md` | The actual memory entries (Observer writes here) |
-| `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` | Legacy free-form notes — migrate to memory-store.md over time |
-| `<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md` | Legacy failure log — migrate to memory-store.md over time |
+| `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-schema.md` | Entry format, categories, tagging conventions |
+| `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` | The actual memory entries (Observer writes here) |
+| `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` | Legacy free-form notes — migrate to memory-store.md over time |
+| `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` | Legacy failure log — migrate to memory-store.md over time |
