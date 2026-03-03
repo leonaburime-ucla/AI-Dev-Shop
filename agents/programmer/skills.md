@@ -45,6 +45,7 @@ Do not skip this step even for small tasks. A confirmed pattern is the contract 
 3. Plan implementation by requirement slice — do not implement everything at once.
 4. For each slice, follow the inner loop:
    - **4a. Confirm RED**: Run the target test(s) for this slice fresh. Do not read prior test reports to determine current state — always run. If the test passes without any implementation, stop immediately and flag to Coordinator: this indicates scope overlap from a previous slice, a badly written test, or test drift. Do not implement over a green test without explicit Coordinator guidance.
+   - **4a1. Testability pre-check (mandatory before writing code):** State the planned test seam and expected assertions for this slice (branches, statements, functions, lines). If you cannot describe how the slice will be tested directly, redesign/refactor the slice boundary before implementation.
    - **4b. Implement**: Write the smallest viable change to make only the target test(s) pass. Do not implement more than the current slice requires.
    - **4c. Confirm GREEN**: Run the target test(s) again and confirm they pass.
    - **4d. Check for regressions**: Run the full local suite. If any previously passing test breaks, revert and diagnose before proceeding.
