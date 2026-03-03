@@ -16,7 +16,7 @@ All pipeline artifacts are written under `<AI_DEV_SHOP_ROOT>` — the AI-Dev-Sho
 ## Full Path (Existing Codebase)
 
 ```
-[CodeBase Analyzer] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[CodeBase Analyzer] → [System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - CodeBase Analyzer optionally produces a Migration Plan artifact — not a separate agent step
@@ -25,7 +25,7 @@ All pipeline artifacts are written under `<AI_DEV_SHOP_ROOT>` — the AI-Dev-Sho
 ## Ideal Path (Greenfield)
 
 ```
-Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - Coordinator generates `tasks.md` from the approved ADR before TDD dispatch — not an agent step
@@ -81,8 +81,20 @@ When a codebase analysis report exists, include in Architect dispatch:
 
 What the Coordinator must include in each agent dispatch. Include only what is listed. Extra context degrades attention quality.
 
+### System Blueprint Agent (conditional pre-spec stage)
+- Product vision / idea statement (from user or VibeCoder output)
+- Known constraints and NFRs
+- Existing architecture context (if extending an existing system)
+- `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md`
+- `<AI_DEV_SHOP_ROOT>/templates/system-blueprint-template.md`
+
+Output:
+- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md`
+- Spec decomposition recommendation (which spec packages to create next and in what order)
+
 ### Spec Agent
 - Product intent from human (verbatim)
+- `system-blueprint.md` (if produced) for domain boundaries and decomposition guidance
 - `<AI_DEV_SHOP_ROOT>/project-knowledge/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
 - Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/project_memory.md` (domain conventions)
 - Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/learnings.md` (recent failure patterns)
@@ -252,6 +264,7 @@ Before Programmer begins implementation:
 
 | Finding | Route To | Context to Include |
 |---|---|---|
+| Multi-domain or unclear boundaries before spec exists | System Blueprint Agent | Product intent, constraints, current architecture context |
 | Spec human-approved | Red-Team Agent | Full spec, spec hash, constitution.md |
 | Red-Team: 3+ BLOCKING | Spec Agent | All BLOCKING findings with exact spec refs |
 | Red-Team: CONSTITUTION-FLAG | Human → Spec Agent | Flag details, relevant constitution article |

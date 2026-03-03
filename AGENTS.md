@@ -69,7 +69,7 @@ If this toolkit is a subfolder and the session starts at the parent project root
 Agents are specialized roles, each with a `skills.md`. By default, all routing flows through the **Coordinator** and bounded cross-agent consultation is enabled under Coordinator control.
 
 ```
-[VibeCoder] → [CodeBase Analyzer] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[VibeCoder] → [CodeBase Analyzer] → [System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - `[VibeCoder]` is an optional starting point — say "switch to vibecoder" or `/agent vibecoder` to prototype fast, then promote to the full pipeline when ready
@@ -87,13 +87,14 @@ Agents are specialized roles, each with a `skills.md`. By default, all routing f
 0a. Human reviews → decides Route A (migrate first) or Route B (build alongside migration)
 
 **For all projects:**
-1. Spawn Spec Agent → ask user where to save the spec package; Spec Agent creates the feature folder at that location — all DoD checklist items must pass, zero [NEEDS CLARIFICATION] markers before step 2
-2. Human approves spec → spawn Red-Team Agent → spawn Architect Agent → ADR
-3. Human approves ADR → generate tasks.md → spawn TDD Agent → certify tests against spec hash
-4. Spawn Programmer Agent → implement until tests pass (~90-95%)
-5. Spawn Code Review Agent → classify findings as Required or Recommended
-6. Spawn Security Agent → human must approve any Critical/High finding before shipping
-7. Done
+1. If scope is multi-domain or boundaries are unclear, spawn System Blueprint Agent → produce macro component/domain map and spec decomposition plan
+2. Spawn Spec Agent → ask user where to save the spec package; Spec Agent creates the feature folder at that location — all DoD checklist items must pass, zero [NEEDS CLARIFICATION] markers before step 3
+3. Human approves spec → spawn Red-Team Agent → spawn Architect Agent → ADR
+4. Human approves ADR → generate tasks.md → spawn TDD Agent → certify tests against spec hash
+5. Spawn Programmer Agent → implement until tests pass (~90-95%)
+6. Spawn Code Review Agent → classify findings as Required or Recommended
+7. Spawn Security Agent → human must approve any Critical/High finding before shipping
+8. Done
 
 If tests repeatedly fail (3+ cycles on same cluster), escalate to human — do not keep retrying.
 
@@ -110,6 +111,7 @@ Full stage-by-stage context injection and parallel execution rules: `<AI_DEV_SHO
 
 | Command | Triggers | Produces |
 |---|---|---|
+| `/blueprint` | System Blueprint Agent | system-blueprint.md with macro boundaries and spec decomposition plan |
 | `/spec` | Spec Agent | spec package, [NEEDS CLARIFICATION] resolved |
 | `/clarify` | Spec Agent | structured questions for unresolved markers |
 | `/plan` | Architect Agent | research.md + ADR |
@@ -129,6 +131,7 @@ Full operating procedure for each agent is in their `skills.md`.
 | Agent | Role | File |
 |---|---|---|
 | VibeCoder (optional) | Fast exploratory prototyping — optional on-ramp before the structured pipeline | `agents/vibecoder/skills.md` |
+| System Blueprint (optional, pre-spec) | Macro-level system planning and spec decomposition before feature specs | `agents/system-blueprint/skills.md` |
 | Coordinator | Pipeline orchestration, routing, convergence, human escalation | `agents/coordinator/skills.md` |
 | Spec | Converts intent into versioned, testable spec packages | `agents/spec/skills.md` |
 | Architect | Selects patterns, defines boundaries, produces ADR | `agents/architect/skills.md` |

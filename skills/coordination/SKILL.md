@@ -53,6 +53,12 @@ Agent output received
 │   └─ Route to: VibeCoder Agent (Agent Direct Mode, optional lane)
 │       Context: plain-language goal, preferred stack (if any), timebox
 │
+├─ Scope is multi-domain OR bounded contexts are unclear OR ownership/integration boundaries are unclear?
+│   └─ Route to: System Blueprint Agent
+│       Context: product intent, constraints, existing architecture context
+│       Output required: `system-blueprint.md` with macro component/domain map and spec decomposition plan
+│       Next: human approves blueprint boundaries, then dispatch Spec Agent using blueprint decomposition
+│
 ├─ Consultation mode enabled AND owner agent needs specialist advice?
 │   └─ Route to: Bounded consultation relay (Coordinator-mediated)
 │       Context: owner agent, consulted agent, CONSULT-REQUEST payload, decision deadline
@@ -149,7 +155,7 @@ Agent output received
 ## Pipeline Stages
 
 ```
-Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+System Blueprint (conditional) → Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
 ```
 
 The Coordinator tracks which stage is active. An agent completing its stage does not automatically trigger the next — the Coordinator validates the output meets the handoff contract first.

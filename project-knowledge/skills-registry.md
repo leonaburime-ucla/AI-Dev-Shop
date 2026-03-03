@@ -24,6 +24,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
 | `skills/architecture-migration/SKILL.md` | CodeBase Analyzer |
 | `skills/design-patterns/SKILL.md` | Architect, CodeBase Analyzer |
+| `skills/system-blueprint/SKILL.md` | System Blueprint Agent, Coordinator |
 | `skills/frontend-react-orcbash/SKILL.md` | Programmer (React frontends) |
 | `skills/testable-design-patterns/SKILL.md` | Architect, Programmer, Refactor Agent, TDD Agent |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Review Agent (React/Next tactical guidance) |
