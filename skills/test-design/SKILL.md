@@ -60,6 +60,22 @@ Every requirement must have at least one test. Every test must trace to a requir
 - Written in behavior terms, not implementation terms
 - These are what the Convergence Threshold is measured against
 
+## Test File Naming Convention (Required)
+
+Use explicit test-type suffixes in filenames:
+
+- Unit tests: `*.unit.test.ts`
+- Integration tests (including internal contract/integration boundary checks): `*.integration.test.ts`
+- E2E/browser tests: `*.e2e.test.ts`
+
+Examples:
+
+- `req-001.submit-order.unit.test.ts`
+- `req-004.model-selection.integration.test.ts`
+- `chat-sidebar.e2e.test.ts`
+
+If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/project_memory.md` and referenced in the certification output. Without an explicit override, this naming rule is mandatory.
+
 ## Test Certification Protocol
 
 Every test suite must include a certification record. This is the mechanism that prevents "green tests, wrong behavior." Use `<AI_DEV_SHOP_ROOT>/templates/test-certification-template.md` as the starting point.
@@ -129,6 +145,8 @@ This is the connective tissue that keeps specs, tests, and code in provable alig
 **Copying spec hash manually**: Automate hash generation and certification. Manual copy-paste is how hashes go stale silently.
 
 **Tests that test the mock**: If your test only verifies that a mock was called with certain arguments, you're not testing behavior — you're testing that you wrote the mock correctly.
+
+**Inconsistent test suffixes**: Mixing `.test.ts`, `.spec.ts`, and type-specific suffixes hides test intent and breaks automation/reporting. Use the required suffixes (`.unit.test.ts`, `.integration.test.ts`, `.e2e.test.ts`) unless a documented project override exists.
 
 **Overly complex tests as a suppressed signal**: A test that requires an unusually long setup block, many mocks, or convoluted arrange logic is not a test problem — it is a design signal. The function under test is doing too many things. When a test is hard to write, flag it: surface the complexity to the Coordinator and recommend the function be broken into smaller units before proceeding. Do not write a complex test to cover a complex function and move on. The difficulty is the feedback.
 

@@ -25,6 +25,7 @@ Encode the spec into executable tests before implementation. Certify each test s
    - Each invariant → dedicated assertion set
    - Each edge case → explicit scenario test
 3. Write tests before code, prioritizing: unit tests for invariants, integration tests for boundary contracts, acceptance tests for criteria.
+   - Enforce naming convention from test-design skill: `.unit.test.ts`, `.integration.test.ts`, `.e2e.test.ts` (if writing browser tests).
 3a. **Property-based tests:** For each AC or invariant involving ranges, collections, validation logic, or round-trip guarantees, generate at least one property-based test. See `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` Property-Based Testing section. List property tests separately in the certification record.
 3b. **Contract tests:** For each API or event contract defined in the ADR's API/Event Contract Summary section, generate at least one contract test verifying the implementation honors the contract. Use the testing approach flagged by the Architect (consumer-driven / schema validation / integration). See `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` Contract Testing section.
 4. Create test certification record using `<AI_DEV_SHOP_ROOT>/templates/test-certification-template.md`. Write to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`. Include spec ID, version, and hash.

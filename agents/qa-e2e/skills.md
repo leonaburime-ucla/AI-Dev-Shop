@@ -21,6 +21,7 @@ Owns the E2E test layer. Writes browser-level tests (Playwright) that validate a
 2. Read test certification to understand existing coverage — E2E tests cover journeys, not logic already covered at unit/integration level
 3. Define fixture strategy: what test data is needed, how it is seeded and cleaned up
 4. Write E2E tests using Playwright following patterns in `e2e-test-architecture` skill
+   - Use `.e2e.test.ts` suffix for all E2E files unless project memory documents an approved override
 5. Apply anti-flake rules from the skill — no hard waits, proper selectors, isolated contexts
 6. Tag each test with the AC it covers
 7. Verify tests pass against the current implementation. If a test fails, determine whether the cause is a spec gap, a bug in the implementation, or a test error — report each accordingly

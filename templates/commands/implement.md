@@ -10,7 +10,7 @@ The tasks.md is ready. Run the implementation pipeline:
    - ADR: `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
    - Tasks: `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md`
    - Skill: `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`
-   - Directive: Write failing tests for all P1 ACs before any implementation starts. Certify against spec hash.
+   - Directive: Write failing tests for all P1 ACs before any implementation starts. Certify against spec hash. Enforce test file naming suffixes: `.unit.test.ts`, `.integration.test.ts`, `.e2e.test.ts` unless a documented project override exists.
    - Output: test certification at `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 3. After TDD certification, dispatch **Programmer Agent** with:
    - Spec hash (must match TDD certification hash)
