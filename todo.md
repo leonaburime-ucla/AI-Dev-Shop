@@ -40,6 +40,16 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ## Priority 1 — Pipeline Gaps
 
+### React Component Testing Policy
+**What it is:** UI testing is often skipped by LLMs. Need a strict policy enforcing React component test creation.
+**Current state:** Added to `project-knowledge/quality/react-component-testing-policy.md`.
+**What to add:** Enforce the policy across TDD and Programmer routing. Update skill definition files and evaluation checklists.
+
+### Debug Playbook
+**What it is:** Agents need a structured debug loop (reproduce, isolate, instrument, hypothesize, fix) to prevent thrashing.
+**Current state:** Added to `project-knowledge/quality/debug-playbook.md`.
+**What to add:** Enforce trace requirements and escalation rules across Programmer and QA roles.
+
 ### Observer Agent Operational Cadence
 **What it is:** The Observer role and output format are well-defined but its trigger is not. Currently it "runs alongside" the pipeline with no specified cadence — making it easy to never dispatch in practice.
 **Current state:** **[PARTIAL]** Observer behavior is documented in multiple places (`workflows/multi-agent-pipeline.md`, scorecard docs), but Coordinator dispatch trigger rules are still not explicit.
@@ -56,6 +66,26 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - PR description template that references spec hash, ADR path, and security sign-off status
 - Coordinator guidance: when to create a branch (at TDD dispatch), when to signal PR-ready (at Done State)
 - Note on merge strategy trade-offs (squash vs merge commit vs rebase) relative to spec traceability
+
+### Testability Anti-Pattern Reporting
+**What it is:** Ensure code anti-patterns that make testing hard are consistently surfaced to humans during implementation and review.
+**Current state:** Catalog added in quality docs; enforcement across rewrite/rollout flow still pending.
+**What to add:**
+- Use `project-knowledge/quality/testability-antipatterns.md` as the canonical catalog.
+- Require anti-pattern findings to be reported in handoff summaries with location, impact, and remediation route.
+- Treat repeated unresolved anti-patterns as escalation candidates instead of silently continuing.
+
+### Programmer Ambient Fast-Feedback Testing
+**What it is:** Give Programmer immediate test breakage feedback during implementation without turning TestRunner into a continuous heavy agent.
+**Current state:** Concept agreed in review discussions; not implemented.
+**What to add (policy/docs only for now):**
+- Require Programmer to run a fast local watcher during implementation (unit tests, plus optional small changed-file integration subset).
+- Do not stream raw watcher logs into agent context; use signal-based summaries only.
+- Define stable-failure alert criteria explicitly: only alert after debounce (10-20s) and 2 consecutive failing runs.
+- Add anti-noise rules: alert budget (max N per interval), changed-file scope filtering, and compact payloads only (test id, short error, first failing frame).
+- Define recovery-state behavior explicitly: after first alert, suppress repeat alerts for that same failure until it returns green; alert again only on future green -> failing regression.
+- Preserve TestRunner as the formal gate for full suites, coverage profile checks, spec-hash validation, and certification artifact generation.
+- Document this split in `agents/programmer/skills.md` and coordination docs; defer any scripting/automation until a later phase.
 
 ---
 
@@ -90,10 +120,10 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ### Spec-Kit Command Contract Parity **[PARTIAL]**
 **What it is:** Command files (`.claude/commands/`) currently lack machine-readable frontmatter. Spec-kit's command format includes `handoffs:` and `scripts:` fields that enable automated contract validation — e.g., checking that `/plan` references an approved spec before executing.
-**Current state:** Command files exist in `templates/commands/` (including `spec`, `clarify`, `plan`, `tasks`, `implement`, `review`, `consensus`, `agent`). Frontmatter contracts are still not present.
+**Current state:** Command files exist in `slash-commands/` (including `spec`, `clarify`, `plan`, `tasks`, `implement`, `review`, `consensus`, `agent`). Frontmatter contracts are still not present.
 **What to add:**
 - Frontmatter schema for command files — `description`, `requires`, `handoffs`, `produces`, and optional `mode`
-- Update all command files in `templates/commands/` to include frontmatter
+- Update all command files in `slash-commands/` to include frontmatter
 - Coordinator skills update — teach it to validate command preconditions against frontmatter `requires` fields before dispatch
 **References:** github/spec-kit command format (`github-spec-kit/templates/commands/specify.md`)
 
