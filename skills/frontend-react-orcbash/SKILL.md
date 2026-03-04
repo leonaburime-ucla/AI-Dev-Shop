@@ -1,7 +1,7 @@
 ---
 name: frontend-react-orcbash
 version: 1.1.0
-last_updated: 2026-03-02
+last_updated: 2026-03-04
 description: Use when structuring React frontend code using the Orc-BASH pattern (Orchestration, Business Logic, API, State Management, Hooks) — a hexagonal architecture that inverts dependency flow, maximizes reusability across pages, and makes every layer independently testable.
 ---
 
@@ -24,6 +24,18 @@ Business Logic, API, and State Manager import from shared `types/` only. They ne
 1. Data (simple values)
 2. Functions (API calls, business logic methods)
 3. Classes (store instances, service instances — last resort, harder to mock)
+
+## Orchestrator Injection Is a Hard Gate
+
+This is non-optional. If any item below is violated, the implementation is not Orc-BASH compliant:
+
+1. Hooks must receive API/state/logic through an explicit `deps` contract from the orchestrator.
+2. Orchestrators must wire dependencies explicitly (no hidden globals, no direct store imports, no implicit singleton lookups from hooks).
+3. Hooks must not import API modules, state stores, or service implementations directly.
+4. Business logic and state layers must not import each other.
+5. UI components must consume only orchestrator outputs.
+
+**Blocking rule:** If dependency injection is bypassed in any layer, stop and refactor before handoff. Do not treat this as a style preference.
 
 ## Shared Micro-Level Rules
 
@@ -252,37 +264,38 @@ export const usePost = (
 } => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { post, fetchPost: fetchPostApi, likePost, formatPost, savePost, updatePostLikes } = deps;
 
   const ui = usePostUiState();                          // UI State sub-hook
   const logic = usePostLogic({                          // Business Logic sub-hook
-    post: deps.post,
-    formatPost: deps.formatPost,
+    post,
+    formatPost,
   });
 
   const fetchPost = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const fetched = await deps.fetchPost({ postId });
-      deps.savePost(fetched);
+      const fetched = await fetchPostApi({ postId });
+      savePost(fetched);
     } catch (err) {
       setError(err as Error);
     } finally {
       setIsLoading(false);
     }
-  }, [postId, deps]);
+  }, [postId, fetchPostApi, savePost]);
 
   const like = useCallback(async () => {
     ui.actions.setLiking(true);
     try {
-      const { likes } = await deps.likePost({ postId });
-      deps.updatePostLikes({ postId, likes });
+      const { likes } = await likePost({ postId });
+      updatePostLikes({ postId, likes });
     } catch (err) {
       setError(err as Error);
     } finally {
       ui.actions.setLiking(false);
     }
-  }, [postId, deps, ui.actions]);
+  }, [postId, likePost, updatePostLikes, ui.actions]);
 
   return {
     post: logic.formattedPost,       // from Business Logic sub-hook
@@ -438,6 +451,15 @@ useEffect(() => { deps.fetchPost({ postId }); }, [postId]);
 **Skipping the Business Logic Hook when React lifecycle is needed**: Calling service methods directly in the Integration Hook without wrapping in `useMemo`/`useCallback` when those methods have referential equality implications. Use the Business Logic sub-hook for any service interaction that needs lifecycle awareness.
 
 **Verbose dependency interface as ignored signal**: `UsePostDependencies` growing past 8–10 fields means the hook has too many responsibilities. Split it into domain-specific hooks.
+
+## DI Compliance Checklist (Required Before Handoff)
+
+- Hook has a typed `deps` interface and receives all external dependencies from orchestrator.
+- Hook does not import API/state/logic implementations directly.
+- Orchestrator imports state adapter, not concrete store.
+- Orchestrator wiring is explicit for API calls, logic methods, and state actions.
+- UI imports orchestrator only.
+- `useEffect` and callbacks depend on stable, specific dependency refs (not whole `deps` object).
 
 ## Full Implementation Reference
 
