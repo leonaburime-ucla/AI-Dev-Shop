@@ -387,6 +387,16 @@ export const PostPage = ({
 
 Injecting the orchestrator as a prop with a default enables full UI testing without any state or API setup.
 
+### Component Logic Extraction Rule (Mandatory)
+
+If a component contains business/domain logic beyond trivial rendering decisions:
+
+1. Move that logic into the domain `logic/` layer (service class or pure logic module).
+2. Expose it through the orchestrator/hook dependency contract.
+3. Keep component body focused on rendering + event wiring only.
+
+Do not leave non-trivial business logic as local helpers inside the component. If logic needs tests, it belongs in `logic/`, not inline in `views/`.
+
 ## Error Handling
 
 | Layer | Responsibility |
@@ -437,6 +447,8 @@ Cross-domain communication happens through orchestrators, not between domain int
 **Instantiating in the orchestrator**: `new PostService()` creates a new instance per render. Use exported singletons.
 
 **Cross-layer imports**: Business logic importing from state, hooks importing from API directly. All cross-layer wiring belongs in the orchestrator only.
+
+**Business logic in components**: Keeping transformation/decision rules in `views/*.tsx` (including local helper functions declared inside the component) makes logic hard to test and couples behavior to rendering. Move logic to `logic/` and inject via orchestrator/hook contracts.
 
 **Broad `useEffect` dependencies**: Passing objects, arrays, or the entire `deps` bag as `useEffect` dependencies causes unstable endless re-render cycles because these references are recreated on every render. Always depend on the specific primitive values or stable references you actually need, never on a whole object or the injected dependencies object.
 
