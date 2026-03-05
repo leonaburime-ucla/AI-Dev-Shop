@@ -36,7 +36,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/supabase/SKILL.md` | Supabase Sub-Agent |
 | `skills/systematic-debugging/SKILL.md` | Skills Librarian, Programmer (debug process reference) |
 | `skills/shadcn-ui/SKILL.md` | Skills Librarian, Programmer (frontend component integration reference) |
-| `skills/seo-geo/SKILL.md` | Skills Librarian, Docs Agent (SEO/GEO reference) |
+| `skills/seo-geo/SKILL.md` | Skills Librarian, Programmer, Docs Agent (SEO/GEO reference) |
 | `skills/find-skills/SKILL.md` | Skills Librarian only (external discovery) |
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
