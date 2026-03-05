@@ -4,6 +4,7 @@
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
+- `<AI_DEV_SHOP_ROOT>/skills/llm-council/SKILL.md` — structured multi-model planning council (parallel planner plans + judge merge)
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic, convergence policy, iteration budgets, escalation triggers, cycle summary format
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy

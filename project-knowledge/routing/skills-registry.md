@@ -41,6 +41,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
 | `skills/swarm-consensus/SKILL.md` | All agents (opt-in via Coordinator) |
+| `skills/llm-council/SKILL.md` | Coordinator (structured planning council and judge-merge workflow) |
 | `skills/observability-implementation/SKILL.md` | Architect, Programmer, Security Agent |
 | `skills/devops-delivery/SKILL.md` | DevOps Agent |
 | `skills/security-review/SKILL.md` | Security, Code Review, DevOps |
