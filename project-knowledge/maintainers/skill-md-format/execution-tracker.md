@@ -17,8 +17,8 @@
 
 | File | Section Set | Status | Owner | Notes |
 |---|---|---|---|---|
-| `maintainers/skill-md-format/standards.md` | Execution/Guardrails/Output | compliant | coordinator | concise canonical rules |
-| `maintainers/skill-md-format/gates-and-handoffs.md` | schema sections | compliant | coordinator | compact schema contract |
+| `project-knowledge/maintainers/skill-md-format/standards.md` | Execution/Guardrails/Output | compliant | coordinator | concise canonical rules |
+| `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md` | schema sections | compliant | coordinator | compact schema contract |
 
 ## Scope Filter Checklist
 

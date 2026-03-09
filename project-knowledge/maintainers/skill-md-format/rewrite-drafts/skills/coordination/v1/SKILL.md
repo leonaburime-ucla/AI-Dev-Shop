@@ -10,7 +10,7 @@ description: Condensed coordination skill format for comparison with current coo
 ## Execution
 
 - Load active feature state and current hashes (`spec`, `adr`, `tasks`, `test-cert` when present).
-- Validate pre-dispatch gate from `maintainers/skill-md-format/gates-and-handoffs.md`.
+- Validate pre-dispatch gate from `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`.
 - If gate `PASS`: dispatch next stage with compact handoff payload.
 - If gate `BLOCK`: route to corrective stage or escalate.
 - Enforce dependency gates and human checkpoints before advancing stages.
@@ -37,6 +37,6 @@ description: Condensed coordination skill format for comparison with current coo
 ## Reference
 
 - `skills/coordination/SKILL.md` (current baseline for comparison)
-- `maintainers/skill-md-format/standards.md`
-- `maintainers/skill-md-format/gates-and-handoffs.md`
+- `project-knowledge/maintainers/skill-md-format/standards.md`
+- `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`
 - `project-knowledge/governance/escalation-policy.md`

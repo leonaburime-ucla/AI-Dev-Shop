@@ -63,6 +63,6 @@ Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current defa
 
 - Normal feature work should not edit `agents/`, `skills/`, `templates/`, or `workflows/`.
 - If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work.
-- Maintainer-only rollout notes and design history live under [maintainers/README.md](maintainers/README.md).
-- Bootstrap-only scaffolding lives under [bootstrap/README.md](bootstrap/README.md).
-- Archived audit artifacts live under [archive/README.md](archive/README.md).
+- Maintainer-only rollout notes and design history live under [project-knowledge/maintainers/README.md](project-knowledge/maintainers/README.md).
+- Bootstrap-only scaffolding lives under [templates/bootstrap/README.md](templates/bootstrap/README.md).
+- Archived audit artifacts live under [project-knowledge/archive/README.md](project-knowledge/archive/README.md).

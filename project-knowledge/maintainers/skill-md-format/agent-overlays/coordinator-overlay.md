@@ -3,7 +3,7 @@
 ## Execution
 
 - Read active `spec_hash`, `adr`, `tasks`, and stage artifacts.
-- Run pre-dispatch gate using `maintainers/skill-md-format/gates-and-handoffs.md`.
+- Run pre-dispatch gate using `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`.
 - If gate `PASS`, dispatch next stage with compact handoff payload.
 - If gate `BLOCK`, route to corrective stage or escalate per policy.
 - Record routing outcome and evidence links.
@@ -18,12 +18,12 @@
 
 ## Output
 
-- Emit compact payload matching `maintainers/skill-md-format/gates-and-handoffs.md`.
+- Emit compact payload matching `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`.
 - Include: `feature_id`, `stage_from`, `stage_to`, hashes, summary metrics, failures, risks.
 - Set `human_decision_needed=true` when blocking condition exists.
 
 ## Reference
 
-- `maintainers/skill-md-format/gates-and-handoffs.md`
-- `maintainers/skill-md-format/gates-and-handoffs.md`
+- `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`
+- `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`
 - `project-knowledge/governance/escalation-policy.md`

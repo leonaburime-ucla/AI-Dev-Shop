@@ -266,6 +266,6 @@
 - Run manual validation on top candidate files to convert this baseline into final EXECUTE/RATIONALE split actions before SMF.3/SMF.4.
 
 ## Line-Level Tags Artifact
-- Path: `archive/reports/context-refactor/line-tags.tsv`
+- Path: `project-knowledge/archive/reports/context-refactor/line-tags.tsv`
 - Columns: `file`, `line_number`, `class`, `line_text`
 - Rows: 20554

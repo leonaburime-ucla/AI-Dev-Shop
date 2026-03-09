@@ -9,4 +9,4 @@ Organized knowledge base for pipeline operations and project-specific governance
 - `routing/`: model routing, skills registry, compatibility matrix
 - `quality/`: scorecards and spec quality definitions
 - `operations/`: operational reminders and working conventions
-- `../maintainers/skill-md-format/`: maintainer-only instruction-format standards, gates, overlays, and rollout tracking
+- `maintainers/skill-md-format/`: maintainer-only instruction-format standards, gates, overlays, and rollout tracking

@@ -9,15 +9,15 @@
 **Tech Stack:** Markdown, file edits only. All paths are relative to `<AI_DEV_SHOP_ROOT>/`.
 
 **Reference files:**
-- Design doc: `maintainers/guides/2026-02-22-speckit-integration-design.md`
+- Design doc: `project-knowledge/maintainers/guides/2026-02-22-speckit-integration-design.md`
 - Source inspiration: `<spec-kit>/templates/` (GitHub's spec-kit repo)
 
 ---
 
-## Task 1: Create `bootstrap/constitution-template.md`
+## Task 1: Create `templates/bootstrap/constitution-template.md`
 
 **Files:**
-- Create: `bootstrap/constitution-template.md`
+- Create: `templates/bootstrap/constitution-template.md`
 
 **Step 1: Create the file**
 
@@ -138,7 +138,7 @@ Copy this file to `project-knowledge/governance/constitution.md`. Fill in each a
 
 **Step 2: Verify**
 
-Open `bootstrap/constitution-template.md` and confirm:
+Open `templates/bootstrap/constitution-template.md` and confirm:
 - All 8 Article placeholders are present
 - Governance section includes the blocking escalation rule
 - Amendment log table is present
@@ -146,7 +146,7 @@ Open `bootstrap/constitution-template.md` and confirm:
 **Step 3: Commit**
 
 ```bash
-git add bootstrap/constitution-template.md
+git add templates/bootstrap/constitution-template.md
 git commit -m "feat: add constitution-template.md"
 ```
 
@@ -1185,6 +1185,6 @@ ls "<AI_DEV_SHOP_ROOT>/templates/"
 ls "<AI_DEV_SHOP_ROOT>/project-knowledge/"
 ```
 
-Expected in templates: `constitution-template.md`, `research-template.md`, `tasks-template.md` (alongside existing `spec-template.md`, `adr-template.md`, `test-certification-template.md`)
+Expected in templates: `bootstrap/constitution-template.md`, `research-template.md`, `tasks-template.md` (alongside existing `spec-template.md`, `adr-template.md`, `test-certification-template.md`)
 
 Expected in project-knowledge: `constitution.md` (alongside existing `foundation.md`, `learnings.md`, `project_memory.md`, `project_notes.md`)

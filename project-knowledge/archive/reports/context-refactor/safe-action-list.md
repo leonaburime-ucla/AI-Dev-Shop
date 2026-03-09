@@ -1,7 +1,7 @@
 # Skill-MD-Format Safe Action List (Non-vercel)
 
 - Generated: 2026-03-03T20:39:25Z
-- Source artifacts: `archive/reports/context-refactor/context-audit.md`, `archive/reports/context-refactor/line-tags.tsv`
+- Source artifacts: `project-knowledge/archive/reports/context-refactor/context-audit.md`, `project-knowledge/archive/reports/context-refactor/line-tags.tsv`
 - Scope filter: excludes all `skills/vercel-*`
 
 ## How To Use This File

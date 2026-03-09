@@ -27,7 +27,7 @@ Integrate four concepts from GitHub's spec-kit toolkit into AI-Dev-Shop-speckit:
 
 ## Files to Create (4)
 
-### 1. `bootstrap/constitution-template.md`
+### 1. `templates/bootstrap/constitution-template.md`
 A fill-in template for establishing project-level engineering governance. Contains:
 - Numbered articles (Library-First, Test-First, Simplicity Gate, Anti-Abstraction Gate, Integration-First Testing, Security-by-Default, Spec Integrity, Observability)
 - Each article: name, principle statement, what it prohibits, how to justify an exception

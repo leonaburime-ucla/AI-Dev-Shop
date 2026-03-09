@@ -21,5 +21,5 @@
 
 ## Reference
 
-- `maintainers/skill-md-format/gates-and-handoffs.md`
-- `maintainers/skill-md-format/gates-and-handoffs.md`
+- `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`
+- `project-knowledge/maintainers/skill-md-format/gates-and-handoffs.md`
