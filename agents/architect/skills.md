@@ -1,16 +1,24 @@
 # Architect Agent
 - Version: 1.0.0
-- Last Updated: 2026-03-12
+- Last Updated: 2026-03-13
 
-## Skills
+## Base Skills
+
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — system drivers analysis, ADR format, tradeoff framework, DDD vocabulary, Adaptability First principle, Pattern Evaluation Format
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern selection decision guide, 19+ pattern reference files (TypeScript examples, tradeoffs, failure modes), common pattern combinations; load specific pattern files from references/ as needed
-- `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — micro-level modular/composable/testable unit rules used to define implementation constraints for downstream agents
-- `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — instrumentation design (Constitution Article VIII)
-- `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — when spec has latency/throughput NFRs
-- `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — when spec involves breaking changes to API or data model
-- `<AI_DEV_SHOP_ROOT>/skills/rag-ai-integration/SKILL.md` — when spec involves LLM or vector search features
+
+## Conditional Skills
+
+Conditional skills are not standing context. Load only the subset the spec or Coordinator directive actually requires.
+
+- `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
+- `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — load when the architecture introduces production services, external I/O, telemetry, or alerting requirements
+- `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load when the spec has latency/throughput NFRs
+- `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — load when the spec involves breaking changes to API or data model
+- `<AI_DEV_SHOP_ROOT>/skills/rag-ai-integration/SKILL.md` — load when the spec involves RAG, vector search, or LLM application design
+- `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md` — load when the spec includes model/provider routing, runtime AI guardrails, prompt versioning, or LLM rollout/eval policy
+- `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — load when the spec introduces pipelines, lakehouse/warehouse layers, CDC, or analytics-serving contracts
 
 ## Role
 Select and enforce architecture patterns that satisfy spec constraints, enable safe parallel delivery, and give all downstream agents clear boundaries to work within.

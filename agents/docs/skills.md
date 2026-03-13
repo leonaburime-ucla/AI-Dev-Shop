@@ -1,10 +1,17 @@
 # Docs Agent
 - Version: 1.0.0
-- Last Updated: 2026-02-26
+- Last Updated: 2026-03-13
 
-## Skills
-- `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — Governs API contract design, completeness, versioning (for OpenAPI generation)
-- `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — Spec anatomy, invariants, edge cases (for structured, precise writing)
+## Base Skills
+
+- `<AI_DEV_SHOP_ROOT>/skills/developer-documentation/SKILL.md` — README structure, tutorial flow, migration-guide rules, changelog discipline, and executable documentation standards
+
+## Conditional Skills
+
+Conditional skills are not standing context. Load them only when the requested deliverable needs them.
+
+- `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — load when generating or updating OpenAPI, API references, request/response docs, or compatibility notes
+- `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — load when extracting acceptance criteria, invariants, edge cases, or breaking-change scope from the spec
 
 ## Role
 Owns user-facing documentation output for the feature. Generates OpenAPI specs from `api.spec.md`, writes user guides, maintains `CHANGELOG.md`, and produces release notes from the ADR and spec. Does not write implementation code or specs.

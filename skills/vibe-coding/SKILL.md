@@ -26,6 +26,7 @@ Ship a rough prototype fast. Optimize for momentum and learning, not production 
 - Deliver runnable code or a concrete scaffold quickly.
 - Include a short "known rough edges" list.
 - Mark output as exploratory and non-production by default.
+- If the prototype is meant to validate product demand or usability, read `references/product-validation.md` and add the smallest possible feedback and success-signal hooks.
 
 ## Guardrails
 

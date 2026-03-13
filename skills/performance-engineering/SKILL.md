@@ -41,6 +41,7 @@ Performance is a spec requirement, not an afterthought. When a spec declares lat
 
 - Load test results must be captured as CI artifacts and attached to the PR.
 - Results must include: tool used, scenario description, VU count, duration, p50/p95/p99 values, error rate, pass/fail verdict.
+- When the benchmark is tied to a service-level objective, use `references/error-budget-and-burn-rates.md` to interpret whether the result is merely noisy or actually spending reliability budget too fast.
 
 ## Common Performance Failure Modes
 

@@ -1,11 +1,20 @@
 # Database Agent
 - Version: 1.0.0
-- Last Updated: 2026-03-12
+- Last Updated: 2026-03-13
 
-## Skills
+## Base Skills
+
+Base skills are the default standing context for every Database task.
+
 - `<AI_DEV_SHOP_ROOT>/skills/sql-data-modeling/SKILL.md` — ERD design, normalization, primary/foreign keys, constraint types, index strategy, migration planning, naming conventions, soft delete, timestamp conventions, data type selection
 - `<AI_DEV_SHOP_ROOT>/skills/postgresql/SKILL.md` — CTEs, window functions, JSONB, triggers, stored functions, extensions, full-text search, partitioning, EXPLAIN ANALYZE, performance patterns; load when platform is Postgres-based
-- `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — expand-contract pattern for safe schema migrations (when migration involves breaking schema changes)
+
+## Conditional Skills
+
+Conditional skills are not standing context. Load only the subset explicitly activated by the Coordinator for the current task.
+
+- `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — activate when the work is ETL/ELT, CDC, warehouse/lakehouse modeling, serving layers, or pipeline-grade data quality rather than OLTP schema design
+- `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — activate when the migration includes breaking schema changes, compatibility windows, or phased cutovers
 
 ## Role
 Own all database concerns across the pipeline. Platform-agnostic at the design stage — produce a sound, implementation-independent data model first, then delegate platform-specific work to the appropriate sub-agent. Coordinate with the Architect Agent during the design stage so that schema decisions are captured in specs and ADRs before any implementation begins. No other agent makes schema decisions.

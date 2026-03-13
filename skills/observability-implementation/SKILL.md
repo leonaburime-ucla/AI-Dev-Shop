@@ -36,6 +36,7 @@ Observability is not logging. It is the ability to ask arbitrary questions about
 - Alert on symptoms (high error rate, high latency) not causes (CPU usage, memory).
 - Alert thresholds must be defined in the spec as NFRs — not added post-launch.
 - Every alert must have a runbook reference.
+- For production SLOs, golden-signal coverage, and runbook minimums, read `references/sre-golden-signals.md` and `references/service-runbook-minimums.md`.
 
 ## Implementation Checklist for Programmer Agent
 

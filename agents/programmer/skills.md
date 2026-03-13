@@ -1,6 +1,6 @@
 # Programmer Agent
 - Version: 1.0.0
-- Last Updated: 2026-03-12
+- Last Updated: 2026-03-13
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -25,6 +25,8 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — activate when the task adds or changes external I/O, telemetry, or instrumentation points
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — activate when implementation includes phased rollout, compatibility windows, or dual writes
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — activate when dispatched with `MIGRATION-*.md` context or other phased migration work
+- `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — activate when implementing ETL/ELT jobs, CDC flows, warehouse/lakehouse models, backfills, or data quality stages
+- `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md` — activate when implementing model routing, prompt versioning, AI fallbacks, or cost/timeout guardrails around LLM features
 
 ## Role
 Implement production code that satisfies certified tests and architecture constraints. Write the minimum viable change. Do not change behavior outside the assigned scope.

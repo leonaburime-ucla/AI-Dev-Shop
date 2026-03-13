@@ -1,7 +1,7 @@
 ---
 name: skills-registry
 version: 1.0.0
-last_updated: 2026-03-12
+last_updated: 2026-03-13
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -30,6 +30,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/testable-design-patterns/SKILL.md` | Architect, Programmer, Refactor Agent, TDD Agent |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Review Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Review Agent (React component API patterns) |
+| `skills/ux-design/SKILL.md` | UX/UI Designer Agent (design system creation, visual direction, component/state design, implementation-ready handoff) |
 | `skills/vercel-web-design-guidelines/SKILL.md` | UX/UI Designer Agent, Code Review Agent, QA/E2E Agent (UI/UX guideline audits) |
 | `skills/vercel-react-native-skills/SKILL.md` | Programmer, QA/E2E Agent, Code Review Agent (React Native/Expo tactical guidance) |
 | `skills/sql-data-modeling/SKILL.md` | Database Agent |
@@ -53,6 +54,10 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/swarm-consensus/SKILL.md` | Coordinator (owns consensus dispatch; injects to other agents only when consensus mode is active) |
 | `skills/llm-council/SKILL.md` | Coordinator (structured planning council and judge-merge workflow) |
 | `skills/observability-implementation/SKILL.md` | Architect, Programmer, Security Agent |
+| `skills/incident-response/SKILL.md` | DevOps Agent, Coordinator (production incident routing), Observer (post-incident pattern analysis) |
+| `skills/data-engineering/SKILL.md` | Database Agent, Architect, Programmer |
+| `skills/developer-documentation/SKILL.md` | Docs Agent |
+| `skills/llm-operations/SKILL.md` | Architect, Programmer |
 | `skills/devops-delivery/SKILL.md` | DevOps Agent |
 | `skills/security-review/SKILL.md` | Security, Code Review, DevOps |
 | `skills/performance-engineering/SKILL.md` | TestRunner Agent, Architect |

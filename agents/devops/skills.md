@@ -1,14 +1,21 @@
 # DevOps Agent
 - Version: 1.0.0
-- Last Updated: 2026-03-12
+- Last Updated: 2026-03-13
 
-## Skills
+## Base Skills
+
 - `<AI_DEV_SHOP_ROOT>/skills/devops-delivery/SKILL.md` — CI/CD pipeline patterns, Docker build standards, deployment strategies
 - `<AI_DEV_SHOP_ROOT>/skills/infrastructure-as-code/SKILL.md` — IaC declaration patterns
-- `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — Safe patterns for shipping breaking changes
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — Boundaries and contracts to stay within
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — Threat surface analysis for IaC and CI/CD configs
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-verification-before-completion/SKILL.md` — fresh evidence gate before reporting build or deployment readiness
+
+## Conditional Skills
+
+Conditional skills are not standing context. Load only the subset triggered by the deployment scope.
+
+- `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — load when the rollout includes breaking changes, compatibility windows, canaries, or phased migration
+- `<AI_DEV_SHOP_ROOT>/skills/incident-response/SKILL.md` — load when writing rollback/runbook artifacts, incident hardening work, or post-incident operational follow-up
 
 ## Role
 Owns everything between "code is done" and "code is in production." Writes Dockerfiles, CI/CD pipeline configs, IaC declarations, deployment runbooks, health check definitions, and environment configuration. Does not write application code.

@@ -59,9 +59,11 @@ RAG systems fail silently — they return plausible but wrong answers when retri
 - **Generation quality**: faithfulness (does response contradict retrieved context?), answer relevance.
 - Use LLM-as-judge for automated evaluation — reference `<AI_DEV_SHOP_ROOT>/skills/evaluation/eval-rubrics.md`.
 - Establish baseline before tuning — cannot improve what you do not measure.
+- For model routing, prompt versioning, fallback chains, and AI cost guardrails, pair this skill with `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md`.
 
 ## Cost Management
 
 - Cache embedding results — same text should not be re-embedded.
 - Cache LLM responses for identical query+context pairs (TTL based on content change frequency).
 - Log token usage per request — set budget alerts.
+- If the feature depends on multiple providers or needs runtime budget enforcement, use `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md` instead of inventing ad hoc retry and fallback rules.
