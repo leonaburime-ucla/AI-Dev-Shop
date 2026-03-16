@@ -4,6 +4,26 @@ Drop this toolkit into a project and point your coding agent at `AGENTS.md`.
 
 `AGENTS.md` is the runtime authority. `README.md` is setup and maintainer guidance only.
 
+## Install
+
+Copy the toolkit into your project root:
+
+```bash
+cp -r AI-Dev-Shop-speckit/ your-project/AI-Dev-Shop-speckit/
+```
+
+Add this line to the startup file your tool reads at the project root:
+
+```md
+Read `AI-Dev-Shop-speckit/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
+```
+
+Common entry points:
+- `CLAUDE.md` for Claude Code
+- `GEMINI.md` or `CLAUDE.md` for Gemini CLI and Codex CLI
+<!-- - `.cursor/rules/*.mdc` for Cursor -->
+<!-- - `.github/copilot-instructions.md` for GitHub Copilot -->
+
 ## What This Is
 
 AI Dev Shop Foundation is a drop-in multi-agent delivery framework for coding agents. It turns an open-ended "build this feature" request into a structured pipeline with explicit stages for analysis, spec writing, architecture, test design, implementation, review, security, and docs.
@@ -42,26 +62,6 @@ Idea/request
   -> Humans approve key checkpoints
   -> Repository gains both implementation and a paper trail
 ```
-
-## Install
-
-Copy the toolkit into your project root:
-
-```bash
-cp -r AI-Dev-Shop-speckit/ your-project/AI-Dev-Shop-speckit/
-```
-
-Add this line to the startup file your tool reads at the project root:
-
-```md
-Read `AI-Dev-Shop-speckit/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
-```
-
-Common entry points:
-- `CLAUDE.md` for Claude Code
-- `GEMINI.md` or `CLAUDE.md` for Gemini CLI and Codex CLI
-<!-- - `.cursor/rules/*.mdc` for Cursor -->
-<!-- - `.github/copilot-instructions.md` for GitHub Copilot -->
 
 ## Slash Commands
 
