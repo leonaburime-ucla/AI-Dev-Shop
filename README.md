@@ -31,7 +31,23 @@ AI Dev Shop Foundation is a drop-in multi-agent delivery framework for coding ag
 In practice, this gives a repo a repeatable way to move from idea to working code without relying on a single giant prompt or ad hoc agent behavior.
 
 ```text
-[VibeCoder] -> [CodeBase Analyzer] -> [System Blueprint] -> Spec -> [Red-Team] -> Architect -> [Database] -> TDD -> Programmer -> [QA/E2E] -> TestRunner -> Code Review -> [Refactor] -> Security -> [DevOps] -> [Docs] -> Done
+[VibeCoder]
+  -> [CodeBase Analyzer]
+  -> [System Blueprint]
+  -> Spec
+  -> [Red-Team]
+  -> Architect
+  -> [Database]
+  -> TDD
+  -> Programmer
+  -> [QA/E2E]
+  -> TestRunner
+  -> Code Review
+  -> [Refactor]
+  -> Security
+  -> [DevOps]
+  -> [Docs]
+  -> Done
 ```
 
 ## Quick Overview
