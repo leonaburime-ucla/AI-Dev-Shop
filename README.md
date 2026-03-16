@@ -4,6 +4,45 @@ Drop this toolkit into a project and point your coding agent at `AGENTS.md`.
 
 `AGENTS.md` is the runtime authority. `README.md` is setup and maintainer guidance only.
 
+## What This Is
+
+AI Dev Shop Foundation is a drop-in multi-agent delivery framework for coding agents. It turns an open-ended "build this feature" request into a structured pipeline with explicit stages for analysis, spec writing, architecture, test design, implementation, review, security, and docs.
+
+In practice, this gives a repo a repeatable way to move from idea to working code without relying on a single giant prompt or ad hoc agent behavior.
+
+## Quick Overview
+
+- **For**: teams and solo builders who want coding agents to work through a defined software-delivery process instead of improvising
+- **Does**: routes work through specialized agents like Coordinator, Spec, Architect, TDD, Programmer, Code Review, and Security
+- **Produces**: durable artifacts such as specs, ADRs, task lists, test certifications, review findings, and project memory
+- **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it
+
+## Why It Exists
+
+Most agent workflows are strong at generating code but weak at preserving intent, surfacing risks, and keeping decisions auditable. This toolkit adds:
+
+- a runtime contract in `AGENTS.md`
+- a standard pipeline from request to implementation
+- writable project knowledge and reports for traceability
+- clear human approval points before architecture, implementation, and shipping
+
+## How It Works
+
+1. Install the toolkit into your repository.
+2. Point your coding tool at `AI-Dev-Shop-speckit/AGENTS.md`.
+3. Start in Coordinator mode or invoke a pipeline command.
+4. The framework routes work through the right agents and writes artifacts under `reports/` and `project-knowledge/`.
+
+## At A Glance
+
+```text
+Idea/request
+  -> Coordinator routes work
+  -> Specialists produce specs, architecture, tests, code, and reviews
+  -> Humans approve key checkpoints
+  -> Repository gains both implementation and a paper trail
+```
+
 ## Install
 
 Copy the toolkit into your project root:
@@ -21,8 +60,8 @@ Read `AI-Dev-Shop-speckit/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 Common entry points:
 - `CLAUDE.md` for Claude Code
 - `GEMINI.md` or `CLAUDE.md` for Gemini CLI and Codex CLI
-- `.cursor/rules/*.mdc` for Cursor
-- `.github/copilot-instructions.md` for GitHub Copilot
+<!-- - `.cursor/rules/*.mdc` for Cursor -->
+<!-- - `.github/copilot-instructions.md` for GitHub Copilot -->
 
 ## Slash Commands
 
@@ -50,6 +89,13 @@ Other hosts do not support native slash commands. For those, open the matching f
 - [templates/adr-template.md](templates/adr-template.md): ADR template used by Architect
 
 Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current default agents, not a fixed maximum count.
+
+## Repository Architecture
+
+This toolkit enforces a strict separation between the "Engine" and the "Data":
+
+- **The Engine (Read-Only):** `agents/`, `skills/`, `workflows/`, and `templates/` are the core framework. They remain read-only during normal feature work to prevent agents from accidentally overwriting pipeline rules. You can safely overwrite these folders when upgrading to a new version of the toolkit.
+- **The Data (Writable):** `project-knowledge/` and `reports/` are your local workspace. This is where you configure your specific project (constitution, memory) and where agents write their outputs.
 
 ## Architecture Defaults
 
