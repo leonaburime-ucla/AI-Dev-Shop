@@ -6,7 +6,6 @@ Centralize skill discovery and curation through one owner agent to keep canonica
 ## Locations
 - Inbox: `project-knowledge/skills-inbox/`
 - Inbox archive: `project-knowledge/skills-inbox/archive/`
-- Inbox scripts: `project-knowledge/skills-inbox/scripts/`
 - Canonical skills: `skills/`
 - Audit reports: `reports/skills-audit/`
 

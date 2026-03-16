@@ -12,13 +12,7 @@ Quarantine area for external skill inputs.
 - Only `Skills Librarian` reads/writes here for ingestion work.
 - Do not treat files here as active skills.
 - After review, move each file to `archive/` with a decision note in audit report.
-- Automation scripts for inbox processing live in `project-knowledge/skills-inbox/scripts/`.
-- Workflow template copy is stored at `project-knowledge/skills-inbox/workflows/skills-librarian-monthly.yml`.
-
-## Workflow Template Note
-- `workflows/skills-librarian-monthly.yml` is a local backup of the monthly GitHub Actions automation.
-- It checks upstream skill sources, stages changed snapshots, writes audit reports, and opens a review issue when changes are detected.
-- If your push credential lacks GitHub `workflow` scope, keep using this local copy until you can push `.github/workflows/...` with proper permissions.
+- Upstream intake and review in this folder are manual unless maintainer automation is reintroduced later.
 
 ## Naming
 Use: `YYYY-MM-DD-<source>-<skill>.md`

@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.0.0
-last_updated: 2026-03-13
+version: 1.2.0
+last_updated: 2026-03-15
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -37,6 +37,9 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/postgresql/SKILL.md` | Database Agent, Supabase Sub-Agent |
 | `skills/supabase/SKILL.md` | Supabase Sub-Agent |
 | `skills/systematic-debugging/SKILL.md` | Skills Librarian, Programmer (debug process reference) |
+| `skills/pattern-priming/SKILL.md` | Programmer |
+| `skills/inline-code-documentation/SKILL.md` | Programmer |
+| `skills/constitution-compliance/SKILL.md` | Architect |
 | `skills/superpowers-brainstorming/SKILL.md` | VibeCoder Agent |
 | `skills/superpowers-using-git-worktrees/SKILL.md` | Programmer, VibeCoder Agent |
 | `skills/superpowers-verification-before-completion/SKILL.md` | Programmer, TestRunner Agent, DevOps Agent |
@@ -52,7 +55,6 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
 | `skills/swarm-consensus/SKILL.md` | Coordinator (owns consensus dispatch; injects to other agents only when consensus mode is active) |
-| `skills/llm-council/SKILL.md` | Coordinator (structured planning council and judge-merge workflow) |
 | `skills/observability-implementation/SKILL.md` | Architect, Programmer, Security Agent |
 | `skills/incident-response/SKILL.md` | DevOps Agent, Coordinator (production incident routing), Observer (post-incident pattern analysis) |
 | `skills/data-engineering/SKILL.md` | Database Agent, Architect, Programmer |

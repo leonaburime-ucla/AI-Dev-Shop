@@ -1,8 +1,8 @@
 ---
 name: coordination
-version: 1.1.0
-last_updated: 2026-03-02
-description: Use when routing between agents, enforcing convergence policy, managing iteration budgets, formatting cycle summaries, or deciding when to escalate to a human checkpoint.
+version: 1.2.0
+last_updated: 2026-03-15
+description: Use when routing between agents, handling Review Mode intake, activating conditional skills, enforcing convergence policy, managing iteration budgets, formatting cycle summaries, or deciding when to escalate to a human checkpoint.
 ---
 
 # Skill: Coordination
@@ -41,6 +41,53 @@ Before first TestRunner dispatch for a feature, confirm coverage minimums with t
 - E2E default: `80/80/80/80`
 
 If the human does not provide custom values, apply defaults and persist the active profile into `tasks.md` constraints so TestRunner and TDD use the same numbers.
+
+## Review Mode Intake
+
+When the Coordinator is in Review Mode and the user asks for work:
+
+- Ask which specialist agent owns the request.
+- If the user explicitly wants to stay in Review Mode, answer only as Coordinator.
+- If the owner is clear, switch to Pipeline Mode and dispatch.
+- If the owner is unclear, ask exactly one clarifying question, then dispatch.
+- Handle Coordinator-only status, routing, and mode-control requests directly.
+- Announce dispatch as `Coordinator(Pipeline Mode): Dispatching <Agent> because <reason>.`
+
+Default owner mapping:
+- Existing codebase diagnosis or migration discovery -> CodeBase Analyzer
+- Macro architecture or boundary decomposition -> System Blueprint
+- Spec package authoring or clarification -> Spec
+- Adversarial preflight on approved spec -> Red-Team
+- ADR and architecture decisioning -> Architect
+- Schema, migration, or query design -> Database
+- Test-first suite definition or certification -> TDD
+- Feature implementation against certified tests -> Programmer
+- User-journey or browser validation -> QA/E2E
+- Test execution evidence -> TestRunner
+- Code quality or spec alignment review -> Code Review
+- Non-behavioral structural cleanup -> Refactor
+- Threat modeling or security classification -> Security
+- CI/CD, Docker, IaC, or deployment runbooks -> DevOps
+- Docs, OpenAPI, or release notes -> Docs
+
+## Conditional Skill Activation
+
+When dispatching an agent that separates base skills from conditional skills:
+
+- Assume base skills are always active.
+- Name only the active conditional skills in the dispatch directive.
+- Do not activate every optional skill by default.
+
+Default Programmer activation rules:
+- `frontend-react-orcbash` when scope includes React, Next.js, frontend components, hooks, or UI state or orchestrator work
+- `hexagonal-architecture` when scope includes backend, service, worker, or CLI code or ADR-selected ports-and-adapters boundaries
+- `tool-design` when the task builds agent tools, CLIs, tool interfaces, or operator-facing error or reporting surfaces
+- `observability-implementation` when the task adds or changes external I/O, telemetry, tracing, or instrumentation points
+- `change-management` and `architecture-migration` when dispatch includes `MIGRATION-*.md`, phased rollout, dual writes, backfill, or compatibility-window work
+- `superpowers-using-git-worktrees` when an isolated workspace, scratch branch, or worktree workflow is expected
+- `superpowers-requesting-code-review` when the task includes a review checkpoint for a meaningful change set
+- `superpowers-receiving-code-review` when the task is to address returned review findings
+- `superpowers-finishing-a-development-branch` when the task is in branch wrap-up or implementation closeout phase
 
 ## The Routing Decision Tree
 

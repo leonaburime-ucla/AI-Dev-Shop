@@ -1,8 +1,8 @@
 ---
 name: architecture-decisions
-version: 1.0.0
-last_updated: 2026-02-22
-description: Use when selecting architecture patterns, writing ADRs, analyzing system drivers, evaluating tradeoffs, or advising on module and service boundaries.
+version: 1.1.0
+last_updated: 2026-03-15
+description: Use when selecting architecture patterns, writing ADRs, deciding whether research is required, evaluating tradeoffs, or defining module and service boundaries and testable contracts.
 ---
 
 # Skill: Architecture Decisions
@@ -42,6 +42,17 @@ Before selecting a pattern, classify the system's primary drivers:
 | **Audit requirements** | Do you need a full history of state changes? |
 | **Longevity** | Prototype or long-lived product? |
 | **Adaptability** | How easily can this be replaced in 18 months? Does this pattern trap us in a specific library, framework, or cloud vendor? Can core business logic survive if the database engine, web framework, or messaging layer is swapped? |
+
+## ADR Workflow
+
+- Produce `research.md` when the spec forces a choice between libraries, frameworks, services, persistence mechanisms, messaging, or infrastructure components, or when multiple viable approaches remain open.
+- Run `constitution-compliance` before final pattern selection. Unjustified `EXCEPTION` entries block the ADR.
+- Score every viable candidate with the Pattern Evaluation Format. Adaptability weights at minimum 30% of total match.
+- Define module or service boundaries and explicit contracts before locking the pattern.
+- For each API or event contract, assign one test approach: consumer-driven, schema validation, or integration test.
+- If `system-blueprint.md` assigns data ownership, encode owner and non-owner constraints in the ADR.
+- Identify parallelizable slices and sequencing constraints for `tasks.md`.
+- Write `adr.md` using `<AI_DEV_SHOP_ROOT>/templates/adr-template.md`. Complete Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision below.
 
 ## Pattern Selection Guide
 
@@ -239,9 +250,20 @@ These terms appear throughout architecture discussions. Precision matters.
 
 ## Architecture Decision Record (ADR) Format
 
-Every significant architecture choice must be recorded. Use `<AI_DEV_SHOP_ROOT>/templates/adr-template.md` — it includes all required sections: Context, Decision, Rationale, Pattern Evaluation, Consequences, Module/Service Boundaries, API/Event Contract Summary, Enforcement, and Related Decisions.
+Every significant architecture choice must be recorded. Use `<AI_DEV_SHOP_ROOT>/templates/adr-template.md` — it includes all required sections: Constitution Check, Research Summary, Context, Decision, Rationale, Pattern Evaluation, Consequences, Module/Service Boundaries, API/Event Contract Summary, Enforcement, Related Decisions, Default Heuristic Alignment, and Complexity Justification.
 
 ADRs live in `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. They are inputs to the Programmer Agent and Code Review Agent — architectural violations are violations of a recorded ADR.
+
+## Directory Structure Decision (Required in Every ADR)
+
+Every ADR must state where `__specs__` and `__tests__` live for the selected pattern before TDD or Programmer dispatch.
+
+- Vertical Slice / DDD / Feature-based: co-locate specs and tests with the feature module.
+- Layered / Clean / Hexagonal: keep specs at feature level under a top-level `specs/` folder and mirror tests under `__tests__/` by layer.
+- Modular Monolith: co-locate specs and tests with the owned module.
+- Microservices: each service keeps its own `__specs__/` and `__tests__/` at service root.
+
+If the ADR omits this decision, route back to Architect before TDD.
 
 ## Principles That Always Apply
 

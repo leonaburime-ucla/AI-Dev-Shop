@@ -197,12 +197,9 @@ Coordinator generates `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/
 
 ### Pattern Priming (runs between TDD dispatch and first Programmer dispatch)
 
-Before Programmer begins implementation:
-1. Programmer generates a seed example — one function, one component, or whatever is most relevant to the task
-2. Programmer explains to the user: what pattern priming is and why it is being done
-3. User approves or corrects — iterate until confirmed
-4. The confirmed pattern becomes the reference for all similar code in this session
-5. If the task changes significantly, pattern priming repeats for the new context
+Before Programmer begins production implementation, run `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md`.
+The confirmed seed example becomes the reference for similar code in the session.
+Repeat pattern priming when the task shifts to a materially different layer or concern.
 
 ### Programmer Agent
 - Active spec (hash must match TDD certification hash)

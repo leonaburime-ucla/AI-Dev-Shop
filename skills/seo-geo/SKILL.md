@@ -19,14 +19,6 @@ Comprehensive SEO and GEO (Generative Engine Optimization) for websites. Optimiz
 
 Get the target URL and analyze current SEO/GEO status.
 
-**Basic SEO Audit (Free):**
-```bash
-python3 scripts/seo_audit.py "https://example.com"
-```
-**Use this for**: Quick technical SEO check (title, meta, H1, robots, sitemap, load time). No API needed.
-
----
-
 **Check Meta Tags:**
 ```bash
 curl -sL "https://example.com" | grep -E "<title>|<meta name=\"description\"|<meta property=\"og:|application/ld\+json" | head -20
@@ -246,5 +238,5 @@ This skill works best with:
 - [references/geo-research.md](./references/geo-research.md) - Princeton GEO research (9 methods)
 - [references/schema-templates.md](./references/schema-templates.md) - JSON-LD templates
 - [references/seo-checklist.md](./references/seo-checklist.md) - Complete SEO audit checklist
-- [references/tools-and-apis.md](./references/tools-and-apis.md) - Tools and API reference
+- [references/tools-and-apis.md](./references/tools-and-apis.md) - Manual tools and platform reference
 - [examples/opc-skills-case-study.md](./examples/opc-skills-case-study.md) - Real-world optimization example

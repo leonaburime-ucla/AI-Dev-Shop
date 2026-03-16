@@ -205,57 +205,31 @@ Sitemap: https://example.com/sitemap.xml
 
 ---
 
-## Scripts
+## Practical Tools
 
-Ready-to-use Python scripts in `scripts/` folder.
+Use built-in shell tools, browser-based validators, and WebSearch rather than local helper scripts.
 
-### Setup (DataForSEO scripts)
-
-```bash
-export DATAFORSEO_LOGIN=your_login
-export DATAFORSEO_PASSWORD=your_password
-```
-
-### seo_audit.py
-
-Full SEO audit - meta tags, robots.txt, sitemap, load time, schema, AI bot access. No API required.
+### Quick Page Inspection
 
 ```bash
-python3 scripts/seo_audit.py "https://example.com"
+curl -sL "https://example.com" | grep -E "<title>|<meta name=\"description\"|<meta property=\"og:|application/ld\\+json" | head -20
+curl -s "https://example.com/robots.txt"
+curl -s "https://example.com/sitemap.xml" | head -50
 ```
 
-### keyword_research.py
-
-Get keyword ideas, search volume, difficulty.
+### Browser-Based Validation
 
 ```bash
-python3 scripts/keyword_research.py "seo tools" --limit 20
-python3 scripts/keyword_research.py "seo tools" --location 2826  # UK
+open "https://search.google.com/test/rich-results?url={encoded_url}"
+open "https://validator.schema.org/?url={encoded_url}"
+open "https://www.google.com/search?q=site:{domain}"
+open "https://www.bing.com/search?q=site:{domain}"
 ```
 
-### serp_analysis.py
+### Research Inputs
 
-Analyze top 20 Google results for a keyword.
-
-```bash
-python3 scripts/serp_analysis.py "best seo tools" --depth 20
-```
-
-### backlinks.py
-
-Get backlink profile for a domain.
-
-```bash
-python3 scripts/backlinks.py "example.com" --limit 20
-```
-
-### domain_overview.py
-
-Get domain metrics - traffic, keywords, rankings.
-
-```bash
-python3 scripts/domain_overview.py "example.com"
-```
+- Use WebSearch for keyword research, SERP review, and competitor comparison.
+- Use public SEO platforms manually when you need paid metrics like backlink counts or keyword difficulty.
 
 ---
 
@@ -263,16 +237,9 @@ python3 scripts/domain_overview.py "example.com"
 
 ### Using with OPC Skills
 
-```bash
-# Use twitter skill to find SEO tips
-python3 scripts/search_tweets.py "SEO tips 2026" --limit 20
-
-# Use reddit skill to find discussions
-python3 scripts/search_posts.py "GEO optimization" --subreddit SEO --limit 10
-
-# Use WebSearch for keyword research
-# (Built into agent)
-```
+- Use the twitter skill to find current SEO tips.
+- Use the reddit skill to find community discussions.
+- Use WebSearch for keyword research and competitor analysis.
 
 ### Automation Ideas
 
