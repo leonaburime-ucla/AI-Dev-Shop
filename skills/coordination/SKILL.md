@@ -1,7 +1,7 @@
 ---
 name: coordination
-version: 1.2.1
-last_updated: 2026-03-17
+version: 1.3.0
+last_updated: 2026-03-18
 description: Use when routing between agents, handling Review Mode intake, activating conditional skills, enforcing convergence policy, managing iteration budgets, formatting cycle summaries, or deciding when to escalate to a human checkpoint.
 ---
 
@@ -88,6 +88,36 @@ Default Programmer activation rules:
 - `superpowers-requesting-code-review` when the task includes a review checkpoint for a meaningful change set
 - `superpowers-receiving-code-review` when the task is to address returned review findings
 - `superpowers-finishing-a-development-branch` when the task is in branch wrap-up or implementation closeout phase
+
+## Delegated Agent Resolution
+
+When the Coordinator delegates work to a spawned platform subagent, resolve the repo agent persona first, then choose the closest platform subagent type.
+
+Use the repo agent's existing `skills.md` file as the canonical persona spec:
+
+- implementation, refactor, bug fix, migrations, remediation work -> `agents/programmer/skills.md`
+- test-first suite definition or certification -> `agents/tdd/skills.md`
+- code quality, spec alignment, architecture adherence review -> `agents/code-review/skills.md`
+- threat modeling or security analysis -> `agents/security/skills.md`
+- read-only codebase inspection, discovery, architecture analysis, or grep-heavy exploration -> appropriate repo agent persona + platform `explorer`
+
+Platform mapping rule:
+
+- use platform `worker` for implementation or artifact-producing delegated tasks
+- use platform `explorer` for read-only investigation, discovery, and analysis tasks
+
+Do not spawn a generic worker first and hope it infers the repo persona from context. Resolve persona first, then bootstrap it explicitly.
+
+## Dispatch Prompt Construction
+
+When building any delegated spawn prompt, include in this order:
+
+1. `Read <AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md before any work.`
+2. Explicitly name any activated conditional skills for this task.
+3. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
+4. Give the concrete task directive with scope, constraints, ownership boundaries, and expected output.
+5. Require the subagent to stop if the persona file is missing or unreadable.
+6. Require the subagent to confirm in its first reply that the persona file was loaded.
 
 ## The Routing Decision Tree
 
@@ -244,6 +274,10 @@ Before accepting any agent output and routing it forward, verify the output incl
 Programmer handoffs also require:
 
 - **Architecture Audit**: Status (`PASS`, `WARNING`, or `BLOCKER`), ADR rules checked, files audited, violations found, and any ambiguity needing Architect clarification
+
+Delegated subagent dispatches also require:
+
+- **Persona bootstrap evidence**: resolved repo agent, canonical persona path, activated conditional skills, and confirmation that the subagent was instructed to load the persona file
 
 If any field is missing, return the output to the agent with a request to complete the handoff contract. Do not route incomplete outputs.
 

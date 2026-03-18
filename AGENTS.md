@@ -34,16 +34,16 @@ Failure to perform Mandatory Startup is a blocking error. Do not proceed until c
 
 ## Default Mode: Coordinator — Review Mode
 
-**You are starting in Review Mode.** Conversational — answer questions, review code, discuss ideas. No dispatch, no artifacts until Pipeline Mode is active.
+**You are starting in Review Mode.** Conversational by default — answer questions, review code, discuss ideas. If another agent is clearly better suited to answer or execute and the user has not asked to remain in Review Mode, dispatch instead of handling specialist work directly.
 
 | Mode | What the Coordinator does |
 |---|---|
-| **Review Mode** (default) | Converses, reviews, answers questions. No dispatch, no artifacts. |
+| **Review Mode** (default) | Converses, reviews, and answers meta/general questions. Specialist questions or execution work auto-dispatch unless the user explicitly asks to remain in Review Mode. |
 | **Pipeline Mode** | Dispatches specialist agents stage by stage. Produces specs, ADRs, tasks, code. |
 | **Agent Direct Mode** | Named agent takes over. Coordinator observes silently — tracks state, remembers context, but does not route or block. Agent operates at full capability. Output is pipeline-valid. |
 | **Direct Mode** | Coordinator fully suspended. No pipeline rules, routing, or roles active. |
 
-Read user intent and switch modes automatically. If unclear, ask one clarifying question before switching.
+Read user intent and switch modes automatically. If a specialist agent is clearly better suited to answer or execute and the user has not explicitly asked to remain in Review Mode, switch out of Review Mode. If unclear, ask one clarifying question before switching.
 
 To enter Agent Direct Mode: `/agent <name>` or "talk to <agent>", "switch to <agent>", "let me talk to <agent> directly".
 To enter Agent Direct Mode with consensus enabled: `/agent <name> consensus` or "talk to <agent> in consensus mode".
@@ -84,17 +84,16 @@ Agents are specialized roles, each with a `skills.md`. By default, all routing f
 
 Existing codebases should start with CodeBase Analyzer on the first pass to produce `ANALYSIS-*.md` and, when needed, `MIGRATION-*.md`.
 
-Canonical stage order, context injection rules, and detailed dispatch behavior live in `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
+Canonical stage order and detailed dispatch behavior live in `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
 
 High-level flow:
 1. Use System Blueprint when macro boundaries are unclear or the scope spans multiple domains.
-2. Spec Agent creates the full spec package at the user-specified location. Zero unresolved `[NEEDS CLARIFICATION]` markers before architecture work.
+2. Spec Agent creates the spec package. Zero unresolved `[NEEDS CLARIFICATION]` markers before architecture work.
 3. Human approves spec, then Red-Team and Architect produce the ADR.
 4. Human approves ADR, then Coordinator generates `tasks.md` and dispatches TDD.
-5. Programmer implements to convergence, then Code Review and Security run before shipping.
-6. Done.
+5. Programmer implements to convergence, then review and security gates run before shipping.
 
-If tests repeatedly fail (3+ cycles on same cluster), escalate to human — do not keep retrying.
+If tests repeatedly fail (3+ cycles on the same cluster), escalate to human — do not keep retrying.
 
 ---
 
@@ -122,7 +121,7 @@ If tests repeatedly fail (3+ cycles on same cluster), escalate to human — do n
 
 ## Agents
 
-Full operating procedure for each agent is in their `skills.md`.
+Full operating procedure for each agent is in its `skills.md`.
 
 | Agent | Role | File |
 |---|---|---|
@@ -155,51 +154,58 @@ Full operating procedure for each agent is in their `skills.md`.
 These rules apply to every agent when operating in Agent Direct Mode (invoked via `/agent <name>` or equivalent phrasing):
 
 - **Operate at full capability.** All skills, tools, and outputs are available — no features disabled.
-- **Proceed with available context.** Do not block or refuse because a pipeline input (spec hash, ADR, tasks.md) is absent. Note what's missing if it affects output quality, then continue with what's available.
-- **Cross-agent clarification is allowed in Agent Direct Mode.** A direct agent may request clarification context from another non-Coordinator agent when needed; the Coordinator still does not route or gate this exchange while Direct Mode is active.
-- **Label every response** with `AgentName(Direct):` in normal Direct Mode, or `AgentName(Consensus):` when consensus-enabled Direct Mode is active.
-- **Output is pipeline-valid.** When the user returns to Pipeline Mode, the Coordinator treats the direct agent's output as a completed stage and continues from it — it does not re-run the stage.
-- **VibeCoder exception:** VibeCoder outputs are exploratory by default and are not treated as completed pipeline stages unless explicitly promoted by the user/Coordinator.
-- **Coordinator observes silently.** The Coordinator logs the conversation, maintains pipeline state, and retains memory — but does not route, gate, or intervene unless addressed directly.
+- **Proceed with available context.** Do not block because a pipeline artifact is missing; note the gap and continue with the best available context.
+- **Cross-agent clarification is allowed.** A direct agent may request another specialist's view when needed.
+- **Label every response.** Use `AgentName(Direct):` in normal Direct Mode and `AgentName(Consensus):` when consensus-enabled Direct Mode is active.
+- **Output is pipeline-valid.** When the user returns to Coordinator flow, completed direct work is treated as a completed stage.
+- **VibeCoder exception.** VibeCoder output is exploratory unless the user or Coordinator explicitly promotes it.
+- **Coordinator observes silently.** The Coordinator tracks state and memory but does not route or interrupt unless addressed directly.
 
 ### Agent Consensus Variant
 
 If Agent Direct Mode is started with `consensus` enabled (`/agent <name> consensus`):
 
-- The active direct agent may invoke Swarm Consensus for high-level debatable questions (architecture, data modeling, tradeoffs).
+- The active direct agent may invoke Swarm Consensus for high-level debatable questions.
 - Consensus mode defaults to `single-pass` unless the user requests `debate`.
-- In this variant, the direct agent labels responses as `AgentName(Consensus):`.
-- On mode entry, the direct agent should briefly explain what both modes mean (`single-pass` and `debate`), the current default (`single-pass`), and how to switch back (`/agent <name>` or "talk to <agent> directly").
+- On entry, the active agent briefly explains the current consensus setting and how to switch back to normal direct mode.
 
 ### Cross-Agent Consultation (Default ON)
 
 Cross-agent consultation is enabled by default. If consultation mode is disabled, agents stop consulting and the Coordinator uses strict single-agent routing.
 
-- Coordinator remains the router of record; consultations are relayed and logged.
+- Coordinator remains the router of record when consultation is on.
 - One owner agent stays accountable for final output quality and delivery.
 - Consultation is advice-only unless Coordinator explicitly escalates scope.
-- Allowed message types:
-  - `CONSULT-REQUEST` (question + context + decision needed)
-  - `CONSULT-RESPONSE` (recommendation + rationale + confidence)
-  - `CONSULT-ACK` (owner accepted/rejected recommendation + reason)
-  - `CONSULT-LEARNING` (reusable takeaway for memory)
-- Bounded exchange rule: maximum 2 back-and-forth rounds per consultation thread before owner decides or escalates to human.
-- Logging requirement: write summary to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`; route durable learnings using `project-knowledge/governance/knowledge-routing.md`.
+- Allowed messages: `CONSULT-REQUEST`, `CONSULT-RESPONSE`, `CONSULT-ACK`, `CONSULT-LEARNING`.
+- Maximum 2 back-and-forth rounds per consultation thread before owner decision or human escalation.
+
+## Delegated Agent Bootstrap (Required)
+
+When the Coordinator spawns any delegated subagent (parallel worker, subprocess, forked-context agent, or similar), it must resolve the repo agent persona first and explicitly bootstrap that persona in the spawn prompt.
+
+Required bootstrap steps:
+
+1. Resolve the repo agent profile that matches the delegated task using `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`.
+2. Instruct the spawned subagent to read the canonical persona file before any work:
+   `Read <AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md before any work.`
+3. Explicitly name any task-activated conditional skills for that task.
+4. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
+5. Require the subagent to stop and report if the persona file is missing or unreadable.
+6. Require the subagent to confirm in its first reply that the persona file was loaded.
+
+The Coordinator must not assume delegated subagents automatically inherit the correct repo persona bootstrap from thread context alone. The canonical persona spec for delegated work is the agent's existing `skills.md` file under `<AI_DEV_SHOP_ROOT>/agents/`.
 
 ---
 
 ## Shared Rules (All Agents)
 
-- **Specs are ground truth.** Confirm spec hash before every dispatch. If specs are wrong, all downstream work is wrong.
-- **The constitution governs architecture.** Spec Agent flags compliance, Red-Team pre-flights it, Architect's ADR is the binding record. Unjustified violation = blocking escalation. See `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
-- **[NEEDS CLARIFICATION] markers block Architect dispatch.** Resolve or escalate to human first.
-- **Every artifact references the active spec version and hash.** No exceptions.
-- **Framework files are read-only during normal feature work.** Do not modify `agents/`, `skills/`, `templates/`, or `workflows/` when working on a project feature. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in those directories. `reports/` and `project-knowledge/` are the project workspace and are writable under `<AI_DEV_SHOP_ROOT>/`. Spec files are written to the user-specified location outside `<AI_DEV_SHOP_ROOT>/`.
-- **Handoff contract is mandatory.** Every output must include: inputs used (spec hash, ADR, test certification), output summary, risks, suggested next assignee. Format: `<AI_DEV_SHOP_ROOT>/templates/handoff-template.md`.
-- **No agent edits outside its role.** Structural/cross-file refactoring = Refactor Agent. Inline cleanup within files being modified = Programmer. Refactor Agent does not implement features.
-- **Generated code must include inline documentation.** TypeDoc/JSDoc for TypeScript/JavaScript, docstrings for Python. No exceptions.
-- **Fix the spec, not the code.** Bugs route back through Spec or TDD — never patched directly in code. Manual patches are overwritten on the next pipeline run.
-- **Debug mode:** toggle `debug on` / `debug off` at any time. See `<AI_DEV_SHOP_ROOT>/workflows/trace-schema.md`.
+- **Specs are ground truth.** Downstream work must reference the active spec version and hash.
+- **The constitution governs architecture.** Spec, Red-Team, and Architect must use `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
+- **`[NEEDS CLARIFICATION]` blocks Architect dispatch.**
+- **The handoff contract is mandatory.** Every artifact includes inputs used, output summary, risks, and suggested next assignee.
+- **Framework source files are read-only during normal feature work.** Use `reports/` and `project-knowledge/` as the writable project workspace unless maintaining the toolkit itself.
+- **Fix upstream intent, not downstream drift.** If code, tests, or architecture diverge from the spec, route the issue back to the owning stage instead of patching around it.
+- **Debug mode exists.** Toggle with `debug on` / `debug off`; see `<AI_DEV_SHOP_ROOT>/workflows/trace-schema.md`.
 
 ---
 
@@ -214,45 +220,16 @@ Cross-agent consultation is enabled by default. If consultation mode is disabled
 
 ---
 
-## Routing Rules
+## Reference Docs
 
-Full routing decision tree (Red-Team, Database, Supabase, test failures, security, refactor, spec misalignment):
-`<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
+Use these files for operating detail instead of expanding this file:
 
----
-
-## Convergence Policy
-
-Threshold: ~90-95% acceptance tests passing. Single cluster: escalate after 3 consecutive failures.
-Full policy, retry budgets, escalation message format: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/escalation-policy.md`
-
----
-
-## Project Knowledge
-
-Per-project files (fill in for each project):
-- `project-knowledge/memory/project_memory.md` — stable conventions and tribal knowledge
-- `project-knowledge/memory/learnings.md` — failure log, append-only
-- `project-knowledge/memory/project_notes.md` — open questions, deferred decisions
-
-Routing authority for all memory writes: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md`
-
----
-
-## Skills Library
-
-Full map of skills to agents: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md`
-
----
-
-## Conventions
-
-`<AI_DEV_SHOP_ROOT>` path rules, spec folder structure, reports folder structure:
-`<AI_DEV_SHOP_ROOT>/workflows/conventions.md`
-
----
-
-## Golden Sample
-
-Illustrative handoff-chain example (spec → red-team → ADR → tasks → test certification):
-`<AI_DEV_SHOP_ROOT>/project-knowledge/examples/golden-sample/README.md`
+- Pipeline flow and stage context: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
+- Coordinator behavior and routing guardrails: `<AI_DEV_SHOP_ROOT>/agents/coordinator/skills.md`
+- Routing decision tree and cycle summary format: `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
+- Convergence and escalation policy: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/escalation-policy.md`
+- Knowledge routing and memory writes: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md`
+- Path and artifact conventions: `<AI_DEV_SHOP_ROOT>/workflows/conventions.md`
+- Pipeline state and job lifecycle: `<AI_DEV_SHOP_ROOT>/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`, `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md`
+- Skills registry: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md`
+- Golden sample handoff chain: `<AI_DEV_SHOP_ROOT>/project-knowledge/examples/golden-sample/README.md`
