@@ -5,6 +5,7 @@ This reference shows a minimal, end-to-end Orc-BASH slice with:
 - Explicit return types in function signatures
 - TypeDoc/TSDoc on exported APIs and hooks
 - TypeDoc/TSDoc on internal hooks with non-trivial behavior
+- Normalized feedback contracts instead of raw `Error | null`
 
 ## `types/post.ts`
 
@@ -23,10 +24,30 @@ export interface FormattedPost extends Post {
 }
 ```
 
+## `types/feedback.ts`
+
+```typescript
+export interface ScreenFeedback {
+  kind: 'error' | 'warning' | 'info';
+  code: string;
+  message: string;
+  retryable?: boolean;
+  actionLabel?: string;
+}
+
+export interface NotificationFeedback {
+  kind: 'success' | 'warning' | 'info';
+  code: string;
+  message: string;
+  ttlMs?: number;
+}
+```
+
 ## `hooks/usePost.ts`
 
 ```typescript
 import { useCallback, useMemo, useState } from 'react';
+import type { NotificationFeedback, ScreenFeedback } from '../types/feedback';
 import type { FormattedPost, Post } from '../types/post';
 
 export interface UsePostDependencies {
@@ -56,11 +77,16 @@ interface UsePostLogicResult {
 export interface UsePostResult {
   post: FormattedPost | null;
   isLoading: boolean;
-  error: Error | null;
+  feedback: {
+    screen: ScreenFeedback | null;
+    notification: NotificationFeedback | null;
+  };
   uiState: PostUiState;
   actions: {
     fetchPost: () => Promise<void>;
     like: () => Promise<void>;
+    dismissScreenFeedback: () => void;
+    clearNotification: () => void;
   };
 }
 
@@ -107,7 +133,8 @@ export const usePost = (
   { prefetchOnInit = false }: { prefetchOnInit?: boolean } = {},
 ): UsePostResult => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [screenFeedback, setScreenFeedback] = useState<ScreenFeedback | null>(null);
+  const [notification, setNotification] = useState<NotificationFeedback | null>(null);
 
   const ui = usePostUiState();
   const logic = usePostLogic({
@@ -115,37 +142,64 @@ export const usePost = (
     formatPost: deps.formatPost,
   });
 
+  const toScreenFeedback = useCallback((error: unknown): ScreenFeedback => ({
+    kind: 'error',
+    code: 'POST_FETCH_FAILED',
+    message: error instanceof Error ? error.message : 'Unable to load this post right now.',
+    retryable: true,
+    actionLabel: 'Retry',
+  }), []);
+
   const fetchPost = useCallback(async (): Promise<void> => {
     setIsLoading(true);
-    setError(null);
+    setScreenFeedback(null);
     try {
       const fetched = await deps.fetchPost({ postId });
       deps.savePost(fetched);
     } catch (err) {
-      setError(err as Error);
+      setScreenFeedback(toScreenFeedback(err));
     } finally {
       setIsLoading(false);
     }
-  }, [postId, deps]);
+  }, [postId, deps.fetchPost, deps.savePost, toScreenFeedback]);
 
   const like = useCallback(async (): Promise<void> => {
     ui.actions.setLiking(true);
     try {
       const { likes } = await deps.likePost({ postId });
       deps.updatePostLikes({ postId, likes });
+      setNotification({
+        kind: 'success',
+        code: 'POST_LIKED',
+        message: 'Post liked.',
+        ttlMs: 3000,
+      });
     } catch (err) {
-      setError(err as Error);
+      setNotification({
+        kind: 'warning',
+        code: 'POST_LIKE_FAILED',
+        message: err instanceof Error ? err.message : 'Could not like the post.',
+        ttlMs: 5000,
+      });
     } finally {
       ui.actions.setLiking(false);
     }
-  }, [postId, deps, ui.actions]);
+  }, [postId, deps.likePost, deps.updatePostLikes, ui.actions]);
 
   return {
     post: logic.formattedPost,
     isLoading,
-    error,
+    feedback: {
+      screen: screenFeedback,
+      notification,
+    },
     uiState: ui.uiState,
-    actions: { fetchPost, like },
+    actions: {
+      fetchPost,
+      like,
+      dismissScreenFeedback: (): void => setScreenFeedback(null),
+      clearNotification: (): void => setNotification(null),
+    },
   };
 };
 ```
@@ -157,14 +211,20 @@ import * as postApi from '../api/postApi';
 import { postService } from '../logic/PostService';
 import { usePostStateAdapter } from '../state/PostStateAdapter';
 import { usePost, type UsePostResult } from '../hooks/usePost';
+import type { NotificationFeedback, ScreenFeedback } from '../types/feedback';
 import type { FormattedPost } from '../types/post';
 
 export interface UsePostPageOrchestratorResult {
   post: FormattedPost | null;
   isLoading: boolean;
-  error: Error | null;
+  feedback: {
+    screen: ScreenFeedback | null;
+    notification: NotificationFeedback | null;
+  };
   isLiking: boolean;
   onLike: () => Promise<void>;
+  dismissFeedback: () => void;
+  clearNotification: () => void;
 }
 
 /**
@@ -188,9 +248,11 @@ export const usePostPageOrchestrator = (
   return {
     post: hook.post,
     isLoading: hook.isLoading,
-    error: hook.error,
+    feedback: hook.feedback,
     isLiking: hook.uiState.isLiking,
     onLike: hook.actions.like,
+    dismissFeedback: hook.actions.dismissScreenFeedback,
+    clearNotification: hook.actions.clearNotification,
   };
 };
 ```

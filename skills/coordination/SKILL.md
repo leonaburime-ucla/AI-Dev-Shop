@@ -20,6 +20,8 @@ By default, inter-agent communication flows through the Coordinator with bounded
 5. **Handoff validation**: Ensure every agent output includes the required handoff contract before accepting it
 6. **Consultation governance** (when enabled): Relay bounded advice threads, preserve owner accountability, and log consultation outcomes
 7. **Coverage profile initialization**: At pipeline start, ask whether to keep default coverage minimums or set custom per-suite minimums across lines/branches/functions/statements; persist final profile in `tasks.md` constraints
+8. **Discovery hygiene**: Use read-only discovery passes when broad exploration is needed so implementation context stays focused
+9. **Subagent mode resolution**: Default to helper-agent use only when the current host verifies support; otherwise stay in single-agent mode and explain why
 
 ## Cross-Agent Consultation Protocol (Default ON)
 
@@ -52,6 +54,7 @@ When the Coordinator is in Review Mode and the user asks for work:
 - If the owner is unclear, ask exactly one clarifying question, then dispatch.
 - Handle Coordinator-only status, routing, and mode-control requests directly.
 - Announce dispatch as `Coordinator(Pipeline Mode): Dispatching <Agent> because <reason>.`
+- Respect `single-agent mode` / `disable subagents` / `re-enable subagents` as execution-preference toggles rather than pipeline-mode switches.
 
 Default owner mapping:
 - Existing codebase diagnosis or migration discovery -> CodeBase Analyzer
@@ -69,6 +72,18 @@ Default owner mapping:
 - Threat modeling or security classification -> Security
 - CI/CD, Docker, IaC, or deployment runbooks -> DevOps
 - Docs, OpenAPI, or release notes -> Docs
+
+## File Trigger Guidance
+
+When the changed files, target paths, or requested area are already known, consult `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/file-trigger-table.md` before deciding the owner.
+
+Use the trigger table to reduce routing mistakes, especially for:
+
+- brownfield tasks tied to specific file areas
+- framework-maintenance work
+- database, infra, or QA-heavy paths that are easy to misroute from intent alone
+
+If the trigger table does not clearly identify an owner, run a small read-only discovery pass first.
 
 ## Conditional Skill Activation
 
@@ -106,6 +121,10 @@ Platform mapping rule:
 - use platform `worker` for implementation or artifact-producing delegated tasks
 - use platform `explorer` for read-only investigation, discovery, and analysis tasks
 
+Use `explorer` as the default context-firewall lane when the owner agent needs broad grep, file discovery, or structural reconnaissance before implementation.
+
+Only use spawned helpers automatically when subagent mode resolved to `subagent-assisted`. If the current host is in `single-agent` mode, keep the same discovery pattern but run it sequentially in one session.
+
 Do not spawn a generic worker first and hope it infers the repo persona from context. Resolve persona first, then bootstrap it explicitly.
 
 ## Dispatch Prompt Construction
@@ -135,6 +154,12 @@ Agent output received
 │       Context: product intent, constraints, existing architecture context
 │       Output required: `system-blueprint.md` with macro component/domain map and spec decomposition plan
 │       Next: human approves blueprint boundaries, then dispatch Spec Agent using blueprint decomposition
+│
+├─ Existing codebase feature request AND no fresh area analysis exists yet?
+│   └─ Route to: CodeBase Analyzer
+│       Context: requested feature, likely code areas (if known), repo shape
+│       Output required: analysis of likely owner files, boundaries, dependencies, and migration risk if applicable
+│       Next: dispatch Spec or Architect with the analysis as upstream context
 │
 ├─ Consultation mode enabled AND owner agent needs specialist advice?
 │   └─ Route to: Bounded consultation relay (Coordinator-mediated)
@@ -187,6 +212,11 @@ Agent output received
 ├─ Test failures?
 │   └─ Route to: Programmer Agent
 │       Context: failing test names, spec ref, architecture constraints
+│
+├─ Owner agent needs broad discovery before implementation?
+│   └─ Route to: read-only discovery pass / explorer
+│       Context: the question to answer, likely file area, expected structured output only
+│       Next: return findings to the owner agent without forwarding raw exploration noise
 │
 ├─ Programmer handoff includes Architecture Audit = BLOCKER?
 │   └─ Route to: Coordinator escalation flow
@@ -257,7 +287,7 @@ Agent output received
 ## Pipeline Stages
 
 ```
-System Blueprint (conditional) → Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+CodeBase Analyzer (brownfield default) → System Blueprint (conditional) → Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
 ```
 
 The Coordinator tracks which stage is active. An agent completing its stage does not automatically trigger the next — the Coordinator validates the output meets the handoff contract first.
@@ -277,7 +307,7 @@ Programmer handoffs also require:
 
 Delegated subagent dispatches also require:
 
-- **Persona bootstrap evidence**: resolved repo agent, canonical persona path, activated conditional skills, and confirmation that the subagent was instructed to load the persona file
+- **Persona bootstrap evidence**: resolved repo agent, canonical persona path, activated conditional skills, and the subagent's first-reply confirmation that the persona file was loaded
 
 If any field is missing, return the output to the agent with a request to complete the handoff contract. Do not route incomplete outputs.
 

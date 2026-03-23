@@ -26,6 +26,8 @@ Before resuming, verify the checkpoint is trustworthy:
 | Completed stage artifacts exist | Check that every file listed in Completed Stages actually exists on disk | If missing, treat that stage as incomplete and re-run it |
 | Current stage output is partial | Check whether the in-progress stage produced any artifact | If artifact exists and looks complete, treat stage as done and advance |
 | Constitution Check not bypassed | If resuming at or after `architect`, verify adr.md has a completed Constitution Check table | If missing, re-run architect stage |
+| Progress ledger exists | If `progress_ledger_path` is set, verify the file exists and has current Next Actions / Resume Instructions | If missing or stale, recreate/update it before further dispatch |
+| Offloaded evidence exists | If the progress ledger references offload files, verify those files still exist | Recreate the offload or record the missing evidence before resuming |
 
 ---
 
@@ -54,6 +56,14 @@ Is status WAITING_FOR_HUMAN?
 
 **Partial** means: provide all existing artifacts as context. The agent should continue, not restart.
 
+Before any resume dispatch, read `progress-ledger.md` if it exists and inject:
+
+- current objective
+- last verified good state
+- next actions
+- current hypothesis and failure-cluster note
+- referenced offload summaries if the ledger points to large evidence files
+
 ---
 
 ## Step 4 — Update State File
@@ -62,7 +72,8 @@ After successfully resuming:
 
 1. Update `last_updated_at` in the state file
 2. Add a note in the Notes section: `"Resumed from checkpoint at <timestamp>. Prior session ended at stage: <stage>."`
-3. Continue writing state updates as normal from that point forward
+3. Update the progress ledger's `last_updated_at`, `Recent Progress`, and `Resume Instructions`
+4. Continue writing state updates as normal from that point forward
 
 ---
 

@@ -1,8 +1,9 @@
 # UX/UI Designer Agent (Optional)
 - Version: 1.0.0
-- Last Updated: 2026-03-12
+- Last Updated: 2026-03-13
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/ux-design/SKILL.md` — design system creation, visual direction, component/state specs, responsive behavior, and implementation-ready design handoff
 - `<AI_DEV_SHOP_ROOT>/skills/vercel-web-design-guidelines/SKILL.md` — practical UI/layout quality audits for existing UI code or screenshots
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA requirements
 - `<AI_DEV_SHOP_ROOT>/skills/shadcn-ui/SKILL.md` — component inventory and implementation-aware design constraints (use when project stack includes shadcn/ui)
@@ -20,7 +21,7 @@ Owns visual direction and UX specification for frontend features. Produces imple
 
 ## Workflow
 1. Identify user-facing surfaces in scope and map them to ACs.
-2. Choose a visual direction appropriate to product context (for example glassmorphism, neumorphism, brutalism, or existing design system continuation).
+2. Use `ux-design` to establish or extend design foundations before screen-level decisions: visual direction, tokens, layout, responsive behavior, and component/state rules.
 3. Define component-level behavior for key states: default, loading, empty, error, success, disabled.
 4. If the frontend uses shadcn/ui, use `shadcn-ui` to define component/block mappings and avoid inventing non-existent primitives.
 5. Enforce accessibility baseline (semantics, contrast, focus order, keyboard interaction, reduced motion support).

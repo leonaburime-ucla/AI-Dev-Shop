@@ -19,6 +19,7 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 - spec_hash: <sha256>
 - started_at: <ISO-8601 UTC>
 - last_updated_at: <ISO-8601 UTC>
+- progress_ledger_path: <reports/pipeline/.../progress-ledger.md or reports/continuity/.../progress-ledger.md>
 - current_stage: <stage name — see Stages below>
 - status: IN_PROGRESS | WAITING_FOR_HUMAN | COMPLETE | FAILED | CANCELLED | ABORTED
 
@@ -36,6 +37,7 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 - dispatched_at: 2026-02-22T15:13:00Z
 - job_status: QUEUED | DISPATCHED | RUNNING | DONE | RETRYING | FAILED | ESCALATED | WAITING_FOR_HUMAN | CANCELLED | ABORTED
 - retry_count: 0
+- current_hypothesis: <one sentence or N/A>
 - last_output_summary: <one sentence>
 
 ## Iteration Counts
@@ -66,6 +68,18 @@ Every pipeline run writes a `.pipeline-state.md` file to the active feature fold
 ---
 
 ## Field Reference
+
+### `progress_ledger_path` (required for resumable or long-running work)
+
+```markdown
+progress_ledger_path: reports/pipeline/<NNN>-<feature-name>/progress-ledger.md
+```
+
+Points to the human/agent-readable resume surface defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/session-continuity.md`.
+
+- Required when work is expected to cross sessions, handoffs, or retry-heavy loops
+- Recommended for any feature that reaches programmer retry 2+
+- If absent on a resumable run, the Coordinator should create it before further dispatch
 
 ### `coordinator_mode` (required)
 
@@ -112,6 +126,8 @@ When `on`, the Observer emits `[DEBUG]` trace entries at every dispatch, gate ch
 ## Write Rules
 
 - The Coordinator writes or updates `.pipeline-state.md` at every stage transition.
+- Keep `progress_ledger_path` current when a progress ledger exists.
+- Update `current_hypothesis` whenever a retry changes approach.
 - After each human checkpoint is cleared, mark the corresponding checkbox.
 - Never delete a completed stage row — append only.
 - On FAILED status, write the failure reason to Notes before stopping.
@@ -123,6 +139,8 @@ When `on`, the Observer emits `[DEBUG]` trace entries at every dispatch, gate ch
 - At session start, the Coordinator checks for `.pipeline-state.md` in the active feature folder.
 - If found and status is `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow the Recovery Playbook (`<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md`).
 - If found and status is `ABORTED`, treat as resumable — follow the Recovery Playbook.
+- If `progress_ledger_path` is present, read the ledger before resuming or retrying.
+- If the ledger references offloaded evidence files, verify they still exist before resuming.
 - If found and status is `COMPLETE`, `FAILED`, or `CANCELLED`, do not resume — start a new run or treat as reference only.
 - If not found, create a new one at the start of the spec stage.
 
@@ -141,6 +159,7 @@ When `on`, the Observer emits `[DEBUG]` trace entries at every dispatch, gate ch
 - spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
 - started_at: 2026-02-22T14:30:00Z
 - last_updated_at: 2026-02-22T17:45:00Z
+- progress_ledger_path: reports/pipeline/003-csv-invoice-export/progress-ledger.md
 - current_stage: programmer
 - status: IN_PROGRESS
 
@@ -160,6 +179,7 @@ When `on`, the Observer emits `[DEBUG]` trace entries at every dispatch, gate ch
 - dispatched_at: 2026-02-22T16:15:00Z
 - job_status: RETRYING
 - retry_count: 2
+- current_hypothesis: CSV escaping logic wraps fields correctly but does not double embedded quotes
 - last_output_summary: AC-06 and AC-07 (CSV escaping) still failing; double-quote escape logic inverted
 
 ## Iteration Counts

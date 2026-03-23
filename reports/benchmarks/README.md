@@ -18,9 +18,24 @@ reports/benchmarks/
       ...
   tdd-agent/
   programmer-agent/
+  testrunner-agent/
   code-review-agent/
   security-agent/
 ```
+
+## Seeded Fixtures
+
+The repo now includes first-pass fixtures for both planning and downstream execution/review roles:
+
+- `spec-agent/sample-001-csv-invoice-export/`
+- `architect-agent/sample-001-csv-invoice-export/`
+- `tdd-agent/sample-001-csv-invoice-export/`
+- `programmer-agent/sample-001-csv-invoice-export/`
+- `testrunner-agent/sample-001-csv-invoice-export/`
+- `code-review-agent/sample-001-csv-invoice-export/`
+- `security-agent/sample-001-csv-invoice-export/`
+
+These are anchored to `project-knowledge/examples/golden-sample/`. For downstream roles, the fixtures are scenario-based evaluation packets rather than executable code snapshots; they still give the Observer a stable instruction-regression target.
 
 ---
 
@@ -48,6 +63,8 @@ When a new failure pattern is resolved that took 3+ cycles, it is a good candida
 3. Write `expected-output.md` — what the correct output looks like
 4. Run the agent against it and record the score in `baseline-score.md`
 5. The Observer should reference this benchmark in its next pattern report
+
+For toolkit-maintenance failures, also check `<AI_DEV_SHOP_ROOT>/harness-engineering/failure-promotion-policy.md` to decide whether the issue should become a benchmark, validator, or checklist instead.
 
 ---
 

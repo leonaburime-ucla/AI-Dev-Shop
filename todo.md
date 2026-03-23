@@ -9,7 +9,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ## Quick Status Snapshot
 
-- Observer Agent Operational Cadence: **OPEN / PARTIAL** (Observer docs exist; explicit dispatch cadence still missing)
+- AGENTS.md Map Reduction: **DONE / MONITORED** (root map was slimmed to the safer range and detail moved into local quickstart/index docs; keep watching for re-expansion)
+- Observer Agent Operational Cadence: **DONE / MONITORED** (cadence is now explicit in Observer, Coordinator, and workflow docs; keep it aligned as the pipeline evolves)
 - Git Branching and PR Strategy: **OPEN**
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Protocol Split: MCP + A2A: **OPEN**
@@ -18,6 +19,14 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ---
 
 ## De-Noise and Effectiveness
+
+### AGENTS.md Map Reduction **[DONE / MONITORED]**
+**What it is:** Shrink `AGENTS.md` into a tighter runtime map so the root instruction surface routes agents instead of re-explaining the whole framework.
+**Current state:** Detailed startup/invocation/checkpoint content now lives in `project-knowledge/operations/pipeline-quickstart.md`, and the full agent roster now lives in `project-knowledge/routing/agent-index.md`. `AGENTS.md` remains the runtime map and startup contract and is back under the safer size target.
+**What to add next:**
+- Keep startup/mode/routing semantics at the root and move deeper operating detail into linked canonical docs.
+- Remove repeated explanations that already live in `agents/`, `workflows/`, `skills/`, or `harness-engineering/`.
+- Re-run the doc-garden audit after the reduction and treat the root-file line count as a tracked harness metric.
 
 ### Context De-Noise Hardening
 **What it is:** Reduce instruction noise and improve execution reliability by moving guardrails out of prose and into enforceable structure.
@@ -54,6 +63,9 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - `agency-agents`
   - Why it is useful: broad agent-role starter kit that can accelerate experimentation with specialist personas and startup-like multi-agent staffing patterns.
   - Likely value here: role ideas, agent templates, and prompt structure comparisons against this toolkit's current agent set.
+- `squad`
+  - Why it is useful: multi-agent team runtime with persistent in-repo agent state, routing, orchestration logs, skills, templates, and sample projects.
+  - Likely value here: go through the repo's projects/samples/templates and extract anything useful for coordinator routing, persistent agent memory, context hygiene, observability, and team bootstrap patterns.
 - `promptfoo` (transcript said "Prompt Fu")
   - Why it is useful: prompt testing and evaluation framework for model/prompt comparisons, regressions, and adversarial red-team checks.
   - Likely value here: could strengthen prompt, rubric, and red-team validation workflows for agent prompts and user-facing AI features.
@@ -167,6 +179,27 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Update all command files in `slash-commands/` to include frontmatter
 - Coordinator skills update — teach it to validate command preconditions against frontmatter `requires` fields before dispatch
 **References:** github/spec-kit command format (`github-spec-kit/templates/commands/specify.md`)
+
+---
+
+### System Design Skill Coverage Hardening **[PARTIAL]**
+**What it is:** The new `skills/system-design/` package exists, but it is still stronger on high-level topology and generic distributed-systems framing than on correctness, operational sharp edges, and security-depth topics.
+**Current state:** **[PARTIAL]** Root skill plus references are in place; coverage is good enough to start, but not yet comprehensive against the full recurring system-design checklist.
+**What to add:**
+- Add reference coverage for hot keys / hot rows
+- Add reference coverage for precomputation
+- Add reference coverage for batching
+- Deepen async processing guidance
+- Add explicit idempotency guidance
+- Add explicit deduplication guidance
+- Add transaction tradeoff guidance
+- Add concurrency issue patterns and failure modes
+- Add health check guidance
+- Add graceful degradation patterns
+- Deepen authn/authz treatment
+- Deepen secrets-management treatment
+- Deepen rate-limiting treatment
+- Add abuse-detection coverage
 
 ---
 

@@ -19,9 +19,9 @@ Execute the full verification suite after implementation and report trustworthy 
 
 ## Workflow
 1. Verify test certification hash matches active spec hash before running. Flag any mismatch to Coordinator before proceeding.
-2. Run unit suite. Capture all failures with full output.
+2. Run unit suite. Keep passing output concise; capture full failure output when something breaks.
 2a. If `tasks.md` contains a `## Constraints — Performance` section: execute load tests per the benchmark targets using the tool specified in the constraints. Capture results as artifacts. Apply pass/fail criteria from `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md`. A hard failure blocks the same as a failing test.
-3. Run integration/E2E suite. Capture all failures.
+3. Run integration/E2E suite. Keep passing output concise; capture full failure output when something breaks.
 3a. Run coverage reporter for unit, integration, and E2E suites using the tool specified in `tasks.md` constraints; if none is specified, use the project's default (e.g., c8/istanbul for Node.js, coverage.py for Python, go test -cover for Go).
 3b. Merge coverage artifacts across suite runs before evaluation (do not overwrite per-suite artifacts). Evaluate gates from the merged report plus per-suite summaries.
 3c. Evaluate hard coverage gates from `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` using the active coverage profile in `tasks.md` (or defaults if absent) with no averaging across categories:
@@ -42,6 +42,9 @@ Write run report to `<AI_DEV_SHOP_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<
 Report contents:
 - Suite-by-suite results (unit / integration / E2E / acceptance)
 - Pass rate against convergence threshold
+- Success-silent / failure-loud evidence handling:
+  - passing suites should be summarized briefly
+  - failing suites should include exact failure output or an offload path if large
 - Failure clusters with:
   - Test names and spec references they cover
   - Likely failure owner (Programmer, Architect, Spec)
@@ -76,4 +79,5 @@ Report contents:
 - Do not write new tests
 - Do not modify tests to make them pass
 - Mark non-deterministic test failures as flaky — do not count them as failures or as passes
-- Report exact failure output, not a summary
+- Report exact failure output, not a summary, when a suite fails
+- Do not flood active context with routine passing output

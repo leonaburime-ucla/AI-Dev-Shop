@@ -1,9 +1,18 @@
 # Compatibility Matrix
 
-Maps AI Dev Shop (speckit) features to host environments. Use this before adopting a feature to know what works without guessing.
+Maps AI Dev Shop (speckit) features to host environments. Use this before adopting a feature to know what usually works, then confirm unstable capabilities with the local capability probe instead of trusting the matrix blindly.
 
 **Hosts covered:** Claude Code · Claude.ai (web) · Codex CLI · Gemini CLI · Generic LLM (prompt-only)
 Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
+
+Local verification:
+
+```bash
+bash harness-engineering/validators/probe_host_capabilities.sh
+bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>
+```
+
+For the current environment, prefer the probe above plus `harness-engineering/capability-verification.md`. Treat this matrix as a planning default, not the final truth for version-sensitive features.
 
 ---
 
@@ -13,7 +22,7 @@ Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (us
 |---------|------------|-----------------|-----------|------------|-------------|
 | **Slash commands** (`/spec`, `/plan`, `/tasks`, `/implement`, `/review`, `/clarify`) | ✅ Full (after one-time setup) | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
 | **Option B manual workflow** (paste template contents as prompt) | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
-| **Task tool / agent spawning** | ✅ Full | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
+| **Task tool / agent spawning** | ✅ Full | ❌ Not supported | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Not supported |
 | **Simulated multi-agent** (single session, roleplay stages) | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible |
 | **Filesystem reads** (specs/, project-knowledge/, templates/) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
 | **Filesystem writes** (state file, spec artifacts) | ✅ Native | ❌ Requires copy-out | ✅ Native | ✅ Native | ❌ Requires copy-out |
@@ -23,11 +32,11 @@ Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (us
 | **Constitution gates** (blocking escalation on violation) | ✅ Full | ✅ Full (manual routing) | ✅ Full (manual routing) | ✅ Full (manual routing) | ✅ Full (manual routing) |
 | **[NEEDS CLARIFICATION] marker resolution** | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
 | **FEAT number assignment** | ✅ Auto (reads specs/) | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual |
-| **Parallel task execution** (`[P]` markers in tasks.md) | ✅ Full (Task tool) | ❌ Sequential only | ❌ Sequential only | ❌ Sequential only | ❌ Sequential only |
+| **Parallel task execution** (`[P]` markers in tasks.md) | ✅ Full (Task tool) | ❌ Sequential only | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Sequential only |
 | **Observer Agent** (runs alongside pipeline) | ✅ Full | ⚠️ Deferred pass only | ⚠️ Deferred pass only | ⚠️ Deferred pass only | ⚠️ Deferred pass only |
 | **Memory-store / project knowledge persistence** | ✅ Auto (file writes) | ⚠️ Manual copy-out | ✅ Auto | ✅ Auto | ⚠️ Manual copy-out |
 
-**Legend:** ✅ Full native support · ⚠️ Partial or manual workaround needed · ❌ Not supported
+**Legend:** ✅ Full native support · ⚠️ Version-sensitive, partial, or requires verification · ❌ Not supported
 
 ---
 
@@ -51,11 +60,15 @@ For SHA-256 hashes, compute manually using your OS shell or a web tool and paste
 
 ### Codex CLI
 
-Filesystem reads and writes work natively. No Task tool means agents run sequentially in a single session — multi-agent parallelism is not available. Slash commands are not supported; use Option B. Bash tool available for test running.
+Filesystem reads and writes work natively. Slash commands are not supported; use Option B. Bash tool available for test running.
+
+Do not hardcode task-spawning assumptions from memory alone. Verify current capability status with `bash harness-engineering/validators/probe_host_capabilities.sh` or `codex features list`.
 
 ### Gemini CLI
 
 Filesystem reads and writes work natively. Bash tool availability depends on your Gemini CLI configuration — verify before relying on TestRunner automation. Slash commands not supported; use Option B.
+
+Some Gemini CLI capabilities still require local or vendor verification in this repo. If the probe cannot prove a feature, describe it as `unverified`, not `unsupported`.
 
 ### Generic LLM (prompt-only, no tools)
 
@@ -77,9 +90,9 @@ Paste all relevant context into the prompt manually. Use Option B for every pipe
 ## Known Limitations by Feature
 
 **Parallel tasks (`[P]` markers):**
-The Task tool (Claude Code) spawns each agent as a genuinely isolated subprocess with its own context window. This is the only host where `[P]` tasks run with true parallel execution and context isolation.
+Claude Code supports true isolated agent dispatch. Other hosts must be treated as runtime-sensitive instead of assumed from memory. Use the local capability probe to decide whether `[P]` means real parallel isolation or only a sequencing hint on the current install.
 
-Codex CLI and Gemini CLI do not have an equivalent sub-agent dispatch mechanism. There is no API or built-in command to spawn a separate agent instance mid-session on these hosts. `[P]` tasks must be executed sequentially in a single session; context from earlier tasks accumulates rather than being isolated. On these hosts, treat `[P]` markers as sequencing hints — order independent tasks to minimize blocking, but do not expect isolation or true concurrency.
+If parallel agent support is unavailable or unverified on the current host, execute `[P]` tasks sequentially and keep discovery/validation output compact so accumulated context does not sprawl.
 
 **SHA-256 hashing on web hosts:**
 Without Bash, generate hashes with `shasum -a 256 <file>` on macOS/Linux or `Get-FileHash -Algorithm SHA256 <file>` on Windows. Paste the result into the spec header. A missing or unverified hash degrades spec integrity guarantees but does not break the pipeline — flag it in the pipeline state Notes section.

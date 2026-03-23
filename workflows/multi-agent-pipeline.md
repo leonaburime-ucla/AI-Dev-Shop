@@ -47,6 +47,8 @@ Run this before the first Spec when working with an existing codebase.
 
 ### CodeBase Analyzer Dispatch
 
+For existing codebases, this is the default first step on the first pass unless a fresh analysis already covers the requested area.
+
 Include in context:
 - Path to codebase root (or specific modules to analyze)
 - Desired output: analysis only, or analysis + migration plan
@@ -210,21 +212,31 @@ Repeat pattern priming when the task shifts to a materially different layer or c
 - Relevant `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` entries
 - Handoff output from TDD Agent (summary only, not full session)
 - Confirmed pattern-priming reference (from Pattern Priming step above)
+- `progress-ledger.md` when resuming long-running work or when programmer retry count is 2+
+- Self-validation harness template when runtime startup, API, UI, auth, migration, or integration behavior is in scope
+
+If broad discovery is required before implementation, use a read-only discovery pass first and pass only structured findings into the Programmer context.
 
 Programmer handoff must include an `Architecture Audit` section:
 - `PASS` = no known architectural violations found
 - `WARNING` = likely architectural violations remain; Coordinator surfaces them to the human and asks whether to route back to Programmer or continue downstream
 - `BLOCKER` = ADR ambiguity or a hard architectural constraint prevents safe continuation; Coordinator pauses routing and escalates
+- `Pre-Completion Checklist` = explicit proof that the claimed fix or completion was re-verified against the active task/spec
+- `Loop Alert` = required when a loop-detection tripwire fired before handoff
+- `Self-Validation` = required when runtime-changing work needed app-level validation before handoff; include report path, paths checked, and any offloaded evidence
 
 ### TestRunner Agent
 - Test suite location
 - Spec hash certified by TDD Agent (to validate drift)
 - Previous cycle's failure clusters (to detect regressions)
+- Self-validation report path when one was produced during implementation
 - Coverage tool (from `tasks.md` constraints section; if absent, use project default)
 - Active coverage profile for lines/branches/functions/statements by suite (from `tasks.md` constraints):
   - defaults: unit `98/98/98/98`, integration `90/90/90/90`, e2e `80/80/80/80`
   - if user provides custom minimums, those override defaults
 - Per-file coverage baseline (from `tasks.md` constraints section if present, used to flag regressions on touched files)
+
+Passing suites should be summarized briefly. Failing suites should include exact output or an offload path if the raw output is large.
 
 ### Code Review Agent
 - Full diff of changed files
@@ -276,6 +288,20 @@ Programmer handoff must include an `Architecture Audit` section:
 - All agent outputs from the current cycle (summaries, not full sessions)
 - Previous Observer reports (for trend analysis)
 - `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` (to cross-reference new patterns against known ones)
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` (for cadence triggers, doc-garden workflow, and benchmark refresh rules)
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/failure-promotion-policy.md` (for mandatory promotion when failure classes recur)
+
+**Minimum Observer cadence:**
+- after every 3rd completed feature
+- immediately after any convergence escalation
+- before merge for toolkit-maintenance changes touching `AGENTS.md`, `agents/`, `skills/`, `workflows/`, `templates/`, or `harness-engineering/`
+- weekly while framework-maintenance work is active
+
+**Toolkit-maintenance pass requirements:**
+- run `bash harness-engineering/validators/run-all.sh`
+- capture the doc-garden audit output in the Observer report
+- review benchmark impact when instructions or routing docs changed
+- recommend a concrete harness artifact when a failure class reaches the promotion threshold
 
 ---
 

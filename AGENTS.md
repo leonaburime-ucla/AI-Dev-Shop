@@ -1,7 +1,5 @@
 # AGENTS
-
 ## Agent Communication Protocol
-
 **CRITICAL:** Whenever any agent responds to the user (including subagents reporting back to the Coordinator), the agent's name and its current mode MUST be prefixed to the message.
 Format: `AgentName(Mode): ...`
 Examples: `Coordinator(Review Mode): ...` or `Coordinator(Pipeline): ...` or `Programmer(Execution): ...` or `Spec Agent(Direct): ...` or `Architect(Consensus): ...`
@@ -9,9 +7,7 @@ In Agent Direct Mode, use `AgentName(Direct):`; if Direct Mode is started with c
 This is strictly required to let the user know exactly who is talking and to confirm the AI Dev Shop framework is active.
 
 ---
-
 # Mandatory Startup
-
 On the first user message in this repository (including greetings), before any reply:
 1. Open and read `<AI_DEV_SHOP_ROOT>/AGENTS.md`.
 2. Provide a welcome message that MUST include:
@@ -20,8 +16,10 @@ On the first user message in this repository (including greetings), before any r
    - The pipeline diagram and its notes (copy from the How This Works section verbatim).
    - One sentence explaining that Consultation Mode (default ON) exists and how to enable/disable it.
    - One sentence explaining that Agent Consensus Mode exists and how to enter/exit it, without explaining debate details.
+   - One sentence explaining that sub-agent assistance auto-enables when the current host verifies it, usually uses more total tokens, and can be disabled with `single-agent mode`.
 3. If the file is missing or unreadable, state that explicitly and stop.
 4. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt after the welcome message.
+5. When Bash is available, detect the current host and resolve subagent mode with `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/resolve_subagent_mode.sh`. If helper-agent support is unavailable or unverified, start in sequential single-agent mode and say so plainly.
 
 **slash-commands-setup** (skip if dismissed):
 Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/consensus`, and more)? Say **yes** and I'll walk you through it."
@@ -31,9 +29,7 @@ If the user says "skip" / "don't show again" / "dismiss": append `- slash-comman
 Failure to perform Mandatory Startup is a blocking error. Do not proceed until corrected.
 
 ---
-
 ## Default Mode: Coordinator — Review Mode
-
 **You are starting in Review Mode.** Conversational by default — answer questions, review code, discuss ideas. If another agent is clearly better suited to answer or execute and the user has not asked to remain in Review Mode, dispatch instead of handling specialist work directly.
 
 | Mode | What the Coordinator does |
@@ -48,10 +44,20 @@ Read user intent and switch modes automatically. If a specialist agent is clearl
 To enter Agent Direct Mode: `/agent <name>` or "talk to <agent>", "switch to <agent>", "let me talk to <agent> directly".
 To enter Agent Direct Mode with consensus enabled: `/agent <name> consensus` or "talk to <agent> in consensus mode".
 Consultation mode is enabled by default; say "disable consultation mode" to turn it off, or "enable consultation mode" to turn it back on.
+Sub-agent assistance defaults to automatic when the current host verifies helper-agent support; say `single-agent mode` or `disable subagents` to keep work in one context, or `re-enable subagents` / `auto subagent mode` to restore automatic helper use.
 To enter Direct Mode: "exit coordinator", "just talk to me normally".
 To return from either: "back to coordinator", "resume coordinator" — Coordinator re-evaluates pipeline state from the direct session and announces where things stand, then defaults to Review Mode.
 Startup one-sentence copy: `Consultation Mode (default ON) enables agent-to-agent communication via the Coordinator for difficult decisions while keeping one owner agent accountable for final output.`
 Startup one-sentence copy: `Agent Consensus Mode is available for high-level debatable questions among several AI models; enter with /agent <name> consensus (or "talk to <agent> in consensus mode") and exit back to normal direct with /agent <name> (or "talk to <agent> directly").`
+Startup one-sentence copy: `Sub-agent assistance auto-enables when the current host verifies helper-agent support; it helps keep the main context cleaner but usually uses more total tokens, and you can say "single-agent mode" or "disable subagents" to keep work in one context.`
+
+---
+
+## User Explanation Rule
+
+It is fine to use internal terms such as `harness engineering`, `Observer`, or `progress-ledger`, but do not assume the user already knows them.
+Use `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/plain-language-explanations.md` and explain the current step in this order: what we are doing, why it exists, what we need from the user (if anything), and what happens next.
+Translate internal terms on first meaningful use, then keep the explanation concrete and proportional to the user's immediate need.
 
 ---
 
@@ -80,72 +86,31 @@ Agents are specialized roles, each with a `skills.md`. By default, all routing f
 
 ## Starting the Pipeline
 
-**Before anything else:** Confirm `<AI_DEV_SHOP_ROOT>` — the path to the AI Dev Shop toolkit folder (default: `AI-Dev-Shop-speckit/`). Pipeline artifacts are written under `<AI_DEV_SHOP_ROOT>/reports/`. Spec files are written to the user-specified location.
+Use `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/pipeline-quickstart.md` as the source of truth for:
 
-Existing codebases should start with CodeBase Analyzer on the first pass to produce `ANALYSIS-*.md` and, when needed, `MIGRATION-*.md`.
+- startup sequencing
+- slash/manual pipeline entrypoints
+- blocking human checkpoints
 
-Canonical stage order and detailed dispatch behavior live in `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
-
-High-level flow:
-1. Use System Blueprint when macro boundaries are unclear or the scope spans multiple domains.
-2. Spec Agent creates the spec package. Zero unresolved `[NEEDS CLARIFICATION]` markers before architecture work.
-3. Human approves spec, then Red-Team and Architect produce the ADR.
-4. Human approves ADR, then Coordinator generates `tasks.md` and dispatches TDD.
-5. Programmer implements to convergence, then review and security gates run before shipping.
-
-If tests repeatedly fail (3+ cycles on the same cluster), escalate to human — do not keep retrying.
+The minimum startup rule still holds: confirm `<AI_DEV_SHOP_ROOT>`, start existing codebases with CodeBase Analyzer when needed, and do not send work past Spec or ADR approval gates without the required human checkpoint.
 
 ---
 
 ## Invoking the Pipeline
 
-**Option A — Slash commands (Claude Code only)** (one-time setup):
-- Claude Code: copy `<AI_DEV_SHOP_ROOT>/slash-commands/` to `.claude/commands/`
+Operator entrypoints live in `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/pipeline-quickstart.md`.
 
-**Option B — Manual (Gemini CLI, Codex CLI, Claude.ai, Generic LLM)**: paste the contents of the corresponding template file as your message, replacing `$ARGUMENTS`.
-
-| Command | Triggers | Produces |
-|---|---|---|
-| `/blueprint` | System Blueprint Agent | system-blueprint.md with macro boundaries and spec decomposition plan |
-| `/spec` | Spec Agent | spec package, [NEEDS CLARIFICATION] resolved |
-| `/clarify` | Spec Agent | structured questions for unresolved markers |
-| `/plan` | Architect Agent | research.md + ADR |
-| `/tasks` | Coordinator | tasks.md with [P] parallelization markers |
-| `/implement` | TDD → Programmer | test-certification.md → implementation to convergence |
-| `/review` | Code Review + Security | Required/Recommended findings + security report |
-| `/agent <name>` | Named agent (direct) | Enters Agent Direct Mode with the specified agent |
-| `/agent <name> consensus` | Named agent (direct + consensus) | Enters Agent Direct Mode and enables Swarm Consensus for debatable high-level questions |
-| `/agent vibecoder` | VibeCoder Agent (direct, optional) | Quick-and-dirty prototype output with minimal structure |
+- Claude Code: slash commands are the preferred entrypoint.
+- Codex CLI, Gemini CLI, Claude.ai, and generic LLM hosts use the matching `slash-commands/*.md` template content manually.
+- Keep the command surface thin at the root; expand details in the quickstart doc instead of here.
 
 ---
 
 ## Agents
 
-Full operating procedure for each agent is in its `skills.md`.
+Use `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/agent-index.md` for the full agent roster, role summaries, and persona file entrypoints.
 
-| Agent | Role | File |
-|---|---|---|
-| VibeCoder (optional) | Fast exploratory prototyping — optional on-ramp before the structured pipeline | `agents/vibecoder/skills.md` |
-| System Blueprint (optional, pre-spec) | Macro-level system planning and spec decomposition before feature specs | `agents/system-blueprint/skills.md` |
-| Coordinator | Pipeline orchestration, routing, convergence, human escalation | `agents/coordinator/skills.md` |
-| Skills Librarian (optional) | Centralized external skill discovery, audit, and canonical merge governance | `agents/skills-librarian/skills.md` |
-| Spec | Converts intent into versioned, testable spec packages | `agents/spec/skills.md` |
-| Architect | Selects patterns, defines boundaries, produces ADR | `agents/architect/skills.md` |
-| TDD | Writes certified test suite before implementation | `agents/tdd/skills.md` |
-| Programmer | Implements code to satisfy certified tests | `agents/programmer/skills.md` |
-| UX/UI Designer (optional) | Defines visual direction, UI style system, and implementation-ready design specs for frontend work | `agents/ux-ui-designer/skills.md` |
-| QA/E2E | Writes browser-level tests that validate user journeys and frontend ACs | `agents/qa-e2e/skills.md` |
-| TestRunner | Executes test suite, reports pass/fail evidence | `agents/testrunner/skills.md` |
-| Code Review | Reviews spec alignment, architecture, test quality, security surface | `agents/code-review/skills.md` |
-| Refactor | Proposes non-behavioral structural improvements post-review | `agents/refactor/skills.md` |
-| Security | Analyzes threat surface, classifies findings, blocks Critical/High | `agents/security/skills.md` |
-| DevOps | Produces Dockerfiles, CI/CD configs, IaC, and deployment runbooks | `agents/devops/skills.md` |
-| Docs | Publishes OpenAPI specs, writes user guides, and produces release notes | `agents/docs/skills.md` |
-| Observer (optional) | Watches pipeline, detects patterns, produces system improvements | `agents/observer/skills.md` |
-| Red-Team | Adversarially probes approved specs before Architect dispatch | `agents/red-team/skills.md` |
-| CodeBase Analyzer | Analyzes existing codebase before pipeline begins | `agents/codebase-analyzer/skills.md` |
-| Database | Owns schema design, migrations, query patterns | `agents/database/skills.md` |
-| Supabase Sub-Agent | Supabase-specific implementation under Database Agent | `agents/database/supabase/skills.md` |
+Use `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md` for shared-skill ownership and reuse mapping.
 
 ---
 
@@ -205,18 +170,8 @@ The Coordinator must not assume delegated subagents automatically inherit the co
 - **The handoff contract is mandatory.** Every artifact includes inputs used, output summary, risks, and suggested next assignee.
 - **Framework source files are read-only during normal feature work.** Use `reports/` and `project-knowledge/` as the writable project workspace unless maintaining the toolkit itself.
 - **Fix upstream intent, not downstream drift.** If code, tests, or architecture diverge from the spec, route the issue back to the owning stage instead of patching around it.
+- **Evidence over invention.** Do not present guesses or memory as fact; if a claim is not grounded in inspected artifacts, tool output, or cited sources, mark uncertainty or say you do not know. See `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/anti-hallucination-policy.md`.
 - **Debug mode exists.** Toggle with `debug on` / `debug off`; see `<AI_DEV_SHOP_ROOT>/workflows/trace-schema.md`.
-
----
-
-## Human Checkpoints (Blocking)
-
-| Checkpoint | Before |
-|---|---|
-| Spec approval | Architect dispatch |
-| Architecture sign-off | TDD dispatch |
-| Convergence escalation | Burning more cycles |
-| Security sign-off | Shipping |
 
 ---
 
@@ -224,12 +179,19 @@ The Coordinator must not assume delegated subagents automatically inherit the co
 
 Use these files for operating detail instead of expanding this file:
 
+- Pipeline startup, command entrypoints, and checkpoints: `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/pipeline-quickstart.md`
+- Plain-language explanation pattern for users: `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/plain-language-explanations.md`
+- Capability verification and subagent defaulting: `<AI_DEV_SHOP_ROOT>/harness-engineering/capability-verification.md`, `<AI_DEV_SHOP_ROOT>/harness-engineering/subagent-usage-policy.md`
 - Pipeline flow and stage context: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
 - Coordinator behavior and routing guardrails: `<AI_DEV_SHOP_ROOT>/agents/coordinator/skills.md`
 - Routing decision tree and cycle summary format: `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
 - Convergence and escalation policy: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/escalation-policy.md`
+- Anti-hallucination and evidence rules: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/anti-hallucination-policy.md`
 - Knowledge routing and memory writes: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md`
+- Session continuity and resume ledger rules: `<AI_DEV_SHOP_ROOT>/harness-engineering/session-continuity.md`
+- Pre-completion and loop-detection tripwires: `<AI_DEV_SHOP_ROOT>/harness-engineering/tripwires.md`
 - Path and artifact conventions: `<AI_DEV_SHOP_ROOT>/workflows/conventions.md`
 - Pipeline state and job lifecycle: `<AI_DEV_SHOP_ROOT>/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`, `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md`
+- Agent roster and persona entrypoints: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/agent-index.md`
 - Skills registry: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md`
 - Golden sample handoff chain: `<AI_DEV_SHOP_ROOT>/project-knowledge/examples/golden-sample/README.md`

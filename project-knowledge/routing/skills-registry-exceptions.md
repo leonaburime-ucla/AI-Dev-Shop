@@ -1,0 +1,19 @@
+# Skills Registry Exceptions
+
+Use this file only when a canonical shared skill should exist on disk but should not appear in `skills-registry.md`.
+
+Default rule: shared skills under `skills/*/SKILL.md` must be registered. This file is the narrow escape hatch for deliberate exclusions.
+
+## Format
+
+- one bullet per excluded skill path
+- wrap the path in backticks
+- explain the reason in plain language after the path
+
+Example:
+
+Example entry: `skills/<deprecated-skill>/SKILL.md` — deprecated but kept temporarily for migration support
+
+## Current Exceptions
+
+None.

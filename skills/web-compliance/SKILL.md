@@ -101,6 +101,19 @@ When this skill is applied, output should include:
 - Jurisdiction assumptions used for each finding
 - Verification evidence type (`code`, `config`, `network`, `ui-copy`, `flow-path`)
 - Explicit uncertainty notes when legal interpretation is required
+- For `high` and `medium` findings, add audit-style gap framing:
+  - `control_area`
+  - `current_state`
+  - `target_state`
+  - `remediation_steps`
+  - `estimated_effort`
+  - `evidence_needed`
+
+## Audit-Style Evidence Layer
+- Use audit-style gap framing when the feature touches consent logging, DSR flows, retention/deletion behavior, vendor/script controls, cancellation parity, or age-gating.
+- If multiple findings share the same root cause, group them into one remediation cluster and list shared evidence needed.
+- If evidence cannot be verified from code or config, mark it as `missing evidence` rather than assuming compliance.
+- When useful, load `<AI_DEV_SHOP_ROOT>/skills/web-compliance/references/audit-evidence.md` for gap templates and evidence-matrix structure.
 
 ## Escalation Routing Heuristics
 - Route to `legal` for jurisdiction interpretation, cross-border transfer mechanism questions, ToS/pricing term changes, marketing claims substantiation, and minor/age-gating edge cases.
@@ -113,3 +126,4 @@ When this skill is applied, output should include:
 - Do not present this skill as legal advice
 - Do not block release on low-confidence assumptions; escalate with explicit uncertainty
 - Prefer concrete evidence (copy text, UI path, config behavior) over generic warnings
+- Do not claim certification or framework readiness from website-surface checks alone

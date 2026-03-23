@@ -1,295 +1,130 @@
 ---
 name: sql-data-modeling
-version: 1.0.0
-last_updated: 2026-02-23
+version: 1.1.1
+last_updated: 2026-03-22
 description: Use when designing relational schemas, producing ERDs, planning migrations, selecting data types, defining constraints, or reasoning about normalization and indexing strategy. Platform-agnostic — applies to any SQL database.
 ---
 
 # Skill: SQL Data Modeling
 
-A schema is a contract. Every downstream agent — Programmer, TDD, Code Review — works against the schema as a stable interface. Get it right before writing any application code. Changing a schema after application code is written is expensive; changing it after data is in production is a risk.
+A schema is a contract. Downstream implementation quality depends on whether the data model correctly represents the domain, enforces invariants in the database, and supports the required query patterns.
 
-The goal is not the most normalized schema. The goal is a schema that correctly represents the domain, enforces its invariants at the database level, and supports the query patterns the spec requires — with the minimum structural complexity needed to do that.
+Keep this file lean. Read it for the modeling contract, then load only the reference files needed for the specific task.
 
-## ERD Design Principles
+## Version Notes
 
-An Entity-Relationship Diagram describes what the data is, not how it is stored. Model at this level first, then translate to DDL.
+- `1.1.1` clarifies that the lean `SKILL.md` is a routing layer, not a content reduction. The reference files now carry fuller examples for normalization, composite keys, and index design.
+- `1.1.0` converted the old monolithic skill into a map-plus-references structure so agents can load only the relevant depth for the task.
 
-**Entities** are things with an independent existence that the system needs to remember. Each entity becomes a table. Name tables in **plural snake_case** (`users`, `invoice_items`, `audit_logs`).
+## Core Model
 
-**Attributes** are facts about an entity. Each attribute becomes a column. Name columns in **singular snake_case** (`first_name`, `created_at`, `is_active`). Do not prefix column names with the table name (`user_id` in the `users` table is redundant; use `id`).
+Model in this order:
 
-**Relationships** describe how entities relate to each other. Three types:
+1. Entities and relationships
+2. Ownership and cardinality
+3. Keys and constraints
+4. Query patterns and indexes
+5. Migration risk and rollout path
 
-| Type | Description | Implementation |
-|---|---|---|
-| One-to-One (1:1) | Each row in A relates to at most one row in B | FK on either side with UNIQUE constraint |
-| One-to-Many (1:N) | One row in A relates to many rows in B | FK on the "many" side (B references A) |
-| Many-to-Many (M:N) | Many rows in A relate to many rows in B | Junction table with two FKs |
+The goal is not maximum normalization. The goal is the minimum structural complexity that preserves correctness, integrity, and required performance.
 
-**Cardinality** must be explicit: is the relationship optional (0..1, 0..N) or required (1..1, 1..N)? Optional relationships use nullable FKs. Required relationships use NOT NULL FKs.
+## Load Strategy
 
-## Normalization
+Start here, then load only the reference you need:
 
-Normalization reduces data redundancy and update anomalies. Apply by default; denormalize only with documented justification.
+- `references/modeling-and-normalization.md` for ERD rules, cardinality, normalization, and denormalization
+- `references/keys-constraints-and-indexes.md` for PK/FK design, constraints, junction tables, and index strategy
+- `references/migrations-and-lifecycle.md` for migration classification, soft vs hard delete, and timestamp lifecycle patterns
+- `references/conventions-and-data-types.md` for naming rules and type selection guidance
 
-### First Normal Form (1NF)
-- Each column holds atomic (indivisible) values — no comma-separated lists, no arrays of values in a single column (use a child table instead)
-- Each row is uniquely identifiable (has a primary key)
-- No repeating groups of columns (e.g. `phone_1`, `phone_2`, `phone_3` → separate `phone_numbers` table)
+## When to Use
 
-### Second Normal Form (2NF)
-- Must be in 1NF
-- Every non-key column depends on the entire primary key, not just part of it
-- Applies when using composite primary keys — if a column depends on only one part of the composite key, it belongs in a separate table
+Use this skill when the task involves:
 
-### Third Normal Form (3NF)
-- Must be in 2NF
-- No transitive dependencies: non-key columns must not depend on other non-key columns
-- Example violation: storing both `zip_code` and `city` in `users` — `city` depends on `zip_code`, not on the user's identity. Extract to a `zip_codes` table or accept the redundancy with documented justification.
+- designing or reviewing a relational schema
+- deciding table boundaries and relationships
+- choosing PK, FK, constraint, or index strategy
+- planning a migration path
+- deciding between normalization and denormalization
+- selecting SQL data types
 
-### When to Denormalize
-Denormalization trades write anomaly risk for read performance. Accept it only when:
-- A query joins many tables and the join cost is measured and significant
-- A derived value is expensive to recompute on every read and the source data changes infrequently
-- A reporting table is populated by a controlled process (ETL, trigger) rather than ad-hoc writes
+Do not use this skill as a substitute for:
 
-Always document denormalization decisions: what was denormalized, why, which process keeps the derived value in sync, and what breaks if it drifts.
+- database-platform-specific behavior such as Supabase RLS or PostgREST
+- advanced engine-specific SQL tuning beyond schema design
+- application-layer validation decisions that do not belong in the schema
 
-## Primary and Foreign Key Design
+## Required Context
 
-**Primary keys**: Use `uuid` (v4 or v7) as the default for any table that will be exposed externally or referenced across services. Use `bigserial` / `bigint GENERATED ALWAYS AS IDENTITY` for internal high-volume tables where sequential IDs are safe and join performance matters. Never use natural keys (emails, usernames, phone numbers) as primary keys — they change.
+Before modeling, confirm:
 
-```sql
--- Preferred for externally visible entities
-id uuid PRIMARY KEY DEFAULT gen_random_uuid()
+- the core entities and their relationships
+- ownership rules and lifecycle rules
+- required read and write paths
+- deletion behavior
+- expected data volume and growth
+- whether the schema is greenfield or a migration of existing data
 
--- Preferred for internal high-volume tables
-id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY
-```
+## Contract by Concern
 
-**Foreign keys**: Always define FK constraints explicitly — do not rely on application code to maintain referential integrity.
-
-```sql
--- Define cascade behavior explicitly on every FK
-user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE
-order_id uuid NOT NULL REFERENCES orders(id) ON DELETE RESTRICT
-```
-
-**Cascade rules**:
-
-| Rule | Behavior | Use When |
-|---|---|---|
-| `ON DELETE CASCADE` | Child rows deleted when parent is deleted | Child cannot exist without parent (e.g. order items without an order) |
-| `ON DELETE RESTRICT` | Delete blocked if children exist | Child can exist independently or deletion requires explicit cleanup |
-| `ON DELETE SET NULL` | FK set to NULL when parent is deleted | Child is optional; losing the parent is valid |
-| `ON DELETE SET DEFAULT` | FK set to default value when parent is deleted | Reassignment to a default entity is valid (e.g. reassign to a generic owner) |
-
-## Constraint Types
-
-Define constraints at the database level. Application-level validation is a second line of defense — the schema is the first.
-
-```sql
--- NOT NULL: column must always have a value
-email text NOT NULL
-
--- UNIQUE: no two rows can share the same value
-email text NOT NULL UNIQUE
-
--- CHECK: arbitrary condition must be true
-amount numeric NOT NULL CHECK (amount > 0)
-status text NOT NULL CHECK (status IN ('draft', 'published', 'archived'))
-
--- Table-level UNIQUE across multiple columns
-UNIQUE (user_id, organization_id)
-
--- Table-level CHECK
-CHECK (end_date IS NULL OR end_date > start_date)
-```
-
-Prefer table-level constraints over application-level validation for invariants that must hold regardless of which code path writes the data.
-
-## Index Strategy
-
-Indexes speed up reads and slow down writes. Add indexes for the queries the spec actually requires. Do not pre-emptively index every FK or text column.
-
-**When to index**:
-- Columns used in `WHERE` clauses with high selectivity (many distinct values)
-- Columns used in `JOIN` conditions (FK columns)
-- Columns used in `ORDER BY` on large tables
-- Columns used in range queries
-
-**When not to index**:
-- Low-cardinality columns (boolean flags, small enums) — the planner will prefer a sequential scan
-- Columns only used in `SELECT` — covering indexes (see below) handle this as a secondary concern
-- Tables with very high write volume where index maintenance cost exceeds read benefit
-
-**Index types**:
-
-| Type | Use Case |
+| Concern | Contract |
 |---|---|
-| B-tree (default) | Equality and range queries on any ordered type |
-| GIN | Full-text search (`tsvector`), JSONB containment, array operations |
-| GiST | Geometric/geographic data, range type containment |
-| BRIN | Monotonically increasing columns on very large tables (timestamps, sequential IDs) |
-| Hash | Equality-only lookups (rare — B-tree is usually better) |
+| ERD | Model entities, attributes, and relationships explicitly before writing DDL. |
+| Cardinality | Mark optional vs required relationships intentionally; nullability must reflect domain truth. |
+| Keys | Prefer stable surrogate PKs. Natural keys are usually poor PKs. |
+| Foreign Keys | Enforce referential integrity in the database, not just in application code. |
+| Constraints | Push invariant enforcement into NOT NULL, UNIQUE, CHECK, and FK constraints whenever possible. |
+| Normalization | Normalize by default; denormalize only with explicit justification and sync strategy. |
+| Indexes | Index for real query patterns, not out of habit. |
+| Migrations | Classify change risk before writing SQL and prefer additive rollout paths. |
+| Lifecycle Columns | Be explicit about timestamps, delete strategy, and update behavior. |
+| Types | Choose the most precise domain-correct type, not the most permissive one. |
 
-**Composite indexes**: Column order matters. Put the most selective column first, then the next, etc. A composite index on `(a, b)` supports queries filtering on `a` alone or `a` AND `b`, but not `b` alone.
+## Hard Gates
 
-```sql
--- Supports: WHERE user_id = ? AND created_at > ?
--- Also supports: WHERE user_id = ?
--- Does NOT efficiently support: WHERE created_at > ?
-CREATE INDEX idx_events_user_created ON events (user_id, created_at DESC);
-```
+- Do not leave ownership or cardinality ambiguous.
+- Do not omit FK constraints when the relationship is real.
+- Do not use application code as the only enforcement layer for schema invariants.
+- Do not denormalize without a documented reason and maintenance strategy.
+- Do not plan destructive or data-transforming migrations without rollback thinking.
+- Do not choose types that allow invalid domain values by default.
 
-**Covering indexes**: Include non-filtered columns in the index to enable index-only scans.
+## Implementation Defaults
 
-```sql
--- Query: SELECT status FROM orders WHERE user_id = ? AND created_at > ?
--- Including status avoids a heap fetch
-CREATE INDEX idx_orders_user_created_status ON orders (user_id, created_at DESC) INCLUDE (status);
-```
+- Prefer plural snake_case table names and singular snake_case column names.
+- Prefer `id` as the PK column name and `<referenced_entity>_id` for FKs.
+- Prefer `uuid` for externally visible entities and service-crossing references.
+- Prefer identity bigint keys for internal high-volume tables where sequential IDs are appropriate.
+- Prefer NOT NULL by default unless null is semantically meaningful.
+- Prefer explicit CHECK constraints for bounded domains and invariants.
+- Prefer indexing FK columns and high-value query predicates, but only when real access patterns justify it.
+- Prefer additive-first migrations over one-shot destructive changes.
 
-**Partial indexes**: Index only the rows that match a condition. Smaller, faster, and more useful than a full index when most rows will never be queried.
+## Common Failure Modes
 
-```sql
--- Only index active users — deleted users are never queried by application
-CREATE INDEX idx_users_email_active ON users (email) WHERE deleted_at IS NULL;
-```
+- tables designed from screens instead of domain relationships
+- natural keys used as PKs and later forced to change
+- nullable FKs used where the relationship is actually required
+- denormalization introduced without a sync mechanism
+- boolean or enum-like columns indexed without selectivity justification
+- destructive migrations planned before compatibility rollout
+- soft delete added without query filtering discipline or partial indexes
+- timestamps added without a reliable `updated_at` maintenance path
 
-## Migration Planning
+## Compliance Checklist
 
-A migration is a schema change applied to a running database. The risk is proportional to how much data exists and whether the change blocks writes.
+- entities, attributes, and relationships are explicit
+- required vs optional relationships are reflected in nullability
+- PK, FK, UNIQUE, CHECK, and NOT NULL decisions are intentional
+- indexes map to actual query patterns
+- migration risk is classified before SQL is written
+- delete strategy is explicit
+- timestamp strategy is explicit
+- data types match the domain precisely enough to prevent invalid values
 
-**Classify every change before writing the SQL**:
+## References
 
-| Class | Examples | Risk |
-|---|---|---|
-| Additive | Add column (nullable), add table, add index CONCURRENTLY | Low — does not break existing queries or application code |
-| Restrictive | Add NOT NULL to existing column, add FK to existing column | Medium — requires backfilling data before constraint can be enforced |
-| Destructive | Drop column, drop table, rename column | High — breaks application code that references the old name; requires coordinated deploy |
-| Data-transforming | Change column type, split one column into two | High — requires data migration script, potential for data loss |
-
-**Additive-first principle**: Prefer additive changes. Add the new column, deploy application code that writes to both old and new, backfill, then drop the old column in a follow-up migration.
-
-**Rollback strategy**: For every destructive or data-transforming change, define the rollback before the migration is approved:
-- What SQL undoes the change?
-- Is data recovery possible, or is this a one-way door?
-- What is the point of no return (e.g. after application code that depended on the old column is deleted)?
-
-**Lock awareness**: `ALTER TABLE` on a large table acquires a full table lock by default in PostgreSQL. For high-traffic tables:
-- Use `CREATE INDEX CONCURRENTLY` instead of `CREATE INDEX`
-- Add nullable columns first, then backfill, then add NOT NULL constraint
-- Use `ALTER TABLE ... SET NOT NULL` only after a CHECK constraint has validated existing rows
-
-## Naming Conventions
-
-| Object | Convention | Example |
-|---|---|---|
-| Tables | plural snake_case | `users`, `invoice_items`, `audit_log_entries` |
-| Columns | singular snake_case | `first_name`, `created_at`, `is_published` |
-| Primary key | `id` | `id uuid PRIMARY KEY` |
-| Foreign key | `<referenced_table_singular>_id` | `user_id`, `organization_id` |
-| Boolean columns | `is_` or `has_` prefix | `is_active`, `has_verified_email` |
-| Timestamp columns | `_at` suffix | `created_at`, `updated_at`, `deleted_at` |
-| Indexes | `idx_<table>_<columns>` | `idx_orders_user_id`, `idx_users_email_active` |
-| Unique constraints | `uq_<table>_<columns>` | `uq_users_email` |
-| Check constraints | `chk_<table>_<description>` | `chk_orders_amount_positive` |
-| FK constraints | `fk_<table>_<referenced_table>` | `fk_orders_users` |
-
-## Junction Tables for Many-to-Many
-
-A many-to-many relationship requires a junction (associative) table. The junction table holds the two FKs as a composite primary key, and may carry attributes of the relationship itself.
-
-```sql
--- Users can belong to many organizations; organizations have many users
-CREATE TABLE organization_members (
-    organization_id uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-    user_id         uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    role            text NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member')),
-    joined_at       timestamptz NOT NULL DEFAULT now(),
-    PRIMARY KEY (organization_id, user_id)
-);
-
--- Index the reverse lookup (find all organizations for a user)
-CREATE INDEX idx_org_members_user ON organization_members (user_id);
-```
-
-Name junction tables after the relationship, not a concatenation of the two tables: `organization_members`, not `organizations_users`.
-
-## Soft Delete vs Hard Delete
-
-**Hard delete**: `DELETE FROM table WHERE id = ?` — row is gone.
-
-**Soft delete**: Add a `deleted_at timestamptz` column. Mark as deleted with `UPDATE table SET deleted_at = now() WHERE id = ?`. Row persists.
-
-| Factor | Hard Delete | Soft Delete |
-|---|---|---|
-| Storage | Reclaimed | Grows indefinitely |
-| Audit trail | Lost | Preserved |
-| Query complexity | Simple (no filter needed) | Every query must filter `WHERE deleted_at IS NULL` |
-| FK referential integrity | Clean | Must decide: cascade soft-delete to children, or allow orphaned children |
-| GDPR / right to erasure | Requires true deletion | Soft-deleted rows still contain PII — must hard-delete on erasure request |
-
-Use soft delete when: audit trails are required, data recovery is needed, or related entities reference this one and cascading hard deletes are unsafe.
-
-Use hard delete when: data has no audit value, storage is a concern, or regulatory requirements mandate true erasure.
-
-If using soft delete, create a partial index to keep active-row queries fast:
-
-```sql
-CREATE INDEX idx_orders_user_active ON orders (user_id) WHERE deleted_at IS NULL;
-```
-
-## Timestamp Conventions
-
-Include these three columns on every table that represents a business entity (not junction tables or lookup tables):
-
-```sql
-created_at  timestamptz NOT NULL DEFAULT now()
-updated_at  timestamptz NOT NULL DEFAULT now()
-deleted_at  timestamptz          -- NULL means active; non-NULL means soft-deleted
-```
-
-Always use `timestamptz` (timestamp with time zone), never `timestamp` (without time zone). `timestamp` stores local time with no zone context — values become ambiguous across DST transitions and deployments in different timezones.
-
-Keep `updated_at` current via a trigger or an ORM hook. A stale `updated_at` is worse than no `updated_at` — it creates false confidence about when data was last changed.
-
-```sql
--- Trigger to auto-update updated_at on any row change
-CREATE OR REPLACE FUNCTION set_updated_at()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
-BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_set_updated_at
-BEFORE UPDATE ON orders
-FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-```
-
-## Data Type Selection
-
-Choose the most precise type that correctly represents the domain. Overly permissive types (storing a price as `text`, storing an enum as `varchar(255)`) allow invalid data in and force application code to validate what the database could guarantee.
-
-| Domain | Recommended Type | Notes |
-|---|---|---|
-| Primary keys (external) | `uuid` | Use `gen_random_uuid()` default |
-| Primary keys (internal) | `bigint GENERATED ALWAYS AS IDENTITY` | Sequential, compact |
-| Short text (< 255 chars) | `text` with CHECK constraint | PostgreSQL `text` and `varchar` are equivalent; prefer `text` |
-| Long text | `text` | No length limit; use CHECK only if a domain maximum exists |
-| Fixed-length codes | `char(n)` | Only for truly fixed-length values (ISO country codes, etc.) |
-| Money / prices | `numeric(19, 4)` | Never use `float` or `real` for money — floating-point rounding errors |
-| Whole counts | `integer` or `bigint` | Use `bigint` for anything that could grow large (event counts, sequence numbers) |
-| Decimal ratios | `numeric(p, s)` | Specify precision and scale explicitly |
-| Boolean flags | `boolean` | Not `integer` 0/1 or `char` Y/N |
-| Datetimes | `timestamptz` | Always with time zone |
-| Dates only | `date` | When time component is irrelevant (birth dates, due dates) |
-| Durations | `interval` | Not an integer count of seconds |
-| Enumerations | `text` with CHECK constraint | Prefer over `CREATE TYPE ... AS ENUM` — adding enum values requires DDL; CHECK constraint is altered with a simple migration |
-| Semi-structured data | `jsonb` | Not `json` (jsonb is binary-indexed, json is stored as text) |
-| IP addresses | `inet` | Not `text` — `inet` validates format and enables subnet queries |
-| UUIDs stored as text | Avoid | Use the native `uuid` type |
+- `references/modeling-and-normalization.md`
+- `references/keys-constraints-and-indexes.md`
+- `references/migrations-and-lifecycle.md`
+- `references/conventions-and-data-types.md`

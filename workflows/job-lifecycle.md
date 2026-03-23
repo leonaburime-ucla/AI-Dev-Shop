@@ -48,6 +48,32 @@ QUEUED → DISPATCHED → RUNNING → DONE
 **Backoff rule for Programmer retries 3+:**
 Before dispatching retry 4 or 5, inject the full failure cluster history and ask the agent to reason about root cause before attempting a fix. Do not just re-dispatch with the same context — that produces the same result.
 
+## Pre-Completion Gate
+
+Before the Coordinator accepts `DONE` for implementation or verification stages, require the pre-completion checklist defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/tripwires.md`.
+
+Reject the handoff if:
+
+- the checklist is missing
+- the evidence is stale or partial
+- the claimed completion does not map back to the active task/spec
+- runtime-changing work required self-validation evidence and the handoff lacks either a self-validation report path or an explicit reason it was not run
+
+## Loop-Detection Tripwires
+
+Loop detection fires before budget exhaustion when any of these are true inside one failure cluster:
+
+- the same file is edited 3 times
+- the same command/test is rerun 3 times with materially identical failure output
+- retry 2 ends without a materially new hypothesis
+
+When a loop trigger fires:
+
+1. keep the job in `RETRYING`
+2. require a `Loop Alert` summary plus a different next approach
+3. update the progress ledger before another retry
+4. escalate early if no different approach exists
+
 ---
 
 ## Rejection Criteria
@@ -68,6 +94,7 @@ Escalate to human (set state to `ESCALATED`) when:
 
 - Any stage hits its max retry count
 - Programmer: same failing cluster persists after 3 retries — this signals a spec or architecture problem, not a code problem
+- Loop trigger fires and no materially different next approach is available
 - Security: any Critical or High finding
 - Spec hash changes mid-run
 - Two agents produce directly conflicting guidance

@@ -14,6 +14,8 @@ Located at: `specs/<NNN>-<feature-name>/.pipeline-state.md`
 - [ ] `current_stage` is a valid stage name (see `<AI_DEV_SHOP_ROOT>/workflows/pipeline-state-format.md`)
 - [ ] `status` is one of: `IN_PROGRESS` | `WAITING_FOR_HUMAN` | `COMPLETE` | `FAILED` | `CANCELLED` | `ABORTED`
 - [ ] `last_updated_at` timestamp is recent (if stale by days, the run may have been abandoned)
+- [ ] If `progress_ledger_path` is present, the file exists and is readable
+- [ ] If the progress ledger references offloaded evidence, those offload paths also exist
 
 ### Completed stages
 - [ ] Every file listed in the Completed Stages table actually exists on disk
@@ -26,12 +28,14 @@ Located at: `specs/<NNN>-<feature-name>/.pipeline-state.md`
 ### Current stage detail
 - [ ] `job_status` is a valid state: `QUEUED` | `DISPATCHED` | `RUNNING` | `RETRYING` | `DONE` | `FAILED` | `ESCALATED` | `WAITING_FOR_HUMAN` | `CANCELLED` | `ABORTED`
 - [ ] If `job_status` is `RETRYING`, `retry_count` is present and within the stage's budget
+- [ ] If `retry_count` is 2 or more, `current_hypothesis` is present and specific
 - [ ] If `job_status` is `ABORTED`, treat as resumable — follow `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md`
 - [ ] If `job_status` is `CANCELLED`, do not resume — start a new run
 
 ### Failure clusters
 - [ ] Each cluster row has a `First Seen` date and `Retry Count`
 - [ ] No cluster has retry count above its stage budget without an escalation note
+- [ ] If a cluster is retry-heavy, the progress ledger records a next different approach instead of repeating the same hypothesis
 
 ---
 

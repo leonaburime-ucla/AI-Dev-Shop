@@ -52,7 +52,9 @@ and paste as your prompt along with any relevant project files.
 
 ### Host Detection
 
-- Task tool + Bash tool available → Claude Code
-- Bash tool available, no Task tool → Gemini CLI or Codex CLI (check system context)
+- Prefer the actual runtime/session identity over installed binaries on disk
+- If startup code already knows the host, pass it explicitly to resolver scripts or set `AI_DEV_SHOP_HOST`
+- Task tool + Bash tool available → usually Claude Code
+- Bash tool available, no Task tool → Gemini CLI or Codex CLI; do not guess if both are installed
 - No tool access → Claude.ai or Generic LLM
-- If uncertain, ask the user which host they are on
+- If uncertain, ask the user which host they are on or stay conservative

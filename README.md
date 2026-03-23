@@ -98,6 +98,7 @@ Other hosts do not support native slash commands. For those, open the matching f
 - [workflows/conventions.md](workflows/conventions.md): file placement and writable/read-only rules
 - [templates/spec-system/feature.spec.md](templates/spec-system/feature.spec.md): canonical spec entry point
 - [templates/adr-template.md](templates/adr-template.md): ADR template used by Architect
+- [harness-engineering/README.md](harness-engineering/README.md): harness layer, validators, rollout plan, and local source notes
 
 Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current default agents, not a fixed maximum count.
 
@@ -107,6 +108,8 @@ This toolkit enforces a strict separation between the "Engine" and the "Data":
 
 - **The Engine (Read-Only):** `agents/`, `skills/`, `workflows/`, and `templates/` are the core framework. They remain read-only during normal feature work to prevent agents from accidentally overwriting pipeline rules. You can safely overwrite these folders when upgrading to a new version of the toolkit.
 - **The Data (Writable):** `project-knowledge/` and `reports/` are your local workspace. This is where you configure your specific project (constitution, memory) and where agents write their outputs.
+
+For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. That can be a `docs/` tree, a host-level `project-knowledge/` tree, or both, as long as the product repo stays the source of truth for its own PRD/architecture/runbook material.
 
 ## Architecture Defaults
 
