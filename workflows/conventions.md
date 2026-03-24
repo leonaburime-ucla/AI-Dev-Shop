@@ -1,6 +1,6 @@
 ---
 name: conventions
-version: 1.1.0
+version: 1.2.0
 last_updated: 2026-03-24
 description: Output root, spec folder structure, and reports folder structure for all pipeline artifacts.
 ---
@@ -93,6 +93,10 @@ Use `.local-artifacts/` for local-only, ignored outputs that help the current se
     runs/
     offloads/
     smoke-tests/
+  external-audit/
+    packets/
+    runs/
+    offloads/
 ```
 
 **Rules:**
@@ -130,6 +134,11 @@ All agent reports live under a single centralized folder. This is the single sou
       CTX-<slug>-<YYYY-MM-DD>.md      (user-approved shared packet used by all consensus participants)
     runs/
       <timestamp>-consensus-report.md (user-approved templated consensus report)
+  external-audit/
+    packets/
+      <timestamp>-audit-packet.md     (optional retained packet summarizing the work given to the external auditor)
+    runs/
+      <timestamp>-external-audit-report.md  (user-approved external audit report with Coordinator synthesis)
   continuity/
     <workstream>/progress-ledger.md   (non-feature resumable work such as toolkit maintenance)
   offloads/

@@ -69,7 +69,8 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 | `/plan` | Architect Agent | research.md + ADR |
 | `/tasks` | Coordinator | tasks.md with [P] parallelization markers |
 | `/implement` | TDD → Programmer | test-certification.md → implementation to convergence |
-| `/review` | Code Review + Security | Required/Recommended findings + security report |
+| `/code-review` | Code Review + Security | Required/Recommended findings + security report |
+| `/audit-work` | External auditor review | Independent auditor findings plus Coordinator agree/disagree synthesis |
 | `/agent <name>` | Named agent (direct) | Enters Agent Direct Mode with the specified agent |
 | `/agent <name> consensus` | Named agent (direct + consensus) | Enters Agent Direct Mode and enables Swarm Consensus for debatable high-level questions |
 | `/agent vibecoder` | VibeCoder Agent (direct, optional) | Quick-and-dirty prototype output with minimal structure |

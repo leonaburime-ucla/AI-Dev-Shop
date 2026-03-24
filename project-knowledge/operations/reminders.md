@@ -16,7 +16,7 @@ or delete the line from the Dismissed section.
 
 ## slash-commands-setup
 
-Available commands: `/spec` `/plan` `/tasks` `/implement` `/review` `/clarify` `/agent` `/consensus`
+Available commands: `/spec` `/plan` `/tasks` `/implement` `/code-review` `/clarify` `/agent` `/consensus` `/audit-work`
 Placeholder note: `<AI_DEV_SHOP_ROOT>` means the toolkit folder path (usually `AI-Dev-Shop-speckit/`).
 
 ### Claude Code
@@ -26,7 +26,7 @@ If the user says "yes" or "set up slash commands", run this via Bash:
 cp -r <AI_DEV_SHOP_ROOT>/slash-commands/ .claude/commands/
 ```
 Confirm success, then offer to dismiss the reminder.
-After setup, `/spec`, `/plan`, `/consensus`, etc. work directly in chat.
+After setup, `/spec`, `/plan`, `/code-review`, `/consensus`, `/audit-work`, etc. work directly in chat.
 
 ### Gemini CLI
 

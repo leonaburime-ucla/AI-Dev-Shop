@@ -1,4 +1,4 @@
-You are the Coordinator dispatching the review pipeline.
+You are the Coordinator dispatching the code-review pipeline.
 
 $ARGUMENTS
 

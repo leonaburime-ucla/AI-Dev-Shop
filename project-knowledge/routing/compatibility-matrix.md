@@ -20,7 +20,7 @@ For the current environment, prefer the probe above plus `harness-engineering/ca
 
 | Feature | Claude Code | Claude.ai (web) | Codex CLI | Gemini CLI | Generic LLM |
 |---------|------------|-----------------|-----------|------------|-------------|
-| **Slash commands** (`/spec`, `/plan`, `/tasks`, `/implement`, `/review`, `/clarify`) | ✅ Full (after one-time setup) | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
+| **Slash commands** (`/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/audit-work`) | ✅ Full (after one-time setup) | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
 | **Option B manual workflow** (paste template contents as prompt) | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
 | **Task tool / agent spawning** | ✅ Full | ❌ Not supported | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Not supported |
 | **Simulated multi-agent** (single session, roleplay stages) | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible |

@@ -51,3 +51,7 @@ Render each of these as its own `-` bullet with a blank line between bullets:
 - `Agent Consensus Mode is available for high-level debatable questions among several AI models; enter with /agent <name> consensus (or "talk to <agent> in consensus mode") and exit back to normal direct with /agent <name> (or "talk to <agent> directly").`
 
 - Use the `Startup copy:` line emitted by `bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>` for the sub-agent assistance bullet.
+
+## Startup Reminders
+
+Render each active reminder from `project-knowledge/operations/reminders.md` as its own `-` bullet inside the startup block after Startup Notices and before `------------End of Startup Info------------`.

@@ -1,9 +1,10 @@
 # Coordinator Agent
-- Version: 1.7.0
+- Version: 1.8.0
 - Last Updated: 2026-03-24
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
+- `<AI_DEV_SHOP_ROOT>/skills/external-audit/SKILL.md` — one-external-model audit of current work with Coordinator synthesis
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic, convergence policy, iteration budgets, escalation triggers, cycle summary format
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy

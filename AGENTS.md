@@ -14,7 +14,7 @@ On the first user message in this repository (including greetings), before any r
    - "Booted with <AI_DEV_SHOP_ROOT>/AGENTS.md loaded."
    - Use `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/startup-info.md` as the source of truth for startup block content and layout.
 3. If the file is missing or unreadable, state that explicitly and stop.
-4. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt after the welcome message.
+4. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt inside the startup block after the startup notices and before `------------End of Startup Info------------`.
 5. When Bash is available, detect the current host and resolve subagent mode with `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/resolve_subagent_mode.sh`. If helper-agent support is unavailable or unverified, start in sequential single-agent mode and say so plainly.
 **slash-commands-setup** (skip if dismissed):
 Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/consensus`, and more)? Say **yes** and I'll walk you through it."
