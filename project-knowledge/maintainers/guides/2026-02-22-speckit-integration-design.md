@@ -10,7 +10,7 @@ Integrate four concepts from GitHub's spec-kit toolkit into AI-Dev-Shop-speckit:
 
 1. **Constitution framework** — a governance document that gates the Architect before writing any ADR
 2. **Richer templates** — spec-template enhanced, ADR augmented, two new templates (tasks, research)
-3. **Slash commands** — `/spec`, `/plan`, `/tasks`, `/implement`, `/review` in CLAUDE.md and AGENTS.md
+3. **Slash commands** — `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review` in CLAUDE.md and AGENTS.md
 4. **Research artifact** — Architect produces `research.md` before the ADR when tech choices are involved
 
 ## Updated Pipeline
@@ -106,7 +106,7 @@ Add slash commands section:
 - `/plan` — spawn Architect Agent against the latest approved spec
 - `/tasks` — generate tasks.md from the latest approved ADR
 - `/implement` — spawn TDD → Programmer sequence for the current tasks
-- `/review` — spawn Code Review + Security against current diff
+- `/code-review` — spawn Code Review + Security against current diff
 
 ### 12. `AGENTS.md`
 Add:

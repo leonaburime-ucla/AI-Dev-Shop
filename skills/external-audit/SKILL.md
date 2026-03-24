@@ -1,6 +1,6 @@
 ---
 name: external-audit
-version: 1.0.0
+version: 1.1.0
 last_updated: 2026-03-24
 description: Package the current work for one external LLM auditor, capture its review, and return a decision-ready synthesis to the user.
 ---
@@ -24,17 +24,22 @@ This skill is for:
 - one packaged audit packet
 - one synthesis back to the user with explicit agreement and disagreement
 
+This workflow is **packet-first**. Default to a curated work-log packet, not a blind diff against the last push.
+Use `skills/llm-operations/references/peer-llm-dispatch.md` for shared packet, transport, diagnostics, and capability rules.
+
 ## Auditor Selection Rules
 
 - Prefer a different model family from the current host.
 - Do not use a same-family child/subagent as the external auditor by default.
 - If the user explicitly wants same-family review, say so clearly and note that it is weaker independence.
 - Never hallucinate an auditor response. If no external CLI is available, stop and say so.
+- When `auditor=` is omitted, filter out the current host family by default, then choose the first available CLI in this exact order: `claude`, `gemini`, `codex`.
+- If no different-family external CLI is available, stop and tell the user instead of silently falling back to the same family. Only use a same-family auditor when the user explicitly asks for it.
 
 ## Runtime Controls
 
 - `auditor=<claude|gemini|codex>`: choose the external auditor CLI explicitly
-- `scope=<current-diff|staged|last-commit>`: choose the default work surface
+- `scope=<work-log|current-diff|staged|last-commit>`: choose the default work surface
 - `audit_timeout_seconds=<int>`: maximum wall-clock wait for the auditor call (default `300`)
 - `claude_model=<id>`: per-run Claude model override
 - `gemini_model=<id>`: per-run Gemini model override
@@ -56,12 +61,13 @@ Then:
 
 1. Record which external CLIs are available.
 2. Exclude the current host family unless the user explicitly asks to use it anyway.
-3. Resolve the planned auditor model using this order:
+3. If `auditor=` is omitted, choose the planned auditor using the deterministic fallback order from `## Auditor Selection Rules`.
+4. Resolve the planned auditor model using this order:
    - per-run override
    - saved user preference
    - local CLI default
    - alias assumption
-4. If the exact planned model is inferred rather than explicitly pinned or proven, stop before dispatch and ask:
+5. If the exact planned model is inferred rather than explicitly pinned or proven, stop before dispatch and ask:
 
 `Planned auditor: <CLI>=<resolved-or-inferred>. Reply with "run" to proceed or override with auditor=..., claude_model=..., gemini_model=..., codex_model=....`
 
@@ -75,6 +81,7 @@ The packet must capture:
 
 - the original user request
 - the exact scope under review
+- the audit target reference (commit, diff, or explicit file set)
 - what you changed
 - why you changed it
 - relevant files and artifacts
@@ -83,6 +90,13 @@ The packet must capture:
 - known risks, caveats, and open questions
 - any unrelated worktree changes excluded from the audit scope
 - the specific questions you want the external auditor to answer
+
+Default behavior:
+
+- `scope=work-log` is the default
+- build the packet from the coordinator's work log plus the touched-file list and verification notes
+- attach commit or diff references only when they materially help the auditor inspect details
+- do not default to `origin/main..HEAD`, `last push`, or another broad diff unless the user explicitly asks for that view
 
 Default packet path:
 
@@ -97,6 +111,8 @@ Packets are scratch by default unless the user explicitly asks to retain them.
 ## Step 3 — Dispatch The External Auditor
 
 Prompt the external auditor to review the packet, not just the bare diff summary.
+
+Before asking a peer to read a packet from disk, confirm that the packet path is peer-readable. If the authoring packet lives under `.local-artifacts/` or another path the peer cannot access, create a dispatch copy in a peer-readable workspace or host temp directory and retry once with that corrected path. Use `skills/llm-operations/references/peer-llm-dispatch.md` for the rule set.
 
 Audit prompt requirements:
 
@@ -159,9 +175,10 @@ Use this structure:
 # External Audit Report
 
 **Date:** <ISO-8601>
-**Scope:** <current-diff | staged | last-commit | custom>
+**Scope:** <work-log | current-diff | staged | last-commit | custom>
 **Focus:** <the user's audit question>
 **Audit Packet:** <path>
+**Dispatch Packet:** <peer-readable path or "same as audit packet">
 **Auditor CLI:** <claude | gemini | codex>
 **Requested Model:** <requested or "n/a">
 **Resolved Model:** <resolved or "unknown">

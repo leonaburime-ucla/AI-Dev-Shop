@@ -1,7 +1,7 @@
 ---
 name: llm-operations
-version: 1.0.0
-last_updated: 2026-03-13
+version: 1.1.0
+last_updated: 2026-03-24
 description: Use when operating LLM features in production, including model routing, fallback chains, prompt versioning, evals, shadow testing, and AI cost guardrails.
 ---
 
@@ -41,3 +41,4 @@ Use this for operating AI features in production after prompt or retrieval desig
 - Provider routing, circuit breakers, shadow traffic: `references/routing-and-fallbacks.md`
 - Prompt versioning and eval loops: `references/evaluation-and-prompt-versioning.md`
 - Cost controls and abuse guardrails: `references/ai-finops-and-guardrails.md`
+- Cross-host peer-LLM packet, transport, and capability rules: `references/peer-llm-dispatch.md`

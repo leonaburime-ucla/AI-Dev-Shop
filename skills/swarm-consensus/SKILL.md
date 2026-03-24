@@ -22,6 +22,8 @@ description: Orchestrate a multi-model swarm by dispatching a prompt to all avai
 
 The peer CLIs are external — they run as subprocesses via shell and return `stdout`. You do not know in advance which ones are installed. The prerequisite check determines this at runtime.
 
+For shared packet, transport, diagnostics, and capability-discovery rules that apply beyond consensus, use `skills/llm-operations/references/peer-llm-dispatch.md`.
+
 Supported peer CLIs:
 
 | CLI | Invocation | Notes |

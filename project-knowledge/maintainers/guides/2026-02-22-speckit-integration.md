@@ -1063,7 +1063,7 @@ Full pipeline reference: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
 | `/plan` | Spawn Architect Agent against the latest human-approved spec. Produces research.md (if needed) + ADR with Constitution Check + Complexity Justification. |
 | `/tasks` | Coordinator generates tasks.md from the latest human-approved ADR. Produces phased task list with [P] parallelization markers. |
 | `/implement` | Dispatch TDD Agent then Programmer Agent sequence for the current tasks.md. Requires approved spec + ADR + tasks.md. |
-| `/review` | Spawn Code Review Agent + Security Agent against the current diff. Produces Required/Recommended findings + security threat report. |
+| `/code-review` | Spawn Code Review Agent + Security Agent against the current diff. Produces Required/Recommended findings + security threat report. |
 
 **Example flow:**
 ```
@@ -1073,7 +1073,7 @@ Full pipeline reference: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
 → [review and approve ADR]
 /tasks
 /implement
-/review
+/code-review
 ```
 ```
 
@@ -1126,7 +1126,7 @@ Insert before it:
 | `/plan` | Architect Agent | research.md (if needed) + ADR with Constitution Check + Complexity Justification |
 | `/tasks` | Coordinator | tasks.md with [P] parallelization markers, phased by story priority |
 | `/implement` | TDD Agent → Programmer Agent | Certified tests → implementation to convergence |
-| `/review` | Code Review Agent + Security Agent | Required/Recommended findings + security threat report |
+| `/code-review` | Code Review Agent + Security Agent | Required/Recommended findings + security threat report |
 
 ```
 
