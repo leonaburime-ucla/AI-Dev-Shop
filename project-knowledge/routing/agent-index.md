@@ -26,4 +26,32 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | Database | Owns schema design, migrations, query patterns | `agents/database/skills.md` |
 | Supabase Sub-Agent | Supabase-specific implementation under Database Agent | `agents/database/supabase/skills.md` |
 
+## Reserved Pipeline Agent Names
+
+The following names are the canonical reserved agent names for response prefixes, delegated helper identity claims, and pipeline-stage labeling:
+
+- `Coordinator`
+- `CodeBase Analyzer`
+- `System Blueprint`
+- `VibeCoder`
+- `Skills Librarian`
+- `Spec`
+- `Red-Team`
+- `Architect`
+- `Database`
+- `Supabase Sub-Agent`
+- `TDD`
+- `Programmer`
+- `UX/UI Designer`
+- `QA/E2E`
+- `TestRunner`
+- `Code Review`
+- `Refactor`
+- `Security`
+- `DevOps`
+- `Docs`
+- `Observer`
+
+A delegated helper may use one of those names only after it has read the matching persona file and confirmed that load in its first reply. Otherwise it must use a generic helper label. The detailed bootstrap and validity rules live in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`.
+
 Use `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md` when you need shared-skill ownership and reuse mapping rather than the persona roster.

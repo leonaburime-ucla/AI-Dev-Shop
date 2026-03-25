@@ -26,6 +26,7 @@ Treat this as guidance, not a hard constraint:
 
 - Prefer packet-first prompts plus an explicit file list before escalating to open-ended repo exploration.
 - If a peer stalls, returns empty output, or behaves inconsistently on a broad repo-audit prompt, retry once with the same packet and a bounded file set.
+- If the packet already names the relevant files, prefer a bounded prompt and a constrained read-only tool surface over a broad open-ended repo-audit prompt.
 - Do not assume a failure on an open-ended repo audit means the peer cannot handle repo work in general; first test whether the bounded version succeeds.
 
 ## Transport Rules
@@ -34,6 +35,7 @@ Treat this as guidance, not a hard constraint:
 - Parse `stdout` only as the peer answer.
 - Treat `stderr` as diagnostics and save it separately.
 - Keep raw offloads in local scratch by default unless the user explicitly wants retained evidence.
+- Do not treat zero-byte redirected offload files from an in-flight peer process as a failure signal by themselves. Some peers, including Claude Code in this repo's packet-audit pattern, may buffer output until process exit.
 - If the peer must read a packet from disk, make sure the packet lives in a peer-readable location.
 - Prefer a short prompt that points the peer at the packet path over inlining the full packet body into a shell argument when a peer-readable file is available.
 - When invoking peer CLIs from shell, avoid nested heredocs, large command substitutions, or other brittle quoting patterns for long prompts. Prefer a small stable prompt string or a prompt file.
@@ -68,6 +70,16 @@ Before the full peer review or debate call, run a cheap readability probe agains
 - Fix the dispatch path and retry once before spending tokens on the real task.
 - Do not treat a failed readability probe as model disagreement or reasoning failure.
 
+### Live-Run Observation
+
+While the peer process is still running:
+
+- Treat process liveness and elapsed wall-clock time as the primary signal, not the current byte count of redirected stdout/stderr files.
+- For Claude Code packet-first audits, expect that stdout may not appear until the process exits.
+- Do not classify a Claude run as stalled just because redirected stdout/stderr files remain empty while the process is alive.
+- Keep `audit_timeout_seconds` as the hard ceiling.
+- If you need a soft "this may be hung" threshold for Claude packet audits, use roughly `90s` before suspicion instead of `30-40s`.
+
 ### Dispatch Cleanup
 
 Dispatch copies are transport artifacts, not primary evidence.
@@ -84,11 +96,14 @@ Classify peer failures before retrying:
 - `capacity_or_rate_limit`: `429`, `503`, provider-capacity exhaustion
 - `timeout`
 - `malformed_or_no_output`
+- `empty_result_transport_failure`: peer exited successfully but returned an empty answer body
 - `truncated_output`
 
 Only retry transient transport failures such as `429` and `503` by default.
 Do not treat path/permission failures as model reasoning failures.
 Fix the path, then retry once with the corrected dispatch copy.
+Only classify `empty_result_transport_failure` after the peer process has exited successfully and stdout is still empty.
+If a broad packet-based audit returns `empty_result_transport_failure`, retry once with a tighter prompt, a bounded file set, and a constrained read-only tool surface when the peer supports it.
 
 ## Model And Prompt Hygiene
 

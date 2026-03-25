@@ -96,7 +96,7 @@ python3 harness-engineering/validators/doc_garden_audit.py
 ## Current Boundaries
 
 - These validators currently check repository knowledge integrity, not application runtime behavior.
-- Self-validation templates live here, but the actual boot commands, health checks, and critical-path assertions belong in the project-specific repo that uses this toolkit.
+- Self-validation templates live here, but the project-specific repo that uses this toolkit must still define the actual boot commands, health checks, critical-path assertions, and any richer static-analysis/runtime enforcement it wants. The bounded retry and optional sidecar-diagnosis rules live in `harness-engineering/self-validation.md`; the host project supplies the concrete commands those rules execute.
 - Enterprise shift-left harnesses remain in `skills/enterprise-spec/`; this folder is the broader repo-level harness layer.
 - `AGENTS.md` reduction is intentionally tracked separately in `todo.md` so the harness layer can stabilize first.
 

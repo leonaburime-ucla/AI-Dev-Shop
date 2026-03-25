@@ -42,7 +42,8 @@ Please review this work independently. Use the Ask section's `Audit target` and 
 
 Return:
 
-1. Findings ordered by severity
-2. File references when possible
-3. Which changes are blockers vs optional improvements
-4. What looks solid and should probably stay unchanged
+1. Start with an `Auditor Scope Check` that restates what you believe you are auditing, the active scope and audit target, which files or artifacts you actually reviewed, and any ambiguity or mismatch you noticed
+2. Findings ordered by severity
+3. File references when possible
+4. Which changes are blockers vs optional improvements
+5. What looks solid and should probably stay unchanged

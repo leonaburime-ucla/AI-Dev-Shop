@@ -27,6 +27,8 @@ bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-ho
 
 If the result is `subagent-assisted`, default to helper-agent use for qualifying discovery, review, and parallel-safe work. If the result is `single-agent`, stay sequential and say so plainly. When helper mode is active, also explain that it usually uses more total tokens and that the user can say `single-agent mode` to turn it off.
 
+Even when helper mode is active, spawned helpers must still be bootstrapped as AI Dev Shop repo agents. Platform subagents alone are not enough.
+
 Host detection order:
 
 1. Use the actual runtime/session identity when the host is already known.

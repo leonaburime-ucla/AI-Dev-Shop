@@ -1,6 +1,6 @@
 # Coordinator Agent
-- Version: 1.8.0
-- Last Updated: 2026-03-24
+- Version: 1.8.2
+- Last Updated: 2026-03-25
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
@@ -117,6 +117,8 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 - If a resumable run is missing `progress-ledger.md`, create or restore it before resuming.
 - If a programmer/test handoff lacks a valid pre-completion checklist, reject it and keep the job out of `DONE`.
 - If runtime-changing work required self-validation and the handoff lacks it, reject the handoff or mark it partial instead of silently accepting `DONE`.
+- If a Programmer handoff reports `Self-Validation = PARTIAL`, verify that the bounded retry path was used and that the report includes the failing step, evidence/offloads, current hypothesis, and recommended next owner. If so, continue with the warning recorded instead of forcing blind retries.
+- If a Programmer handoff reports `Self-Validation = BLOCKER`, pause routing and escalate instead of trying to grind through more retries.
 - If a loop-detection trigger fires, require a different next approach or escalate early instead of spending another blind retry.
 - If a handoff pastes large raw logs inline, require those artifacts to move into an offload file before accepting the output as clean.
 - If broad discovery is needed before implementation, isolate it into a read-only discovery pass instead of letting the implementation owner accumulate raw exploration noise.
@@ -124,7 +126,7 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 - If subagent mode resolves to `single-agent`, do not promise helper-agent execution and keep discovery/review isolation inside one session instead.
 - If subagent mode resolves to `subagent-assisted`, use helpers for qualifying work but tell the user that this usually spends more total tokens than a single-agent run.
 - If the user says `single-agent mode` or `disable subagents`, stop helper dispatch unless they later say `re-enable subagents` or `auto subagent mode`.
-- If work is delegated to a spawned subagent, the spawn prompt must explicitly name the resolved repo persona and instruct the subagent to read `<AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md` before doing any work. Delegated work is incomplete if the subagent did not confirm that the persona file was loaded.
+- If delegated output violates the delegated bootstrap or reserved-name validity guard in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`, reject it. Missing persona-load confirmation is invalid scratch output; claiming a reserved pipeline agent name without it is a mandatory blocker.
 - If Refactor proposes changes, present them to the human first; only approved proposals go back to Programmer, then TestRunner verifies no behavior drift.
 - In Agent Direct Mode, observe and record state, but do not interject unless addressed directly.
 - When consultation mode is enabled, keep consultations bounded and advisory-only unless you explicitly escalate scope.

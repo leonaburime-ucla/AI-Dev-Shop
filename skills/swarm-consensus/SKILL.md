@@ -1,6 +1,6 @@
 ---
 name: swarm-consensus
-version: 1.6.0
+version: 1.6.1
 last_updated: 2026-03-24
 description: Orchestrate a multi-model swarm by dispatching a prompt to all available LLM CLIs (whichever ones are installed), collating independent responses, and synthesizing a consensus. Supports single-pass and debate modes. Model-agnostic — the primary model is whoever is currently running this skill. OFF by default.
 ---
@@ -39,6 +39,14 @@ If you are Claude Code, you dispatch to `gemini` and `codex`. If you are Gemini,
 - The current host model is already the `Primary` participant in the swarm and in debate mode.
 - Do not add a same-family child/subagent as an extra voting peer by default. That weakens independence and can overweight one model family.
 - If the user explicitly wants a same-family helper, use it only for context-packet preparation, adversarial review, or synthesis critique. Record it as a non-voting helper in run notes or diagnostics, and exclude it from agreement math and the Decision Ledger.
+
+### Primary Participation Guard (hard requirement)
+
+- The current host model MUST contribute a substantive first-pass response before any peer synthesis, debate, or final recommendation.
+- A consensus run that only relays peer outputs is invalid. Do not present peer-only debate as consensus.
+- If the host environment cannot cleanly surface the current host model's own first-pass response, create exactly one same-family child/helper to supply that frozen first-pass response before reading peer outputs.
+- That same-family child/helper fills the `Primary` slot only. It is not an extra voting peer, must not create a fourth vote, and must not be counted separately in agreement math.
+- If neither the host model nor a same-family child/helper can provide a substantive primary response, stop and report the run as invalid instead of returning a peer-only result.
 
 ---
 
@@ -209,6 +217,8 @@ For file-based transport, prefer `.local-artifacts/swarm-consensus/prompts/` ove
 1. Primary model MUST produce its own answer first and freeze it.
 2. Primary model MUST NOT read peer outputs until its first-pass answer is written.
 3. Round-1 peer prompts MUST NOT include other models' answers.
+4. If the host environment cannot surface the primary model's first-pass answer cleanly, it MUST create one same-family child/helper to fill the `Primary` slot before peer synthesis.
+5. Peer-only consensus runs are invalid and MUST stop.
 
 ### Swarm timeout budget (hard requirement)
 
@@ -320,6 +330,9 @@ With all responses collected:
 7. If the user explicitly wants a retained architecture or project artifact, write the final report to `reports/swarm-consensus/runs/<timestamp>-consensus-report.md` instead.
 8. If a shared context packet was used, record its path in the report header.
 9. If the user prefers inline output instead of a file, preserve the same section order and tables inline.
+10. A valid report MUST include a non-empty `Primary` row in `## The Swarm`.
+11. A valid report MUST include a non-empty `### <Primary model name>` subsection under `## Individual Responses`.
+12. If either primary slot is missing or empty, stop and report the run as invalid rather than presenting peer-only output as consensus.
 
 Produce a `consensus-report.md` (or inline if the user prefers) with this structure:
 

@@ -44,17 +44,25 @@ Act as an External Audit Coordinator.
    - do not hand `.local-artifacts/` paths directly to the peer by default; use the dispatch copy path for file-based peer reads
    - run a cheap readability probe first: ask the peer to read the dispatch packet and echo the first Markdown heading
    - if the probe fails, classify it as `path_or_permission_failure`, move the dispatch copy, and retry once before the real audit
+   - require the auditor to begin with an `Auditor Scope Check` that states what it believes it is auditing, the scope and target it used, which files or artifacts it reviewed, and any mismatch or uncertainty it noticed before giving findings
    - prefer a short prompt that points to the dispatch packet over embedding the full packet body inline when the peer can read files directly
+   - if the packet already names the relevant files, prefer a bounded sectioned prompt over an open-ended repo-audit prompt
+   - for Claude Code packet-first audits, prefer a constrained `Read`-only tool surface when that is sufficient
    - Prefer structured output modes when available.
    - Parse `stdout` only as the auditor answer.
    - Treat `stderr` as diagnostics.
    - Save raw stdout/stderr captures to `.local-artifacts/external-audit/offloads/` by default.
+   - do not treat zero-byte redirected offload files from a still-running Claude audit as failure by themselves; Claude may flush only on process exit
    - Retry transient failures like `429` and `503` within `audit_timeout_seconds`, with at most 2 retries.
+   - only classify `empty_result_transport_failure` after the peer process exits successfully and stdout is still empty
+   - for Claude Code packet-first audits, use `audit_timeout_seconds` as the hard ceiling and only suspect a hang early if runtime pushes past roughly `90s`
+   - if the peer exits successfully but returns an empty answer body, classify it as `empty_result_transport_failure` and retry once with a tighter bounded prompt and constrained read-only tool surface when supported
    - delete the temporary dispatch copy after the run unless the user explicitly asks to retain it for debugging or evidence
 9. Synthesize the result back to the user. The final answer must include:
    - the exact report structure from `skills/external-audit/references/external-audit-report-template.md`
    - the exact auditor model version used (`Resolved Model`) and the auditor CLI version
    - `Work Log`
+   - `Auditor Scope Check`
    - `What The External LLM Said`
    - `Coordinator Response -> Agree`
    - `Coordinator Response -> Change`

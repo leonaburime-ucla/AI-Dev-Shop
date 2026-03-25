@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.3.2
-- Last Updated: 2026-03-24
+- Version: 1.3.3
+- Last Updated: 2026-03-25
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -75,7 +75,13 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - confirm no certified tests were deleted or weakened to manufacture green
    - confirm changed files stayed within scope, or disclose the deviation explicitly
    - record what remains open, if anything
-8. If runtime-changing behavior is in scope, run the appropriate self-validation harness from `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md` and write the result to `<AI_DEV_SHOP_ROOT>/reports/self-validation/`. If it cannot be run, state exactly why.
+8. If runtime-changing behavior is in scope, run the appropriate self-validation harness from `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md` and write the result to `<AI_DEV_SHOP_ROOT>/reports/self-validation/`.
+   - Use the bounded self-validation retry rule from that file. Do not keep rerunning the same runtime check indefinitely.
+   - If the failure is still ambiguous after the first repair pass, you may use one bounded diagnosis pass before the final rerun. Follow the definition in `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md`.
+   - End with a clear status: `PASS`, `PARTIAL`, or `BLOCKER`.
+   - `PARTIAL` is allowed only when the exact failing step, artifacts, current hypothesis, and remaining risk are recorded explicitly.
+   - `BLOCKER` means the runtime evidence shows a genuine stop condition. Escalate instead of continuing.
+   - If self-validation cannot be run at all, state exactly why.
 9. Offload large raw outputs, long logs, DOM dumps, JSON payloads, or trace files per `<AI_DEV_SHOP_ROOT>/harness-engineering/context-offloading.md` instead of pasting them inline. Use success-silent / failure-loud handling for routine command output.
 10. Review own output for inline documentation compliance using `<AI_DEV_SHOP_ROOT>/skills/inline-code-documentation/SKILL.md` before handoff.
 11. Update `progress-ledger.md` before pause, handoff, or resume-heavy completion so a fresh session can continue without reconstructing context from memory.
@@ -98,9 +104,12 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
   - open items
 - Self-Validation:
   - required or not required
-  - report path or explicit reason not run
+  - status: `PASS`, `PARTIAL`, `BLOCKER`, or explicit reason not run
+  - report path
+  - attempts used
   - critical path checked
   - negative or edge path checked
+  - whether a bounded diagnosis pass was used
 - Discovery Summary (required if a broad discovery pass was needed):
   - candidate files or modules
   - why they matter
@@ -132,6 +141,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - **Pre-Completion Checklist evidence is mandatory before handoff.** Do not claim done, fixed, or ready without fresh proof tied back to the active task/spec.
 - **Coverage self-check is blocking before handoff.** For every changed function in in-scope modules (per the Scope Boundary in `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`): verify compliance with the coverage rules in that skill — can every branch, statement, and function be directly asserted without combinatorial test effort? If not, refactor before reporting handoff complete. Do not hand off with known coverage-unfriendly code.
 - **If runtime validation is in scope, self-validation evidence is mandatory before claiming done.** Either attach the report path or explicitly say why the runtime loop could not be run.
+- **Do not let self-validation become an infinite loop.** After the bounded retry path is exhausted, hand off as `PARTIAL` with explicit evidence or escalate as `BLOCKER`.
 - **Do not paste large raw outputs inline.** Save them as offloads and reference the file paths plus a short summary.
 - **Do not let discovery overwhelm implementation context.** If broad exploration is needed, isolate it into a read-only discovery pass first.
 - Prefer reversible, incremental changes

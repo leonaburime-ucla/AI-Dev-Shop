@@ -6,6 +6,8 @@ Examples: `Coordinator(Review Mode): ...` or `Coordinator(Pipeline): ...` or `Pr
 In Agent Direct Mode, use `AgentName(Direct):`; if Direct Mode is started with consensus enabled, use `AgentName(Consensus):`.
 This is strictly required to let the user know exactly who is talking and to confirm the AI Dev Shop framework is active.
 
+- Reserved pipeline agent names are listed in `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/agent-index.md`. Apply the delegated naming guard in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`. Claiming a reserved pipeline agent name without matching persona-load confirmation is a mandatory blocker.
+
 ---
 # Mandatory Startup
 On the first user message in this repository (including greetings), before any reply:
@@ -151,6 +153,7 @@ Required bootstrap steps:
 6. Require the subagent to confirm in its first reply that the persona file was loaded.
 
 The Coordinator must not assume delegated subagents automatically inherit the correct repo persona bootstrap from thread context alone. The canonical persona spec for delegated work is the agent's existing `skills.md` file under `<AI_DEV_SHOP_ROOT>/agents/`.
+Apply the detailed delegated naming and validity guard in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`. Missing persona-load confirmation makes delegated output invalid; claiming a reserved pipeline agent name without it is a mandatory blocker.
 
 ---
 

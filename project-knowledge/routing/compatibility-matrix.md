@@ -64,6 +64,8 @@ Filesystem reads and writes work natively. Slash commands are not supported; use
 
 Do not hardcode task-spawning assumptions from memory alone. Verify current capability status with `bash harness-engineering/validators/probe_host_capabilities.sh` or `codex features list`.
 
+If Codex subagent spawning is available, do not assume spawned helpers automatically inherit AI Dev Shop repo personas. Codex platform helpers are only valid delegated AI Dev Shop agents when the spawn prompt explicitly bootstraps `agents/<resolved-agent>/skills.md` and the helper confirms it loaded.
+
 For `/audit-work`-style peer dispatch, the visible dispatch-copy path strategy should translate across OSes, but the shell snippets in this repo are still Bash-oriented and are not yet verified on native Windows shells.
 
 ### Gemini CLI

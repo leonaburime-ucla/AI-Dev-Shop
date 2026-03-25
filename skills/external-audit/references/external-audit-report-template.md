@@ -27,6 +27,12 @@
 | Attempts | <count> |
 | Final status | <Responded | Failed | Timed out | Retry exhausted | Not installed> |
 
+## Auditor Scope Check
+- **What it says it is auditing:** <the user request / focus as the auditor understood it>
+- **Scope and target it used:** <work-log | current-diff | staged | last-commit | custom> and <commit, diff, or file set>
+- **Files or artifacts it says it reviewed:** <packet, diff, commit, specific files, or "not stated">
+- **Scope ambiguity or mismatch:** <none | describe the mismatch the auditor noticed>
+
 ## What The External LLM Said
 
 ### Findings By Severity

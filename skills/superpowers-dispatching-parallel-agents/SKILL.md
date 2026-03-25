@@ -24,6 +24,7 @@ Split independent work into parallel tracks only when independence is real.
 - Do not parallelize related failures just to go faster.
 - Do not dispatch multiple agents into the same files without explicit coordination.
 - Do not rely on inherited thread context alone to load repo personas or pipeline-specific instructions.
+- Apply the delegated bootstrap and reserved-name validity guard from `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`. A parallel helper without first-reply persona confirmation is invalid; a parallel helper that claims a reserved pipeline agent name without that confirmation is a mandatory blocker.
 - If independence is unclear, investigate first instead of parallelizing blindly.
 - If conflicts appear on return, resolve them before claiming the parallel split was valid.
 

@@ -51,6 +51,7 @@ Do not escalate for:
 - Refactor proposals the Refactor Agent disagrees with
 - Architecture alternatives the Architect considered and rejected with documentation
 - Observer recommendations (these are inputs to future work, not stops)
+- Self-validation runs that end `PARTIAL` after the bounded retry path, provided the report records the exact failing step, evidence, current hypothesis, and remaining risk
 
 Escalating for non-blocking issues erodes human trust in escalations and causes humans to ignore them. Reserve escalation for conditions that genuinely require a human decision.
 

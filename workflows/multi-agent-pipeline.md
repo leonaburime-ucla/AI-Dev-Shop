@@ -229,7 +229,7 @@ Programmer handoff must include an `Architecture Audit` section:
 - `BLOCKER` = ADR ambiguity or a hard architectural constraint prevents safe continuation; Coordinator pauses routing and escalates
 - `Pre-Completion Checklist` = explicit proof that the claimed fix or completion was re-verified against the active task/spec
 - `Loop Alert` = required when a loop-detection tripwire fired before handoff
-- `Self-Validation` = required when runtime-changing work needed app-level validation before handoff; include report path, paths checked, and any offloaded evidence
+- `Self-Validation` = required when runtime-changing work needed app-level validation before handoff; include status `PASS`, `PARTIAL`, or `BLOCKER`, report path, attempts used, paths checked, any bounded diagnosis pass used, and any offloaded evidence
 
 ### TestRunner Agent
 - Test suite location

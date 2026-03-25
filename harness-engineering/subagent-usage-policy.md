@@ -18,6 +18,11 @@ It means:
 - keep trivial or narrow work in the owner agent's context
 - use subagents when they reduce context rot or unblock safe parallel work
 
+It does **not** mean:
+
+- spawn a generic platform helper and assume it automatically became an AI Dev Shop repo agent
+- bypass the delegated bootstrap and reserved-name validity guard in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
+
 ## Use Subagents By Default For
 
 - read-only discovery that would otherwise flood the implementation context
@@ -84,5 +89,7 @@ Detection rule:
 - if multiple CLIs are installed and the runtime cannot be distinguished safely, the resolver should fall back to conservative `single-agent` behavior rather than guessing
 
 If the result is `subagent-assisted`, tell the user that helper agents are available and automatic for qualifying work.
+
+Even on hosts where subagent spawning is enabled, AI Dev Shop delegated work must follow the delegated bootstrap and reserved-name validity guard in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`. The canonical reserved-name list lives in `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/agent-index.md`. This matters especially on hosts like Codex CLI, where the platform spawning surface does not itself enforce the repo persona.
 
 If the result is `single-agent`, tell the user that helpers are unavailable or unverified on this host and that the framework is starting sequentially instead.

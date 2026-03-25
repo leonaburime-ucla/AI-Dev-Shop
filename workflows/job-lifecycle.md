@@ -58,6 +58,7 @@ Reject the handoff if:
 - the evidence is stale or partial
 - the claimed completion does not map back to the active task/spec
 - runtime-changing work required self-validation evidence and the handoff lacks either a self-validation report path or an explicit reason it was not run
+- runtime-changing work claims `Self-Validation = PARTIAL` but does not record the failing step, attempts used, current hypothesis, and offload/report evidence
 
 ## Loop-Detection Tripwires
 
@@ -95,10 +96,13 @@ Escalate to human (set state to `ESCALATED`) when:
 - Any stage hits its max retry count
 - Programmer: same failing cluster persists after 3 retries — this signals a spec or architecture problem, not a code problem
 - Loop trigger fires and no materially different next approach is available
+- Self-validation ends in `BLOCKER` because runtime evidence shows a confirmed critical-path, auth/security, data-loss, or migration-stop problem
 - Security: any Critical or High finding
 - Spec hash changes mid-run
 - Two agents produce directly conflicting guidance
 - Constitution violation in ADR without a corresponding Complexity Justification row (same severity as spec hash mismatch)
+
+`Self-Validation = PARTIAL` is not an automatic escalation. If the bounded retry path was used and the failure is recorded clearly, the Coordinator may continue downstream with the warning preserved.
 
 ---
 

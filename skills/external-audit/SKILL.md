@@ -1,7 +1,7 @@
 ---
 name: external-audit
-version: 1.1.4
-last_updated: 2026-03-24
+version: 1.1.7
+last_updated: 2026-03-25
 description: Package the current work for one external LLM auditor, capture its review, and return a decision-ready synthesis to the user.
 ---
 
@@ -136,7 +136,10 @@ Audit prompt requirements:
 3. Ask for file references when possible.
 4. Ask which issues are real blockers vs optional improvements.
 5. Ask for a short strengths section so the user sees what the auditor thinks is solid.
-6. Prefer a short prompt that references the dispatch packet path over embedding the full packet body inline when the peer can read files directly.
+6. Require the auditor to begin with an `Auditor Scope Check` before any findings. That scope check must restate what it believes it is auditing, the active scope and audit target, which files or artifacts it actually reviewed, and any ambiguity or mismatch it noticed.
+7. Prefer a short prompt that references the dispatch packet path over embedding the full packet body inline when the peer can read files directly.
+8. If the packet already contains a bounded file list, prefer a bounded sectioned prompt over an open-ended repo audit prompt.
+9. For Claude Code packet-first audits, prefer a constrained `Read`-only tool surface when that is enough to inspect the packet and the listed files.
 
 Prefer structured output when the CLI supports it.
 
@@ -144,10 +147,14 @@ Prefer structured output when the CLI supports it.
 - Treat `stderr` as diagnostics.
 - Save raw stdout/stderr captures to `.local-artifacts/external-audit/offloads/` by default.
 - Only retain raw offloads in `reports/offloads/` if the user explicitly asks for retained evidence.
+- For Claude Code packet-first audits, do not infer failure from zero-byte redirected offload files while the process is still alive. Judge liveness by the live process and elapsed wall-clock time, not by mid-run file size.
 
 Retry policy:
 
 - Retry clear transient failures such as `429`, `503`, rate-limit, or provider-capacity messages.
+- Only classify `empty_result_transport_failure` after the peer process exits successfully and stdout is still empty.
+- On `empty_result_transport_failure`, retry once with a tighter bounded prompt and a constrained read-only tool surface when the peer supports it.
+- For Claude Code packet-first audits, prefer allowing normal completion unless the run exceeds `audit_timeout_seconds`; if a soft suspicion threshold is needed, use roughly `90s`, not `30-40s`.
 - Use bounded backoff.
 - Stop after at most 2 retries.
 - Never exceed `audit_timeout_seconds`.
@@ -158,6 +165,7 @@ Your final answer must not stop at "here is what the auditor said."
 
 You must add your own judgment in separate sections:
 
+- what the external auditor said it was auditing
 - what the external auditor said
 - what you agree with
 - what you think should change
@@ -188,6 +196,7 @@ Use `skills/external-audit/references/external-audit-report-template.md` as the 
 ` reports/external-audit/runs/<timestamp>-external-audit-report.md `
 
 6. The report must explicitly separate:
+   - what the external LLM said it was auditing
    - what the external LLM said
    - what you agree with
    - what you would change

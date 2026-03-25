@@ -41,10 +41,11 @@
 
 - fix attempted: <summary>
 - rerun result: <pass/fail>
+- bounded diagnosis pass used: <yes/no + short note>
 
 ## Handoff Summary
 
-- runtime status: <pass/partial/fail>
+- runtime status: <PASS/PARTIAL/BLOCKER>
 - verified behaviors:
   - <behavior 1>
   - <behavior 2>

@@ -17,6 +17,8 @@ Treat every capability claim as a 4-layer check:
 4. **Repo/framework usage**
    - AI Dev Shop is actually configured to use the capability
 
+For delegated helpers, layer 4 is not satisfied merely because the host can spawn subagents. AI Dev Shop only counts delegated subagent use as `enabled` when the spawn prompt bootstraps the resolved repo persona and the helper confirms that persona file was loaded.
+
 Only call a capability **enabled** when all relevant layers are satisfied.
 
 ## Allowed Status Words
