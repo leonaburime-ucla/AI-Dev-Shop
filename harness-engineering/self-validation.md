@@ -6,6 +6,8 @@ This file defines the downstream runtime harness pattern for repos that use this
 
 Green unit tests are not the same as a working app. Before handoff, agents often need a repo-local runbook for booting the app, checking logs, exercising one critical path, and retrying once with fresh evidence.
 
+This file covers the implementer's own runtime checks. It does not assume self-validation is an unbiased final judge for harder autonomous builds.
+
 ## What A Self-Validation Harness Is
 
 A self-validation harness is a stack-specific runbook that tells the implementing agent how to:
@@ -28,9 +30,11 @@ Use a self-validation harness when the change affects:
 
 Pure documentation work, policy/docs-only framework edits, and non-runtime markdown maintenance do not need one.
 
+If the task is beyond what the current model handles reliably in one pass, add a separate evaluator loop per `harness-engineering/evaluation-loops.md` instead of treating self-validation as the only quality gate.
+
 ## Canonical Templates
 
-Start from the closest stack template under `<AI_DEV_SHOP_ROOT>/templates/self-validation/`:
+Start from the closest stack template under `<AI_DEV_SHOP_ROOT>/framework/templates/self-validation/`:
 
 - `generic-web-app-template.md`
 - `node-api-template.md`
@@ -112,13 +116,15 @@ Examples:
 
 Store the run result at:
 
-`<AI_DEV_SHOP_ROOT>/reports/self-validation/SV-<feature-or-workstream>-<YYYY-MM-DD-HHmm>.md`
+`<AI_DEV_SHOP_ROOT>/framework/reports/self-validation/SV-<feature-or-workstream>-<YYYY-MM-DD-HHmm>.md`
 
 If long logs or DOM dumps are needed, offload them per `<AI_DEV_SHOP_ROOT>/harness-engineering/context-offloading.md`.
 
 ## Handoff Rule
 
 If runtime validation is in scope and the harness was not run, the agent must say so explicitly and treat the handoff as incomplete or partial. Do not imply “done” when the runtime path was never exercised.
+
+If runtime checks passed locally but the task still required an independent evaluator to judge product quality, edge-case depth, or end-to-end usability, do not present self-validation alone as final acceptance.
 
 If runtime validation was run but remained unresolved after the bounded retry rule above:
 

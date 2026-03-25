@@ -27,7 +27,7 @@ Integrate four concepts from GitHub's spec-kit toolkit into AI-Dev-Shop-speckit:
 
 ## Files to Create (4)
 
-### 1. `templates/bootstrap/constitution-template.md`
+### 1. `framework/templates/bootstrap/constitution-template.md`
 A fill-in template for establishing project-level engineering governance. Contains:
 - Numbered articles (Library-First, Test-First, Simplicity Gate, Anti-Abstraction Gate, Integration-First Testing, Security-by-Default, Spec Integrity, Observability)
 - Each article: name, principle statement, what it prohibits, how to justify an exception
@@ -45,7 +45,7 @@ The default project constitution instance (pre-filled with sensible defaults, cu
 - **Article VII — Spec Integrity**: Specs are ground truth. Code that contradicts the spec is wrong; specs that contradict intent are revised.
 - **Article VIII — Observability**: All production paths emit structured, queryable signals.
 
-### 3. `templates/tasks-template.md`
+### 3. `framework/templates/tasks-template.md`
 Phased task list derived from the ADR. Structure:
 - **Phase 0 — Setup**: Project initialization, tooling, directory structure
 - **Phase 1 — Foundational**: Core infrastructure marked as CRITICAL (blocks all stories)
@@ -54,7 +54,7 @@ Phased task list derived from the ADR. Structure:
 - **[P] markers**: Tasks that can run in parallel (different files, no shared mutable state)
 - **Independent test checkpoint** per story: write-and-fail before implementing
 
-### 4. `templates/research-template.md`
+### 4. `framework/templates/research-template.md`
 Pre-ADR research artifact produced by the Architect when the spec involves library or technology choices. Sections:
 - Library candidates (name, version, license, weekly downloads, last commit)
 - Compatibility analysis (does it work with the project's language version, platform, existing deps?)
@@ -64,14 +64,14 @@ Pre-ADR research artifact produced by the Architect when the spec involves libra
 
 ## Files to Modify (8)
 
-### 5. `templates/spec-template.md`
+### 5. `framework/templates/spec-template.md`
 Add:
 - **Feature number field**: `FEAT-<auto-incremented 001, 002, ...>` in the header metadata
 - **[NEEDS CLARIFICATION] instruction**: Inline marker for any requirement with unresolved ambiguity; Spec Agent must resolve all before handing off to Architect
 - **P1/P2/P3 priority** on Acceptance Criteria (P1 = must-have, P2 = should-have, P3 = nice-to-have)
 - **Constitution Compliance section**: one-line per article — COMPLIES / EXCEPTION (with justification) / N/A
 
-### 6. `templates/adr-template.md`
+### 6. `framework/templates/adr-template.md`
 Add:
 - **Constitution Check gate** at top: must pass before writing the ADR body; lists each article and compliance status
 - **Complexity Justification table**: documents any architectural decision that violates a constitution article, with necessity rationale and simpler alternatives that were considered and rejected
@@ -84,16 +84,16 @@ Add to Workflow:
 
 ### 8. `agents/architect/skills.md`
 Add to Workflow:
-- Step 0 (new): If spec involves library or technology choices, produce `research.md` using `<AI_DEV_SHOP_ROOT>/templates/research-template.md` before writing the ADR.
+- Step 0 (new): If spec involves library or technology choices, produce `research.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md` before writing the ADR.
 - Step 1 (new, before current Step 1): Run Constitution Check — for each article in `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`, verify the proposed architecture complies. Any violation goes into the Complexity Justification table in the ADR, or triggers a revised architecture.
 
 ### 9. `agents/coordinator/skills.md`
 Add:
 - Inject `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` in Spec Agent and Architect Agent dispatches
 - New escalation trigger: constitution violation without justification (same severity as spec hash mismatch)
-- After ADR approval: generate `tasks.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md` based on the ADR's parallel delivery plan
+- After ADR approval: generate `tasks.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md` based on the ADR's parallel delivery plan
 
-### 10. `workflows/multi-agent-pipeline.md`
+### 10. `framework/workflows/multi-agent-pipeline.md`
 Add:
 - `constitution.md` to Spec Agent and Architect Agent context injection tables
 - `research.md` as a new optional Architect output (required when spec has library/tech choices)

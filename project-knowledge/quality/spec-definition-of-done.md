@@ -4,6 +4,10 @@
 - Last Updated: 2026-02-23
 - Authority: A spec is INVALID and MUST NOT advance past the Spec Agent unless it passes every gate in this document. The Coordinator enforces this before dispatching the Architect Agent.
 
+Provider scope note:
+- this document is the validated strict-mode DoD for the default `speckit` provider
+- other providers should define or reference their equivalent readiness artifact in `framework/spec-providers/<provider>/provider.md`
+
 > **Language note:** Code examples in this document use TypeScript syntax for illustration. Adapt them to your project's type system — Pydantic models, dataclasses, Go structs, Rust types, etc. The contracts are language-agnostic; the examples are not.
 
 ---

@@ -26,24 +26,25 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 Select and enforce architecture patterns that satisfy spec constraints, enable safe parallel delivery, and give all downstream agents clear boundaries to work within.
 
 ## Required Inputs
-- Active spec file (full content + hash) — must be human-approved, zero unresolved [NEEDS CLARIFICATION] markers
-- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced — use domain ownership boundaries and core/foundation sequencing)
+- Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
+- Active provider-defined spec entrypoint (full content + hash) — must be human-approved, zero unresolved clarification blockers
+- `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced — use domain ownership boundaries and core/foundation sequencing)
 - `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`
 - Non-functional constraints (scale, reliability, latency, cost)
-- Existing system boundaries and dependencies (existing ADRs in `<AI_DEV_SHOP_ROOT>/reports/pipeline/`)
+- Existing system boundaries and dependencies (existing ADRs in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/`)
 - Coordinator directive
-- Research artifact (`<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md`) if produced in Step 0
-- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (if produced — read all BLOCKING, ADVISORY, and CONSTITUTION-FLAG findings before Step 1; BLOCKING findings must be resolved before ADR work begins; ADVISORY findings must be acknowledged in the ADR)
-- `<AI_DEV_SHOP_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md` (if produced by CodeBase Analyzer — consume before pattern selection; treat findings as informed estimates, not guarantees)
-- `<AI_DEV_SHOP_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as a draft architectural recommendation; validate or refine the proposed target pattern in the ADR rather than accepting it uncritically)
+- Research artifact (`<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/research.md`) if produced in Step 0
+- `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (if produced — read all BLOCKING, ADVISORY, and CONSTITUTION-FLAG findings before Step 1; BLOCKING findings must be resolved before ADR work begins; ADVISORY findings must be acknowledged in the ADR)
+- `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/ANALYSIS-<id>-<date>.md` (if produced by CodeBase Analyzer — consume before pattern selection; treat findings as informed estimates, not guarantees)
+- `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as a draft architectural recommendation; validate or refine the proposed target pattern in the ADR rather than accepting it uncritically)
 
 ## Workflow
-0. Produce `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
+0. Read the active provider profile, then produce `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
 1. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
 2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files.
 3. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.
 4. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` and identify parallel delivery slices for `tasks.md`.
-5. Write `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/templates/adr-template.md`. Include Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
+5. Write `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 6. Publish the architecture decision as a downstream constraint.
 
 ## Pattern Catalog

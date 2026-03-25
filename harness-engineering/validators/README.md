@@ -10,6 +10,11 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks that `skills-registry.md` entries point to real files
   - fails when canonical skill files exist on disk but are not registered
   - allows explicit exclusions only through `project-knowledge/routing/skills-registry-exceptions.md`
+- `validate_evaluator_artifacts.py`
+  - checks retained evaluator contracts and evaluator reports for required fields and sections
+  - fails when a `progress-ledger.md` marks `evaluator_mode: required` but no retained evaluator contract is recorded
+- `validate_load_bearing_audits.py`
+  - checks retained `framework/reports/maintenance/harness-load-bearing-*.md` reports for required sections and decision labels
 
 ## Advisory Audit
 
@@ -20,7 +25,7 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks a narrow watchlist of high-risk docs against concrete source-of-truth targets and review cadence
   - advisory only; intended to catch silent routing/workflow drift early
 - `generate_maintenance_report.py`
-  - refreshes `reports/maintenance/harness-maintenance.md` from current repo state
+  - refreshes `framework/reports/maintenance/harness-maintenance.md` from current repo state
   - intended for scheduled maintenance workflows and manual maintainer passes
 - `probe_host_capabilities.sh`
   - checks version-sensitive host capabilities against the local environment when a reliable probe exists

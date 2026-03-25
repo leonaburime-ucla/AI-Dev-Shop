@@ -39,9 +39,9 @@ The following files MUST NEVER receive project memory, user instructions, learne
 | `CLAUDE.md` | Claude Code entry point. Contains only bootstrap instructions. Never a memory target. |
 | Any `agents/*/skills.md` | Agent-specific SOPs. Conventions belong in project-knowledge files, not inside agent definitions. Updating a skills.md to remember a project fact couples project state to a framework file. |
 | Any `skills/*/SKILL.md` | Shared skill definitions. These are framework primitives, not project-specific stores. |
-| Any file under `templates/` | Templates generate artifacts. They must remain project-agnostic. |
-| Any file under `workflows/` | Pipeline workflow definitions. Same reason as templates. |
-| Any spec file (`specs/*/feature.spec.md`) | Specs are immutable ground truth for a specific version. They are not memory stores. |
+| Any file under `framework/templates/` | Templates generate artifacts. They must remain project-agnostic. |
+| Any file under `framework/workflows/` | Pipeline workflow definitions. Same reason as templates. |
+| Any provider-defined planning artifact (for example `specs/*/feature.spec.md`, `openspec/**`, or BMAD planning files) | Planning artifacts are immutable ground truth for a specific version. They are not memory stores. |
 | Any ADR file | ADRs are point-in-time architecture decisions. They are not updated to store new facts. |
 | Any test file | Tests encode spec behavior. They are not memory stores. |
 | Any source code file | Source code implements specs. Memory does not belong in source. |
@@ -131,7 +131,7 @@ Reason: Standing code convention every agent must apply.
 **WRONG:** Writing a failure postmortem to `project_notes.md`.
 **WHY WRONG:** project_notes.md is for open questions and deferred decisions. Postmortems go in `learnings.md` (and optionally as a structured `[FAILURE]` entry in `memory-store.md`).
 
-**WRONG:** Storing a standing constraint inside a template file under `templates/`.
+**WRONG:** Storing a standing constraint inside a template file under `framework/templates/`.
 **WHY WRONG:** Templates are project-agnostic framework files. They generate artifacts; they do not store project-specific facts.
 
 ---

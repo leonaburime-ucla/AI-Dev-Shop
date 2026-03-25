@@ -114,7 +114,7 @@ If a repository has an approved existing convention that differs, the override m
 
 ## Test Certification Protocol
 
-Every test suite must include a certification record. This is the mechanism that prevents "green tests, wrong behavior." Use `<AI_DEV_SHOP_ROOT>/templates/test-certification-template.md` as the starting point.
+Every test suite must include a certification record. This is the mechanism that prevents "green tests, wrong behavior." Use `<AI_DEV_SHOP_ROOT>/framework/templates/test-certification-template.md` as the starting point.
 
 ```
 # Test Certification

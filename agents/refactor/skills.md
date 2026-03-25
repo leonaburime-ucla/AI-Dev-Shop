@@ -31,7 +31,7 @@ Propose non-behavioral improvements that reduce complexity and tech debt. Every 
 
 ## Output Format
 
-Write proposals to `<AI_DEV_SHOP_ROOT>/reports/refactor/REFACTOR-<feature-id>-<YYYY-MM-DD>.md`.
+Write proposals to `<AI_DEV_SHOP_ROOT>/framework/reports/refactor/REFACTOR-<feature-id>-<YYYY-MM-DD>.md`.
 
 - Refactor proposals (one per finding) with:
   - Type and priority

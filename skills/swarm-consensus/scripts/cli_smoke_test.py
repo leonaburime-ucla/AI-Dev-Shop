@@ -58,7 +58,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--artifacts-dir",
         default=".local-artifacts/swarm-consensus/smoke-tests",
-        help="Directory for dated smoke-test artifacts when --save-artifact is used. Override with reports/swarm-consensus/smoke-tests if you want a retained repo artifact.",
+        help="Directory for dated smoke-test artifacts when --save-artifact is used. Override with framework/reports/swarm-consensus/smoke-tests if you want a retained repo artifact.",
     )
     parser.add_argument("--skip-claude", action="store_true")
     parser.add_argument("--skip-gemini", action="store_true")

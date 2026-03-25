@@ -38,7 +38,7 @@ Key concepts:
 - **Convergence threshold**: ~90-95% of acceptance tests passing gates progression to code review. Calibrate to risk. Iteration budget (5 total retries; escalate any cluster at 3) prevents infinite loops. Stubborn failures signal spec/architecture problems — escalate, don't retry.
 - **Human checkpoints**: Spec approval, architecture sign-off, convergence escalation, final security sign-off. These are blocking. The pipeline stops and waits.
 
-Why it matters: this is the operational model this entire folder implements. Every design decision in AGENTS.md, skills/, and workflows/ traces back to these principles.
+Why it matters: this is the operational model this entire folder implements. Every design decision in AGENTS.md, skills/, and framework/workflows/ traces back to these principles.
 
 ---
 

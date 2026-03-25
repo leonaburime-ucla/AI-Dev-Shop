@@ -56,7 +56,7 @@ No restrictions.
 
 | Artifact | SECRET | PII | SENSITIVE-BUSINESS | INTERNAL | PUBLIC |
 |----------|--------|-----|--------------------|----------|--------|
-| feature.spec.md | ❌ | ❌ (synthetic only) | ⚠️ (flag in Agent Directives) | ✅ | ✅ |
+| provider-defined spec entrypoint (for example `feature.spec.md`) | ❌ | ❌ (synthetic only) | ⚠️ (flag in Agent Directives) | ✅ | ✅ |
 | adr.md | ❌ | ❌ | ⚠️ | ✅ | ✅ |
 | tasks.md | ❌ | ❌ | ⚠️ | ✅ | ✅ |
 | test-certification.md | ❌ | ❌ (synthetic only) | ⚠️ | ✅ | ✅ |

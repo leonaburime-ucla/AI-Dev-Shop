@@ -38,17 +38,17 @@ Host detection order:
 
 ## Starting the Pipeline
 
-**Before anything else:** Confirm `<AI_DEV_SHOP_ROOT>` — the path to the AI Dev Shop toolkit folder (default: `AI-Dev-Shop-speckit/`). Pipeline artifacts are written under `<AI_DEV_SHOP_ROOT>/reports/`. Spec files are written to the user-specified location.
+**Before anything else:** Confirm `<AI_DEV_SHOP_ROOT>` — the path to the AI Dev Shop toolkit folder (default: `AI-Dev-Shop-speckit/`). Then resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`. Pipeline artifacts are written under `<AI_DEV_SHOP_ROOT>/framework/reports/`. Provider-native planning artifacts are written to the user-specified location or native provider folders.
 
 Existing codebases should start with CodeBase Analyzer on the first pass to produce `ANALYSIS-*.md` and, when needed, `MIGRATION-*.md`.
 If the file area is already known, Coordinator should also consult `project-knowledge/routing/file-trigger-table.md` before dispatch.
 
-Canonical stage order and detailed dispatch behavior live in `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
+Canonical stage order and detailed dispatch behavior live in `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`.
 
 High-level flow:
 1. Use System Blueprint when macro boundaries are unclear or the scope spans multiple domains.
-2. Spec Agent creates the spec package. Zero unresolved `[NEEDS CLARIFICATION]` markers before architecture work.
-3. Human approves spec, then Red-Team and Architect produce the ADR.
+2. Spec Agent creates the provider-defined planning surface. With the default `speckit` provider, this is the strict-mode spec package. Zero unresolved clarification blockers before architecture work.
+3. Human approves the planning surface, then Red-Team and Architect produce the ADR.
 4. Human approves ADR, then Coordinator generates `tasks.md` and dispatches TDD.
 5. Programmer implements to convergence, then review and security gates run before shipping.
 
@@ -57,7 +57,7 @@ If tests repeatedly fail (3+ cycles on the same cluster), escalate to human — 
 ## Invoking the Pipeline
 
 **Option A — Slash commands (Claude Code only)** (one-time setup):
-- Claude Code: copy `<AI_DEV_SHOP_ROOT>/slash-commands/` to `.claude/commands/`
+- Claude Code: copy `<AI_DEV_SHOP_ROOT>/framework/slash-commands/` to `.claude/commands/`
 
 **Option B — Manual (Gemini CLI, Codex CLI, Claude.ai, Generic LLM)**: paste the contents of the corresponding template file as your message, replacing `$ARGUMENTS`.
 

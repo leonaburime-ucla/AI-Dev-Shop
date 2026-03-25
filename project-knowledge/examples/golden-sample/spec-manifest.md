@@ -32,4 +32,4 @@
 ## Notes
 
 - This sample uses current naming (`feature.spec.md`) so references match the active pipeline.
-- For new work, prefer the current templates in `templates/spec-system/` over this sample when there is any conflict.
+- For new work, prefer the current templates in `framework/templates/spec-system/` over this sample when there is any conflict.

@@ -33,7 +33,7 @@ Rules:
 - Advice-only by default; no scope transfer unless explicitly routed by Coordinator.
 - Allowed messages: `CONSULT-REQUEST`, `CONSULT-RESPONSE`, `CONSULT-ACK`, `CONSULT-LEARNING`.
 - Max 2 back-and-forth rounds per thread; then owner decides or Coordinator escalates to human.
-- Log thread summary to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`.
+- Log thread summary to `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`.
 
 ## Coverage Profile Prompt (Before Test Execution)
 
@@ -49,9 +49,9 @@ If the human does not provide custom values, apply defaults and persist the acti
 
 When the current task is about producing a report or artifact that is not required by the delivery pipeline:
 
-- If the artifact is required by the workflow, save it to the canonical `reports/` path without asking.
+- If the artifact is required by the workflow, save it to the canonical `framework/reports/` path without asking.
 - If the artifact is optional and the user has not already said to save it, ask whether it should be:
-  - `retained` in `reports/`
+  - `retained` in `framework/reports/`
   - `local only` in `.local-artifacts/`
   - `inline only` with no file written
 - If the artifact is raw evidence, temporary prompts, or intermediate captures, default to `.local-artifacts/` unless the user explicitly asks to retain it.
@@ -155,7 +155,7 @@ When building any delegated spawn prompt, include in this order:
 
 1. `Read <AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md before any work.`
 2. Explicitly name any activated conditional skills for this task.
-3. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
+3. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`.
 4. Give the concrete task directive with scope, constraints, ownership boundaries, and expected output.
 5. Require the subagent to stop if the persona file is missing or unreadable.
 6. Require the subagent to confirm in its first reply that the persona file was loaded.
@@ -229,7 +229,7 @@ Agent output received
 │             re-dispatch Programmer if seam changes needed, then re-run TestRunner
 │         (b) Gap has no spec mapping (dead code or untestable coupling) → TDD flags to Coordinator
 │             → Route to: Refactor Agent
-│                 Context: `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`,
+│                 Context: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`,
 │                          Coverage Gap List, specific uncovered files and line ranges, ADR constraints
 │                 After Refactor proposes seam extraction and human approves: dispatch Programmer,
 │                 then dispatch TDD to cover the newly testable units, then re-run TestRunner

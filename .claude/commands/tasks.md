@@ -4,10 +4,10 @@ $ARGUMENTS
 
 The ADR has been human-approved. Generate the task list:
 
-1. Identify the active feature from `<AI_DEV_SHOP_ROOT>/reports/` (most recently updated folder with approved ADR, or from $ARGUMENTS).
-2. Read `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` for the parallel delivery plan and module boundaries.
-3. Read the spec from `spec_path` in `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/.pipeline-state.md` for AC priorities (P1/P2/P3).
-4. Write `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md`:
+1. Identify the active feature from `<AI_DEV_SHOP_ROOT>/framework/reports/` (most recently updated folder with approved ADR, or from $ARGUMENTS).
+2. Read `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md` for the parallel delivery plan and module boundaries.
+3. Read the spec from `spec_path` in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/.pipeline-state.md` for AC priorities (P1/P2/P3).
+4. Write `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md`:
    - Phase 0: Setup (tooling, directory structure)
    - Phase 1: Foundational infrastructure (blocks all stories)
    - Phase 2+: One phase per user story, ordered P1 first

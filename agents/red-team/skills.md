@@ -45,7 +45,7 @@ After human spec approval, before Architect dispatch. Coordinator dispatches Red
 - Does the spec silently assume functionality not in the requirements (e.g., "user must be logged in" when auth is out of scope)?
 - Are there implied dependencies on systems or data not mentioned?
 
-**Constitution pre-flight (speckit):**
+**Constitution pre-flight (default provider profile):**
 - Does any requirement likely require a custom implementation where a library exists? (Article I)
 - Does any requirement make testing prohibitively difficult? (Article II)
 - Does the spec introduce complexity not traceable to a present requirement? (Article III)
@@ -53,7 +53,7 @@ After human spec approval, before Architect dispatch. Coordinator dispatches Red
 
 ## Output Format
 
-Write findings to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` using `<AI_DEV_SHOP_ROOT>/templates/red-team-template.md`.
+Write findings to `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/red-team-template.md`.
 
 Findings classified as:
 

@@ -11,16 +11,18 @@
 Convert product intent into precise, versioned, testable specifications that become the system source of truth. If the spec is wrong, every downstream agent builds on a flawed foundation. This is the most critical role in the pipeline.
 
 ## Required Inputs
+- Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
 - Problem statement and business outcome
 - Constraints (regulatory, performance, platform)
 - Existing spec metadata (if updating — include current hash)
 - Coordinator directive and scope boundaries
 
 ## Workflow
-1. Normalize request into clear scope and explicit non-goals.
-2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
-3. Assign FEAT number by scanning existing feature folders in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
-4. Ask the user two questions before writing anything:
+1. Read `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`, `<AI_DEV_SHOP_ROOT>/framework/spec-providers/core/provider-contract.md`, and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`.
+2. Normalize request into clear scope and explicit non-goals.
+3. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text when the provider supports inline clarification markers.
+4. Assign FEAT number by scanning existing feature folders in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
+5. Ask the user two questions before writing anything:
 
    **a) Where to save the spec package** (if not already specified).
 
@@ -34,15 +36,13 @@ Convert product intent into precise, versioned, testable specifications that bec
    >
    > Which do you prefer?
 
-   Create `<user-specified>/<NNN>-<feature-name>/`. Create `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record both `spec_path: <user-specified>/<NNN>-<feature-name>/` and `spec_naming: prefixed | standard` in `.pipeline-state.md`. Apply the chosen naming to every file written in this spec package.
+   Create `<user-specified>/<NNN>-<feature-name>/` when the provider uses a user-owned target folder. Create `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `spec_entrypoint_path`, `spec_readiness_artifact`, and any compatibility fields such as `spec_path` or `spec_naming` in `.pipeline-state.md`.
 
-5. Determine which spec-package files apply to the feature. Write or revise the full package at `<user-specified>/<NNN>-<feature-name>/`, using `<AI_DEV_SHOP_ROOT>/templates/spec-system/` templates for every applicable file.
-6. Complete the Constitution Compliance table in `feature.spec.md`. Mark each article COMPLIES, EXCEPTION, or N/A. Assign or update metadata: Spec ID, FEAT number, Version, Last Edited (ISO-8601 UTC), Content Hash (sha256).
-7. Generate `spec-manifest.md`. Record the actual filenames written, omitted files with one-line justification, and the `spec_naming` choice used.
-8. Validate `api.spec.md` contract completeness when an API contract file exists. Ensure every endpoint maps cleanly to OpenAPI 3.x generation rules. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
-9. Fill `spec-dod.md`. Every item must be PASS or NA with justification. Any FAIL blocks handoff until fixed.
-10. If `[NEEDS CLARIFICATION]` markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/slash-commands/clarify.md` for the presentation format.
-11. Once `spec-dod.md` fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
+6. Produce or revise the provider-defined planning surface. For the default Speckit provider, write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/templates/spec-system/` templates for every applicable file.
+7. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, and fill `spec-dod.md`.
+8. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
+9. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
+10. Once the provider-defined readiness artifact fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
 
 ## Output Format
 - Spec package path
@@ -65,9 +65,9 @@ Convert product intent into precise, versioned, testable specifications that bec
 - Never hand off with unresolved `[NEEDS CLARIFICATION]` markers — escalate to human if the ambiguity cannot be resolved from available context
 - The FEAT number must be assigned before handoff — never reuse an existing FEAT number
 
-## Strict Mode — Spec Package Output
-In strict mode, a spec is a PACKAGE. The Spec Agent must produce ALL applicable files at the user-specified location (`<user-specified>/<NNN>-<feature-name>/`). File names below show the base suffix — prepend `<feature-name>.` for prefixed naming (e.g., `csv-invoice-export.feature.spec.md`):
-- `feature.spec.md` — canonical spec (use templates/spec-system/feature.spec.md)
+## Strict Mode — Speckit Package Output
+When the active provider is `speckit`, a spec is a PACKAGE. The Spec Agent must produce ALL applicable files at the user-specified location (`<user-specified>/<NNN>-<feature-name>/`). File names below show the base suffix — prepend `<feature-name>.` for prefixed naming (e.g., `csv-invoice-export.feature.spec.md`):
+- `feature.spec.md` — canonical spec (use framework/templates/spec-system/feature.spec.md)
 - `api.spec.md` — typed API contracts (if applicable)
 - `state.spec.md` — state shapes and transitions (if applicable)
 - `orchestrator.spec.md` — orchestrator output model (if applicable)
@@ -101,4 +101,4 @@ Specs are written wherever the user specifies. No hardcoded output location.
 There is no default location — always ask if the user has not specified one.
 
 ## Output Path Rule
-Write spec artifacts to the user-specified location. During spec work, never modify `agents/`, `skills/`, `templates/`, or `workflows/`.
+Write spec artifacts to the user-specified location. During spec work, never modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/`.

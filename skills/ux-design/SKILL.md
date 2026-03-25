@@ -48,7 +48,7 @@ Write a concise design artifact that includes:
 - implementation notes for Programmer
 - verification notes for QA/E2E and Code Review
 
-Default path: `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/design-spec.md`
+Default path: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/design-spec.md`
 
 ## Reference
 

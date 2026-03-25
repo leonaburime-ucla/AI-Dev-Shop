@@ -25,7 +25,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **Current state:** Detailed startup/invocation/checkpoint content now lives in `project-knowledge/operations/pipeline-quickstart.md`, and the full agent roster now lives in `project-knowledge/routing/agent-index.md`. `AGENTS.md` remains the runtime map and startup contract and is back under the safer size target.
 **What to add next:**
 - Keep startup/mode/routing semantics at the root and move deeper operating detail into linked canonical docs.
-- Remove repeated explanations that already live in `agents/`, `workflows/`, `skills/`, or `harness-engineering/`.
+- Remove repeated explanations that already live in `agents/`, `framework/workflows/`, `skills/`, or `harness-engineering/`.
 - Re-run the doc-garden audit after the reduction and treat the root-file line count as a tracked harness metric.
 
 ### Context De-Noise Hardening
@@ -93,6 +93,19 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ## Pipeline Gaps
 
+### Specialized Harness Follow-Ons From Video **[OPEN]**
+**Source video:** `https://www.youtube.com/watch?v=I2K81s0OQto`
+**What it is:** Follow-up ideas from a harness-engineering video focused on specialized multi-stage business workflows, deterministic rails, subagents, observability, and checkpointed execution.
+**Why it matters:** Most repo-level harness work is now in place, but these items push the framework further toward specialized downstream harnesses for compliance, legal, financial, and other long-running business processes.
+**What to add:**
+- Stage-output schema enforcement: add stricter machine-validated output contracts for multi-stage handoffs instead of relying only on markdown structure and prose rules.
+- Model-tier routing policy: document when to use stronger orchestrator models versus cheaper narrower subagents, including cost/quality tradeoff guidance.
+- Phase-checkpoint template for downstream harnesses: require each major phase to write resumable checkpoint artifacts so long-running workflows can restart from phase `N` instead of from scratch.
+- Specialized non-code validation-loop templates: add downstream templates for things like clause-vs-playbook checks, fact-check loops, and rule-based business validation beyond software testing.
+- Fixed-plan vs dynamic-plan design guidance: document when a workflow should stay on deterministic fixed rails versus when dynamic replanning is acceptable.
+- Tool-approval patterns for risky actions: add stronger downstream guidance for actions that should always require explicit human approval before write/push/send/publish behavior.
+- Observability and trace design for specialized harnesses: define what a downstream harness should log about phase timing, retries, subagent activity, and validation outcomes without bloating the main context.
+
 ### React Component Testing Policy
 **What it is:** UI testing is often skipped by LLMs. Need a strict policy enforcing React component test creation.
 **Current state:** Added to `project-knowledge/quality/react-component-testing-policy.md`.
@@ -105,7 +118,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ### Observer Agent Operational Cadence
 **What it is:** The Observer role and output format are well-defined but its trigger is not. Currently it "runs alongside" the pipeline with no specified cadence — making it easy to never dispatch in practice.
-**Current state:** **[PARTIAL]** Observer behavior is documented in multiple places (`workflows/multi-agent-pipeline.md`, scorecard docs), but Coordinator dispatch trigger rules are still not explicit.
+**Current state:** **[PARTIAL]** Observer behavior is documented in multiple places (`framework/workflows/multi-agent-pipeline.md`, scorecard docs), but Coordinator dispatch trigger rules are still not explicit.
 **What to add:**
 - Define trigger conditions in `agents/coordinator/skills.md`: dispatch Observer after every 3rd feature completion, after any convergence escalation, and on explicit Coordinator request
 - Define what "weekly pattern report" means: manual trigger via slash command or Coordinator initiates after N features
@@ -173,12 +186,12 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ### Spec-Kit Command Contract Parity **[PARTIAL]**
 **What it is:** Command files (`.claude/commands/`) currently lack machine-readable frontmatter. Spec-kit's command format includes `handoffs:` and `scripts:` fields that enable automated contract validation — e.g., checking that `/plan` references an approved spec before executing.
-**Current state:** Command files exist in `slash-commands/` (including `spec`, `clarify`, `plan`, `tasks`, `implement`, `review`, `consensus`, `agent`). Frontmatter contracts are still not present.
+**Current state:** Command files exist in `framework/slash-commands/` (including `spec`, `clarify`, `plan`, `tasks`, `implement`, `review`, `consensus`, `agent`). Frontmatter contracts are still not present.
 **What to add:**
 - Frontmatter schema for command files — `description`, `requires`, `handoffs`, `produces`, and optional `mode`
-- Update all command files in `slash-commands/` to include frontmatter
+- Update all command files in `framework/slash-commands/` to include frontmatter
 - Coordinator skills update — teach it to validate command preconditions against frontmatter `requires` fields before dispatch
-**References:** github/spec-kit command format (`github-spec-kit/templates/commands/specify.md`)
+**References:** github/spec-kit command format (`github-spec-kit/framework/templates/commands/specify.md`)
 
 ---
 

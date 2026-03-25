@@ -34,7 +34,7 @@ Suggested operating pattern:
 - run a dated baseline once after setting up consensus on a host
 - rerun after CLI upgrades, major model-family changes, or parser regressions
 - save ad hoc runs in `.local-artifacts/swarm-consensus/smoke-tests/` by default
-- only write to `reports/swarm-consensus/smoke-tests/` when you explicitly want a retained host baseline in the repo
+- only write to `framework/reports/swarm-consensus/smoke-tests/` when you explicitly want a retained host baseline in the repo
 - treat the saved artifact as evidence for updating saved model preferences or slash-command guidance
 
 Interpretation rules:

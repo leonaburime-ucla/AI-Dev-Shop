@@ -41,6 +41,22 @@ In practice, this gives a repo a repeatable way to move from idea to working cod
 - `[Observer]` is passive and active across all stages when enabled
 - `[...]` stages are optional; dispatched by Coordinator when spec/ADR triggers them or when you specifically ask for them
 
+## Spec Providers
+
+The toolkit now treats the upstream planning framework as a provider.
+
+- Default provider: `speckit`
+- Swappable provider profiles: `openspec`, `bmad`
+- Active provider file: `framework/spec-providers/active-provider.md`
+- Provider contract: `framework/spec-providers/core/provider-contract.md`
+
+This keeps provider-specific planning assumptions in one folder instead of spreading Speckit-only rules through the whole toolkit.
+
+Current status:
+- `speckit` is validated in this repo
+- `openspec` is scaffolded but not yet tested end-to-end in this repo
+- `bmad` is scaffolded but not yet tested end-to-end in this repo
+
 ## Quick Overview
 
 - **For**: teams and solo builders who want coding agents to work through a defined software-delivery process instead of improvising
@@ -61,8 +77,9 @@ Most agent workflows are strong at generating code but weak at preserving intent
 
 1. Install the toolkit into your repository.
 2. Point your coding tool at `AI-Dev-Shop-speckit/AGENTS.md`.
-3. Start in Coordinator mode or invoke a pipeline command.
-4. The framework routes work through the right agents and writes artifacts under `reports/` and `project-knowledge/`.
+3. Confirm or switch the active spec provider in `framework/spec-providers/active-provider.md`.
+4. Start in Coordinator mode or invoke a pipeline command.
+5. The framework routes work through the right agents and writes artifacts under `framework/reports/` and `project-knowledge/`.
 
 ## At A Glance
 
@@ -79,35 +96,38 @@ Idea/request
 Claude Code can load the built-in slash command templates:
 
 ```bash
-cp -r AI-Dev-Shop-speckit/slash-commands/ .claude/commands/
+cp -r AI-Dev-Shop-speckit/framework/slash-commands/ .claude/commands/
 ```
 
-Other hosts do not support native slash commands. For those, open the matching file in `slash-commands/` and paste its contents manually.
+Other hosts do not support native slash commands. For those, open the matching file in `framework/slash-commands/` and paste its contents manually.
 
 ## First-Time Project Setup
 
+- Confirm the active provider in [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md).
 - Customize [constitution.md](project-knowledge/governance/constitution.md).
 - Fill in [project_memory.md](project-knowledge/memory/project_memory.md).
 - Start with the Coordinator in Review Mode, or run `/spec` once slash commands are installed.
-- Expect pipeline artifacts under `reports/` and spec packages at the user-specified location outside the toolkit.
+- Expect pipeline artifacts under `framework/reports/` and spec packages at the user-specified location outside the toolkit.
 
 ## Key Files
 
 - [AGENTS.md](AGENTS.md): runtime contract, modes, routing rules
-- [workflows/multi-agent-pipeline.md](workflows/multi-agent-pipeline.md): detailed stage execution rules
-- [workflows/conventions.md](workflows/conventions.md): file placement and writable/read-only rules
-- [templates/spec-system/feature.spec.md](templates/spec-system/feature.spec.md): canonical spec entry point
-- [templates/adr-template.md](templates/adr-template.md): ADR template used by Architect
+- [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md): active planning provider and switch rules
+- [framework/spec-providers/core/provider-contract.md](framework/spec-providers/core/provider-contract.md): provider boundary used by the pipeline
+- [framework/workflows/multi-agent-pipeline.md](framework/workflows/multi-agent-pipeline.md): detailed stage execution rules
+- [framework/workflows/conventions.md](framework/workflows/conventions.md): file placement and writable/read-only rules
+- [framework/spec-providers/speckit/provider.md](framework/spec-providers/speckit/provider.md): default provider mapping and current Speckit compatibility shims
+- [framework/templates/adr-template.md](framework/templates/adr-template.md): ADR template used by Architect
 - [harness-engineering/README.md](harness-engineering/README.md): harness layer, validators, rollout plan, and local source notes
 
 Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current default agents, not a fixed maximum count.
 
 ## Repository Architecture
 
-This toolkit enforces a strict separation between the "Engine" and the "Data":
+This toolkit keeps its engine files grouped while preserving a clean split between source and writable artifacts:
 
-- **The Engine (Read-Only):** `agents/`, `skills/`, `workflows/`, and `templates/` are the core framework. They remain read-only during normal feature work to prevent agents from accidentally overwriting pipeline rules. You can safely overwrite these folders when upgrading to a new version of the toolkit.
-- **The Data (Writable):** `project-knowledge/` and `reports/` are your local workspace. This is where you configure your specific project (constitution, memory) and where agents write their outputs.
+- **The Engine (Read-Only):** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, and `framework/slash-commands/` are the framework source. They remain read-only during normal feature work to prevent agents from accidentally overwriting pipeline rules. You can safely overwrite these folders when upgrading to a new version of the toolkit.
+- **The Data (Writable):** `project-knowledge/` and `framework/reports/` are your local workspace. `framework/reports/` is grouped under `framework/` for organization, but it remains writable and is where agents save retained artifacts.
 
 For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. That can be a `docs/` tree, a host-level `project-knowledge/` tree, or both, as long as the product repo stays the source of truth for its own PRD/architecture/runbook material.
 
@@ -119,10 +139,16 @@ For the host application itself, keep app-specific product docs in the host repo
 - Use Orc-BASH for React frontends.
 - Do not force architecture ceremony onto trivial CRUD, scripts, or short-lived work.
 
+## Design Philosophy
+
+This toolkit is a portable, self-contained set of markdown files, templates, and agent instructions that can be dropped into a repository to standardize AI behavior and project governance without external databases or complex setup. The current default planning provider is Speckit, but provider selection is now isolated under `framework/spec-providers/` so the upstream planning surface can be swapped without rewriting the rest of the pipeline.
+
+Furthermore, this framework is built on **Harness Engineering** principles. Rather than relying purely on prompt engineering to make an AI model smarter, this toolkit provides a deterministic "harness" (state machines, durable memory files, strict routing, and validation loops) that wraps the non-deterministic LLM. It treats the agent as the Model + the Harness.
+
 ## Maintainers
 
-- Normal feature work should not edit `agents/`, `skills/`, `templates/`, or `workflows/`.
+- Normal feature work should not edit `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/`.
 - If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work.
 - Maintainer-only rollout notes and design history live under [project-knowledge/maintainers/README.md](project-knowledge/maintainers/README.md).
-- Bootstrap-only scaffolding lives under [templates/bootstrap/README.md](templates/bootstrap/README.md).
+- Bootstrap-only scaffolding lives under [framework/templates/bootstrap/README.md](framework/templates/bootstrap/README.md).
 - Archived audit artifacts live under [project-knowledge/archive/README.md](project-knowledge/archive/README.md).

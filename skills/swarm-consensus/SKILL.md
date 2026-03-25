@@ -146,7 +146,7 @@ Before changing saved consensus model preferences or updating the command docs t
 Use the smoke test to compare text vs structured output, stderr noise, end-marker behavior, and explicit model-flag handling on the current host.
 
 By default, save ad hoc smoke-test artifacts to `.local-artifacts/swarm-consensus/smoke-tests/`.
-If the user explicitly wants a retained host baseline in the repo, set `--artifacts-dir reports/swarm-consensus/smoke-tests`.
+If the user explicitly wants a retained host baseline in the repo, set `--artifacts-dir framework/reports/swarm-consensus/smoke-tests`.
 
 If there is no recent dated artifact for the current host, or if the host/CLI/model stack has changed materially since the last run, ask the user whether to run the smoke test now and save a dated artifact before changing saved preferences or slash-command guidance.
 
@@ -167,9 +167,9 @@ Use a shared context packet when the question depends on brownfield repo knowled
 
 1. Before writing a packet to disk, decide whether it is `local-only` scratch or a retained project artifact.
 2. If the user has not already specified that choice, ask:
-   `Save context packet? Reply "save packet" to retain it in reports/swarm-consensus/context/ or "local only" to keep it in .local-artifacts/swarm-consensus/context/.`
+   `Save context packet? Reply "save packet" to retain it in framework/reports/swarm-consensus/context/ or "local only" to keep it in .local-artifacts/swarm-consensus/context/.`
 3. Save the packet at `.local-artifacts/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md` by default.
-4. If the user explicitly wants a reusable retained artifact, save or promote the packet to `reports/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md`.
+4. If the user explicitly wants a reusable retained artifact, save or promote the packet to `framework/reports/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md`.
 5. Use `skills/swarm-consensus/references/context-packet-template.md` as the reference layout.
 6. Put only the context every participant needs:
    - the exact question to answer
@@ -236,7 +236,7 @@ For file-based transport, prefer `.local-artifacts/swarm-consensus/prompts/` ove
 4. If a CLI emits startup chatter, tool logs, or repo bootstrap text, exclude that material from the peer answer. Use only the structured payload or the end-marker-delimited answer.
 5. If structured mode fails but plain text succeeds, record the fallback mode and include that fact in the report.
 
-Store raw per-round stdout/stderr captures in `.local-artifacts/swarm-consensus/offloads/` by default. Only save them under `reports/offloads/` when the user explicitly wants retained evidence.
+Store raw per-round stdout/stderr captures in `.local-artifacts/swarm-consensus/offloads/` by default. Only save them under `framework/reports/offloads/` when the user explicitly wants retained evidence.
 
 ### Retryable Peer Failure Protocol
 
@@ -325,9 +325,9 @@ With all responses collected:
 3. In `debate` mode, you may add a `## Debate Trace` section for round-by-round movement, but you must still include all mandatory sections from the template.
 4. Before writing any report to disk, decide whether it is `local-only`, `retained`, or `inline-only`.
 5. If the user has not already specified that choice, ask:
-   `Save consensus report? Reply "save report" to retain it in reports/swarm-consensus/runs/, "local only" to keep it in .local-artifacts/swarm-consensus/runs/, or "inline only" for no file.`
+   `Save consensus report? Reply "save report" to retain it in framework/reports/swarm-consensus/runs/, "local only" to keep it in .local-artifacts/swarm-consensus/runs/, or "inline only" for no file.`
 6. By default, write ad hoc run reports to `.local-artifacts/swarm-consensus/runs/<timestamp>-consensus-report.md`.
-7. If the user explicitly wants a retained architecture or project artifact, write the final report to `reports/swarm-consensus/runs/<timestamp>-consensus-report.md` instead.
+7. If the user explicitly wants a retained architecture or project artifact, write the final report to `framework/reports/swarm-consensus/runs/<timestamp>-consensus-report.md` instead.
 8. If a shared context packet was used, record its path in the report header.
 9. If the user prefers inline output instead of a file, preserve the same section order and tables inline.
 10. A valid report MUST include a non-empty `Primary` row in `## The Swarm`.

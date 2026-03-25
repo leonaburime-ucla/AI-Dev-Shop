@@ -4,7 +4,7 @@ This file is the harness-local note for validator enforcement.
 
 ## Canonical Workflow
 
-The current GitHub Actions workflow lives at `.github/workflows/harness-validators.yml`.
+The current GitHub Actions workflow lives at `.github/framework/workflows/harness-validators.yml`.
 
 It intentionally does one thing only:
 

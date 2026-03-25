@@ -27,7 +27,7 @@ Do **not** use this area for:
   - `AGENTS.md`
   - `agents/`
   - `skills/`
-  - `workflows/`
+  - `framework/workflows/`
   - `project-knowledge/` (project memory/governance/routing)
 - Maintainer authority for framework evolution stays in:
   - `project-knowledge/maintainers/`

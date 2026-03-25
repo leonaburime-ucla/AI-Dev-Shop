@@ -42,7 +42,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 ## Required Inputs
 - Active spec metadata (ID / version / hash)
 - Certified test suite with coverage gap report
-- Architecture boundaries and contracts (from ADRs in `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
+- Architecture boundaries and contracts (from ADRs in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`)
 - Coordinator routing directive with explicit scope and any activated conditional skills
 - `progress-ledger.md` when resuming a long-running task or when retry history matters
 - Self-validation harness template when runtime startup, API, UI, auth, migration, or integration behavior is in scope
@@ -75,7 +75,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - confirm no certified tests were deleted or weakened to manufacture green
    - confirm changed files stayed within scope, or disclose the deviation explicitly
    - record what remains open, if anything
-8. If runtime-changing behavior is in scope, run the appropriate self-validation harness from `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md` and write the result to `<AI_DEV_SHOP_ROOT>/reports/self-validation/`.
+8. If runtime-changing behavior is in scope, run the appropriate self-validation harness from `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md` and write the result to `<AI_DEV_SHOP_ROOT>/framework/reports/self-validation/`.
    - Use the bounded self-validation retry rule from that file. Do not keep rerunning the same runtime check indefinitely.
    - If the failure is still ambiguous after the first repair pass, you may use one bounded diagnosis pass before the final rerun. Follow the definition in `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md`.
    - End with a clear status: `PASS`, `PARTIAL`, or `BLOCKER`.

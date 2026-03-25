@@ -52,7 +52,7 @@ Before selecting a pattern, classify the system's primary drivers:
 - For each API or event contract, assign one test approach: consumer-driven, schema validation, or integration test.
 - If `system-blueprint.md` assigns data ownership, encode owner and non-owner constraints in the ADR.
 - Identify parallelizable slices and sequencing constraints for `tasks.md`.
-- Write `adr.md` using `<AI_DEV_SHOP_ROOT>/templates/adr-template.md`. Complete Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision below.
+- Write `adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Complete Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision below.
 
 ## Pattern Selection Guide
 
@@ -250,9 +250,9 @@ These terms appear throughout architecture discussions. Precision matters.
 
 ## Architecture Decision Record (ADR) Format
 
-Every significant architecture choice must be recorded. Use `<AI_DEV_SHOP_ROOT>/templates/adr-template.md` — it includes all required sections: Constitution Check, Research Summary, Context, Decision, Rationale, Pattern Evaluation, Consequences, Module/Service Boundaries, API/Event Contract Summary, Enforcement, Related Decisions, Default Heuristic Alignment, and Complexity Justification.
+Every significant architecture choice must be recorded. Use `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md` — it includes all required sections: Constitution Check, Research Summary, Context, Decision, Rationale, Pattern Evaluation, Consequences, Module/Service Boundaries, API/Event Contract Summary, Enforcement, Related Decisions, Default Heuristic Alignment, and Complexity Justification.
 
-ADRs live in `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. They are inputs to the Programmer Agent and Code Review Agent — architectural violations are violations of a recorded ADR.
+ADRs live in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`. They are inputs to the Programmer Agent and Code Review Agent — architectural violations are violations of a recorded ADR.
 
 ## Directory Structure Decision (Required in Every ADR)
 

@@ -39,7 +39,7 @@ Create a macro-level system blueprint that defines what is being built and how i
    - Any package with API/event/schema dependency on another package must list it in `Depends on` and be placed in a later phase.
    - Any package requiring a foreign key to another domain-owned table must be sequenced after the owner domain.
 10. Keep `P0` thin: no feature-specific business logic or feature-owned schema in Core/Foundation.
-11. Write `system-blueprint.md` using `<AI_DEV_SHOP_ROOT>/templates/system-blueprint-template.md`.
+11. Write `system-blueprint.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md`.
 12. Hand off to Coordinator for human review and Spec dispatch.
 
 ## Output Format

@@ -67,7 +67,7 @@ When making any context engineering decision about where to write a memory entry
 
 Rules:
 - Before writing any memory entry, consult `knowledge-routing.md` to confirm the correct destination file
-- Never write project-specific memory (conventions, gotchas, decisions, lessons) into framework files: `AGENTS.md`, any `skills.md`, or any `templates/` file. Framework files define agent behavior — they are not storage for project-specific state
+- Never write project-specific memory (conventions, gotchas, decisions, lessons) into framework files: `AGENTS.md`, any `skills.md`, or any `framework/templates/` file. Framework files define agent behavior — they are not storage for project-specific state
 - If a memory entry does not clearly fit a category in `knowledge-routing.md`, add an Open Question to `project_notes.md` and escalate to the Coordinator to update the routing rules before writing the entry
 
 This rule exists to prevent knowledge files from becoming junk drawers and framework files from becoming contaminated with project-specific state that does not transfer to other projects.
@@ -79,7 +79,7 @@ Getting this wrong turns knowledge files into junk drawers, which degrades every
 | Content Type | Correct Location |
 |---|---|
 | Requirements, acceptance criteria | Spec files |
-| Architecture pattern choices | ADRs in `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/` |
+| Architecture pattern choices | ADRs in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/` |
 | Reusable domain knowledge | `<AI_DEV_SHOP_ROOT>/skills/` files |
 | Project-specific conventions | `project_memory.md` |
 | Lessons from past failures | `learnings.md` |

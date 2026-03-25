@@ -10,4 +10,4 @@ Use your available tools to dispatch each specialized agent. Include their `<AI_
 
 ## Gemini CLI: Command Usage
 
-Slash commands are not natively supported in Gemini CLI. Use Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md`: open `<AI_DEV_SHOP_ROOT>/slash-commands/<command>.md`, paste the contents as your prompt, and replace `$ARGUMENTS`.
+Slash commands are not natively supported in Gemini CLI. Use Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md`: open `<AI_DEV_SHOP_ROOT>/framework/slash-commands/<command>.md`, paste the contents as your prompt, and replace `$ARGUMENTS`.

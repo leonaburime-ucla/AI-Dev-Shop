@@ -24,7 +24,7 @@ Applies to any external skill source, including `skills.sh`, GitHub skill repos,
 4. External skills are staged in `project-knowledge/skills-inbox/` before review.
 5. Reviewed inputs are moved to `project-knowledge/skills-inbox/archive/` with decision notes.
 6. Merge by extraction and rewrite, never blind overwrite.
-7. Every ingestion produces an audit artifact in `reports/skills-audit/`.
+7. Every ingestion produces an audit artifact in `framework/reports/skills-audit/`.
 
 ## Request Contract (From Other Agents)
 When an agent detects a capability gap, it submits:
@@ -40,7 +40,7 @@ When an agent detects a capability gap, it submits:
 4. Decision: `adopt`, `partial-adopt`, or `reject`.
 5. Merge: Add only net-new compatible guidance to canonical skill.
 6. Archive: Move staged files to archive and log rationale.
-7. Report: Publish audit summary under `reports/skills-audit/`.
+7. Report: Publish audit summary under `framework/reports/skills-audit/`.
 
 ## Decision Criteria
 Adopt only when guidance is:

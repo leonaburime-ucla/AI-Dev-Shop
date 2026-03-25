@@ -8,7 +8,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic and convergence policy (to detect when Coordinator is making suboptimal routing decisions)
 - `<AI_DEV_SHOP_ROOT>/skills/agent-evaluation/SKILL.md` — multi-dimensional rubrics for evaluating agent output quality trends, LLM-as-judge methodology, bias awareness
 - `<AI_DEV_SHOP_ROOT>/skills/evaluation/eval-rubrics.md` — per-agent scoring rubrics and judge prompt templates
-- `<AI_DEV_SHOP_ROOT>/workflows/trace-schema.md` — trace entry format and storage rules
+- `<AI_DEV_SHOP_ROOT>/framework/workflows/trace-schema.md` — trace entry format and storage rules
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` — explicit cadence triggers, doc-garden workflow, benchmark refresh timing
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/failure-promotion-policy.md` — when recurring failures must become validators, benchmarks, or instruction changes
 
@@ -21,7 +21,7 @@ Maintain auditability and enable system learning. The Observer does not sit in t
 - A pipeline stage has failed more than once and the pattern is unclear
 - The pipeline has been running for 3+ features (enough data to surface trends)
 - You suspect a skills.md file needs updating but don't have evidence yet
-- Toolkit source changed in `AGENTS.md`, `agents/`, `skills/`, `workflows/`, `templates/`, or `harness-engineering/`
+- Toolkit source changed in `AGENTS.md`, `agents/`, `skills/`, `framework/spec-providers/`, `framework/workflows/`, `framework/templates/`, `framework/slash-commands/`, or `harness-engineering/`
 
 **Skip the Observer when all of the following are true:**
 - Solo developer, single short-lived feature
@@ -42,7 +42,7 @@ Use `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` as the operatin
 
 - Run after every 3rd completed feature
 - Run immediately after any convergence escalation or repeated failure cluster that hits the promotion threshold
-- Run before merge for toolkit-maintenance changes that touch `AGENTS.md`, `agents/`, `skills/`, `workflows/`, `templates/`, or `harness-engineering/`
+- Run before merge for toolkit-maintenance changes that touch `AGENTS.md`, `agents/`, `skills/`, `framework/spec-providers/`, `framework/workflows/`, `framework/templates/`, `framework/slash-commands/`, or `harness-engineering/`
 - Run a weekly maintenance pass when framework work is active
 
 ## Workflow
@@ -60,10 +60,10 @@ Use `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` as the operatin
    - Architecture or technology decisions → write `[DECISION]` entry (include ADR reference)
    - Constitution compliance events (exceptions, violations) → write `[CONSTITUTION]` entry
    - Discovered project facts or gotchas → write `[FACT]` entry
-   - Every agent dispatch and completion → write `[TRACE]` entry per `<AI_DEV_SHOP_ROOT>/workflows/trace-schema.md` (include `constitution_check` field for architect stage)
+   - Every agent dispatch and completion → write `[TRACE]` entry per `<AI_DEV_SHOP_ROOT>/framework/workflows/trace-schema.md` (include `constitution_check` field for architect stage)
 7. **LLM-as-judge pass:** After each pipeline run, score the Spec Agent output using the rubric in `<AI_DEV_SHOP_ROOT>/skills/evaluation/eval-rubrics.md`. Weekly, score all agent outputs including Architect constitution compliance dimension. Record each score as a `[QUALITY]` entry in memory-store.md. Flag regressions (score drops > 1.0 vs baseline) to the Coordinator immediately.
 8. During toolkit-maintenance passes, run `bash harness-engineering/validators/run-all.sh` and capture the doc-garden output delta in the Observer report rather than treating it as an informal side task.
-9. Refresh `reports/maintenance/harness-maintenance.md` with `python3 harness-engineering/validators/generate_maintenance_report.py` during scheduled maintenance passes or toolkit-maintenance closeout.
+9. Refresh `framework/reports/maintenance/harness-maintenance.md` with `python3 harness-engineering/validators/generate_maintenance_report.py` during scheduled maintenance passes or toolkit-maintenance closeout.
 10. When a recurring failure reaches the promotion threshold in `<AI_DEV_SHOP_ROOT>/harness-engineering/failure-promotion-policy.md`, recommend the smallest durable upgrade path: validator, benchmark, checklist, workflow rule, or skills update.
 11. Produce weekly improvement recommendations, referencing specific memory entries and quality scores as evidence. Flag any benchmark regressions alongside skills.md change recommendations. Track constitution compliance score trends separately.
 
@@ -76,7 +76,7 @@ Use `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` as the operatin
 
 ## Output Format
 
-**Timeline Log** (per cycle): write to `<AI_DEV_SHOP_ROOT>/reports/observer/timeline-CYCLE-<NNN>.md`
+**Timeline Log** (per cycle): write to `<AI_DEV_SHOP_ROOT>/framework/reports/observer/timeline-CYCLE-<NNN>.md`
 ```
 Cycle: CYCLE-007
 Agents dispatched: Programmer, Security
@@ -85,7 +85,7 @@ Security: 3 findings (1 High, 2 Medium). High requires human sign-off.
 Iteration budget: AC-03 at 2/5, INV-01 at 2/5.
 ```
 
-**Pattern Report** (weekly): write to `<AI_DEV_SHOP_ROOT>/reports/observer/pattern-report-<YYYY-WNN>.md`
+**Pattern Report** (weekly): write to `<AI_DEV_SHOP_ROOT>/framework/reports/observer/pattern-report-<YYYY-WNN>.md`
 - Recurring failure clusters and their resolution paths
 - Agent failure modes observed more than once
 - Token efficiency trends (are cycles getting longer or shorter?)
@@ -97,7 +97,7 @@ Iteration budget: AC-03 at 2/5, INV-01 at 2/5.
 - Implementation referencing deleted module
 
 **Improvement Recommendations** (inline to Coordinator, not saved separately):
-Recommendations are addressed to the **human**, not applied directly by the Observer. The Observer never edits `agents/`, `skills/`, `templates/`, or `workflows/` files — those are read-only toolkit source. Recommendations describe what a human should consider changing and why.
+Recommendations are addressed to the **human**, not applied directly by the Observer. The Observer never edits `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/` files — those are read-only toolkit source. Recommendations describe what a human should consider changing and why.
 
 Example format:
 - Consider adding to `<AI_DEV_SHOP_ROOT>/agents/programmer/skills.md`: "Always check project_memory.md for the legacy billing API behavior before touching payment code." (observed 3 times this month — evidence: FAILURE-20260222-001, FAILURE-20260223-003)

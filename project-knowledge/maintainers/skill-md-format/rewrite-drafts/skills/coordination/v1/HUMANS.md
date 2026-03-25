@@ -37,7 +37,7 @@ Rules:
 - Advice-only by default; no scope transfer unless explicitly routed by Coordinator.
 - Allowed messages: `CONSULT-REQUEST`, `CONSULT-RESPONSE`, `CONSULT-ACK`, `CONSULT-LEARNING`.
 - Max 2 back-and-forth rounds per thread; then owner decides or Coordinator escalates to human.
-- Log thread summary to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`.
+- Log thread summary to `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`.
 
 ## Coverage Profile Prompt (Before Test Execution)
 
@@ -103,7 +103,7 @@ Agent output received
 │             re-dispatch Programmer if seam changes needed, then re-run TestRunner
 │         (b) Gap has no spec mapping (dead code or untestable coupling) → TDD flags to Coordinator
 │             → Route to: Refactor Agent
-│                 Context: `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`,
+│                 Context: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`,
 │                          Coverage Gap List, specific uncovered files and line ranges, ADR constraints
 │                 After Refactor proposes seam extraction and human approves: dispatch Programmer,
 │                 then dispatch TDD to cover the newly testable units, then re-run TestRunner

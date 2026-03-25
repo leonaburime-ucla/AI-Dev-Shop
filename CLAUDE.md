@@ -13,7 +13,7 @@ Use the **Task tool** to dispatch each specialized agent. Include their `<AI_DEV
 To activate slash commands, copy the command files once:
 
 ```bash
-cp -r <AI_DEV_SHOP_ROOT>/slash-commands/ .claude/commands/
+cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
 ```
 
 Then type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, or `/audit-work` directly in chat. If you haven't done the copy yet, use Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md` — paste the template contents directly as a prompt.

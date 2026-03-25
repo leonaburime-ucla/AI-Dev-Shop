@@ -58,9 +58,9 @@ This stage should help the user learn options and choose intentionally, not rece
 
 ## Required Output
 
-Write one artifact using `<AI_DEV_SHOP_ROOT>/templates/system-blueprint-template.md` to:
+Write one artifact using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md` to:
 
-`<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<project-or-feature>/system-blueprint.md`
+`<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<project-or-feature>/system-blueprint.md`
 
 The output must include:
 

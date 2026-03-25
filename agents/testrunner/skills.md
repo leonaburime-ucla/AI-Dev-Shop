@@ -37,7 +37,7 @@ Execute the full verification suite after implementation and report trustworthy 
 
 ## Output Format
 
-Write run report to `<AI_DEV_SHOP_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`. Never overwrite a prior report — timestamp ensures each run is a separate artifact for the audit trail.
+Write run report to `<AI_DEV_SHOP_ROOT>/framework/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`. Never overwrite a prior report — timestamp ensures each run is a separate artifact for the audit trail.
 
 Report contents:
 - Suite-by-suite results (unit / integration / E2E / acceptance)

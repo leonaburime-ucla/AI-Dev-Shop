@@ -26,7 +26,9 @@ harness-engineering/
   context-offloading.md
   doc-staleness-policy.md
   doc-staleness-watchlist.md
+  evaluation-loops.md
   failure-promotion-policy.md
+  load-bearing-harness-audit.md
   observer-cadence.md
   registry-integrity-policy.md
   self-validation.md
@@ -62,6 +64,11 @@ harness-engineering/
 - A file-trigger routing table and context-firewall rules for cleaner discovery dispatch
 - A file-backed context-offloading rule for long logs, traces, and retry evidence
 - Stack-specific self-validation templates for downstream runtime checks
+- An independent-evaluator loop policy for skeptical QA, grading rubrics, and build contracts
+- Retained evaluator contract/report templates plus a validator that enforces them when `evaluator_mode: required` is declared in a progress ledger
+- A load-bearing audit policy for simplifying harnesses as models and hosts improve
+- A retained load-bearing audit template plus a validator for benchmark-driven maintenance reports
+- An explicit compaction-vs-reset rule for long-running sessions instead of treating resets as timeless defaults
 - A maintenance-report generator plus scheduled cleanup workflow support
 - A narrow doc-staleness watchlist plus advisory audit for high-risk source-of-truth docs
 
@@ -90,6 +97,8 @@ Run the validators individually:
 ```bash
 python3 harness-engineering/validators/validate_path_references.py
 python3 harness-engineering/validators/validate_registry_integrity.py
+python3 harness-engineering/validators/validate_evaluator_artifacts.py
+python3 harness-engineering/validators/validate_load_bearing_audits.py
 python3 harness-engineering/validators/doc_garden_audit.py
 ```
 
@@ -97,6 +106,7 @@ python3 harness-engineering/validators/doc_garden_audit.py
 
 - These validators currently check repository knowledge integrity, not application runtime behavior.
 - Self-validation templates live here, but the project-specific repo that uses this toolkit must still define the actual boot commands, health checks, critical-path assertions, and any richer static-analysis/runtime enforcement it wants. The bounded retry and optional sidecar-diagnosis rules live in `harness-engineering/self-validation.md`; the host project supplies the concrete commands those rules execute.
+- The evaluator-loop and load-bearing-audit validators only enforce retained artifact shape and declared presence. They do not prove that the evaluator or benchmark methodology itself was high quality.
 - Enterprise shift-left harnesses remain in `skills/enterprise-spec/`; this folder is the broader repo-level harness layer.
 - `AGENTS.md` reduction is intentionally tracked separately in `todo.md` so the harness layer can stabilize first.
 
@@ -104,7 +114,7 @@ python3 harness-engineering/validators/doc_garden_audit.py
 
 - OpenAI: `references/openai-harness-engineering.md`
 - OpenAI: `references/openai-practical-guide.md`
-- Anthropic: `references/anthropic-effective-harnesses.md`
+- Anthropic: `references/anthropic-harness-design-long-running-apps.md`
 - Anthropic: `references/anthropic-guardrails.md`
 - LangChain: `references/langchain-anatomy-agent-harness.md`
 - LangChain: `references/langchain-improving-deep-agents.md`

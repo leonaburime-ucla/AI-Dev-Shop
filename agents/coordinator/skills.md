@@ -17,9 +17,9 @@ Use these files as the source of truth instead of re-stating them here:
 
 - Startup copy, mode semantics, direct-mode rules, and shared agent rules: `<AI_DEV_SHOP_ROOT>/AGENTS.md`
 - Routing decision tree, convergence behavior, and cycle summary format: `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
-- Full pipeline stages and stage-by-stage context injection: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
-- Artifact locations and path rules: `<AI_DEV_SHOP_ROOT>/workflows/conventions.md`
-- State file, recovery, and retry lifecycle: `<AI_DEV_SHOP_ROOT>/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md`, `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`
+- Full pipeline stages and stage-by-stage context injection: `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`
+- Artifact locations and path rules: `<AI_DEV_SHOP_ROOT>/framework/workflows/conventions.md`
+- State file, recovery, and retry lifecycle: `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/recovery-playbook.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/job-lifecycle.md`
 - Memory write routing: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md`
 - Escalation policy: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/escalation-policy.md`
 - Plain-language explanation pattern: `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/plain-language-explanations.md`
@@ -47,8 +47,8 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
 4. Maintain pipeline state, job status, and resume safety using the workflow docs.
 5. Generate `tasks.md` after ADR approval and before TDD dispatch.
 6. Apply convergence limits and escalate to humans before retry loops become wasteful.
-7. Classify artifact intent before saving: pipeline-required artifacts go to `reports/`, optional retained reports ask first, and local-only scratch goes to `.local-artifacts/`.
-8. Keep retained project artifacts in `reports/`, local-only scratch artifacts in `.local-artifacts/`, and durable knowledge in `project-knowledge/`; do not write feature artifacts into toolkit source folders.
+7. Classify artifact intent before saving: pipeline-required artifacts go to `framework/reports/`, optional retained reports ask first, and local-only scratch goes to `.local-artifacts/`.
+8. Keep retained project artifacts in `framework/reports/`, local-only scratch artifacts in `.local-artifacts/`, and durable knowledge in `project-knowledge/`; do not write feature artifacts into toolkit source folders.
 9. For any delegated subagent, resolve the repo agent persona first and require the spawn prompt to bootstrap that persona via `<AI_DEV_SHOP_ROOT>/agents/<name>/skills.md`.
 10. Explain current work and routing decisions to users in plain language instead of assuming internal framework fluency.
 11. Use the file-trigger table and context-firewall rules to keep discovery and implementation routing clean.
@@ -100,11 +100,11 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 
 ## State, Memory, and Write Rules
 
-- Follow `<AI_DEV_SHOP_ROOT>/workflows/conventions.md` for artifact placement.
-- Follow `<AI_DEV_SHOP_ROOT>/workflows/pipeline-state-format.md` and `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md` for state and retry tracking.
+- Follow `<AI_DEV_SHOP_ROOT>/framework/workflows/conventions.md` for artifact placement.
+- Follow `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md` and `<AI_DEV_SHOP_ROOT>/framework/workflows/job-lifecycle.md` for state and retry tracking.
 - Follow `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md` before writing any memory entry.
 - If the user says "remember this" or similar, classify it, confirm destination, then write it to the correct project-knowledge file.
-- During normal feature work, do not modify `agents/`, `skills/`, `templates/`, or `workflows/` unless the user is explicitly asking to maintain the toolkit itself.
+- During normal feature work, do not modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/` unless the user is explicitly asking to maintain the toolkit itself.
 
 ## Special Coordinator Cases
 
@@ -112,7 +112,7 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 - If Programmer handoff reports `Architecture Audit = WARNING`, surface the violations to the user and ask whether to route back to Programmer for remediation or continue downstream with the warning recorded.
 - If Programmer handoff reports `Architecture Audit = BLOCKER`, pause routing and escalate to human or Architect based on whether the issue is ADR ambiguity or implementation drift against a hard constraint.
 - If a feature reaches Done and it is the 3rd completed feature since the last Observer pass, queue an Observer maintenance pass before closing the cycle completely.
-- If toolkit-maintenance work touches `AGENTS.md`, `agents/`, `skills/`, `workflows/`, `templates/`, or `harness-engineering/`, require an Observer/doc-garden pass before treating the change as complete.
+- If toolkit-maintenance work touches `AGENTS.md`, `agents/`, `skills/`, `framework/spec-providers/`, `framework/workflows/`, `framework/templates/`, `framework/slash-commands/`, or `harness-engineering/`, require an Observer/doc-garden pass before treating the change as complete.
 - If the same failure class appears twice or one cluster burns 3+ cycles, force a promotion decision: validator, benchmark, checklist, workflow rule, or skills update.
 - If a resumable run is missing `progress-ledger.md`, create or restore it before resuming.
 - If a programmer/test handoff lacks a valid pre-completion checklist, reject it and keep the job out of `DONE`.

@@ -107,11 +107,11 @@ Default packet path:
 
 Default dispatch copy path for peer-readable runs:
 
-` tmp/external-audit-dispatch/<timestamp>-audit-packet.md `
+` framework/reports/external-audit/dispatch/<timestamp>-audit-packet.md `
 
 If the user explicitly wants the packet retained as project evidence, save it instead at:
 
-` reports/external-audit/packets/<timestamp>-audit-packet.md `
+` framework/reports/external-audit/packets/<timestamp>-audit-packet.md `
 
 Packets are scratch by default unless the user explicitly asks to retain them.
 
@@ -123,8 +123,8 @@ Use `skills/llm-operations/references/peer-llm-dispatch.md` for the rule set.
 
 Dispatch workflow:
 
-1. Keep the authoring packet in `.local-artifacts/` or `reports/` according to the user's retention choice.
-2. If the peer needs to read a packet from disk, create a peer-readable dispatch copy first. For ad hoc local runs, default to `tmp/external-audit-dispatch/<timestamp>-audit-packet.md`.
+1. Keep the authoring packet in `.local-artifacts/` or `framework/reports/` according to the user's retention choice.
+2. If the peer needs to read a packet from disk, create a peer-readable dispatch copy first. For ad hoc local runs, default to `framework/reports/external-audit/dispatch/<timestamp>-audit-packet.md`.
 3. Probe readability before the full audit call by asking the peer to read the dispatch packet and echo the first Markdown heading.
 4. If the probe fails because the path is ignored, unreadable, or outside the peer workspace, classify it as `path_or_permission_failure`, move the dispatch copy, and retry once.
 5. Use the dispatch packet path, not the authoring packet path, in the actual audit prompt.
@@ -148,7 +148,7 @@ Prefer structured output when the CLI supports it.
 - Parse `stdout` only as the auditor answer.
 - Treat `stderr` as diagnostics.
 - Save raw stdout/stderr captures to `.local-artifacts/external-audit/offloads/` by default.
-- Only retain raw offloads in `reports/offloads/` if the user explicitly asks for retained evidence.
+- Only retain raw offloads in `framework/reports/offloads/` if the user explicitly asks for retained evidence.
 - Use host-specific references for auditor-specific transport quirks instead of restating them inline.
 
 Retry policy:
@@ -187,7 +187,7 @@ Use `skills/external-audit/references/external-audit-report-template.md` as the 
 2. Do not collapse the external audit into a prose blob.
 3. Before writing the final report to disk, if the user has not already specified retention, ask:
 
-`Save external audit report? Reply "save report" to retain it in reports/external-audit/runs/, "local only" to keep it in .local-artifacts/external-audit/runs/, or "inline only" for no file.`
+`Save external audit report? Reply "save report" to retain it in framework/reports/external-audit/runs/, "local only" to keep it in .local-artifacts/external-audit/runs/, or "inline only" for no file.`
 
 4. Default saved location for ad hoc runs:
 
@@ -195,7 +195,7 @@ Use `skills/external-audit/references/external-audit-report-template.md` as the 
 
 5. Retained location when the user explicitly wants to keep it:
 
-` reports/external-audit/runs/<timestamp>-external-audit-report.md `
+` framework/reports/external-audit/runs/<timestamp>-external-audit-report.md `
 
 6. The report must explicitly separate:
    - what the external LLM said it was auditing

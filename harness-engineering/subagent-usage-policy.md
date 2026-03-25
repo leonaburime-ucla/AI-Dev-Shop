@@ -6,6 +6,8 @@ This file defines when the framework should use spawned subagents, when it shoul
 
 When the current host verifies `subagent_spawning = enabled`, the framework should default to **subagent-assisted execution** for tasks that benefit from context isolation or safe parallelism.
 
+Capability enables that path. It does not make helper dispatch mandatory for every task.
+
 When the current host reports `unavailable` or `unverified`, the framework should default to **single-agent mode** and say so plainly.
 
 ## What "Subagent-Assisted" Means
@@ -34,6 +36,7 @@ It does **not** mean:
 
 - quick answers and small edits
 - narrow single-file or single-owner tasks
+- docs-only policy edits, small harness-maintenance changes, and narrow validator refinements
 - cheap follow-up fixes where spawn overhead would exceed the benefit
 - hosts where subagent support is unavailable or not yet verified
 

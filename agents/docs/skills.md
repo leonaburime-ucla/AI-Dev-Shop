@@ -15,18 +15,18 @@ Conditional skills are not standing context. Load them only when the requested d
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — load when extracting acceptance criteria, invariants, edge cases, or breaking-change scope from the spec
 
 ## Role
-Owns user-facing documentation output for the feature. Generates OpenAPI specs from `api.spec.md`, writes user guides, maintains `CHANGELOG.md`, and produces release notes from the ADR and spec. Does not write implementation code or specs.
+Owns user-facing documentation output for the feature. Generates OpenAPI specs from the provider-defined API contract surface when present, writes user guides, maintains `CHANGELOG.md`, and produces release notes from the ADR and planning surface. Does not write implementation code or specs.
 
 ## Required Inputs
-- Active spec (full content) — `feature.spec.md`, `api.spec.md`
-- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (architectural decisions worth surfacing in release notes)
-- `<AI_DEV_SHOP_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect user-facing behavior, e.g. new auth requirements)
+- Active provider-defined planning surface, plus any explicit API contract artifact if present
+- `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md` (architectural decisions worth surfacing in release notes)
+- `<AI_DEV_SHOP_ROOT>/framework/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect user-facing behavior, e.g. new auth requirements)
 - Existing `CHANGELOG.md` (to append correctly)
 - Coordinator directive specifying doc deliverables required for this feature
 
 ## Workflow
-1. Read api.spec.md — generate or update OpenAPI 3.x YAML spec from the endpoint definitions
-2. Read feature.spec.md — identify user-facing behavior changes worth documenting
+1. Read the provider-defined API contract surface if present — generate or update OpenAPI 3.x YAML spec from the endpoint definitions
+2. Read the provider-defined planning entrypoint — identify user-facing behavior changes worth documenting
 3. Read ADR — extract any architectural decisions that affect how users or integrators interact with the system
 4. Write or update user guide section for the feature
 5. Append CHANGELOG.md entry following Keep a Changelog format (Added/Changed/Deprecated/Removed/Fixed/Security)
@@ -36,11 +36,11 @@ Owns user-facing documentation output for the feature. Generates OpenAPI specs f
 ## Output Format
 - `openapi.yaml` or appended section in existing OpenAPI file (path confirmed with Coordinator)
 - Updated `CHANGELOG.md` with new entry at top of Unreleased section
-- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/release-notes.md` (one paragraph release notes + full change summary)
+- `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/release-notes.md` (one paragraph release notes + full change summary)
 - User guide file(s) (path confirmed with Coordinator based on project's doc structure)
 
 ## Escalation Rules
-- API behavior in implementation differs from api.spec.md → do not document the implementation, route to Spec Agent
+- API behavior in implementation differs from the provider-defined API contract surface → do not document the implementation, route to Spec Agent
 - Release notes require business context not in the spec → escalate to human for input
 - Breaking API change not flagged in spec → flag to Coordinator before documenting
 

@@ -1,6 +1,8 @@
 # Compatibility Matrix
 
-Maps AI Dev Shop (speckit) features to host environments. Use this before adopting a feature to know what usually works, then confirm unstable capabilities with the local capability probe instead of trusting the matrix blindly.
+Maps AI Dev Shop host capabilities to host environments. Use this before adopting a feature to know what usually works, then confirm unstable capabilities with the local capability probe instead of trusting the matrix blindly.
+
+Provider-specific planning behavior is not defined here. Resolve that from `framework/spec-providers/active-provider.md` and the matching provider profile.
 
 **Hosts covered:** Claude Code · Claude.ai (web) · Codex CLI · Gemini CLI · Generic LLM (prompt-only)
 Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
@@ -24,7 +26,7 @@ For the current environment, prefer the probe above plus `harness-engineering/ca
 | **Option B manual workflow** (paste template contents as prompt) | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
 | **Task tool / agent spawning** | ✅ Full | ❌ Not supported | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Not supported |
 | **Simulated multi-agent** (single session, roleplay stages) | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible |
-| **Filesystem reads** (specs/, project-knowledge/, templates/) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
+| **Filesystem reads** (provider-native spec roots such as `specs/`, `project-knowledge/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
 | **Filesystem writes** (state file, spec artifacts) | ✅ Native | ❌ Requires copy-out | ✅ Native | ✅ Native | ❌ Requires copy-out |
 | **Bash tool** (TestRunner: `npm test`, `pytest`, etc.) | ✅ Full | ❌ Not supported | ✅ Full | ⚠️ Limited | ❌ Not supported |
 | **SHA-256 content hashing** (spec hash, ADR hash) | ✅ Via Bash | ⚠️ Manual only | ✅ Via Bash | ✅ Via Bash | ⚠️ Manual only |
@@ -47,14 +49,14 @@ For the current environment, prefer the probe above plus `harness-engineering/ca
 All features work as documented. Slash commands require the one-time setup:
 
 ```bash
-cp -r <AI_DEV_SHOP_ROOT>/slash-commands/ .claude/commands/
+cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
 ```
 
 The Task tool enables true parallel agent dispatch and isolated context windows per agent. This is the recommended host for production use of this framework.
 
 ### Claude.ai (web)
 
-No Task tool, no slash commands, no filesystem access. All pipeline stages run in a single conversation with manual routing. Use Option B: paste the contents of `slash-commands/<command>.md` directly as your message.
+No Task tool, no slash commands, no filesystem access. All pipeline stages run in a single conversation with manual routing. Use Option B: paste the contents of `framework/slash-commands/<command>.md` directly as your message.
 
 For SHA-256 hashes, compute manually using your OS shell or a web tool and paste the result into the artifact. Pipeline state file must be maintained by copy-pasting the current state into a local file between sessions.
 

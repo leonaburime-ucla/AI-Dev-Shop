@@ -16,6 +16,19 @@ import sys
 import time
 from pathlib import Path
 
+MAX_TRANSIENT_RETRIES = 2
+INITIAL_BACKOFF_SECONDS = 5
+TRANSIENT_FAILURE_MARKERS = (
+    "429",
+    "503",
+    "rate limit",
+    "rate-limit",
+    "capacity",
+    "temporarily unavailable",
+    "try again later",
+    "overloaded",
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -56,6 +69,16 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def write_output_text(path: Path, value: str | bytes | None) -> None:
+    if value is None:
+        text = ""
+    elif isinstance(value, bytes):
+        text = value.decode("utf-8", errors="replace")
+    else:
+        text = value
+    path.write_text(text)
+
+
 def run_command(
     cmd: list[str],
     timeout_seconds: int,
@@ -71,13 +94,13 @@ def run_command(
             timeout=timeout_seconds,
         )
         elapsed = time.monotonic() - start
-        stdout_path.write_text(completed.stdout)
-        stderr_path.write_text(completed.stderr)
+        write_output_text(stdout_path, completed.stdout)
+        write_output_text(stderr_path, completed.stderr)
         return completed, elapsed, None
     except subprocess.TimeoutExpired as exc:
         elapsed = time.monotonic() - start
-        stdout_path.write_text(exc.stdout or "")
-        stderr_path.write_text(exc.stderr or "")
+        write_output_text(stdout_path, exc.stdout)
+        write_output_text(stderr_path, exc.stderr)
         return None, elapsed, "timeout"
 
 
@@ -88,12 +111,169 @@ def parse_json_result(raw: str) -> dict | None:
         return None
 
 
+def quoted(value: str) -> str:
+    return json.dumps(value)
+
+
+def extract_models(payload: dict | None) -> list[str]:
+    if not isinstance(payload, dict):
+        return []
+    model_usage = payload.get("modelUsage", {})
+    if isinstance(model_usage, dict):
+        return [str(key) for key in model_usage.keys()]
+    return []
+
+
+def attempt_path(base: Path, attempt: int) -> Path:
+    if attempt == 0:
+        return base
+    return base.with_name(f"{base.stem}.retry{attempt}{base.suffix}")
+
+
+def is_transient_failure(stdout: str, stderr: str, returncode: int) -> bool:
+    if returncode == 0:
+        return False
+    combined = f"{stdout}\n{stderr}".lower()
+    return any(marker in combined for marker in TRANSIENT_FAILURE_MARKERS)
+
+
+def run_command_with_transient_retries(
+    cmd: list[str],
+    timeout_budget_seconds: int,
+    stdout_path: Path,
+    stderr_path: Path,
+    max_retries: int = MAX_TRANSIENT_RETRIES,
+) -> tuple[
+    subprocess.CompletedProcess[str] | None,
+    float,
+    str | None,
+    list[dict[str, object]],
+]:
+    start = time.monotonic()
+    attempts: list[dict[str, object]] = []
+
+    for attempt in range(max_retries + 1):
+        remaining_seconds = max(1, int(timeout_budget_seconds - (time.monotonic() - start)))
+        current_stdout = attempt_path(stdout_path, attempt)
+        current_stderr = attempt_path(stderr_path, attempt)
+        completed, elapsed, failure = run_command(
+            cmd,
+            remaining_seconds,
+            current_stdout,
+            current_stderr,
+        )
+        total_elapsed = time.monotonic() - start
+        attempt_record: dict[str, object] = {
+            "attempt": attempt + 1,
+            "stdout_path": str(current_stdout),
+            "stderr_path": str(current_stderr),
+            "elapsed_seconds": round(elapsed, 2),
+            "timeout_seconds": remaining_seconds,
+            "failure": failure,
+        }
+        if completed is not None:
+            attempt_record["returncode"] = completed.returncode
+            attempt_record["stdout_length"] = len(completed.stdout)
+            attempt_record["stderr_length"] = len(completed.stderr)
+        attempts.append(attempt_record)
+
+        if failure == "timeout":
+            return None, total_elapsed, "timeout", attempts
+
+        if completed is None:
+            return None, total_elapsed, "malformed_or_no_output", attempts
+
+        if not is_transient_failure(completed.stdout, completed.stderr, completed.returncode):
+            return completed, total_elapsed, None, attempts
+
+        attempts[-1]["failure"] = "capacity_or_rate_limit"
+        if attempt >= max_retries:
+            return completed, total_elapsed, "capacity_or_rate_limit", attempts
+
+        remaining_after = timeout_budget_seconds - (time.monotonic() - start)
+        if remaining_after <= 1:
+            return completed, total_elapsed, "capacity_or_rate_limit", attempts
+
+        backoff_seconds = min(
+            INITIAL_BACKOFF_SECONDS * (2**attempt),
+            max(0, int(remaining_after) - 1),
+        )
+        attempts[-1]["backoff_seconds"] = backoff_seconds
+        if backoff_seconds > 0:
+            time.sleep(backoff_seconds)
+
+    return None, time.monotonic() - start, "capacity_or_rate_limit", attempts
+
+
+def extract_file_paths_from_packet(packet: Path) -> list[str]:
+    text = packet.read_text()
+    in_table = False
+    paths: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped == "## Files And Artifacts":
+            in_table = True
+            continue
+        if in_table and stripped.startswith("## "):
+            break
+        if not in_table or not stripped.startswith("|"):
+            continue
+        if stripped.startswith("| Path |") or stripped.startswith("|---|"):
+            continue
+        columns = [column.strip() for column in stripped.strip("|").split("|")]
+        if not columns:
+            continue
+        path = columns[0].strip().strip("`")
+        if path:
+            paths.append(path)
+    return paths
+
+
+def build_probe_prompt(dispatch: Path) -> str:
+    return (
+        f"Read the file at path {quoted(str(dispatch))} and return exactly the first "
+        "Markdown heading line, nothing else."
+    )
+
+
+def build_audit_prompt(dispatch: Path) -> str:
+    return (
+        f"Read the packet at path {quoted(str(dispatch))} and inspect only the files "
+        "listed in its Files And Artifacts section using Read. Follow the packet's "
+        "Auditor Instructions exactly."
+    )
+
+
+def build_text_retry_prompt(dispatch: Path, file_paths: list[str]) -> str:
+    if file_paths:
+        file_block = "\n".join(f"- {quoted(path)}" for path in file_paths)
+        file_instruction = f"Inspect only these listed files:\n{file_block}\n"
+    else:
+        file_instruction = (
+            "Inspect only the files named in the packet's Files And Artifacts section.\n"
+        )
+    return (
+        f"Read the packet at path {quoted(str(dispatch))}. "
+        "This is a bounded retry after an empty JSON audit result.\n"
+        f"{file_instruction}"
+        "Use Read only. Do not review the wider repo. Return plain text with exactly "
+        "these sections:\n"
+        "## Auditor Scope Check\n"
+        "## Findings (Ordered by Severity)\n"
+        "## Blockers vs. Optional Improvements\n"
+        "## What Looks Solid and Should Stay Unchanged\n"
+        "If any listed path is unreadable, say so in Auditor Scope Check and continue "
+        "with the rest."
+    )
+
+
 def main() -> int:
     args = parse_args()
 
     packet = Path(args.packet)
     dispatch = Path(args.dispatch)
     offload_prefix = Path(args.offload_prefix)
+    packet_file_paths = extract_file_paths_from_packet(packet)
 
     dispatch.parent.mkdir(parents=True, exist_ok=True)
     offload_prefix.parent.mkdir(parents=True, exist_ok=True)
@@ -111,7 +291,7 @@ def main() -> int:
         offload_prefix.name + "-audit.text-retry.stderr.txt"
     )
     text_result = offload_prefix.with_name(
-        offload_prefix.name + "-audit.text-retry.result.md"
+        offload_prefix.name + "-audit.text-retry.result.txt"
     )
 
     summary: dict[str, object] = {
@@ -121,141 +301,161 @@ def main() -> int:
         "offload_prefix": str(offload_prefix),
     }
 
-    probe_prompt = (
-        f"Read the file at {dispatch} and return exactly the first Markdown heading "
-        "line, nothing else."
-    )
-    probe_cmd = ["claude", "-p", "--output-format", "json", probe_prompt]
-    probe_completed, probe_elapsed, probe_failure = run_command(
-        probe_cmd,
-        args.probe_timeout_seconds,
-        probe_stdout,
-        probe_stderr,
-    )
-    summary["probe"] = {
-        "elapsed_seconds": round(probe_elapsed, 2),
-        "failure": probe_failure,
-    }
-    if probe_failure:
-        summary["status"] = "probe_failed"
-        print(json.dumps(summary, indent=2))
-        return 1
+    try:
+        probe_cmd = ["claude", "-p", "--output-format", "json", build_probe_prompt(dispatch)]
+        probe_completed, probe_elapsed, probe_failure, probe_attempts = (
+            run_command_with_transient_retries(
+                probe_cmd,
+                args.probe_timeout_seconds,
+                probe_stdout,
+                probe_stderr,
+                max_retries=1,
+            )
+        )
+        summary["probe"] = {
+            "elapsed_seconds": round(probe_elapsed, 2),
+            "failure": probe_failure,
+            "attempts": probe_attempts,
+        }
+        if probe_failure:
+            summary["status"] = "probe_failed"
+            print(json.dumps(summary, indent=2))
+            return 1
 
-    probe_payload = parse_json_result(probe_completed.stdout)
-    if probe_completed.returncode != 0 or not probe_payload or not probe_payload.get("result"):
-        summary["status"] = "probe_failed"
+        probe_payload = parse_json_result(probe_completed.stdout)
+        if (
+            probe_completed.returncode != 0
+            or not probe_payload
+            or not probe_payload.get("result")
+        ):
+            summary["status"] = "probe_failed"
+            summary["probe"] |= {
+                "returncode": probe_completed.returncode,
+                "result_length": len(probe_completed.stdout),
+            }
+            print(json.dumps(summary, indent=2))
+            return 1
+
+        probe_models = extract_models(probe_payload)
         summary["probe"] |= {
             "returncode": probe_completed.returncode,
-            "result_length": len(probe_completed.stdout),
+            "result": probe_payload.get("result", ""),
+            "model": probe_models[0] if probe_models else None,
+            "models": probe_models,
         }
-        print(json.dumps(summary, indent=2))
-        return 1
 
-    summary["probe"] |= {
-        "returncode": probe_completed.returncode,
-        "result": probe_payload.get("result", ""),
-        "model": next(iter(probe_payload.get("modelUsage", {})), None),
-    }
-
-    audit_prompt = (
-        f"Read {dispatch} and inspect only the files listed in its Files And Artifacts "
-        "section using Read. Follow the packet's Auditor Instructions exactly."
-    )
-    audit_cmd = [
-        "claude",
-        "-p",
-        "--allowedTools",
-        "Read",
-        "--output-format",
-        "json",
-        "--",
-        audit_prompt,
-    ]
-    audit_completed, audit_elapsed, audit_failure = run_command(
-        audit_cmd,
-        args.timeout_seconds,
-        audit_stdout,
-        audit_stderr,
-    )
-    summary["audit"] = {
-        "elapsed_seconds": round(audit_elapsed, 2),
-        "failure": audit_failure,
-    }
-    if audit_failure == "timeout":
-        summary["status"] = "timeout"
-        print(json.dumps(summary, indent=2))
-        return 1
-
-    raw_stdout = audit_completed.stdout
-    audit_payload = parse_json_result(raw_stdout)
-    if audit_completed.returncode != 0 or not audit_payload:
-        summary["status"] = "malformed_or_no_output"
-        summary["audit"] |= {
-            "returncode": audit_completed.returncode,
-            "stdout_length": len(raw_stdout),
-            "stderr_length": len(audit_completed.stderr),
-        }
-        print(json.dumps(summary, indent=2))
-        return 1
-
-    result_text = audit_payload.get("result", "")
-    summary["audit"] |= {
-        "returncode": audit_completed.returncode,
-        "stdout_length": len(raw_stdout),
-        "stderr_length": len(audit_completed.stderr),
-        "num_turns": audit_payload.get("num_turns"),
-        "model": next(iter(audit_payload.get("modelUsage", {})), None),
-    }
-
-    if result_text:
-        audit_result.write_text(result_text)
-        summary["status"] = "responded"
-        summary["audit"]["result_path"] = str(audit_result)
-        summary["audit"]["result_length"] = len(result_text)
-    else:
-        text_cmd = [
+        audit_cmd = [
             "claude",
             "-p",
             "--allowedTools",
             "Read",
+            "--output-format",
+            "json",
             "--",
-            audit_prompt,
+            build_audit_prompt(dispatch),
         ]
-        text_completed, text_elapsed, text_failure = run_command(
-            text_cmd,
-            min(args.text_retry_timeout_seconds, args.timeout_seconds),
-            text_stdout,
-            text_stderr,
+        audit_completed, audit_elapsed, audit_failure, audit_attempts = (
+            run_command_with_transient_retries(
+                audit_cmd,
+                args.timeout_seconds,
+                audit_stdout,
+                audit_stderr,
+            )
         )
-        summary["text_retry"] = {
-            "elapsed_seconds": round(text_elapsed, 2),
-            "failure": text_failure,
-            "timeout_seconds": min(args.text_retry_timeout_seconds, args.timeout_seconds),
+        summary["audit"] = {
+            "elapsed_seconds": round(audit_elapsed, 2),
+            "failure": audit_failure,
+            "attempts": audit_attempts,
         }
-        if text_failure == "timeout":
-            summary["status"] = "empty_result_transport_failure"
-        else:
-            text_output = text_completed.stdout
-            summary["text_retry"] |= {
-                "returncode": text_completed.returncode,
-                "stdout_length": len(text_output),
-                "stderr_length": len(text_completed.stderr),
+        if audit_failure == "timeout":
+            summary["status"] = "timeout"
+            print(json.dumps(summary, indent=2))
+            return 1
+        if audit_failure == "capacity_or_rate_limit":
+            summary["status"] = "capacity_or_rate_limit"
+            print(json.dumps(summary, indent=2))
+            return 1
+
+        raw_stdout = audit_completed.stdout
+        audit_payload = parse_json_result(raw_stdout)
+        if audit_completed.returncode != 0 or not audit_payload:
+            summary["status"] = "malformed_or_no_output"
+            summary["audit"] |= {
+                "returncode": audit_completed.returncode,
+                "stdout_length": len(raw_stdout),
+                "stderr_length": len(audit_completed.stderr),
             }
-            if text_completed.returncode == 0 and text_output.strip():
-                text_result.write_text(text_output)
-                summary["status"] = "responded_text_retry"
-                summary["text_retry"]["result_path"] = str(text_result)
-            else:
+            print(json.dumps(summary, indent=2))
+            return 1
+
+        result_text = audit_payload.get("result", "")
+        audit_models = extract_models(audit_payload)
+        summary["audit"] |= {
+            "returncode": audit_completed.returncode,
+            "stdout_length": len(raw_stdout),
+            "stderr_length": len(audit_completed.stderr),
+            "num_turns": audit_payload.get("num_turns"),
+            "model": audit_models[0] if audit_models else None,
+            "models": audit_models,
+        }
+
+        if result_text:
+            audit_result.write_text(result_text)
+            summary["status"] = "responded"
+            summary["audit"]["result_path"] = str(audit_result)
+            summary["audit"]["result_length"] = len(result_text)
+        else:
+            text_cmd = [
+                "claude",
+                "-p",
+                "--allowedTools",
+                "Read",
+                "--",
+                build_text_retry_prompt(dispatch, packet_file_paths),
+            ]
+            text_completed, text_elapsed, text_failure, text_attempts = (
+                run_command_with_transient_retries(
+                    text_cmd,
+                    min(args.text_retry_timeout_seconds, args.timeout_seconds),
+                    text_stdout,
+                    text_stderr,
+                    max_retries=1,
+                )
+            )
+            summary["text_retry"] = {
+                "elapsed_seconds": round(text_elapsed, 2),
+                "failure": text_failure,
+                "timeout_seconds": min(
+                    args.text_retry_timeout_seconds, args.timeout_seconds
+                ),
+                "attempts": text_attempts,
+            }
+            if text_failure == "timeout":
                 summary["status"] = "empty_result_transport_failure"
+            elif text_failure == "capacity_or_rate_limit":
+                summary["status"] = "capacity_or_rate_limit"
+            else:
+                text_output = text_completed.stdout
+                summary["text_retry"] |= {
+                    "returncode": text_completed.returncode,
+                    "stdout_length": len(text_output),
+                    "stderr_length": len(text_completed.stderr),
+                }
+                if text_completed.returncode == 0 and text_output.strip():
+                    text_result.write_text(text_output)
+                    summary["status"] = "responded_text_retry"
+                    summary["text_retry"]["result_path"] = str(text_result)
+                else:
+                    summary["status"] = "empty_result_transport_failure"
 
-    if not args.retain_dispatch:
-        try:
-            dispatch.unlink()
-        except FileNotFoundError:
-            pass
-
-    print(json.dumps(summary, indent=2))
-    return 0 if summary["status"] in {"responded", "responded_text_retry"} else 1
+        print(json.dumps(summary, indent=2))
+        return 0 if summary["status"] in {"responded", "responded_text_retry"} else 1
+    finally:
+        if not args.retain_dispatch:
+            try:
+                dispatch.unlink()
+            except FileNotFoundError:
+                pass
 
 
 if __name__ == "__main__":

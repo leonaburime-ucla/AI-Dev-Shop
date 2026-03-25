@@ -64,7 +64,7 @@ def check_reference(path_text: str) -> bool:
         return True
     if path_text.startswith("specs/"):
         return True
-    if path_text.startswith("reports/"):
+    if path_text.startswith("framework/reports/"):
         base_name = Path(path_text).name
         stem = Path(path_text).stem
         if not path_text.endswith(".md"):

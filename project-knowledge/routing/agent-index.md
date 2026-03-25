@@ -8,7 +8,7 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | System Blueprint (optional, pre-spec) | Macro-level system planning and spec decomposition before feature specs | `agents/system-blueprint/skills.md` |
 | Coordinator | Pipeline orchestration, routing, convergence, human escalation | `agents/coordinator/skills.md` |
 | Skills Librarian (optional) | Centralized external skill discovery, audit, and canonical merge governance | `agents/skills-librarian/skills.md` |
-| Spec | Converts intent into versioned, testable spec packages | `agents/spec/skills.md` |
+| Spec | Converts intent into versioned, testable provider-defined planning artifacts | `agents/spec/skills.md` |
 | Architect | Selects patterns, defines boundaries, produces ADR | `agents/architect/skills.md` |
 | TDD | Writes certified test suite before implementation | `agents/tdd/skills.md` |
 | Programmer | Implements code to satisfy certified tests | `agents/programmer/skills.md` |

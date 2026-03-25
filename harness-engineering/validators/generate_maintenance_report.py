@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-REPORT = ROOT / "reports/maintenance/harness-maintenance.md"
+REPORT = ROOT / "framework/reports/maintenance/harness-maintenance.md"
 EXPECTED_BENCHMARK_DIRS = [
     "spec-agent",
     "architect-agent",
@@ -34,7 +34,7 @@ def count_lines(path: Path) -> int:
 
 
 def count_benchmark_samples(agent_dir: str) -> int:
-    path = ROOT / "reports/benchmarks" / agent_dir
+    path = ROOT / "framework/reports/benchmarks" / agent_dir
     if not path.exists():
         return 0
     return len([child for child in path.iterdir() if child.is_dir()])

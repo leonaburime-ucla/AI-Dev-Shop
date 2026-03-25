@@ -19,7 +19,7 @@ def count_agent_skill_files() -> int:
 
 
 def count_benchmark_samples() -> int:
-    return len([path for path in (ROOT / "reports/benchmarks").glob("*/*") if path.is_dir()])
+    return len([path for path in (ROOT / "framework/reports/benchmarks").glob("*/*") if path.is_dir()])
 
 
 def count_trigger_rows() -> int:

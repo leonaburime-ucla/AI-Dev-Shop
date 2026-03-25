@@ -10,14 +10,14 @@
 
 **Reference files:**
 - Design doc: `project-knowledge/maintainers/guides/2026-02-22-speckit-integration-design.md`
-- Source inspiration: `<spec-kit>/templates/` (GitHub's spec-kit repo)
+- Source inspiration: `<spec-kit>/framework/templates/` (GitHub's spec-kit repo)
 
 ---
 
-## Task 1: Create `templates/bootstrap/constitution-template.md`
+## Task 1: Create `framework/templates/bootstrap/constitution-template.md`
 
 **Files:**
-- Create: `templates/bootstrap/constitution-template.md`
+- Create: `framework/templates/bootstrap/constitution-template.md`
 
 **Step 1: Create the file**
 
@@ -138,7 +138,7 @@ Copy this file to `project-knowledge/governance/constitution.md`. Fill in each a
 
 **Step 2: Verify**
 
-Open `templates/bootstrap/constitution-template.md` and confirm:
+Open `framework/templates/bootstrap/constitution-template.md` and confirm:
 - All 8 Article placeholders are present
 - Governance section includes the blocking escalation rule
 - Amendment log table is present
@@ -146,7 +146,7 @@ Open `templates/bootstrap/constitution-template.md` and confirm:
 **Step 3: Commit**
 
 ```bash
-git add templates/bootstrap/constitution-template.md
+git add framework/templates/bootstrap/constitution-template.md
 git commit -m "feat: add constitution-template.md"
 ```
 
@@ -282,10 +282,10 @@ git commit -m "feat: add default project constitution"
 
 ---
 
-## Task 3: Create `templates/research-template.md`
+## Task 3: Create `framework/templates/research-template.md`
 
 **Files:**
-- Create: `templates/research-template.md`
+- Create: `framework/templates/research-template.md`
 
 Produced by the Architect Agent before writing the ADR when the spec involves library or technology choices. Stored in `<AI_DEV_SHOP_ROOT>/specs/` alongside the ADR.
 
@@ -363,7 +363,7 @@ Any unresolved questions that could affect the decision:
 
 **Step 2: Verify**
 
-Open `templates/research-template.md` and confirm:
+Open `framework/templates/research-template.md` and confirm:
 - Candidate evaluation section covers version, license, maintenance, compatibility, performance, security
 - Decision section maps to spec requirements
 - Constitution Article I check is present in the decision
@@ -371,16 +371,16 @@ Open `templates/research-template.md` and confirm:
 **Step 3: Commit**
 
 ```bash
-git add templates/research-template.md
+git add framework/templates/research-template.md
 git commit -m "feat: add research-template.md"
 ```
 
 ---
 
-## Task 4: Create `templates/tasks-template.md`
+## Task 4: Create `framework/templates/tasks-template.md`
 
 **Files:**
-- Create: `templates/tasks-template.md`
+- Create: `framework/templates/tasks-template.md`
 
 Produced by the Coordinator after ADR approval, before TDD dispatch. Uses `[P]` markers for parallelizable tasks. Stored in `<AI_DEV_SHOP_ROOT>/specs/` alongside the spec and ADR.
 
@@ -483,7 +483,7 @@ Cross-cutting improvements after all required stories are complete.
 
 **Step 2: Verify**
 
-Open `templates/tasks-template.md` and confirm:
+Open `framework/templates/tasks-template.md` and confirm:
 - [P] marker explanation is present
 - Phase 0/1/2/3/N structure present
 - Checkpoint annotations after Phase 1 and each story phase
@@ -492,16 +492,16 @@ Open `templates/tasks-template.md` and confirm:
 **Step 3: Commit**
 
 ```bash
-git add templates/tasks-template.md
+git add framework/templates/tasks-template.md
 git commit -m "feat: add tasks-template.md with [P] parallelization markers"
 ```
 
 ---
 
-## Task 5: Modify `templates/spec-template.md`
+## Task 5: Modify `framework/templates/spec-template.md`
 
 **Files:**
-- Modify: `templates/spec-template.md`
+- Modify: `framework/templates/spec-template.md`
 
 Add: feature number (FEAT-001), `[NEEDS CLARIFICATION]` instruction, P1/P2/P3 priority on ACs, Constitution Compliance section.
 
@@ -591,21 +591,21 @@ Any EXCEPTION requires a justification entry in the ADR's Complexity Justificati
 
 **Step 4: Verify**
 
-Read `templates/spec-template.md` and confirm all three additions are present.
+Read `framework/templates/spec-template.md` and confirm all three additions are present.
 
 **Step 5: Commit**
 
 ```bash
-git add templates/spec-template.md
+git add framework/templates/spec-template.md
 git commit -m "feat: enhance spec-template with FEAT number, [NEEDS CLARIFICATION], P1/P2/P3, constitution compliance"
 ```
 
 ---
 
-## Task 6: Modify `templates/adr-template.md`
+## Task 6: Modify `framework/templates/adr-template.md`
 
 **Files:**
-- Modify: `templates/adr-template.md`
+- Modify: `framework/templates/adr-template.md`
 
 Add: Constitution Check gate at top, Complexity Justification table, Research Summary field.
 
@@ -663,7 +663,7 @@ Insert before it:
 
 **Step 3: Verify**
 
-Read `templates/adr-template.md` and confirm:
+Read `framework/templates/adr-template.md` and confirm:
 - Constitution Check table appears before Context
 - Research Summary field is present
 - Complexity Justification table appears before Related Decisions
@@ -671,7 +671,7 @@ Read `templates/adr-template.md` and confirm:
 **Step 4: Commit**
 
 ```bash
-git add templates/adr-template.md
+git add framework/templates/adr-template.md
 git commit -m "feat: enhance adr-template with constitution check gate, complexity justification, research summary"
 ```
 
@@ -784,21 +784,21 @@ Find:
 3. Select primary pattern and optional secondary patterns. Justify against system drivers.
 4. Define module/service boundaries and explicit contracts.
 5. Identify parallelizable slices and sequence plan.
-6. Write ADR using `<AI_DEV_SHOP_ROOT>/templates/adr-template.md`. Store in `<AI_DEV_SHOP_ROOT>/specs/`.
+6. Write ADR using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Store in `<AI_DEV_SHOP_ROOT>/specs/`.
 7. Publish architecture decision as a constraint for all downstream agents.
 ```
 
 Replace with:
 ```
 ## Workflow
-0. **Research** (conditional): If the spec involves library or technology choices (any requirement that implies selecting a library, framework, storage system, or messaging system), produce `<AI_DEV_SHOP_ROOT>/specs/RESEARCH-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/templates/research-template.md` before proceeding. Skip this step only if the spec has no technology choices.
+0. **Research** (conditional): If the spec involves library or technology choices (any requirement that implies selecting a library, framework, storage system, or messaging system), produce `<AI_DEV_SHOP_ROOT>/specs/RESEARCH-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md` before proceeding. Skip this step only if the spec has no technology choices.
 1. **Constitution Check**: Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For each article, determine if the proposed architecture complies. For any violation: either (a) revise the architecture to comply, or (b) document a justified exception in the ADR's Complexity Justification table. An unjustified violation is a blocking escalation — do not proceed to Step 2.
 2. Review requirements and classify system drivers (complexity, scale, coupling, release cadence) using the framework in `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 3. Evaluate candidate patterns from the pattern catalog.
 4. Select primary pattern and optional secondary patterns. Justify against system drivers.
 5. Define module/service boundaries and explicit contracts.
 6. Identify parallelizable slices and sequence plan. These become the basis for `tasks.md` (produced by Coordinator after ADR approval).
-7. Write ADR using `<AI_DEV_SHOP_ROOT>/templates/adr-template.md`. Complete the Constitution Check table and Research Summary field. Store in `<AI_DEV_SHOP_ROOT>/specs/`.
+7. Write ADR using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Complete the Constitution Check table and Research Summary field. Store in `<AI_DEV_SHOP_ROOT>/specs/`.
 8. Publish architecture decision as a constraint for all downstream agents.
 ```
 
@@ -868,7 +868,7 @@ Replace with:
 2. Verify each output includes the full handoff contract (input refs, output summary, risks, suggested next).
 3. Build routing plan for this cycle using the decision tree in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`.
 4. Dispatch to agents with explicit scope, constraints, and deliverables. Include `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` in every Spec Agent and Architect Agent dispatch.
-5. After ADR is human-approved: generate `<AI_DEV_SHOP_ROOT>/specs/TASKS-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md`. Base the phase structure and [P] markers on the ADR's parallel delivery plan. Dispatch TDD Agent only after tasks.md is produced.
+5. After ADR is human-approved: generate `<AI_DEV_SHOP_ROOT>/specs/TASKS-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md`. Base the phase structure and [P] markers on the ADR's parallel delivery plan. Dispatch TDD Agent only after tasks.md is produced.
 6. Apply convergence policy — advance or escalate, never loop indefinitely.
 7. Publish cycle summary.
 ```
@@ -913,10 +913,10 @@ git commit -m "feat: add constitution injection, tasks.md generation, and consti
 
 ---
 
-## Task 10: Modify `workflows/multi-agent-pipeline.md`
+## Task 10: Modify `framework/workflows/multi-agent-pipeline.md`
 
 **Files:**
-- Modify: `workflows/multi-agent-pipeline.md`
+- Modify: `framework/workflows/multi-agent-pipeline.md`
 
 Add constitution.md to context injection tables, research.md as Architect output, tasks.md generation step, constitution check documentation.
 
@@ -984,8 +984,8 @@ Replace with:
 - Relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files (Coordinator selects based on system drivers in spec)
 
 **Architect outputs (in order):**
-1. `<AI_DEV_SHOP_ROOT>/specs/RESEARCH-<spec-id>.md` (if spec has technology choices) — using `<AI_DEV_SHOP_ROOT>/templates/research-template.md`
-2. `<AI_DEV_SHOP_ROOT>/specs/ADR-<id>.md` — using `<AI_DEV_SHOP_ROOT>/templates/adr-template.md` (includes Constitution Check table and Complexity Justification)
+1. `<AI_DEV_SHOP_ROOT>/specs/RESEARCH-<spec-id>.md` (if spec has technology choices) — using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md`
+2. `<AI_DEV_SHOP_ROOT>/specs/ADR-<id>.md` — using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md` (includes Constitution Check table and Complexity Justification)
 ```
 
 **Step 4: Add tasks.md generation step between Architect and TDD**
@@ -1000,7 +1000,7 @@ Insert before it:
 ```
 ### Coordinator: tasks.md Generation (after ADR human approval, before TDD dispatch)
 
-The Coordinator generates `<AI_DEV_SHOP_ROOT>/specs/TASKS-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md`:
+The Coordinator generates `<AI_DEV_SHOP_ROOT>/specs/TASKS-<spec-id>.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md`:
 - Phases derived from the ADR's parallel delivery plan
 - `[P]` markers based on the ADR's independent module boundaries
 - Story phases ordered by AC priority (P1 first)
@@ -1026,12 +1026,12 @@ Replace with:
 
 **Step 6: Verify**
 
-Read `workflows/multi-agent-pipeline.md` and confirm all five edits are present.
+Read `framework/workflows/multi-agent-pipeline.md` and confirm all five edits are present.
 
 **Step 7: Commit**
 
 ```bash
-git add workflows/multi-agent-pipeline.md
+git add framework/workflows/multi-agent-pipeline.md
 git commit -m "feat: update pipeline with constitution, research.md, tasks.md generation step"
 ```
 
@@ -1048,12 +1048,12 @@ Add slash commands section.
 
 Find:
 ```
-Full pipeline reference: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
+Full pipeline reference: `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`
 ```
 
 Replace with:
 ```
-Full pipeline reference: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
+Full pipeline reference: `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`
 
 ## Slash Commands
 
@@ -1181,7 +1181,7 @@ Expected: 12 commits, one per task.
 
 Confirm new files exist:
 ```bash
-ls "<AI_DEV_SHOP_ROOT>/templates/"
+ls "<AI_DEV_SHOP_ROOT>/framework/templates/"
 ls "<AI_DEV_SHOP_ROOT>/project-knowledge/"
 ```
 

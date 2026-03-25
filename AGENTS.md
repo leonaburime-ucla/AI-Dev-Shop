@@ -95,7 +95,7 @@ The minimum startup rule still holds: confirm `<AI_DEV_SHOP_ROOT>`, start existi
 Operator entrypoints live in `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/pipeline-quickstart.md`.
 
 - Claude Code: slash commands are the preferred entrypoint.
-- Codex CLI, Gemini CLI, Claude.ai, and generic LLM hosts use the matching `slash-commands/*.md` template content manually.
+- Codex CLI, Gemini CLI, Claude.ai, and generic LLM hosts use the matching `framework/slash-commands/*.md` template content manually.
 - Keep the command surface thin at the root; expand details in the quickstart doc instead of here.
 
 ---
@@ -148,7 +148,7 @@ Required bootstrap steps:
 2. Instruct the spawned subagent to read the canonical persona file before any work:
    `Read <AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md before any work.`
 3. Explicitly name any task-activated conditional skills for that task.
-4. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`.
+4. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`.
 5. Require the subagent to stop and report if the persona file is missing or unreadable.
 6. Require the subagent to confirm in its first reply that the persona file was loaded.
 
@@ -160,14 +160,15 @@ Apply the detailed delegated naming and validity guard in `<AI_DEV_SHOP_ROOT>/sk
 ## Shared Rules (All Agents)
 
 - **Specs are ground truth.** Downstream work must reference the active spec version and hash.
+- **Spec provider is explicit.** Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` before assuming filenames, commands, or readiness gates for the spec surface.
 - **The constitution governs architecture.** Spec, Red-Team, and Architect must use `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
 - **`[NEEDS CLARIFICATION]` blocks Architect dispatch.**
 - **The handoff contract is mandatory.** Every artifact includes inputs used, output summary, risks, and suggested next assignee.
-- **Framework source files are read-only during normal feature work.** Use `reports/`, `.local-artifacts/`, and `project-knowledge/` as the writable project workspace unless maintaining the toolkit itself.
-- **Classify artifact intent before saving.** Required pipeline artifacts go to `reports/` automatically. Optional retained reports require an explicit user save choice. Scratch prompts, raw logs, temporary captures, and other session-only artifacts go to `.local-artifacts/` by default.
+- **Framework source files are read-only during normal feature work.** Use `framework/reports/`, `.local-artifacts/`, and `project-knowledge/` as the writable project workspace unless maintaining the toolkit itself.
+- **Classify artifact intent before saving.** Required pipeline artifacts go to `framework/reports/` automatically. Optional retained reports require an explicit user save choice. Scratch prompts, raw logs, temporary captures, and other session-only artifacts go to `.local-artifacts/` by default.
 - **Fix upstream intent, not downstream drift.** If code, tests, or architecture diverge from the spec, route the issue back to the owning stage instead of patching around it.
 - **Evidence over invention.** Do not present guesses or memory as fact; if a claim is not grounded in inspected artifacts, tool output, or cited sources, mark uncertainty or say you do not know. See `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/anti-hallucination-policy.md`.
-- **Debug mode exists.** Toggle with `debug on` / `debug off`; see `<AI_DEV_SHOP_ROOT>/workflows/trace-schema.md`.
+- **Debug mode exists.** Toggle with `debug on` / `debug off`; see `<AI_DEV_SHOP_ROOT>/framework/workflows/trace-schema.md`.
 
 ---
 
@@ -175,11 +176,12 @@ Apply the detailed delegated naming and validity guard in `<AI_DEV_SHOP_ROOT>/sk
 
 Use these files for operating detail instead of expanding this file:
 
+- Spec-provider contract and active provider selection: `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`, `<AI_DEV_SHOP_ROOT>/framework/spec-providers/core/provider-contract.md`, `<AI_DEV_SHOP_ROOT>/framework/spec-providers/core/provider-selection.md`
 - Pipeline startup, command entrypoints, and checkpoints: `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/pipeline-quickstart.md`
 - Startup block wording and layout: `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/startup-info.md`
 - Plain-language explanation pattern for users: `<AI_DEV_SHOP_ROOT>/project-knowledge/operations/plain-language-explanations.md`
 - Capability verification and subagent defaulting: `<AI_DEV_SHOP_ROOT>/harness-engineering/capability-verification.md`, `<AI_DEV_SHOP_ROOT>/harness-engineering/subagent-usage-policy.md`
-- Pipeline flow and stage context: `<AI_DEV_SHOP_ROOT>/workflows/multi-agent-pipeline.md`
+- Pipeline flow and stage context: `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`
 - Coordinator behavior and routing guardrails: `<AI_DEV_SHOP_ROOT>/agents/coordinator/skills.md`
 - Routing decision tree and cycle summary format: `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
 - Convergence and escalation policy: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/escalation-policy.md`
@@ -187,8 +189,8 @@ Use these files for operating detail instead of expanding this file:
 - Knowledge routing and memory writes: `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/knowledge-routing.md`
 - Session continuity and resume ledger rules: `<AI_DEV_SHOP_ROOT>/harness-engineering/session-continuity.md`
 - Pre-completion and loop-detection tripwires: `<AI_DEV_SHOP_ROOT>/harness-engineering/tripwires.md`
-- Path and artifact conventions: `<AI_DEV_SHOP_ROOT>/workflows/conventions.md`
-- Pipeline state and job lifecycle: `<AI_DEV_SHOP_ROOT>/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`, `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md`
+- Path and artifact conventions: `<AI_DEV_SHOP_ROOT>/framework/workflows/conventions.md`
+- Pipeline state and job lifecycle: `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/job-lifecycle.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/recovery-playbook.md`
 - Agent roster and persona entrypoints: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/agent-index.md`
 - Skills registry: `<AI_DEV_SHOP_ROOT>/project-knowledge/routing/skills-registry.md`
 - Golden sample handoff chain: `<AI_DEV_SHOP_ROOT>/project-knowledge/examples/golden-sample/README.md`

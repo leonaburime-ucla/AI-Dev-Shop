@@ -51,7 +51,7 @@ Do not assume every peer CLI can read every local path.
 - Generic OS temp paths such as `/tmp` may be outside the peer's allowed workspace.
 - Default pattern:
   - write the authoring packet to `.local-artifacts/`
-  - create a peer-readable dispatch copy in a visible workspace path such as `tmp/<workflow>-dispatch/`
+  - create a peer-readable dispatch copy in a visible workspace path such as `framework/reports/<workflow>/dispatch/`
   - give the peer the dispatch copy path, not the authoring path
 - If needed, create a dispatch copy inside:
   - the repo workspace, if the peer can read it there, or
@@ -84,7 +84,7 @@ While the peer process is still running:
 
 Dispatch copies are transport artifacts, not primary evidence.
 
-- Keep the authoring packet in `.local-artifacts/` or `reports/` according to the user's retention choice.
+- Keep the authoring packet in `.local-artifacts/` or `framework/reports/` according to the user's retention choice.
 - Delete temporary dispatch copies after the peer run finishes unless the user explicitly asks to retain them.
 - If the dispatch copy is retained temporarily for troubleshooting, say so and clean it up before closing the task when feasible.
 

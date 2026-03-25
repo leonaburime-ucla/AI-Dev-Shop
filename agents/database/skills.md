@@ -24,7 +24,7 @@ Coordinator receives any task involving: schema design, data modeling, migration
 
 ## Required Inputs
 - Active spec file (full content + hash) — must be human-approved, zero unresolved [NEEDS CLARIFICATION] markers
-- ADR (if architectural decisions have already been made) from `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
+- ADR (if architectural decisions have already been made) from `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`
 - Target platform (Supabase, raw Postgres, RDS, Railway, etc.) — if known
 - Existing schema or migration history (if modifying an existing database)
 - Coordinator routing directive with explicit scope
@@ -56,7 +56,7 @@ Coordinator receives any task involving: schema design, data modeling, migration
 
 ## Output Format
 
-Write all artifacts to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/db-model.md`.
+Write all artifacts to `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/db-model.md`.
 
 - **Data model**: Entity list with attributes, types, and constraints; ERD description (entity relationships and cardinality); normalization rationale; denormalization decisions with justification
 - **Migration plan**: Ordered list of schema changes, classified as additive / destructive / data-transforming; rollback steps for each destructive change; estimated lock duration for high-traffic tables

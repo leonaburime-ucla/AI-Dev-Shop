@@ -51,7 +51,7 @@ Prefer enforceable structure over reminder text:
 
 - Routing rules -> `skills/coordination/SKILL.md`
 - Per-agent execution -> `agents/<name>/skills.md`
-- Stage contracts/context injection -> `workflows/multi-agent-pipeline.md`
+- Stage contracts/context injection -> `framework/workflows/multi-agent-pipeline.md`
 - Project-wide guardrails -> `project-knowledge/governance/constitution.md`
 - Human escalation policy -> `project-knowledge/governance/escalation-policy.md`
 
