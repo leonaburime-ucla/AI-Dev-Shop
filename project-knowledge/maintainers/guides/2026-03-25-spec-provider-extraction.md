@@ -20,9 +20,10 @@ This keeps the AI Dev Shop pipeline reusable while letting the repo default to S
 
 ## Provider Model
 
-- `speckit` is the validated default provider
-- `openspec` is scaffolded as an adapter profile
-- `bmad` is scaffolded as an adapter profile
+- `speckit` is the default provider and is now source-grounded against the upstream Spec Kit repo
+- `speckit` is still exercised here through an AI Dev Shop compatibility flow rather than a literal upstream `.specify/` installation
+- `openspec` is source-grounded against the upstream OpenSpec repo but not yet tested end-to-end in this repo
+- `bmad` is source-grounded against the upstream BMAD-METHOD repo but not yet tested end-to-end in this repo
 
 OpenSpec and BMAD are intentionally marked untested in this repo until they complete real feature runs here.
 
@@ -38,16 +39,16 @@ AI Dev Shop core still owns:
 
 ## Migration Strategy
 
-This change does not delete the current Speckit-oriented files under `framework/templates/` and `framework/slash-commands/`.
+This change localizes the Speckit compatibility implementation under `framework/spec-providers/speckit/`.
 
 Instead:
 - `framework/spec-providers/` becomes the source of truth for provider identity and mapping
-- legacy Speckit paths remain as compatibility shims
-- core docs are updated to resolve the provider boundary first
+- `framework/spec-providers/speckit/compatibility.md` owns the strict package flow, validator path, and read sets
+- provider-local templates and validators live under the Speckit provider folder
+- core docs are updated to resolve the provider boundary first and reference provider-local assets
 
 ## Follow-Up Work
 
-- move more Speckit-only implementation details physically under `framework/spec-providers/speckit/`
 - validate one end-to-end OpenSpec run
 - validate one end-to-end BMAD run
 - add automated translator helpers if provider switching becomes common

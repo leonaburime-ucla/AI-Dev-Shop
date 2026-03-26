@@ -27,7 +27,7 @@ Every spec must include:
 **Header Metadata**
 ```
 Spec ID:      SPEC-001
-Version:      1.2
+Version:      1.2.0
 Last Edited:  2026-02-21T14:00:00Z
 Hash:         sha256:<hash of canonical content>
 ```
@@ -182,6 +182,8 @@ A spec is ready when:
 
 In strict mode, a spec is a PACKAGE, not a single file. A feature that enters the delivery pipeline in strict mode must have all required files present and complete before any downstream agent (TDD, Architect, Programmer) is dispatched.
 
+When the active provider is `speckit`, the authoritative AI Dev Shop-local contract is `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`.
+
 **Required files for a strict-mode spec package:**
 
 | File | Purpose |
@@ -194,6 +196,7 @@ In strict mode, a spec is a PACKAGE, not a single file. A feature that enters th
 | `errors.spec.md` | All error types, codes, messages, and the conditions that produce them |
 | `behavior.spec.md` | Behavioral narratives: end-to-end user journeys and system behavior in plain language |
 | `traceability.spec.md` | Requirement-to-test mapping: each REQ/AC traced to the test(s) that verify it |
+| `spec-manifest.md` | Package index: actual filenames, omitted files, stage read set, and naming convention |
 | `spec-dod.md` | Definition-of-Done checklist with evidence (not just checked boxes) |
 
 **DoD checklist requirement**: Each item in `spec-dod.md` must include evidence of completion — a reference to the specific requirement, test name, or artifact that satisfies it. Checked boxes with no evidence are not accepted.
@@ -211,6 +214,8 @@ Example of compliant usage: "The system must return HTTP 422 with body `{ error:
 **Implementation-readiness test**: Before a strict-mode spec package is approved, apply this test: can a competent developer who has never seen this project implement the feature from these spec files alone, without asking any clarifying questions? If the answer is no — because something is missing, ambiguous, or requires assumed context — the spec is not done.
 
 **Reference**: `<AI_DEV_SHOP_ROOT>/project-knowledge/quality/spec-definition-of-done.md` is the authoritative checklist template for strict-mode spec packages.
+
+**Mechanical validation**: when Python is available, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec-folder>` before handoff. Treat any non-zero exit code as a blocking failure.
 
 ## Brownfield / Legacy Code Rule
 

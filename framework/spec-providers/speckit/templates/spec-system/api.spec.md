@@ -1,6 +1,6 @@
 # API Contract Spec: <feature-name>
 
-SPEC PACKAGE FILE: `framework/templates/spec-system/api.spec.md`
+SPEC PACKAGE FILE: `framework/spec-providers/speckit/templates/spec-system/api.spec.md`
 
 - Spec ID: `SPEC-<NNN>`
 - Feature: `FEAT-<NNN>-<short-feature-name>`

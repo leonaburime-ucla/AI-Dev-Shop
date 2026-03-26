@@ -1,6 +1,6 @@
 # Orchestrator Contract Spec: <feature-name>
 
-SPEC PACKAGE FILE: `framework/templates/spec-system/orchestrator.spec.md`
+SPEC PACKAGE FILE: `framework/spec-providers/speckit/templates/spec-system/orchestrator.spec.md`
 
 - Spec ID: `SPEC-<NNN>`
 - Feature: `FEAT-<NNN>-<short-feature-name>`

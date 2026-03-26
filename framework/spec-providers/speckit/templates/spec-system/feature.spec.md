@@ -1,7 +1,7 @@
 # Feature Spec: <feature-name>
 
-<!-- SPEC PACKAGE FILE: framework/templates/spec-system/feature.spec.md -->
-<!-- Part of the spec-system package. See framework/templates/spec-system/ for all required files. -->
+<!-- SPEC PACKAGE FILE: framework/spec-providers/speckit/templates/spec-system/feature.spec.md -->
+<!-- Part of the spec-system package. See framework/spec-providers/speckit/templates/spec-system/ for all required files. -->
 
 ---
 
@@ -11,7 +11,7 @@
 |-------|-------|
 | spec_id | SPEC-<NNN> |
 | version | <semver — e.g., 1.0.0; major for scope changes, minor for clarifications, patch for typo fixes> |
-| status | DRAFT \| IN-REVIEW \| APPROVED \| SUPERSEDED \| DEPRECATED |
+| status | DRAFT \| REVIEW \| APPROVED \| SUPERSEDED |
 | content_hash | <sha256 of all content below this metadata block — recompute on every edit> |
 | feature_name | FEAT-<NNN>-<short-feature-name> |
 | last_edited | <ISO-8601 UTC — e.g., 2026-02-23T14:00:00Z> |
@@ -166,7 +166,7 @@ The Spec Agent completes this. The Coordinator verifies before routing.
 
 - [ ] spec_id assigned and unique (verified against existing `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/` folders)
 - [ ] version set to correct semver
-- [ ] status set to APPROVED (not DRAFT or IN-REVIEW)
+- [ ] status set to APPROVED (not DRAFT or REVIEW)
 - [ ] content_hash computed and matches content below header block
 - [ ] feature_name matches the FEAT folder name exactly
 - [ ] Zero `[NEEDS CLARIFICATION]` markers remain in this file
@@ -181,9 +181,10 @@ The Spec Agent completes this. The Coordinator verifies before routing.
 - [ ] Constitution Compliance table complete — all 8 articles marked COMPLIES / EXCEPTION / N/A
 - [ ] Scope: in-scope list present and non-empty
 - [ ] Scope: out-of-scope list present and non-empty
-- [ ] Full spec-system package present: api.spec.md, state.spec.md, ui.spec.md, errors.spec.md (as applicable)
+- [ ] Full spec-system package present: all `PRESENT` files listed in spec-manifest.md exist
 - [ ] behavior.spec.md complete (if feature has non-trivial ordering or precedence rules)
 - [ ] traceability.spec.md complete (after implementation — or marked "pending implementation")
+- [ ] spec-manifest.md complete — all 10 logical files listed with `PRESENT` or `OMITTED` and concrete reasons
 - [ ] spec-dod.md filled and all items PASS
 
 **Gate result:** PASS / FAIL — <summary if FAIL>

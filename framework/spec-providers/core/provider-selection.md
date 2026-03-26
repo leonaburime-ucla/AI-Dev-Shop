@@ -13,17 +13,19 @@ Use `speckit` unless one of the following is true:
 ## Selection Heuristic
 
 Choose `speckit` when:
-- you want the strict multi-file spec package already native to this repo
-- you want the least migration risk
-- you need the most validated path in this toolkit today
+- you want the least migration risk in this repo today
+- the project is already aligned with the current AI Dev Shop default path
+- you are willing to treat this repo's current Speckit support as a compatibility layer informed by upstream Spec Kit, not as a literal `.specify/` clone
 
 Choose `openspec` when:
-- the project already works from proposal/specs/design/tasks folders
-- you want a lighter native planning surface and are comfortable translating it into AI Dev Shop downstream stages
+- the project already has `openspec/config.yaml`, `openspec/specs/`, and active change folders
+- you want OpenSpec's change-folder and schema-driven workflow model
+- you are comfortable operating on a provider that is source-grounded here but not yet exercised end-to-end in this repo
 
 Choose `bmad` when:
-- the project already works from PRD/architecture/story artifacts
-- story-driven planning is the natural handoff surface
+- the project already has `_bmad/`, `_bmad-output/`, and generated BMad skills
+- story-driven implementation and sprint sequencing are the natural handoff surface
+- you are willing to record the selected BMAD track and output folder explicitly because BMAD is installer- and module-defined
 
 ## Mid-Feature Switching Rule
 
@@ -36,6 +38,6 @@ If a feature already has approved planning artifacts:
 
 ## Validation Rule
 
-Only `speckit` is validated end-to-end in this repo today.
-
-`openspec` and `bmad` are intentionally scaffolded here as reusable provider profiles, but they should be treated as untested in this repo until a maintainer completes a real feature run with each one.
+- `speckit` is the only default provider currently exercised in this repo, and even that path is an AI Dev Shop compatibility flow rather than a literal upstream install
+- `openspec` and `bmad` are now source-grounded against cloned upstream repos, but they remain untested end-to-end in this repo
+- do not claim a provider is fully validated here until a maintainer completes a real feature run and records the outcome

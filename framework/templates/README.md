@@ -4,12 +4,11 @@ This directory contains the foundational document templates used by the AI Dev S
 
 Provider note:
 - the active upstream planning provider is resolved from `framework/spec-providers/active-provider.md`
-- the files in `framework/templates/` currently serve as the validated Speckit compatibility surface
-- non-Speckit providers should resolve their planning contract from `framework/spec-providers/<provider>/provider.md` before assuming any file in this directory is canonical for that run
+- provider-owned planning templates live under `framework/spec-providers/<provider>/`
+- do not assume any file in this directory is the planning surface for the active run unless the provider contract says so
 
 ## Subdirectories
 
-- **`spec-system/`**: Contains the strict-mode 9-file spec package templates. This is the modern, multi-file approach to specification (replaces the legacy single-file `spec-template.md`).
 - **`bootstrap/`**: Contains initialization templates intended to be copied into a new project's workspace (e.g., the base constitution template) rather than used directly in the pipeline.
 - **`self-validation/`**: Stack-specific runtime validation templates for downstream repos that need app boot, log inspection, and critical-path checks before handoff.
 

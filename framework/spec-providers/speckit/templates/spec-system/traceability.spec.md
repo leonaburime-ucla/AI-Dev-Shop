@@ -1,7 +1,7 @@
 # Traceability Matrix: <feature-name>
 
-<!-- SPEC PACKAGE FILE: framework/templates/spec-system/traceability.spec.md -->
-<!-- Part of the spec-system package. See framework/templates/spec-system/ for all required files. -->
+<!-- SPEC PACKAGE FILE: framework/spec-providers/speckit/templates/spec-system/traceability.spec.md -->
+<!-- Part of the spec-system package. See framework/spec-providers/speckit/templates/spec-system/ for all required files. -->
 
 ---
 

@@ -1,6 +1,6 @@
 # Error Code Registry Spec: <feature-name>
 
-SPEC PACKAGE FILE: `framework/templates/spec-system/errors.spec.md`
+SPEC PACKAGE FILE: `framework/spec-providers/speckit/templates/spec-system/errors.spec.md`
 
 - Spec ID: `SPEC-<NNN>`
 - Feature: `FEAT-<NNN>-<short-feature-name>`

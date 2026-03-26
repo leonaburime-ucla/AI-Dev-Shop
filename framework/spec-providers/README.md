@@ -17,10 +17,19 @@ framework/spec-providers/
     provider-selection.md
   speckit/
     provider.md
+    compatibility.md
+    templates/spec-system/...
+    validators/validate_spec_package.py
   openspec/
     provider.md
+    compatibility.md
+    templates/...
+    validators/validate_openspec_package.py
   bmad/
     provider.md
+    compatibility.md
+    templates/...
+    validators/validate_bmad_package.py
 ```
 
 ## Core Rule
@@ -32,7 +41,10 @@ At minimum, every provider must define:
 - what supporting planning artifacts are part of the spec surface
 - where unresolved clarification decisions live
 - what artifact proves planning readiness
+- what upstream install/runtime model the repo is assuming
 - how that provider maps into AI Dev Shop's downstream Architect, TDD, and Programmer stages
+
+Read `framework/spec-providers/core/provider-contract.md` before editing any provider file.
 
 ## Default
 
@@ -43,10 +55,13 @@ Current default:
 
 ## Current Status
 
-- `speckit` is the only provider exercised end-to-end in this repo today.
-- `openspec` is scaffolded here but not yet tested end-to-end in this repo.
-- `bmad` is scaffolded here but not yet tested end-to-end in this repo.
+- `speckit` is source-grounded against the upstream Spec Kit repo and remains the default provider.
+- `speckit` is exercised in this repo through a compatibility flow, not through a literal upstream `.specify/` project checkout.
+- `openspec` is now source-grounded against the upstream repo, but it has not been tested end-to-end in this repo yet.
+- `bmad` is now source-grounded against the upstream repo, but it has not been tested end-to-end in this repo yet.
 
-## Compatibility Shims
+## Single Source of Truth Rule
 
-This refactor introduces a provider boundary first. Existing Speckit-oriented files under `framework/templates/` and `framework/slash-commands/` remain in place as compatibility shims while the rest of the toolkit is migrated to read from this folder.
+Each provider's `compatibility.md` is the authoritative operational contract for that provider. It owns the package shape, workflow steps, clarification rules, stage read sets, validation command, and readiness gate.
+
+Slash commands and agent skills must REFERENCE that file, not duplicate its rules. If provider-specific workflow behavior changes, update `compatibility.md` first. Core workflow files route to the active provider's compatibility contract — they do not inline provider-specific file lists, gate conditions, or step sequences.

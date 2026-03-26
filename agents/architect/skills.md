@@ -28,6 +28,7 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 ## Required Inputs
 - Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
 - Active provider-defined spec entrypoint (full content + hash) — must be human-approved, zero unresolved clarification blockers
+- For Speckit: `spec-manifest.md` plus every `PRESENT` file in the strict package, not just `feature.spec.md`
 - `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced — use domain ownership boundaries and core/foundation sequencing)
 - `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`
 - Non-functional constraints (scale, reliability, latency, cost)
@@ -39,7 +40,7 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 - `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as a draft architectural recommendation; validate or refine the proposed target pattern in the ADR rather than accepting it uncritically)
 
 ## Workflow
-0. Read the active provider profile, then produce `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
+0. Read the active provider profile. For Speckit, apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`. Produce `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
 1. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
 2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files.
 3. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.

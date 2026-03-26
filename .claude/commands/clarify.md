@@ -2,11 +2,12 @@ You are the Spec Agent performing a clarification pass on the active feature spe
 
 $ARGUMENTS
 
-1. Identify the active feature by reading `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/.pipeline-state.md` (the most recent folder, or as specified above). The `spec_path` field records where the spec files live.
-2. Read `<spec_path>/spec-manifest.md` if present to determine the actual feature spec filename, then read that feature spec file. If `spec-manifest.md` is absent, fall back to `<spec_path>/feature.spec.md`.
-3. Extract all `[NEEDS CLARIFICATION: ...]` markers from the spec.
-4. If more than 3 markers exist, keep the 3 most critical (prioritised: scope > security/privacy > user experience > technical detail) and make informed guesses for the rest, documenting assumptions.
-5. For each remaining marker, present a structured question:
+1. Read `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and the matching provider profile.
+2. Identify the active feature by reading `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md` (the most recent folder, or as specified above).
+3. Resolve the clarification surface from the active provider. Follow the Clarification Rules section in `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`.
+4. Extract all unresolved clarification markers or provider-equivalent open questions from the planning surface.
+5. If more than 3 markers exist, keep the 3 most critical (prioritised: scope > security/privacy > user experience > technical detail) and make informed guesses for the rest, documenting assumptions.
+6. For each remaining marker, present a structured question:
 
 ---
 
@@ -26,8 +27,9 @@ $ARGUMENTS
 
 ---
 
-6. Present all questions together. Wait for the human to respond (e.g., "Q1: A, Q2: Custom — [details]").
-7. For each answer: replace the `[NEEDS CLARIFICATION: ...]` marker in the spec with the resolved text.
-8. Re-validate the affected items in `<spec_path>/spec-dod.md`. Update DoD pass/fail status and any notes impacted by the clarification.
-9. Recompute the spec content hash.
-10. Output: updated spec path, list of resolved markers, updated DoD status, readiness for `/plan`.
+7. Present all questions together. Wait for the human to respond (e.g., "Q1: A, Q2: Custom — [details]").
+8. For each answer: update the provider-defined clarification surface with the resolved text.
+9. Re-validate the provider-defined readiness artifact per the active provider's compatibility contract at `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`.
+10. Recompute the spec content hash.
+11. When Python is available, run the active provider's validator (path in `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`). Treat any non-zero exit code as blocking until repaired.
+12. Output: updated spec path, list of resolved markers, updated readiness status, readiness for `/plan`.

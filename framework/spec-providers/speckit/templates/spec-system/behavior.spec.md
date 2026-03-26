@@ -1,7 +1,7 @@
 # Behavior Rules Spec: <feature-name>
 
-<!-- SPEC PACKAGE FILE: framework/templates/spec-system/behavior.spec.md -->
-<!-- Part of the spec-system package. See framework/templates/spec-system/ for all required files. -->
+<!-- SPEC PACKAGE FILE: framework/spec-providers/speckit/templates/spec-system/behavior.spec.md -->
+<!-- Part of the spec-system package. See framework/spec-providers/speckit/templates/spec-system/ for all required files. -->
 
 ---
 

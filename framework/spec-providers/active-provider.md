@@ -32,6 +32,6 @@ If switching mid-feature, do not silently swap formats. Create a translation or 
 
 ## Current Availability
 
-- `speckit`: validated in this repo
-- `openspec`: available as a scaffolded provider profile, not tested end-to-end in this repo yet
-- `bmad`: available as a scaffolded provider profile, not tested end-to-end in this repo yet
+- `speckit`: default provider, source-grounded against upstream Spec Kit, exercised here through an AI Dev Shop compatibility flow rather than a literal `.specify/` installation
+- `openspec`: source-grounded against upstream OpenSpec, selectable only with explicit human intent, not yet tested end-to-end in this repo
+- `bmad`: source-grounded against upstream BMAD-METHOD, selectable only with explicit human intent, not yet tested end-to-end in this repo

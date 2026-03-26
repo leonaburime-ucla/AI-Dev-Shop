@@ -68,8 +68,9 @@ Then:
 4. Resolve the planned auditor model using this order:
    - per-run override naming an exact model/version
    - saved user preference naming an exact model/version
+   - documented model IDs in `skills/swarm-consensus/references/cli-smoke-test.md` (the canonical source for locally verified peer model names)
    - local CLI or config evidence that proves the exact model/version
-5. If the exact planned model/version is not explicitly pinned or locally proven, stop before dispatch and ask:
+5. If the exact planned model/version is not resolved by any source above, stop before dispatch and ask:
 
 `Planned auditor CLI: <CLI>. Exact model/version is not proven locally. Reply with auditor=... and claude_model=..., gemini_model=..., or codex_model=... using an exact model name/version to proceed.`
 

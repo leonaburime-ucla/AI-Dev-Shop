@@ -4,9 +4,9 @@ $ARGUMENTS
 
 The tasks.md is ready. Run the implementation pipeline:
 
-1. Verify prerequisites: read `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/.pipeline-state.md` — confirm `spec_path` is set, ADR exists at `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md`, tasks.md exists at `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/tasks.md`.
+1. Verify prerequisites: read `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md` — confirm `spec_entrypoint_path` is set, ADR exists at `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md`, tasks.md exists at `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/tasks.md`.
 2. Dispatch **TDD Agent** with:
-   - Spec: path from `spec_path` in `.pipeline-state.md` (full content + hash)
+   - Spec: path from `spec_entrypoint_path` in `pipeline-state.md` (full content + hash)
    - ADR: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md`
    - Tasks: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/tasks.md`
    - Skill: `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`

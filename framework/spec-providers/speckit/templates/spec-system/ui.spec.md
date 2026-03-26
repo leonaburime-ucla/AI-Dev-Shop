@@ -1,6 +1,6 @@
 # UI Contract Spec: <feature-name>
 
-SPEC PACKAGE FILE: `framework/templates/spec-system/ui.spec.md`
+SPEC PACKAGE FILE: `framework/spec-providers/speckit/templates/spec-system/ui.spec.md`
 
 - Spec ID: `SPEC-<NNN>`
 - Feature: `FEAT-<NNN>-<short-feature-name>`

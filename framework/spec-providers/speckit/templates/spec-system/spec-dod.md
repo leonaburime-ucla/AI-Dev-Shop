@@ -1,7 +1,7 @@
 # Spec Definition of Done (DoD) Checklist: <feature-name>
 
-<!-- SPEC PACKAGE FILE: framework/templates/spec-system/spec-dod.md -->
-<!-- Part of the spec-system package. See framework/templates/spec-system/ for all required files. -->
+<!-- SPEC PACKAGE FILE: framework/spec-providers/speckit/templates/spec-system/spec-dod.md -->
+<!-- Part of the spec-system package. See framework/spec-providers/speckit/templates/spec-system/ for all required files. -->
 
 ---
 
@@ -58,7 +58,7 @@
 |---|------|--------|-------|
 | B-01 | `spec_id` is assigned and unique (verified against existing `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/` folders) | | |
 | B-02 | `version` is set to correct semver (1.0.0 for new specs) | | |
-| B-03 | `status` is APPROVED (not DRAFT or IN-REVIEW) | | |
+| B-03 | `status` is APPROVED (not DRAFT or REVIEW) | | |
 | B-04 | `content_hash` is computed and recorded — matches sha256 of content below the header block | | |
 | B-05 | `feature_name` matches the FEAT folder name exactly (case-sensitive) | | |
 | B-06 | `last_edited` is a valid ISO-8601 UTC timestamp | | |

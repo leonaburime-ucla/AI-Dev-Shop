@@ -110,6 +110,7 @@ If that retry falls back to plain text, keep the fallback on a shorter bounded t
 
 - Pin the model when the user requests it or when reproducibility matters.
 - If the workflow promises exact model reporting, do not dispatch on an inferred or alias-only model. Require an explicit or locally proven exact model name/version before running.
+- When resolving model names, always check `skills/swarm-consensus/references/cli-smoke-test.md` for documented model IDs before falling back to CLI probes or asking the user. That file is the canonical source for locally verified peer model names/versions.
 - Keep the ask explicit: what to inspect, what to ignore, what output shape to return.
 - Require strengths as well as findings so the user sees what should stay unchanged.
 

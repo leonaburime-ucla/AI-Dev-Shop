@@ -62,7 +62,7 @@ Optional but recommended:
 
 ```
 <user-specified>/<NNN>-<feature-name>/
-  feature.spec.md          (canonical spec — use framework/templates/spec-system/feature.spec.md)
+  feature.spec.md          (canonical spec — use framework/spec-providers/speckit/templates/spec-system/feature.spec.md)
   api.spec.md              (typed API contracts — if applicable)
   state.spec.md            (state shapes and transitions — if applicable)
   orchestrator.spec.md     (orchestrator output model — if applicable)

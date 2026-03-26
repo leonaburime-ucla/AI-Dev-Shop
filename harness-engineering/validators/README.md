@@ -15,7 +15,6 @@ These validators are the first mechanical enforcement layer for this repo.
   - fails when a `progress-ledger.md` marks `evaluator_mode: required` but no retained evaluator contract is recorded
 - `validate_load_bearing_audits.py`
   - checks retained `framework/reports/maintenance/harness-load-bearing-*.md` reports for required sections and decision labels
-
 ## Advisory Audit
 
 - `doc_garden_audit.py`
@@ -51,6 +50,19 @@ Resolve startup mode for the current host:
 ```bash
 bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>
 ```
+
+Validate a Speckit package before planning:
+
+```bash
+python3 framework/spec-providers/speckit/validators/validate_spec_package.py <spec-folder>
+```
+
+Provider-local validator:
+
+- `framework/spec-providers/speckit/validators/validate_spec_package.py`
+  - validates the strict Speckit compatibility package
+  - checks required files, unresolved clarification markers, manifest integrity, traceability seeding, and DoD completion
+  - intended as a targeted pre-handoff validator before `/plan`, not as a repo-wide `run-all.sh` check
 
 ## Error Format
 

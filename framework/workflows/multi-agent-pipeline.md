@@ -159,22 +159,7 @@ Coordinator cannot dispatch Architect until ALL of the following pass:
 - Traceability or equivalent planning coverage has no known gaps
 - Implementation-readiness gate passed
 
-For the default Speckit provider, the compatibility gate also requires:
-- Full package exists at the `spec_path` recorded in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`:
-  - `feature.spec.md`
-  - `api.spec.md`
-  - `state.spec.md`
-  - `orchestrator.spec.md`
-  - `ui.spec.md`
-  - `errors.spec.md`
-  - `behavior.spec.md`
-  - `traceability.spec.md`
-  - `spec-dod.md`
-- `spec-dod.md`: all items PASS or NA
-- Zero unresolved [NEEDS CLARIFICATION] markers
-- No banned vague language violations
-- Traceability matrix has no gaps
-- Implementation-readiness gate passed
+For the default Speckit provider, apply the compatibility gate defined in `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`.
 
 Reference: `<AI_DEV_SHOP_ROOT>/project-knowledge/quality/spec-definition-of-done.md`
 
@@ -182,6 +167,7 @@ Reference: `<AI_DEV_SHOP_ROOT>/project-knowledge/quality/spec-definition-of-done
 - `framework/spec-providers/active-provider.md`
 - `framework/spec-providers/<active-provider>/provider.md`
 - Active provider-defined spec entrypoint (full content + hash) — must be human-approved, zero unresolved clarification blockers
+- For Speckit: apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` before ADR work begins
 - Red-Team findings from `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (all ADVISORY and CONSTITUTION-FLAG findings; BLOCKING findings mean spec is not yet ready for Architect)
 - `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` (for Step 0 constitution check)
 - Current system boundaries (existing ADRs in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/`)
