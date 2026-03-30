@@ -110,7 +110,7 @@ For each peer, record:
 
 - `requested_model`: what the run asked for, if anything
 - `resolved_model`: the exact model ID proven from CLI config/output, if available
-- `selection_source`: `per_run_override`, `saved_preference`, `local_default`, `alias_assumption`, or `unknown`
+- `selection_source`: `per_run_override`, `saved_preference`, `local_default`, `alias_assumption`, `smoke_test_discovery`, or `unknown`
 
 If any peer model is not explicitly pinned for the current run, or the exact resolved model ID cannot be proven, pause before dispatch and tell the user:
 
@@ -123,6 +123,19 @@ Use this pattern:
 `Planned peer models: Claude=<resolved-or-inferred>, Gemini=<resolved-or-inferred>, Codex=<resolved-or-inferred>. Reply with "run" to proceed or override with claude_model=..., gemini_model=..., codex_model=....`
 
 Do not silently upgrade a peer to a newly released model family/version just because it exists. If a newer model may be better, tell the user and let them choose.
+
+If the Claude peer model is requested but not yet proven locally, or the CLI rejects the requested model name, do not keep guessing manually. Run the smoke-test harness in discovery mode first:
+
+```bash
+python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
+  --discover-claude \
+  --claude-model <requested-or-saved-model> \
+  --claude-require json \
+  --output-format json
+```
+
+Use the discovered `winner.model` only when it is the same requested family/version and it passed locally in JSON mode. If discovery finds only a different family/version, stop and ask the user before switching.
+A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
 
 ### Freshness policy
 
@@ -149,6 +162,7 @@ By default, save ad hoc smoke-test artifacts to `.local-artifacts/swarm-consensu
 If the user explicitly wants a retained host baseline in the repo, set `--artifacts-dir framework/reports/swarm-consensus/smoke-tests`.
 
 If there is no recent dated artifact for the current host, or if the host/CLI/model stack has changed materially since the last run, ask the user whether to run the smoke test now and save a dated artifact before changing saved preferences or slash-command guidance.
+If a Claude model-resolution failure happens during a live consensus preflight, run the smoke test immediately instead of asking the user to guess another Claude model by hand.
 
 ---
 

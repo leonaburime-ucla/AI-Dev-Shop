@@ -66,6 +66,10 @@ def parse_args() -> argparse.Namespace:
         default=120,
         help="Hard timeout for the plain-text fallback after an empty JSON result",
     )
+    parser.add_argument(
+        "--model",
+        help="Exact Claude model override to pass through to every Claude CLI invocation.",
+    )
     return parser.parse_args()
 
 
@@ -267,6 +271,13 @@ def build_text_retry_prompt(dispatch: Path, file_paths: list[str]) -> str:
     )
 
 
+def build_claude_base_cmd(args: argparse.Namespace) -> list[str]:
+    cmd = ["claude"]
+    if args.model:
+        cmd += ["--model", args.model]
+    return cmd
+
+
 def main() -> int:
     args = parse_args()
 
@@ -299,10 +310,17 @@ def main() -> int:
         "packet": str(packet),
         "dispatch": str(dispatch),
         "offload_prefix": str(offload_prefix),
+        "requested_model": args.model,
     }
 
     try:
-        probe_cmd = ["claude", "-p", "--output-format", "json", build_probe_prompt(dispatch)]
+        claude_base_cmd = build_claude_base_cmd(args)
+        probe_cmd = claude_base_cmd + [
+            "-p",
+            "--output-format",
+            "json",
+            build_probe_prompt(dispatch),
+        ]
         probe_completed, probe_elapsed, probe_failure, probe_attempts = (
             run_command_with_transient_retries(
                 probe_cmd,
@@ -344,8 +362,7 @@ def main() -> int:
             "models": probe_models,
         }
 
-        audit_cmd = [
-            "claude",
+        audit_cmd = claude_base_cmd + [
             "-p",
             "--allowedTools",
             "Read",
@@ -405,8 +422,7 @@ def main() -> int:
             summary["audit"]["result_path"] = str(audit_result)
             summary["audit"]["result_length"] = len(result_text)
         else:
-            text_cmd = [
-                "claude",
+            text_cmd = claude_base_cmd + [
                 "-p",
                 "--allowedTools",
                 "Read",

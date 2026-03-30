@@ -111,6 +111,10 @@ If that retry falls back to plain text, keep the fallback on a shorter bounded t
 - Pin the model when the user requests it or when reproducibility matters.
 - If the workflow promises exact model reporting, do not dispatch on an inferred or alias-only model. Require an explicit or locally proven exact model name/version before running.
 - When resolving model names, always check `skills/swarm-consensus/references/cli-smoke-test.md` for documented model IDs before falling back to CLI probes or asking the user. That file is the canonical source for locally verified peer model names/versions.
+- If a requested Claude model is unproven locally or the CLI rejects it, run `skills/swarm-consensus/scripts/cli_smoke_test.py` in discovery mode before asking the user for another model. Do not keep guessing manually when the smoke harness already exists.
+- For Claude consensus flows, use discovery with `--claude-require json`. For Claude audit flows that may need plain-text fallback, use `--claude-require both`.
+- A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact.
+- If discovery finds a working exact model in the same requested family/version, use that exact model and say it was smoke-proven on this host. If discovery only finds a different family/version, stop and ask the user before switching.
 - Keep the ask explicit: what to inspect, what to ignore, what output shape to return.
 - Require strengths as well as findings so the user sees what should stay unchanged.
 

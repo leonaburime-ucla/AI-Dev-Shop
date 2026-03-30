@@ -39,9 +39,13 @@ Act as an External Audit Coordinator.
    - if `auditor=` is omitted, filter out the current host family and choose the first available CLI in this exact order: `claude`, `gemini`, `codex`
    - if no different-family external CLI is available, stop and tell the user instead of silently using the same family
    - resolve the planned model only by: per-run override naming an exact model/version, saved pinned preference naming an exact model/version, or local CLI/config proof of the exact model/version
-7. If the exact auditor model/version is not explicitly pinned or locally proven, stop and print a model-pinning gate:
+7. If the planned auditor is Claude and the requested or saved Claude model is unproven or rejected, do not keep guessing manually. Run `python3 skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-model <requested-or-saved-model> --claude-require both --output-format json` first.
+   - A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact.
+   - If discovery finds a working exact Claude model in the same requested family/version, use it and continue.
+   - If discovery finds only a different family/version, stop and ask the user before switching.
+8. If the exact auditor model/version is not explicitly pinned or locally proven, stop and print a model-pinning gate:
    `Planned auditor CLI: <CLI>. Exact model/version is not proven locally. Reply with auditor=... and claude_model=..., gemini_model=..., or codex_model=... using an exact model name/version to proceed.`
-8. If the exact auditor model/version is explicit or locally proven, dispatch the audit prompt.
+9. If the exact auditor model/version is explicit or locally proven, dispatch the audit prompt.
    - do not hand `.local-artifacts/` paths directly to the peer by default; use the dispatch copy path for file-based peer reads
    - run a cheap readability probe first: ask the peer to read the dispatch packet and echo the first Markdown heading
    - if the probe fails, classify it as `path_or_permission_failure`, move the dispatch copy, and retry once before the real audit
@@ -58,7 +62,7 @@ Act as an External Audit Coordinator.
    - use any host-specific live-run timing or fallback bounds from the host reference you loaded
    - if the peer exits successfully but returns an empty answer body, classify it as `empty_result_transport_failure` and retry once with a tighter bounded prompt and constrained read-only tool surface when supported
    - delete the temporary dispatch copy after the run unless the user explicitly asks to retain it for debugging or evidence
-9. Synthesize the result back to the user. The final answer must include:
+10. Synthesize the result back to the user. The final answer must include:
    - the exact report structure from `skills/external-audit/references/external-audit-report-template.md`
    - the exact auditor model version used (`Resolved Model`) and the auditor CLI version
    - `Work Log`
@@ -70,6 +74,6 @@ Act as an External Audit Coordinator.
    - `Audit Outcome`
    - `Decision Points For User`
    - if the exact model version cannot be proven, do not run the audit; ask for a pinned model instead
-10. Before writing the final report, if the user has not already specified retention, ask:
+11. Before writing the final report, if the user has not already specified retention, ask:
    `Save external audit report? Reply "save report" to retain it in framework/reports/external-audit/runs/, "local only" to keep it in .local-artifacts/external-audit/runs/, or "inline only" for no file.`
    Save ad hoc reports to `.local-artifacts/external-audit/runs/<timestamp>-external-audit-report.md` by default. If the user explicitly wants to retain the artifact, save it to `framework/reports/external-audit/runs/<timestamp>-external-audit-report.md` instead.

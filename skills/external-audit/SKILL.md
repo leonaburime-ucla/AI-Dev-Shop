@@ -70,7 +70,19 @@ Then:
    - saved user preference naming an exact model/version
    - documented model IDs in `skills/swarm-consensus/references/cli-smoke-test.md` (the canonical source for locally verified peer model names)
    - local CLI or config evidence that proves the exact model/version
-5. If the exact planned model/version is not resolved by any source above, stop before dispatch and ask:
+5. If the auditor is Claude and the requested or saved Claude model is unproven locally or rejected by the CLI, run the smoke-test harness in discovery mode before asking the user to supply another model:
+
+```bash
+python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
+  --discover-claude \
+  --claude-model <requested-or-saved-model> \
+  --claude-require both \
+  --output-format json
+```
+
+Use the discovered `winner.model` only when it matches the requested family/version and it passed both JSON and text mode locally. If discovery finds only a different family/version, stop and ask the user before switching.
+A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
+6. If the exact planned model/version is not resolved by any source above, stop before dispatch and ask:
 
 `Planned auditor CLI: <CLI>. Exact model/version is not proven locally. Reply with auditor=... and claude_model=..., gemini_model=..., or codex_model=... using an exact model name/version to proceed.`
 
@@ -130,7 +142,7 @@ Dispatch workflow:
 4. If the probe fails because the path is ignored, unreadable, or outside the peer workspace, classify it as `path_or_permission_failure`, move the dispatch copy, and retry once.
 5. Use the dispatch packet path, not the authoring packet path, in the actual audit prompt.
 6. Delete the temporary dispatch copy after the audit finishes unless the user explicitly asks to retain it for debugging or evidence.
-7. If the auditor CLI is Claude, apply `skills/llm-operations/references/claude-code-cli-audits.md` and prefer its dedicated runner when available.
+7. If the auditor CLI is Claude, apply `skills/llm-operations/references/claude-code-cli-audits.md` and prefer its dedicated runner when available. Pass the exact proven Claude model to the runner instead of relying on the local default.
 
 Audit prompt requirements:
 

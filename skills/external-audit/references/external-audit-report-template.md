@@ -8,7 +8,7 @@
 **Auditor CLI:** <claude | gemini | codex>
 **Requested Model:** <requested or "n/a">
 **Resolved Model:** <exact model name/version or "not proven">
-**Selection Source:** <per_run_override | saved_preference | local_cli_proof | unknown>
+**Selection Source:** <per_run_override | saved_preference | local_cli_proof | smoke_test_discovery | unknown>
 **CLI Version:** <version>
 **Timeout:** <seconds>
 **Audit Status:** <Responded | Failed | Timed out | Retry exhausted | Not installed>

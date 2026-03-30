@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -16,6 +18,9 @@ import time
 from typing import List
 
 END_MARKER = "<<SWARM_END>>"
+DISCOVERY_CACHE_VERSION = 1
+DEFAULT_DISCOVERY_CACHE_PATH = ".local-artifacts/swarm-consensus/smoke-tests/last-known-good.json"
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -53,12 +58,40 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--save-artifact",
         action="store_true",
-        help="Save the markdown report to a dated file.",
+        help="Save the rendered report to a dated file.",
+    )
+    parser.add_argument(
+        "--output-format",
+        choices=("markdown", "json"),
+        default="markdown",
+        help="Report format for stdout.",
     )
     parser.add_argument(
         "--artifacts-dir",
         default=".local-artifacts/swarm-consensus/smoke-tests",
         help="Directory for dated smoke-test artifacts when --save-artifact is used. Override with framework/reports/swarm-consensus/smoke-tests if you want a retained repo artifact.",
+    )
+    parser.add_argument(
+        "--discover-claude",
+        action="store_true",
+        help="Probe candidate Claude model names and return the first working exact model.",
+    )
+    parser.add_argument(
+        "--claude-require",
+        choices=("json", "both"),
+        default="json",
+        help="Success requirement for Claude discovery. Use 'both' when the workflow may need both JSON and plain-text transport.",
+    )
+    parser.add_argument(
+        "--claude-candidate",
+        action="append",
+        default=[],
+        help="Additional Claude model candidate to probe during discovery. Repeatable.",
+    )
+    parser.add_argument(
+        "--discovery-cache-path",
+        default=DEFAULT_DISCOVERY_CACHE_PATH,
+        help="Path for the environment-keyed Claude discovery cache.",
     )
     parser.add_argument("--skip-claude", action="store_true")
     parser.add_argument("--skip-gemini", action="store_true")
@@ -86,6 +119,124 @@ def ensure_text(value: object) -> str:
     if isinstance(value, bytes):
         return value.decode("utf-8", errors="replace")
     return str(value)
+
+
+def load_json_file(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
+def load_saved_claude_model() -> str | None:
+    payload = load_json_file(Path.home() / ".claude" / "settings.json")
+    if not isinstance(payload, dict):
+        return None
+    model = payload.get("model")
+    return str(model).strip() if model else None
+
+
+def extract_model_suggestion(text: str) -> str | None:
+    match = re.search(r"Try --model to switch to ([^\s\"']+)", text)
+    if not match:
+        return None
+    return match.group(1).strip().rstrip(".,)")
+
+
+def normalize_model_hint(model: str | None) -> str | None:
+    if not model:
+        return None
+    normalized = model.strip().lower()
+    if not normalized:
+        return None
+    normalized = re.sub(r"^(?:[a-z0-9_.-]*\.)?(claude-)", r"\1", normalized)
+    match = re.search(r"claude-(opus|sonnet|haiku)-(\d+(?:-\d+)?)", normalized)
+    if match:
+        return f"claude-{match.group(1)}-{match.group(2)}"
+    if normalized in {"opus", "sonnet", "haiku"}:
+        return f"claude-{normalized}"
+    return normalized
+
+
+def build_claude_environment(cli_versions: list[dict[str, str]], requirement: str) -> dict[str, str]:
+    record = next((item for item in cli_versions if item["cli"] == "claude"), None)
+    return {
+        "cli": "claude",
+        "cli_path": record["path"] if record else "not installed",
+        "cli_version": record["version"] if record else "n/a",
+        "hostname": socket.gethostname(),
+        "system": platform.system(),
+        "release": platform.release(),
+        "machine": platform.machine(),
+        "transport_requirement": requirement,
+    }
+
+
+def build_environment_key(environment: dict[str, str]) -> str:
+    return "|".join(
+        [
+            environment["cli"],
+            environment["cli_version"],
+            environment["hostname"],
+            environment["system"],
+            environment["release"],
+            environment["machine"],
+            environment["transport_requirement"],
+        ]
+    )
+
+
+def load_discovery_cache(path: Path) -> dict:
+    payload = load_json_file(path)
+    if not isinstance(payload, dict):
+        return {"version": DISCOVERY_CACHE_VERSION, "entries": []}
+    entries = payload.get("entries")
+    if not isinstance(entries, list):
+        payload["entries"] = []
+    payload.setdefault("version", DISCOVERY_CACHE_VERSION)
+    return payload
+
+
+def save_discovery_cache(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def resolve_cache_artifact_path(value: str | None) -> Path | None:
+    if not value:
+        return None
+    candidate = Path(str(value))
+    if candidate.is_absolute():
+        return candidate
+    return (REPO_ROOT / candidate).resolve()
+
+
+def find_cached_discovery(
+    cache: dict,
+    environment_key: str,
+    requested_model: str | None,
+    requested_hint: str | None,
+) -> dict | None:
+    entries = cache.get("entries", [])
+    if not isinstance(entries, list):
+        return None
+
+    exact_match: dict | None = None
+    hint_match: dict | None = None
+    for entry in reversed(entries):
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("environment_key") != environment_key:
+            continue
+        artifact_path = resolve_cache_artifact_path(entry.get("artifact_path"))
+        if not artifact_path or not artifact_path.exists():
+            continue
+        if requested_model and entry.get("requested_model") == requested_model:
+            exact_match = entry
+            break
+        if requested_hint and entry.get("requested_model_hint") == requested_hint:
+            hint_match = entry
+    return exact_match or hint_match
 
 
 def extract_response(case_name: str, stdout: str) -> str:
@@ -198,6 +349,10 @@ def run_case(case_name: str, command: list[str], timeout_seconds: int) -> dict[s
         stderr = ensure_text(completed.stderr)
         if rc != 0:
             status = "failed"
+    except FileNotFoundError as exc:
+        status = "unavailable"
+        rc = 127
+        stderr = ensure_text(exc)
     except subprocess.TimeoutExpired as exc:
         status = "timeout"
         rc = -1
@@ -220,6 +375,194 @@ def run_case(case_name: str, command: list[str], timeout_seconds: int) -> dict[s
         "parsed_snippet": snippet(parsed),
         "stdout_snippet": snippet(stdout),
         "stderr_snippet": snippet(stderr),
+        "stdout_raw": stdout,
+        "stderr_raw": stderr,
+    }
+
+
+def slim_case_result(result: dict[str, object]) -> dict[str, object]:
+    return {
+        "case": result["case"],
+        "status": result["status"],
+        "rc": result["rc"],
+        "duration_s": result["duration_s"],
+        "stdout_len": result["stdout_len"],
+        "stderr_len": result["stderr_len"],
+        "stdout_is_jsonish": result["stdout_is_jsonish"],
+        "parsed_has_end_marker": result["parsed_has_end_marker"],
+        "command": result["command"],
+        "parsed_snippet": result["parsed_snippet"],
+        "stdout_snippet": result["stdout_snippet"],
+        "stderr_snippet": result["stderr_snippet"],
+    }
+
+
+def build_skipped_case_result(case_name: str) -> dict[str, object]:
+    return {
+        "case": case_name,
+        "status": "skipped",
+        "rc": 0,
+        "duration_s": 0.0,
+        "stdout_len": 0,
+        "stderr_len": 0,
+        "stdout_is_jsonish": False,
+        "parsed_has_end_marker": False,
+        "command": [],
+        "parsed_snippet": "",
+        "stdout_snippet": "",
+        "stderr_snippet": "",
+        "stdout_raw": "",
+        "stderr_raw": "",
+    }
+
+
+def append_candidate(
+    queue: list[str],
+    sources: dict[str, str],
+    seen: set[str],
+    value: str | None,
+    source: str,
+) -> None:
+    if not value:
+        return
+    normalized = value.strip()
+    if not normalized or normalized in seen:
+        return
+    queue.append(normalized)
+    sources[normalized] = source
+    seen.add(normalized)
+
+
+def run_claude_discovery_with_environment(
+    args: argparse.Namespace,
+    cli_versions: list[dict[str, str]],
+) -> dict[str, object]:
+    saved_model = load_saved_claude_model()
+    requested_hint = normalize_model_hint(args.claude_model)
+    cache_path = Path(args.discovery_cache_path)
+    cache = load_discovery_cache(cache_path)
+    environment = build_claude_environment(cli_versions, args.claude_require)
+    environment_key = build_environment_key(environment)
+    cache_entry = find_cached_discovery(cache, environment_key, args.claude_model, requested_hint)
+    if cache_entry:
+        winner_model = cache_entry.get("winner_model")
+        return {
+            "enabled": True,
+            "requirement": args.claude_require,
+            "saved_claude_model": saved_model,
+            "requested_claude_model": args.claude_model,
+            "requested_model_hint": requested_hint,
+            "candidate_order": [],
+            "winner": {
+                "model": winner_model,
+                "source": "discovery_cache",
+                "json_ok": cache_entry.get("json_ok", False),
+                "text_ok": cache_entry.get("text_ok", False),
+                "requirement": args.claude_require,
+            },
+            "attempts": [],
+            "cache_hit": True,
+            "cache_entry": cache_entry,
+            "cache_path": str(cache_path),
+            "environment": environment,
+            "environment_key": environment_key,
+        }
+
+    queue: list[str] = []
+    sources: dict[str, str] = {}
+    seen: set[str] = set()
+
+    for candidate in args.claude_candidate:
+        append_candidate(queue, sources, seen, candidate, "manual_candidate")
+    append_candidate(queue, sources, seen, args.claude_model, "requested_model")
+    append_candidate(queue, sources, seen, saved_model, "saved_claude_settings")
+    append_candidate(queue, sources, seen, "opus", "alias_probe")
+
+    attempts: list[dict[str, object]] = []
+    winner: dict[str, object] | None = None
+
+    idx = 0
+    while idx < len(queue):
+        candidate = queue[idx]
+        idx += 1
+
+        json_result = run_case(
+            "claude_json",
+            ["claude", "--model", candidate, "-p", "--output-format", "json", args.prompt],
+            args.case_timeout,
+        )
+        if args.claude_require == "both":
+            text_result = run_case(
+                "claude_text",
+                ["claude", "--model", candidate, "-p", args.prompt],
+                args.case_timeout,
+            )
+        else:
+            text_result = build_skipped_case_result("claude_text")
+
+        suggestions: list[str] = []
+        raw_streams = [
+            ensure_text(json_result["stdout_raw"]),
+            ensure_text(json_result["stderr_raw"]),
+        ]
+        if args.claude_require == "both":
+            raw_streams.extend(
+                [
+                    ensure_text(text_result["stdout_raw"]),
+                    ensure_text(text_result["stderr_raw"]),
+                ]
+            )
+        for raw in raw_streams:
+            suggestion = extract_model_suggestion(raw)
+            if suggestion and suggestion not in suggestions:
+                suggestions.append(suggestion)
+                append_candidate(queue, sources, seen, suggestion, f"suggested_by:{candidate}")
+
+        json_ok = bool(
+            json_result["status"] == "ok" and json_result["parsed_has_end_marker"]
+        )
+        text_ok = bool(
+            text_result["status"] == "ok" and text_result["parsed_has_end_marker"]
+        )
+        success = json_ok if args.claude_require == "json" else json_ok and text_ok
+
+        attempt = {
+            "candidate": candidate,
+            "candidate_source": sources.get(candidate, "unknown"),
+            "success": success,
+            "requirement": args.claude_require,
+            "json_ok": json_ok,
+            "text_ok": text_ok,
+            "suggested_models": suggestions,
+            "json_case": slim_case_result(json_result),
+            "text_case": slim_case_result(text_result),
+        }
+        attempts.append(attempt)
+
+        if success:
+            winner = {
+                "model": candidate,
+                "source": sources.get(candidate, "unknown"),
+                "json_ok": json_ok,
+                "text_ok": text_ok,
+                "requirement": args.claude_require,
+            }
+            break
+
+    return {
+        "enabled": True,
+        "requirement": args.claude_require,
+        "saved_claude_model": saved_model,
+        "requested_claude_model": args.claude_model,
+        "requested_model_hint": requested_hint,
+        "candidate_order": queue,
+        "winner": winner,
+        "attempts": attempts,
+        "cache_hit": False,
+        "cache_entry": None,
+        "cache_path": str(cache_path),
+        "environment": environment,
+        "environment_key": environment_key,
     }
 
 
@@ -227,6 +570,7 @@ def render_report(
     results: list[dict[str, object]],
     args: argparse.Namespace,
     cli_versions: list[dict[str, str]],
+    discovery: dict[str, object] | None,
 ) -> str:
     lines = [
         "# Swarm Consensus CLI Smoke Test",
@@ -259,6 +603,34 @@ def render_report(
         )
 
     lines.append("")
+
+    if discovery:
+        winner = discovery.get("winner")
+        lines += [
+            "## Claude Discovery",
+            "",
+            f"- Requirement: `{discovery['requirement']}`",
+            f"- Saved Claude model: `{discovery['saved_claude_model'] or 'none'}`",
+            f"- Requested Claude model: `{discovery['requested_claude_model'] or 'none'}`",
+            f"- Cache hit: `{discovery.get('cache_hit', False)}`",
+            f"- Cache path: `{discovery.get('cache_path', 'n/a')}`",
+            f"- Winning model: `{winner['model'] if winner else 'none'}`",
+            f"- Winning source: `{winner['source'] if winner else 'n/a'}`",
+            "",
+            "| Candidate | Source | Success | JSON OK | Text OK | Suggested Models |",
+            "|---|---|---|---|---|---|",
+        ]
+        if discovery["attempts"]:
+            for attempt in discovery["attempts"]:
+                suggested = ", ".join(attempt["suggested_models"]) if attempt["suggested_models"] else "none"
+                lines.append(
+                    f"| `{attempt['candidate']}` | `{attempt['candidate_source']}` | "
+                    f"`{attempt['success']}` | `{attempt['json_ok']}` | `{attempt['text_ok']}` | `{suggested}` |"
+                )
+        else:
+            lines.append("| `n/a` | `cache_hit` | `True` | `n/a` | `n/a` | `none` |")
+        lines.append("")
+
     for result in results:
         lines.append(f"## {result['case']}")
         lines.append(f"- Command: `{ ' '.join(result['command']) }`")
@@ -271,33 +643,149 @@ def render_report(
     return "\n".join(lines)
 
 
-def save_report(report: str, artifacts_dir: str) -> Path:
+def render_json_report(
+    results: list[dict[str, object]],
+    args: argparse.Namespace,
+    cli_versions: list[dict[str, str]],
+    discovery: dict[str, object] | None,
+) -> str:
+    payload = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "host": socket.gethostname(),
+        "working_directory": os.getcwd(),
+        "prompt": args.prompt,
+        "case_timeout_seconds": args.case_timeout,
+        "codex_cd": args.codex_cd,
+        "cli_versions": cli_versions,
+        "results": [slim_case_result(result) for result in results],
+        "discovery": discovery,
+    }
+    return json.dumps(payload, indent=2)
+
+
+def save_report(report: str, artifacts_dir: str, suffix: str) -> Path:
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")
     path = Path(artifacts_dir)
     path.mkdir(parents=True, exist_ok=True)
-    target = path / f"{stamp}-cli-smoke-test.md"
-    target.write_text(report + "\n", encoding="ascii")
+    target = path / f"{stamp}-cli-smoke-test{suffix}"
+    target.write_text(report + "\n", encoding="utf-8")
     return target
+
+
+def persist_claude_discovery(
+    discovery: dict[str, object],
+    cli_versions: list[dict[str, str]],
+    args: argparse.Namespace,
+) -> dict[str, str] | None:
+    if not discovery or not discovery.get("enabled"):
+        return None
+    if discovery.get("cache_hit"):
+        cache_entry = discovery.get("cache_entry")
+        if isinstance(cache_entry, dict):
+            resolved_artifact_path = resolve_cache_artifact_path(cache_entry.get("artifact_path"))
+            cache_path = Path(str(discovery.get("cache_path", args.discovery_cache_path)))
+            if resolved_artifact_path and cache_path.exists():
+                cache = load_discovery_cache(cache_path)
+                changed = False
+                for entry in cache.get("entries", []):
+                    if not isinstance(entry, dict):
+                        continue
+                    if (
+                        entry.get("environment_key") == cache_entry.get("environment_key")
+                        and entry.get("requested_model") == cache_entry.get("requested_model")
+                        and entry.get("artifact_path") != str(resolved_artifact_path)
+                    ):
+                        entry["artifact_path"] = str(resolved_artifact_path)
+                        changed = True
+                if changed:
+                    cache["updated_at"] = datetime.now(timezone.utc).isoformat()
+                    save_discovery_cache(cache_path, cache)
+            return {
+                "artifact_path": str(resolved_artifact_path or ""),
+                "cache_path": str(discovery.get("cache_path", "")),
+            }
+        return {"artifact_path": "", "cache_path": str(discovery.get("cache_path", ""))}
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")
+    artifacts_dir = Path(args.artifacts_dir)
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    artifact_path = artifacts_dir / f"{timestamp}-claude-discovery.md"
+
+    markdown_report = render_report([], args, cli_versions, discovery)
+    artifact_path.write_text(markdown_report + "\n", encoding="utf-8")
+
+    cache_path = Path(str(discovery.get("cache_path", args.discovery_cache_path)))
+    cache = load_discovery_cache(cache_path)
+    environment = discovery.get("environment", {})
+    environment_key = str(discovery.get("environment_key", ""))
+    winner = discovery.get("winner")
+    if isinstance(winner, dict) and winner.get("model"):
+        new_entry = {
+            "validated_at": datetime.now(timezone.utc).isoformat(),
+            "environment_key": environment_key,
+            "environment": environment,
+            "requested_model": discovery.get("requested_claude_model"),
+            "requested_model_hint": discovery.get("requested_model_hint"),
+            "winner_model": winner.get("model"),
+            "winner_source": "smoke_test_discovery",
+            "json_ok": winner.get("json_ok"),
+            "text_ok": winner.get("text_ok"),
+            "artifact_path": str(artifact_path.resolve()),
+        }
+        entries = [
+            entry
+            for entry in cache.get("entries", [])
+            if not (
+                isinstance(entry, dict)
+                and entry.get("environment_key") == environment_key
+                and entry.get("requested_model") == discovery.get("requested_claude_model")
+            )
+        ]
+        entries.append(new_entry)
+        cache["entries"] = entries
+        cache["updated_at"] = datetime.now(timezone.utc).isoformat()
+        save_discovery_cache(cache_path, cache)
+
+    return {
+        "artifact_path": str(artifact_path),
+        "cache_path": str(cache_path),
+    }
 
 
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
     cases = build_cases(args)
+    discovery: dict[str, object] | None = None
 
-    if not cases:
+    if args.discover_claude:
+        cases = [case for case in cases if not case[0].startswith("claude_")]
+
+    if not cases and not args.discover_claude:
         print("No runnable cases found. Install at least one of: claude, gemini, codex.", file=sys.stderr)
         return 1
 
     cli_versions = probe_cli_versions()
+    if args.discover_claude:
+        discovery = run_claude_discovery_with_environment(args, cli_versions)
+        persistence = persist_claude_discovery(discovery, cli_versions, args)
+        if persistence:
+            discovery["persistence"] = persistence
     results = [run_case(name, command, args.case_timeout) for name, command in cases]
-    report = render_report(results, args, cli_versions)
+    if args.output_format == "json":
+        report = render_json_report(results, args, cli_versions, discovery)
+        suffix = ".json"
+    else:
+        report = render_report(results, args, cli_versions, discovery)
+        suffix = ".md"
     print(report)
 
     if args.save_artifact:
-        target = save_report(report, args.artifacts_dir)
+        target = save_report(report, args.artifacts_dir, suffix)
         print(f"Saved artifact: {target}")
 
+    if discovery and discovery.get("winner"):
+        return 0
     if any(result["parsed_has_end_marker"] for result in results):
         return 0
     return 1

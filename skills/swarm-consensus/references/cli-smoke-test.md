@@ -9,6 +9,8 @@ What this does:
 - shows whether the peer answer survives end-marker parsing
 - shows how much diagnostic noise lands on `stderr`
 - helps detect repo-local behavior differences, especially for `codex exec`
+- can probe candidate Claude model names and return the first locally proven working exact model
+- writes a dated Claude discovery artifact plus an environment-keyed last-known-good cache when discovery mode is used
 
 Run it with current preferences:
 
@@ -19,6 +21,26 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
   --codex-model gpt-5.4 \
   --save-artifact
 ```
+
+If a Claude model is requested but rejected or unproven locally, run discovery first:
+
+```bash
+python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
+  --discover-claude \
+  --claude-model claude-opus-4-6 \
+  --claude-require both \
+  --output-format json
+```
+
+Interpret the discovery result this way:
+
+- use the discovered `winner.model` when it matches the requested family/version and the required transport mode
+- if discovery finds only an older or different model family/version, stop and ask the user before switching
+- prefer `--claude-require json` for consensus runs that stay in structured-output mode
+- prefer `--claude-require both` for Claude audit flows that may need plain-text fallback
+- discovery mode auto-saves a dated artifact under `.local-artifacts/swarm-consensus/smoke-tests/`
+- discovery mode also updates `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json`
+- cache hits are valid only for the same environment tuple: hostname, OS, machine, Claude CLI version, and transport requirement, and only when the cached artifact path still exists
 
 Run Codex in an isolated directory to compare raw CLI behavior against repo-local behavior:
 
@@ -36,11 +58,14 @@ Suggested operating pattern:
 - save ad hoc runs in `.local-artifacts/swarm-consensus/smoke-tests/` by default
 - only write to `framework/reports/swarm-consensus/smoke-tests/` when you explicitly want a retained host baseline in the repo
 - treat the saved artifact as evidence for updating saved model preferences or slash-command guidance
+- do not treat one machine's winning Claude model string as globally valid for other environments
 
 Interpretation rules:
 
 - prefer cases that keep the answer in `stdout` and diagnostics in `stderr`
 - prefer structured output when it still preserves the peer answer cleanly
 - if a model flag fails, do not update the slash command to assume it; confirm the correct flag pattern first
+- if a requested Claude model fails, do not keep guessing manually; run discovery and use the proven winner or stop
+- if there is no exact environment cache hit and no fresh discovery artifact, Claude is not yet proven for that environment
 - if a newer model family looks better, update the saved preference only after rerunning this test
 - runtime consensus runs should still show inferred models to the user and allow per-run overrides
