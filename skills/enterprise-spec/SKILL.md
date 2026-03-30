@@ -111,7 +111,7 @@ For injected constraint examples, load `references/shift-left-harnesses.md`.
 
 - Every post-ship defect must be categorized as either intent-to-spec gap or spec-to-implementation gap.
 - Fixes route through spec/test workflow first, not direct code patching.
-- Every defect must be recorded in `project-knowledge/memory/learnings.md`.
+- Every defect must be recorded in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md`.
 - Repeated defect patterns must become harness improvements after the recurrence threshold is met.
 
 For the defect-record format and examples, load `references/closed-loop-feedback.md`.

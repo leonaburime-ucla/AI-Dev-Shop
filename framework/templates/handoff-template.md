@@ -37,8 +37,8 @@ List every artifact this agent read and acted on. Include version or hash where 
 | Artifact | Version / Hash | Notes |
 |----------|---------------|-------|
 | Spec: `<provider-defined spec entrypoint>` | v<X.Y.Z> · sha256:<hash> | |
-| ADR: `framework/reports/pipeline/<NNN>-<feature>/adr.md` | sha256:<hash> | (if applicable) |
-| Test certification: `framework/reports/pipeline/<NNN>-<feature>/test-certification.md` | sha256:<hash> | (if applicable) |
+| ADR: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature>/adr.md` | sha256:<hash> | (if applicable) |
+| Test certification: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature>/test-certification.md` | sha256:<hash> | (if applicable) |
 | tasks.md | sha256:<hash> | (if applicable) |
 | <other artifact> | | |
 

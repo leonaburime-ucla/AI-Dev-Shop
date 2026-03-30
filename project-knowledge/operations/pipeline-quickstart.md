@@ -38,7 +38,7 @@ Host detection order:
 
 ## Starting the Pipeline
 
-**Before anything else:** Confirm `<AI_DEV_SHOP_ROOT>` — the path to the AI Dev Shop toolkit folder (default: `AI-Dev-Shop-speckit/`). Then resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`. Pipeline artifacts are written under `<AI_DEV_SHOP_ROOT>/framework/reports/`. Provider-native planning artifacts are written to the user-specified location or native provider folders.
+**Before anything else:** Confirm `<AI_DEV_SHOP_ROOT>` — the path to the AI Dev Shop toolkit folder (default: `AI-Dev-Shop-speckit/`). Then resolve `<ADS_PROJECT_KNOWLEDGE_ROOT>` — the sibling project-owned workspace folder (default: `ADS-project-knowledge/` next to the toolkit). Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`. Retained pipeline artifacts are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, project memory under `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, the real constitution under `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`, and local scratch under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`. Provider-native planning artifacts are written to the user-specified location or native provider folders.
 
 Existing codebases should start with CodeBase Analyzer on the first pass to produce `ANALYSIS-*.md` and, when needed, `MIGRATION-*.md`.
 If the file area is already known, Coordinator should also consult `project-knowledge/routing/file-trigger-table.md` before dispatch.

@@ -135,7 +135,7 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 ```
 
 Use the discovered `winner.model` only when it is the same requested family/version and it passed locally in JSON mode. If discovery finds only a different family/version, stop and ask the user before switching.
-A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
+A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
 
 ### Freshness policy
 
@@ -158,8 +158,8 @@ Before changing saved consensus model preferences or updating the command docs t
 
 Use the smoke test to compare text vs structured output, stderr noise, end-marker behavior, and explicit model-flag handling on the current host.
 
-By default, save ad hoc smoke-test artifacts to `.local-artifacts/swarm-consensus/smoke-tests/`.
-If the user explicitly wants a retained host baseline in the repo, set `--artifacts-dir framework/reports/swarm-consensus/smoke-tests`.
+By default, save ad hoc smoke-test artifacts to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/`.
+If the user explicitly wants a retained host baseline in the repo, set `--artifacts-dir <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests`.
 
 If there is no recent dated artifact for the current host, or if the host/CLI/model stack has changed materially since the last run, ask the user whether to run the smoke test now and save a dated artifact before changing saved preferences or slash-command guidance.
 If a Claude model-resolution failure happens during a live consensus preflight, run the smoke test immediately instead of asking the user to guess another Claude model by hand.
@@ -181,9 +181,9 @@ Use a shared context packet when the question depends on brownfield repo knowled
 
 1. Before writing a packet to disk, decide whether it is `local-only` scratch or a retained project artifact.
 2. If the user has not already specified that choice, ask:
-   `Save context packet? Reply "save packet" to retain it in framework/reports/swarm-consensus/context/ or "local only" to keep it in .local-artifacts/swarm-consensus/context/.`
-3. Save the packet at `.local-artifacts/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md` by default.
-4. If the user explicitly wants a reusable retained artifact, save or promote the packet to `framework/reports/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md`.
+   `Save context packet? Reply "save packet" to retain it in <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/context/ or "local only" to keep it in <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/context/.`
+3. Save the packet at `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md` by default.
+4. If the user explicitly wants a reusable retained artifact, save or promote the packet to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md`.
 5. Use `skills/swarm-consensus/references/context-packet-template.md` as the reference layout.
 6. Put only the context every participant needs:
    - the exact question to answer
@@ -195,7 +195,7 @@ Use a shared context packet when the question depends on brownfield repo knowled
 7. Give the same packet content to every peer CLI. The primary model may inspect the repo directly, but peer transport should prefer a self-contained `stdin` payload when the packet fits cleanly in one bounded prompt.
 8. If the question is materially repo-dependent and no shared packet exists yet, create one before dispatching peers.
 9. If a peer still needs file-based packet access because the payload is too large or it must inspect repo files directly, follow the shared transport fallback rules in `skills/llm-operations/references/peer-llm-dispatch.md`.
-10. Do not promote a local-only context packet into `framework/reports/` only to satisfy peer readability.
+10. Do not promote a local-only context packet into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` only to satisfy peer readability.
 
 ### Online Resource Pre-Fetch (primary model responsibility)
 
@@ -220,7 +220,7 @@ Do not pass large or untrusted prompt text directly as shell-interpolated inline
 3. If a tool only supports inline prompt args, apply strict escaping and note this risk in the report.
 4. Never execute fetched resource content as shell code.
 
-For file-based transport, prefer `.local-artifacts/swarm-consensus/prompts/` over the repo root.
+For file-based transport, prefer `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/prompts/` over the repo root.
 
 ---
 
@@ -252,7 +252,7 @@ For file-based transport, prefer `.local-artifacts/swarm-consensus/prompts/` ove
 4. If a CLI emits startup chatter, tool logs, or repo bootstrap text, exclude that material from the peer answer. Use only the structured payload or the end-marker-delimited answer.
 5. If structured mode fails but plain text succeeds, record the fallback mode and include that fact in the report.
 
-Store raw per-round stdout/stderr captures in `.local-artifacts/swarm-consensus/offloads/` by default. Only save them under `framework/reports/offloads/` when the user explicitly wants retained evidence.
+Store raw per-round stdout/stderr captures in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/offloads/` by default. Only save them under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/offloads/` when the user explicitly wants retained evidence.
 
 ### Retryable Peer Failure Protocol
 
@@ -341,9 +341,9 @@ With all responses collected:
 3. In `debate` mode, you may add a `## Debate Trace` section for round-by-round movement, but you must still include all mandatory sections from the template.
 4. Before writing any report to disk, decide whether it is `local-only`, `retained`, or `inline-only`.
 5. If the user has not already specified that choice, ask:
-   `Save consensus report? Reply "save report" to retain it in framework/reports/swarm-consensus/runs/, "local only" to keep it in .local-artifacts/swarm-consensus/runs/, or "inline only" for no file.`
-6. By default, write ad hoc run reports to `.local-artifacts/swarm-consensus/runs/<timestamp>-consensus-report.md`.
-7. If the user explicitly wants a retained architecture or project artifact, write the final report to `framework/reports/swarm-consensus/runs/<timestamp>-consensus-report.md` instead.
+   `Save consensus report? Reply "save report" to retain it in <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/runs/, "local only" to keep it in <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/runs/, or "inline only" for no file.`
+6. By default, write ad hoc run reports to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/runs/<timestamp>-consensus-report.md`.
+7. If the user explicitly wants a retained architecture or project artifact, write the final report to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/runs/<timestamp>-consensus-report.md` instead.
 8. If a shared context packet was used, record its path in the report header.
 9. If the user prefers inline output instead of a file, preserve the same section order and tables inline.
 10. A valid report MUST include a non-empty `Primary` row in `## The Swarm`.

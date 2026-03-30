@@ -3,7 +3,7 @@
 - Feature: FEAT-<NNN> — <feature name>
 - Spec ID: <SPEC-id>
 - Spec Hash: <sha256 — must match active spec>
-- TestRunner Report: `<AI_DEV_SHOP_ROOT>/framework/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`
+- TestRunner Report: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`
 - Triaged At: <ISO-8601 UTC>
 - Triaged By: TDD Agent
 
@@ -50,7 +50,7 @@ One row per file in the Coverage Gap List. Every file must be classified — no 
 ## Updated Certification Record
 
 After gap fill tests are written, update the certification record at:
-`<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 
 - Do not change the original certified spec hash
 - Add new tests to the Covered Requirements table

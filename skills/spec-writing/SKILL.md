@@ -174,9 +174,9 @@ A spec is ready when:
 |---|---|
 | Requirements, acceptance criteria, invariants, edge cases | Spec file — at user-specified location |
 | Architecture decisions and pattern choices | ADR — see `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` |
-| Project conventions and tribal knowledge | `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` |
-| Lessons learned from past mistakes | `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` |
-| Open questions and parking lot items | `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md` |
+| Project conventions and tribal knowledge | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` |
+| Lessons learned from past mistakes | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` |
+| Open questions and parking lot items | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md` |
 
 ## Strict Mode — Spec Package
 

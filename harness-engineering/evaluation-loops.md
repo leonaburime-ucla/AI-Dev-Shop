@@ -50,11 +50,11 @@ Use:
 Canonical locations:
 
 - Feature-bound work:
-  - `framework/reports/pipeline/<NNN>-<feature-name>/evaluator-contract-<slug>.md`
-  - `framework/reports/pipeline/<NNN>-<feature-name>/evaluator-report-<slug>-<YYYY-MM-DD-HHmm>.md`
+  - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/evaluator-contract-<slug>.md`
+  - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/evaluator-report-<slug>-<YYYY-MM-DD-HHmm>.md`
 - Non-feature toolkit maintenance or direct framework work:
-  - `framework/reports/continuity/<workstream>/evaluator-contract-<slug>.md`
-  - `framework/reports/continuity/<workstream>/evaluator-report-<slug>-<YYYY-MM-DD-HHmm>.md`
+  - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/<workstream>/evaluator-contract-<slug>.md`
+  - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/<workstream>/evaluator-report-<slug>-<YYYY-MM-DD-HHmm>.md`
 
 If the workstream also uses a `progress-ledger.md`, record:
 
@@ -165,8 +165,8 @@ When models, hosts, or task shape improve enough that the extra judge no longer 
 
 It only scans the canonical retained locations:
 
-- `framework/reports/pipeline/<NNN>-<feature-name>/`
-- `framework/reports/continuity/<workstream>/`
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/<workstream>/`
 
 That is intentional. Ledgers or evaluator artifacts outside those retained roots are ignored by design instead of treated as canonical harness state.
 

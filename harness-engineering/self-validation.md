@@ -116,7 +116,7 @@ Examples:
 
 Store the run result at:
 
-`<AI_DEV_SHOP_ROOT>/framework/reports/self-validation/SV-<feature-or-workstream>-<YYYY-MM-DD-HHmm>.md`
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/self-validation/SV-<feature-or-workstream>-<YYYY-MM-DD-HHmm>.md`
 
 If long logs or DOM dumps are needed, offload them per `<AI_DEV_SHOP_ROOT>/harness-engineering/context-offloading.md`.
 

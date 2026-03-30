@@ -60,7 +60,7 @@ This stage should help the user learn options and choose intentionally, not rece
 
 Write one artifact using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md` to:
 
-`<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<project-or-feature>/system-blueprint.md`
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<project-or-feature>/system-blueprint.md`
 
 The output must include:
 

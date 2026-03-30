@@ -125,5 +125,5 @@ Programmer Agent to implement. TestRunner to verify green before and after.
 - Code that is about to be deleted
 - Code that has no test coverage (add tests first, then refactor)
 - Code in the middle of an active bug fix (complete the fix, then refactor)
-- Code whose "messiness" is a deliberate temporary workaround tracked in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md`
+- Code whose "messiness" is a deliberate temporary workaround tracked in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md`
 - Working code that is slightly inconsistent with your personal style preferences (style is not tech debt)

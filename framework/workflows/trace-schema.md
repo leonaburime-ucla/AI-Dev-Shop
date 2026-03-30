@@ -1,6 +1,6 @@
 # Trace Schema
 
-Structured fields for every agent dispatch and handoff. The Observer emits a trace entry at every dispatch and completion. Traces are appended to `project-knowledge/memory/memory-store.md` as `[TRACE]` entries or to a dedicated `traces/` log file for the active feature run.
+Structured fields for every agent dispatch and handoff. The Observer emits a trace entry at every dispatch and completion. Traces are appended to `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md` as `[TRACE]` entries or to a dedicated `traces/` log file for the active feature run.
 
 ---
 
@@ -51,7 +51,7 @@ Debug entries are only emitted when `debug: on` is active. They do not replace r
 ## Storage Options
 
 **Option A — Append to memory-store.md** (simple, single file)
-Add `[TRACE]` entries to `project-knowledge/memory/memory-store.md`. Use for small features or when simplicity is preferred. Downside: mixes traces with DECISION/FAILURE/FACT/CONSTITUTION entries.
+Add `[TRACE]` entries to `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md`. Use for small features or when simplicity is preferred. Downside: mixes traces with DECISION/FAILURE/FACT/CONSTITUTION entries.
 
 **Option B — Dedicated trace log** (preferred for long runs)
 Append to `specs/<NNN>-<feature-name>/traces.md`. Self-contained per feature, easier to audit. Observer reads this file for pattern analysis.

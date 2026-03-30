@@ -7,7 +7,7 @@ description: Use when a spec, red-team pass, or architecture artifact must be ch
 
 ## Execution
 
-- Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` before finalizing the artifact.
+- Read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` before finalizing the artifact.
 - Evaluate every article against the proposed artifact and record `COMPLIES`, `EXCEPTION`, or `N/A`.
 - Revise the artifact to comply when possible.
 - If an exception remains, document the justification in the artifact's exception or complexity table.

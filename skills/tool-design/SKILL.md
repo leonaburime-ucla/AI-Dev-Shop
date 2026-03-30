@@ -73,7 +73,7 @@ Each error should tell the agent: what went wrong, why, and what to do.
 
 ## Parameter Design
 
-Apply the two-object paradigm consistently (see `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md`):
+Apply the two-object paradigm consistently (see `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md`):
 - First argument: required parameters
 - Second argument: optional parameters with defaults
 

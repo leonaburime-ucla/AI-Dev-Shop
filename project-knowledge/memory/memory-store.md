@@ -1,6 +1,6 @@
 # Memory Store
 
-Append-only log of pipeline decisions, failures, facts, constitution events, and quality scores.
+Append-only log schema reference for pipeline decisions, failures, facts, constitution events, and quality scores. In host-project runs, the live file lives at `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md`.
 Schema: `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-schema.md`
 Architecture: `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-architecture.md`
 

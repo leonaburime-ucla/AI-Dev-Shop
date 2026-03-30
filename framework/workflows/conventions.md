@@ -1,7 +1,7 @@
 ---
 name: conventions
-version: 1.2.0
-last_updated: 2026-03-24
+version: 1.3.0
+last_updated: 2026-03-29
 description: Output root, spec folder structure, and reports folder structure for all pipeline artifacts.
 ---
 
@@ -10,17 +10,20 @@ description: Output root, spec folder structure, and reports folder structure fo
 ## Output Root
 
 `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
+`<ADS_PROJECT_KNOWLEDGE_ROOT>` means the sibling project-owned workspace folder where AI Dev Shop writes durable project state (default: `ADS-project-knowledge/` next to the toolkit folder inside the host repo).
 Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` before assuming planning filenames or folder structure.
-Provider-native planning artifacts are written to the **user-specified location** or native provider folders — the Spec Agent asks before writing when the location is not already known. Pipeline artifacts retained by AI Dev Shop core (ADR, research, tasks, test-certification, red-team findings, pipeline state) are written under `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`. Reports (analysis, test runs, code review, security, observer) live in `<AI_DEV_SHOP_ROOT>/framework/reports/` subfolders.
+Provider-native planning artifacts are written to the **user-specified location** or native provider folders — the Spec Agent asks before writing when the location is not already known. Pipeline artifacts retained by AI Dev Shop core (ADR, research, tasks, test-certification, red-team findings, pipeline state) are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Reports (analysis, test runs, code review, security, observer, consensus, external audit) live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` subfolders.
 For long-running or resumable work, use a `progress-ledger.md` in the appropriate reports folder per `<AI_DEV_SHOP_ROOT>/harness-engineering/session-continuity.md`.
 For large raw outputs, logs, or traces, use offload files per `<AI_DEV_SHOP_ROOT>/harness-engineering/context-offloading.md`.
 For runtime-changing work that needs app-level validation before handoff, use a self-validation report per `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md`.
 For work that requires an independent evaluator loop, use retained evaluator artifacts per `<AI_DEV_SHOP_ROOT>/harness-engineering/evaluation-loops.md`.
-Use `<AI_DEV_SHOP_ROOT>/.local-artifacts/` for ignored local-only scratch artifacts such as exploratory consensus runs, raw peer stdout/stderr captures, temporary prompts, and host-specific smoke-test baselines that are not meant to ship with the repo.
-Promote artifacts from `.local-artifacts/` into `framework/reports/` only when the user explicitly wants them retained as reusable project evidence.
+Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` for ignored local-only scratch artifacts such as exploratory consensus runs, raw peer stdout/stderr captures, temporary prompts, and host-specific smoke-test baselines that are not meant to ship with the repo.
+Promote artifacts from `.local-artifacts/` into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` only when the user explicitly wants them retained as reusable project evidence.
+Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` for durable project conventions, learnings, notes, and structured memory entries.
+Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` as the live constitution for the host project. Keep the toolkit's bootstrap default in `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
 
-**Writable under `<AI_DEV_SHOP_ROOT>`:** `framework/reports/`, `project-knowledge/`, `.local-artifacts/`
-**Read-only during normal feature work under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/` — toolkit source files. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in these directories.
+**Project-owned writable root:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
+**Read-only during normal feature work under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`, and the toolkit's own `project-knowledge/` reference tree. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in these directories.
 
 ---
 
@@ -30,17 +33,17 @@ Before writing any new artifact, classify it into one of these buckets:
 
 1. **Pipeline-required**
    - Examples: ADRs, `tasks.md`, `test-certification.md`, red-team findings, `pipeline-state.md`, required codebase-analysis outputs
-   - Behavior: save automatically to `framework/reports/` in the canonical path defined by the workflow
+   - Behavior: save automatically to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` in the canonical path defined by the workflow
 2. **Optional retained**
    - Examples: exploratory research summaries, consensus reports, architecture comparisons, reusable context packets, host compatibility baselines
-   - Behavior: if the user has not already said to save it, ask whether to retain it in `framework/reports/`, keep it `local only`, or return it `inline only`
+   - Behavior: if the user has not already said to save it, ask whether to retain it in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, keep it `local only`, or return it `inline only`
 3. **Local scratch / raw evidence**
    - Examples: temporary prompts, raw stdout/stderr captures, ad hoc smoke tests, one-off logs, intermediate notes
-   - Behavior: save to `.local-artifacts/` by default unless the user explicitly wants it promoted into `framework/reports/`
+   - Behavior: save to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` by default unless the user explicitly wants it promoted into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`
 
 Rule of thumb:
-- `framework/reports/` is for canonical retained artifacts the project may rely on later
-- `.local-artifacts/` is for personal iteration output and disposable session evidence
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` is for canonical retained artifacts the project may rely on later
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` is for personal iteration output and disposable session evidence
 - Do not ask permission before writing pipeline-required artifacts that the framework depends on
 
 ---
@@ -76,10 +79,10 @@ Optional but recommended:
 
 ## Pipeline Artifact Folder Convention
 
-All pipeline artifacts for a feature live under `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/`:
+All pipeline artifacts for a feature live under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`:
 
 ```
-<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/
+<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/
   pipeline-state.md       (Coordinator state — created at spec time, updated every stage; legacy runs may still have `.pipeline-state.md`)
   progress-ledger.md       (human/agent-readable resume ledger for long-running work)
   evaluator-contract-<slug>.md   (required when evaluator_mode is required for this feature run)
@@ -92,16 +95,16 @@ All pipeline artifacts for a feature live under `<AI_DEV_SHOP_ROOT>/framework/re
   red-team-findings.md     (generated by Red-Team Agent — audit trail)
 ```
 
-`<NNN>` is a zero-padded three-digit FEAT number (001, 002, ...). `<feature-name>` is 2–4 words, lowercase-hyphenated. Example: `framework/reports/pipeline/003-csv-invoice-export/`. Scan existing `framework/reports/pipeline/` folders for the next available number — never reuse. The pipeline state should record the provider, the provider-native spec entrypoint, and the readiness artifact for the run. Existing `spec_path` fields remain valid compatibility fields for the default Speckit provider.
+`<NNN>` is a zero-padded three-digit FEAT number (001, 002, ...). `<feature-name>` is 2–4 words, lowercase-hyphenated. Example: `ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/`. Scan existing `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` folders for the next available number — never reuse. The pipeline state should record the provider, the provider-native spec entrypoint, and the readiness artifact for the run. Existing `spec_path` fields remain valid compatibility fields for the default Speckit provider.
 
 ---
 
 ## Local Scratch Artifact Convention
 
-Use `.local-artifacts/` for local-only, ignored outputs that help the current session but are not canonical repo artifacts.
+Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` for local-only, ignored outputs that help the current session but are not canonical repo artifacts.
 
 ```text
-<AI_DEV_SHOP_ROOT>/.local-artifacts/
+<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/
   swarm-consensus/
     prompts/
     context/
@@ -115,19 +118,19 @@ Use `.local-artifacts/` for local-only, ignored outputs that help the current se
 ```
 
 **Rules:**
-- `.local-artifacts/` is ignored by git and safe for personal iteration outputs.
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` should be gitignored and is safe for personal iteration outputs once the workspace `.gitignore` template is applied.
 - Use it by default for ad hoc consensus runs, temporary context packets, raw CLI captures, and smoke-test artifacts.
-- If a debate, context packet, or smoke-test result becomes worth keeping for future project use, copy or rewrite the final retained artifact into `framework/reports/`.
+- If a debate, context packet, or smoke-test result becomes worth keeping for future project use, copy or rewrite the final retained artifact into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`.
 - Optional reports outside swarm consensus follow the same rule: local by default unless the user explicitly retains them.
 
 ---
 
 ## Reports Folder Convention
 
-All agent reports live under a single centralized folder. This is the single source of truth for retained artifacts outside of spec files. The subdirectory structure is pre-created in the repo — agents can write directly without creating directories.
+All agent reports live under a single centralized folder in the sibling project workspace. This is the single source of truth for retained artifacts outside of spec files.
 
 ```
-<AI_DEV_SHOP_ROOT>/framework/reports/
+<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/
   pipeline/
     <NNN>-<feature-name>/    (per-feature — see Pipeline Artifact Folder Convention above)
   codebase-analysis/
@@ -168,9 +171,9 @@ All agent reports live under a single centralized folder. This is the single sou
 ```
 
 **Rules:**
-- `framework/reports/` is for retained project artifacts, not disposable session scratch
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` is for retained project artifacts, not disposable session scratch
 - All agents write retained reports here — do not scatter canonical report files elsewhere
 - Test run reports are timestamped and never overwritten — each run is a separate audit artifact
 - The Programmer reads test state by running tests fresh, not by reading reports — reports are audit trail only
-- Provider-native planning artifacts live outside `framework/reports/` unless the provider profile explicitly says otherwise
-- Pipeline artifacts (adr.md, tasks.md, test-certification.md, red-team-findings.md) live in `framework/reports/pipeline/<NNN>-<feature-name>/`, not scattered elsewhere
+- Provider-native planning artifacts live outside `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` unless the provider profile explicitly says otherwise
+- Pipeline artifacts (adr.md, tasks.md, test-certification.md, red-team-findings.md) live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`, not scattered elsewhere

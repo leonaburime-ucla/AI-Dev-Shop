@@ -252,7 +252,7 @@ These terms appear throughout architecture discussions. Precision matters.
 
 Every significant architecture choice must be recorded. Use `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md` — it includes all required sections: Constitution Check, Research Summary, Context, Decision, Rationale, Pattern Evaluation, Consequences, Module/Service Boundaries, API/Event Contract Summary, Enforcement, Related Decisions, Default Heuristic Alignment, and Complexity Justification.
 
-ADRs live in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`. They are inputs to the Programmer Agent and Code Review Agent — architectural violations are violations of a recorded ADR.
+ADRs live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. They are inputs to the Programmer Agent and Code Review Agent — architectural violations are violations of a recorded ADR.
 
 ## Directory Structure Decision (Required in Every ADR)
 

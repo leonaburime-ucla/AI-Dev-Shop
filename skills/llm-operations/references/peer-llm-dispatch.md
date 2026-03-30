@@ -52,19 +52,19 @@ This section is the source of truth for the temporary dispatch fallback location
 
 Do not assume every peer CLI can read every local path.
 
-- Ignored repo paths such as `.local-artifacts/` may be invisible to some tool layers.
+- Ignored repo paths such as `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` may be invisible to some tool layers.
 - Generic OS temp paths such as `/tmp` may be outside the peer's allowed workspace.
 - Default pattern:
-  - write the authoring packet to `.local-artifacts/`
+  - write the authoring packet to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
   - if the peer can be served with a self-contained `stdin` payload, use that instead of any file path
   - if the peer can read the authoring path and still needs file-based transport, use it directly
   - if the peer cannot read it because the path is ignored, unreadable, or out of workspace, tell the user briefly and create a temporary peer-readable dispatch copy under `tmp/peer-dispatch/<workflow>/`
   - give the peer the dispatch copy path, not the authoring path
 - If needed, create a dispatch copy inside:
   - `tmp/peer-dispatch/<workflow>/` inside the repo workspace for local-only runs, or
-  - a retained `framework/reports/...` path only when the user explicitly wants a repo-kept artifact or the workflow itself is already being retained
+  - a retained `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/...` path only when the user explicitly wants a repo-kept artifact or the workflow itself is already being retained
 - Do not put the dispatch copy under a gitignored or tool-ignored path if the peer needs to read it with file tools.
-- Do not promote a local-only packet into `framework/reports/` just to satisfy peer readability. Use `tmp/` first.
+- Do not promote a local-only packet into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` just to satisfy peer readability. Use `tmp/` first.
 
 If the packet is copied for dispatch, record both:
 
@@ -93,9 +93,9 @@ While the peer process is still running:
 
 Dispatch copies are transport artifacts, not primary evidence.
 
-- Keep the authoring packet in `.local-artifacts/` or `framework/reports/` according to the user's retention choice.
+- Keep the authoring packet in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` or `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` according to the user's retention choice.
 - Delete temporary dispatch copies after the peer run finishes unless the user explicitly asks to retain them.
-- If a local-only dispatch copy in `tmp/` should be kept after the run, move it into `.local-artifacts/` instead of leaving it in `tmp/`.
+- If a local-only dispatch copy in `tmp/` should be kept after the run, move it into `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` instead of leaving it in `tmp/`.
 - If the dispatch copy is retained temporarily for troubleshooting, say so and clean it up before closing the task when feasible.
 
 ## Failure Classification
@@ -123,7 +123,7 @@ If that retry falls back to plain text, keep the fallback on a shorter bounded t
 - When resolving model names, always check `skills/swarm-consensus/references/cli-smoke-test.md` for documented model IDs before falling back to CLI probes or asking the user. That file is the canonical source for locally verified peer model names/versions.
 - If a requested Claude model is unproven locally or the CLI rejects it, run `skills/swarm-consensus/scripts/cli_smoke_test.py` in discovery mode before asking the user for another model. Do not keep guessing manually when the smoke harness already exists.
 - For Claude consensus flows, use discovery with `--claude-require json`. For Claude audit flows that may need plain-text fallback, use `--claude-require both`.
-- A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact.
+- A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact.
 - If discovery finds a working exact model in the same requested family/version, use that exact model and say it was smoke-proven on this host. If discovery only finds a different family/version, stop and ask the user before switching.
 - Keep the ask explicit: what to inspect, what to ignore, what output shape to return.
 - Require strengths as well as findings so the user sees what should stay unchanged.

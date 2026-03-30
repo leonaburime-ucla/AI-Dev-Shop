@@ -48,6 +48,8 @@ Render each of these as its own `-` bullet with a blank line between bullets:
 
 - `Consultation Mode (default ON) enables agent-to-agent communication via the Coordinator for difficult decisions while keeping one owner agent accountable for final output.`
 
+- `By default, AI Dev Shop creates and writes project-specific memory, reports, and local artifacts in a sibling \`ADS-project-knowledge/\` folder so they can be committed with the host project while \`AI-Dev-Shop-speckit/\` stays updateable.`
+
 - `Agent Consensus Mode is available for high-level debatable questions among several AI models; enter with /agent <name> consensus (or "talk to <agent> in consensus mode") and exit back to normal direct with /agent <name> (or "talk to <agent> directly").`
 
 - Use the `Startup copy:` line emitted by `bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>` for the sub-agent assistance bullet.

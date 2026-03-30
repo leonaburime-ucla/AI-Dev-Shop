@@ -156,7 +156,7 @@ Quick flow:
 - Treat `project-context.md` as the provider-native equivalent of a project constitution for implementation behavior.
 - When BMAD already produced `architecture.md`, use it as provider-native architecture input instead of pretending AI Dev Shop is starting from a raw PRD alone.
 - Treat epic/story artifacts and `sprint-status.yaml` as provider-native delivery planning surfaces; BMAD is not naturally modeled as one `tasks.md` file.
-- Keep AI Dev Shop retained reports under `framework/reports/pipeline/<feature>/` instead of writing toolkit-only state into `_bmad-output/`.
+- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` instead of writing toolkit-only state into `_bmad-output/`.
 
 ## Activation Checklist
 

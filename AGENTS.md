@@ -59,6 +59,7 @@ Translate internal terms on first meaningful use, then keep the explanation conc
 
 If this toolkit is a subfolder and the session starts at the parent project root:
 - Toolkit root placeholder: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (default: `AI-Dev-Shop-speckit/`)
+- Project workspace placeholder: `<ADS_PROJECT_KNOWLEDGE_ROOT>` means the sibling project-owned workspace folder (default: `ADS-project-knowledge/` next to the toolkit folder inside the host project)
 - Legacy note: older docs may mention a previous root placeholder; treat that as equivalent to `<AI_DEV_SHOP_ROOT>`.
 - All path references in this file use `<AI_DEV_SHOP_ROOT>`. If the folder is renamed, update `<AI_DEV_SHOP_ROOT>` in `CLAUDE.md` (or your tool's entry-point file) to match the new name.
 
@@ -161,11 +162,11 @@ Apply the detailed delegated naming and validity guard in `<AI_DEV_SHOP_ROOT>/sk
 
 - **Specs are ground truth.** Downstream work must reference the active spec version and hash.
 - **Spec provider is explicit.** Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` before assuming filenames, commands, or readiness gates for the spec surface.
-- **The constitution governs architecture.** Spec, Red-Team, and Architect must use `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`.
+- **The constitution governs architecture.** Spec, Red-Team, and Architect must use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`. The toolkit ships the default template at `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
 - **`[NEEDS CLARIFICATION]` blocks Architect dispatch.**
 - **The handoff contract is mandatory.** Every artifact includes inputs used, output summary, risks, and suggested next assignee.
-- **Framework source files are read-only during normal feature work.** Use `framework/reports/`, `.local-artifacts/`, and `project-knowledge/` as the writable project workspace unless maintaining the toolkit itself.
-- **Classify artifact intent before saving.** Required pipeline artifacts go to `framework/reports/` automatically. Optional retained reports require an explicit user save choice. Scratch prompts, raw logs, temporary captures, and other session-only artifacts go to `.local-artifacts/` by default.
+- **Framework source files are read-only during normal feature work.** Keep project-owned writes in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, and `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/` unless the user explicitly asks to keep state inside the toolkit for compatibility.
+- **Classify artifact intent before saving.** Required pipeline artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` automatically. Optional retained reports require an explicit user save choice. Scratch prompts, raw logs, temporary captures, and other session-only artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` by default.
 - **Fix upstream intent, not downstream drift.** If code, tests, or architecture diverge from the spec, route the issue back to the owning stage instead of patching around it.
 - **Evidence over invention.** Do not present guesses or memory as fact; if a claim is not grounded in inspected artifacts, tool output, or cited sources, mark uncertainty or say you do not know. See `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/anti-hallucination-policy.md`.
 - **Debug mode exists.** Toggle with `debug on` / `debug off`; see `<AI_DEV_SHOP_ROOT>/framework/workflows/trace-schema.md`.

@@ -32,7 +32,7 @@ Owns visual direction and UX specification for frontend features. Produces imple
 10. Route implementation handoff to Programmer and verification notes to QA/E2E and Code Review.
 
 ## Output Format
-Write design output to `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/design-spec.md` with:
+Write design output to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/design-spec.md` with:
 - Visual direction summary
 - Component inventory and state matrix
 - Responsive breakpoint behavior (mobile/tablet/desktop)

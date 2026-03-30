@@ -38,8 +38,8 @@ Interpret the discovery result this way:
 - if discovery finds only an older or different model family/version, stop and ask the user before switching
 - prefer `--claude-require json` for consensus runs that stay in structured-output mode
 - prefer `--claude-require both` for Claude audit flows that may need plain-text fallback
-- discovery mode auto-saves a dated artifact under `.local-artifacts/swarm-consensus/smoke-tests/`
-- discovery mode also updates `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json`
+- discovery mode auto-saves a dated artifact under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/`
+- discovery mode also updates `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json`
 - cache hits are valid only for the same environment tuple: hostname, OS, machine, Claude CLI version, and transport requirement, and only when the cached artifact path still exists
 
 Run Codex in an isolated directory to compare raw CLI behavior against repo-local behavior:
@@ -55,8 +55,8 @@ Suggested operating pattern:
 
 - run a dated baseline once after setting up consensus on a host
 - rerun after CLI upgrades, major model-family changes, or parser regressions
-- save ad hoc runs in `.local-artifacts/swarm-consensus/smoke-tests/` by default
-- only write to `framework/reports/swarm-consensus/smoke-tests/` when you explicitly want a retained host baseline in the repo
+- save ad hoc runs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/` by default
+- only write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/` when you explicitly want a retained host baseline in the repo
 - treat the saved artifact as evidence for updating saved model preferences or slash-command guidance
 - do not treat one machine's winning Claude model string as globally valid for other environments
 

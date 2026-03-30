@@ -21,7 +21,7 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
 ## Required Inputs
 - Diff and changed files
 - Active spec metadata (ID / version / hash)
-- Architecture constraints (relevant ADRs from `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`)
+- Architecture constraints (relevant ADRs from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
 - Test certification evidence
 
 ## Workflow
@@ -41,7 +41,7 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
 
 ## Output Format
 
-Write findings to `<AI_DEV_SHOP_ROOT>/framework/reports/code-review/CR-<feature-id>-<YYYY-MM-DD>.md`.
+Write findings to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/code-review/CR-<feature-id>-<YYYY-MM-DD>.md`.
 
 Report contents:
 - Findings ordered by severity (Required first, then Recommended)

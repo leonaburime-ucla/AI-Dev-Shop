@@ -7,8 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PIPELINE_DIR = ROOT / "framework/reports/pipeline"
-CONTINUITY_DIR = ROOT / "framework/reports/continuity"
+HOST_ROOT = ROOT.parent
+WORKSPACE_ROOT = HOST_ROOT / "ADS-project-knowledge"
+PIPELINE_DIR = WORKSPACE_ROOT / "reports/pipeline"
+CONTINUITY_DIR = WORKSPACE_ROOT / "reports/continuity"
 META_RE = re.compile(r"^- ([A-Za-z][A-Za-z0-9 /_-]*):\s*(.+)$")
 
 LEDGER_ALLOWED_MODES = {"not-needed", "optional", "required"}
@@ -44,7 +46,12 @@ class Violation:
 
 
 def repo_relative(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
+    for base in (HOST_ROOT, ROOT):
+        try:
+            return path.relative_to(base).as_posix()
+        except ValueError:
+            continue
+    return path.as_posix()
 
 
 def normalized_key(raw_key: str) -> str:
@@ -79,7 +86,10 @@ def has_heading(text: str, heading: str) -> bool:
 
 
 def is_retained_evaluator_dir(path: Path) -> bool:
-    rel = path.relative_to(ROOT).parts
+    try:
+        rel = path.relative_to(WORKSPACE_ROOT).parts
+    except ValueError:
+        return False
     return len(rel) == 3 and rel[0] == "reports" and rel[1] in {"pipeline", "continuity"}
 
 
@@ -105,7 +115,7 @@ def resolve_repo_path(path_text: str) -> Path | None:
     candidate = Path(path_text)
     if candidate.is_absolute():
         return None
-    return ROOT / candidate
+    return HOST_ROOT / candidate
 
 
 def validate_contract(path: Path) -> list[Violation]:
@@ -118,7 +128,7 @@ def validate_contract(path: Path) -> list[Violation]:
             Violation(
                 path,
                 "retained evaluator contract does not use the canonical filename prefix",
-                "rename it to evaluator-contract-<slug>.md under framework/reports/pipeline/<feature>/ or framework/reports/continuity/<workstream>/",
+                "rename it to evaluator-contract-<slug>.md under ADS-project-knowledge/reports/pipeline/<feature>/ or ADS-project-knowledge/reports/continuity/<workstream>/",
             )
         )
 
@@ -127,7 +137,7 @@ def validate_contract(path: Path) -> list[Violation]:
             Violation(
                 path,
                 "retained evaluator contract is outside the canonical retained locations",
-                "move it under framework/reports/pipeline/<feature>/ or framework/reports/continuity/<workstream>/",
+                "move it under ADS-project-knowledge/reports/pipeline/<feature>/ or ADS-project-knowledge/reports/continuity/<workstream>/",
             )
         )
 
@@ -177,7 +187,7 @@ def validate_contract(path: Path) -> list[Violation]:
             Violation(
                 path,
                 f"retained evaluator contract has non-repo-relative artifacts_root '{artifacts_root}'",
-                "set Artifacts Root to a repo-relative retained path such as framework/reports/pipeline/<feature>/",
+                "set Artifacts Root to a repo-relative retained path such as ADS-project-knowledge/reports/pipeline/<feature>/",
             )
         )
     elif resolved_artifacts_root is not None and not resolved_artifacts_root.exists():
@@ -221,7 +231,7 @@ def validate_report(path: Path) -> list[Violation]:
             Violation(
                 path,
                 "retained evaluator report is outside the canonical retained locations",
-                "move it under framework/reports/pipeline/<feature>/ or framework/reports/continuity/<workstream>/",
+                "move it under ADS-project-knowledge/reports/pipeline/<feature>/ or ADS-project-knowledge/reports/continuity/<workstream>/",
             )
         )
 

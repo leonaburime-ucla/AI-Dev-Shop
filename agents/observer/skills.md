@@ -34,7 +34,7 @@ Maintain auditability and enable system learning. The Observer does not sit in t
 - Agent outputs and routing events
 - Spec and test certification metadata
 - Iteration budget consumption per cluster
-- `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` — prior decisions, failures, facts, constitution events
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md` — prior decisions, failures, facts, constitution events
 
 ## Cadence
 
@@ -68,7 +68,7 @@ Use `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` as the operatin
 11. Produce weekly improvement recommendations, referencing specific memory entries and quality scores as evidence. Flag any benchmark regressions alongside skills.md change recommendations. Track constitution compliance score trends separately.
 
 ## Memory Guidelines
-- Use `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-schema.md` for entry format
+- Use `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-schema.md` for entry format when writing to `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md`
 - Tag entries consistently — tags are the primary query mechanism
 - If a FAILURE entry already exists for this cluster, add a new occurrence count entry rather than a duplicate
 - Track constitution article frequency in CONSTITUTION entries — a pattern of Article III exceptions may indicate over-engineering tendencies
@@ -76,7 +76,7 @@ Use `<AI_DEV_SHOP_ROOT>/harness-engineering/observer-cadence.md` as the operatin
 
 ## Output Format
 
-**Timeline Log** (per cycle): write to `<AI_DEV_SHOP_ROOT>/framework/reports/observer/timeline-CYCLE-<NNN>.md`
+**Timeline Log** (per cycle): write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/observer/timeline-CYCLE-<NNN>.md`
 ```
 Cycle: CYCLE-007
 Agents dispatched: Programmer, Security
@@ -85,7 +85,7 @@ Security: 3 findings (1 High, 2 Medium). High requires human sign-off.
 Iteration budget: AC-03 at 2/5, INV-01 at 2/5.
 ```
 
-**Pattern Report** (weekly): write to `<AI_DEV_SHOP_ROOT>/framework/reports/observer/pattern-report-<YYYY-WNN>.md`
+**Pattern Report** (weekly): write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/observer/pattern-report-<YYYY-WNN>.md`
 - Recurring failure clusters and their resolution paths
 - Agent failure modes observed more than once
 - Token efficiency trends (are cycles getting longer or shorter?)

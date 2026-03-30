@@ -6,7 +6,7 @@ A quick sanity-check for humans before resuming a pipeline run or reviewing memo
 
 ## 1. Pipeline State File (`pipeline-state.md`)
 
-Located at the active feature's canonical pipeline folder, usually: `framework/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
+Located at the active feature's canonical pipeline folder, usually: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
 
 ### Required fields
 - [ ] `run_id` is present and non-empty
@@ -42,7 +42,7 @@ Located at the active feature's canonical pipeline folder, usually: `framework/r
 
 ---
 
-## 2. Memory Store Entries (`project-knowledge/memory/memory-store.md`)
+## 2. Memory Store Entries (`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md`)
 
 Run this when reviewing entries written by the Observer, or when a human is promoting Observer recommendations to agent skills.md files.
 

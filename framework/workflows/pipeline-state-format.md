@@ -1,8 +1,8 @@
 # Pipeline State Format
 
-Every pipeline run writes a `pipeline-state.md` file to the active feature's canonical pipeline folder. The Coordinator reads this file at the start of every session to detect and resume incomplete runs.
+Every pipeline run writes a `pipeline-state.md` file to the active feature's canonical pipeline folder in the project-owned sibling workspace. The Coordinator reads this file at the start of every session to detect and resume incomplete runs.
 
-**Location:** `framework/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
+**Location:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
 
 Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the previous filename and migrate it to `pipeline-state.md` when the run is next resumed or updated.
 
@@ -25,7 +25,7 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - spec_support_paths: <comma-separated list or N/A>
 - started_at: <ISO-8601 UTC>
 - last_updated_at: <ISO-8601 UTC>
-- progress_ledger_path: <framework/reports/pipeline/.../progress-ledger.md or framework/reports/continuity/.../progress-ledger.md>
+- progress_ledger_path: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/.../progress-ledger.md or <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/.../progress-ledger.md
 - current_stage: <stage name — see Stages below>
 - status: IN_PROGRESS | WAITING_FOR_HUMAN | COMPLETE | FAILED | CANCELLED | ABORTED
 
@@ -34,8 +34,8 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 | Stage | Completed At | Output Artifact | Output Hash |
 |-------|-------------|-----------------|-------------|
 | spec | 2026-02-22T14:32:00Z | <provider-defined spec entrypoint> | sha256:abc... |
-| architect | 2026-02-22T15:10:00Z | framework/reports/pipeline/001-feature/adr.md | sha256:def... |
-| tasks | 2026-02-22T15:12:00Z | framework/reports/pipeline/001-feature/tasks.md | sha256:ghi... |
+| architect | 2026-02-22T15:10:00Z | ADS-project-knowledge/reports/pipeline/001-feature/adr.md | sha256:def... |
+| tasks | 2026-02-22T15:12:00Z | ADS-project-knowledge/reports/pipeline/001-feature/tasks.md | sha256:ghi... |
 
 ## Current Stage Detail
 
@@ -78,7 +78,7 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 ### `progress_ledger_path` (required for resumable or long-running work)
 
 ```markdown
-progress_ledger_path: framework/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md
+progress_ledger_path: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md
 ```
 
 Points to the human/agent-readable resume surface defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/session-continuity.md`.
@@ -163,7 +163,7 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 
 ## Read Rules
 
-- At session start, the Coordinator checks for `pipeline-state.md` in the active feature folder.
+- At session start, the Coordinator checks for `pipeline-state.md` in the active feature folder under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`.
 - If found and status is `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow the Recovery Playbook (`<AI_DEV_SHOP_ROOT>/framework/workflows/recovery-playbook.md`).
 - If found and status is `ABORTED`, treat as resumable — follow the Recovery Playbook.
 - If `progress_ledger_path` is present, read the ledger before resuming or retrying.
@@ -186,7 +186,7 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 - spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
 - started_at: 2026-02-22T14:30:00Z
 - last_updated_at: 2026-02-22T17:45:00Z
-- progress_ledger_path: framework/reports/pipeline/003-csv-invoice-export/progress-ledger.md
+- progress_ledger_path: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/progress-ledger.md
 - current_stage: programmer
 - spec_provider: speckit
 - status: IN_PROGRESS
@@ -199,10 +199,10 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 | Stage | Completed At | Output Artifact | Output Hash |
 |-------|-------------|-----------------|-------------|
 | spec | 2026-02-22T14:32:00Z | specs/003-csv-invoice-export/feature.spec.md | sha256:a3f8... |
-| red-team | 2026-02-22T14:55:00Z | framework/reports/pipeline/003-csv-invoice-export/red-team-findings.md | sha256:b1c4... |
-| architect | 2026-02-22T15:30:00Z | framework/reports/pipeline/003-csv-invoice-export/adr.md | sha256:b9e2... |
-| tasks | 2026-02-22T15:32:00Z | framework/reports/pipeline/003-csv-invoice-export/tasks.md | sha256:c7d3... |
-| tdd | 2026-02-22T16:10:00Z | framework/reports/pipeline/003-csv-invoice-export/test-certification.md | sha256:c1d4... |
+| red-team | 2026-02-22T14:55:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/red-team-findings.md | sha256:b1c4... |
+| architect | 2026-02-22T15:30:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/adr.md | sha256:b9e2... |
+| tasks | 2026-02-22T15:32:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/tasks.md | sha256:c7d3... |
+| tdd | 2026-02-22T16:10:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/test-certification.md | sha256:c1d4... |
 
 ## Current Stage Detail
 

@@ -143,7 +143,7 @@ For the default `spec-driven` schema:
 - Treat `design.md` as provider-native technical design input, not as an optional afterthought, when the selected schema requires it.
 - Treat `tasks.md` as provider-native implementation planning input.
 - Treat `archive` and `sync` as provider-owned lifecycle operations that reconcile change state back into baseline specs.
-- Keep AI Dev Shop retained reports under `framework/reports/pipeline/<feature>/` rather than storing toolkit-only state inside `openspec/`.
+- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` rather than storing toolkit-only state inside `openspec/`.
 
 ## Activation Checklist
 

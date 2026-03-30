@@ -24,7 +24,7 @@ Any EXCEPTION must have a row in the Complexity Justification table below.
 
 ## Research Summary
 
-- Research artifact: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/research.md` / N/A (no library or technology choices in spec)
+- Research artifact: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` / N/A (no library or technology choices in spec)
 - Key decision: <one-sentence summary of what was selected and why, or N/A>
 
 ## Context

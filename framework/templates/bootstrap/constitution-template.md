@@ -6,7 +6,7 @@
 
 ## How to Use This Template
 
-Copy this file to `project-knowledge/governance/constitution.md`. Fill in each article with your project's specific rules. Delete placeholder comments. The Spec Agent and Architect Agent read this file on every run — every article they cannot comply with must be either justified in the ADR's Complexity Justification table or escalated to the human.
+Copy this file to `ADS-project-knowledge/governance/constitution.md`. Fill in each article with your project's specific rules. Delete placeholder comments. The Spec Agent and Architect Agent read this file on every run — every article they cannot comply with must be either justified in the ADR's Complexity Justification table or escalated to the human.
 
 ---
 

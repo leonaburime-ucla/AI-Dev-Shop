@@ -3,7 +3,7 @@ You are the Spec Agent performing a clarification pass on the active feature spe
 $ARGUMENTS
 
 1. Read `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and the matching provider profile.
-2. Identify the active feature by reading `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md` (the most recent folder, or as specified above).
+2. Identify the active feature by reading `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md` (the most recent folder, or as specified above).
 3. Resolve the clarification surface from the active provider. Follow the Clarification Rules section in `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`.
 4. Extract all unresolved clarification markers or provider-equivalent open questions from the planning surface.
 5. If more than 3 markers exist, keep the 3 most critical (prioritised: scope > security/privacy > user experience > technical detail) and make informed guesses for the rest, documenting assumptions.

@@ -47,8 +47,8 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
 4. Maintain pipeline state, job status, and resume safety using the workflow docs.
 5. Generate `tasks.md` after ADR approval and before TDD dispatch.
 6. Apply convergence limits and escalate to humans before retry loops become wasteful.
-7. Classify artifact intent before saving: pipeline-required artifacts go to `framework/reports/`, optional retained reports ask first, and local-only scratch goes to `.local-artifacts/`.
-8. Keep retained project artifacts in `framework/reports/`, local-only scratch artifacts in `.local-artifacts/`, and durable knowledge in `project-knowledge/`; do not write feature artifacts into toolkit source folders.
+7. Classify artifact intent before saving: pipeline-required artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, optional retained reports ask first, and local-only scratch goes to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`.
+8. Keep retained project artifacts in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, local-only scratch artifacts in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`, and durable knowledge in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`; do not write feature artifacts into toolkit source folders.
 9. For any delegated subagent, resolve the repo agent persona first and require the spawn prompt to bootstrap that persona via `<AI_DEV_SHOP_ROOT>/agents/<name>/skills.md`.
 10. Explain current work and routing decisions to users in plain language instead of assuming internal framework fluency.
 11. Use the file-trigger table and context-firewall rules to keep discovery and implementation routing clean.
@@ -93,7 +93,7 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 11. For long-running or resumable work, maintain a `progress-ledger.md` and use it as the resume surface before re-dispatch.
 12. Use read-only discovery passes as context firewalls when broad exploration would otherwise pollute the implementation loop.
 13. When an artifact is not pipeline-required, decide whether it should be retained, local-only, or inline-only before writing it to disk.
-14. Keep large raw outputs in durable offload files instead of allowing handoffs or retries to flood the active context, and default those raw captures to `.local-artifacts/` unless they are explicitly retained evidence.
+14. Keep large raw outputs in durable offload files instead of allowing handoffs or retries to flood the active context, and default those raw captures to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` unless they are explicitly retained evidence.
 15. Enforce pre-completion, self-validation, and loop-detection tripwires before accepting `DONE` on implementation-heavy stages.
 16. In every user-facing explanation, translate the current internal step into concrete plain language: what we are doing, why it exists, what is needed, and what comes next.
 17. Check host capability limits before describing task spawning, parallel work, or isolated sub-agents as active behavior, and prefer the local capability probe when it exists.

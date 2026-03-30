@@ -62,7 +62,7 @@ Current status:
 - **For**: teams and solo builders who want coding agents to work through a defined software-delivery process instead of improvising
 - **Does**: routes work through specialized agents like Coordinator, Spec, Architect, TDD, Programmer, Code Review, and Security
 - **Produces**: durable artifacts such as specs, ADRs, task lists, test certifications, review findings, and project memory
-- **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it
+- **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it, while project-owned state lives in a sibling `ADS-project-knowledge/` folder
 
 ## Why It Exists
 
@@ -70,7 +70,7 @@ Most agent workflows are strong at generating code but weak at preserving intent
 
 - a runtime contract in `AGENTS.md`
 - a standard pipeline from request to implementation
-- writable project knowledge and reports for traceability
+- a clean split between toolkit source and project-owned writable state
 - clear human approval points before architecture, implementation, and shipping
 
 ## How It Works
@@ -79,7 +79,7 @@ Most agent workflows are strong at generating code but weak at preserving intent
 2. Point your coding tool at `AI-Dev-Shop-speckit/AGENTS.md`.
 3. Confirm or switch the active spec provider in `framework/spec-providers/active-provider.md`.
 4. Start in Coordinator mode or invoke a pipeline command.
-5. The framework routes work through the right agents and writes artifacts under `framework/reports/` and `project-knowledge/`.
+5. The framework routes work through the right agents and writes project-owned artifacts under a sibling `ADS-project-knowledge/` folder.
 
 ## At A Glance
 
@@ -104,10 +104,12 @@ Other hosts do not support native slash commands. For those, open the matching f
 ## First-Time Project Setup
 
 - Confirm the active provider in [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md).
-- Customize [constitution.md](project-knowledge/governance/constitution.md).
-- Fill in [project_memory.md](project-knowledge/memory/project_memory.md).
+- Create or allow AI Dev Shop to create a sibling `ADS-project-knowledge/` folder next to `AI-Dev-Shop-speckit/`.
+- Copy [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-project-knowledge/.gitignore` so `.local-artifacts/` stays local by default.
+- Copy the toolkit constitution template from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) to `ADS-project-knowledge/governance/constitution.md`, then customize it.
+- Fill in `ADS-project-knowledge/memory/project_memory.md`.
 - Start with the Coordinator in Review Mode, or run `/spec` once slash commands are installed.
-- Expect pipeline artifacts under `framework/reports/` and spec packages at the user-specified location outside the toolkit.
+- Expect retained pipeline artifacts under `ADS-project-knowledge/reports/`, local scratch under `ADS-project-knowledge/.local-artifacts/`, and spec packages at the user-specified location outside the toolkit.
 
 ## Key Files
 
@@ -126,10 +128,10 @@ Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current defa
 
 This toolkit keeps its engine files grouped while preserving a clean split between source and writable artifacts:
 
-- **The Engine (Read-Only):** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, and `framework/slash-commands/` are the framework source. They remain read-only during normal feature work to prevent agents from accidentally overwriting pipeline rules. You can safely overwrite these folders when upgrading to a new version of the toolkit.
-- **The Data (Writable):** `project-knowledge/` and `framework/reports/` are your local workspace. `framework/reports/` is grouped under `framework/` for organization, but it remains writable and is where agents save retained artifacts.
+- **The Engine (Read-Only):** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`, and the toolkit's own `project-knowledge/` reference material are framework source. They remain read-only during normal feature work to prevent agents from accidentally overwriting pipeline rules. You can safely overwrite these folders when upgrading to a new version of the toolkit.
+- **The Project Workspace (Writable):** `ADS-project-knowledge/` is the project-owned sibling workspace. Agents write retained artifacts to `ADS-project-knowledge/reports/`, memory to `ADS-project-knowledge/memory/`, the real constitution to `ADS-project-knowledge/governance/constitution.md`, local scratch to `ADS-project-knowledge/.local-artifacts/`, and future workspace metadata to `ADS-project-knowledge/meta/`.
 
-For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. That can be a `docs/` tree, a host-level `project-knowledge/` tree, or both, as long as the product repo stays the source of truth for its own PRD/architecture/runbook material.
+For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop-speckit/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.
 
 ## Architecture Defaults
 

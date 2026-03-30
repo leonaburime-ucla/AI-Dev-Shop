@@ -9,7 +9,7 @@ When a pipeline session ends mid-run (context limit hit, network drop, user clos
 At the start of every session, before doing anything else:
 
 1. Ask the user: "Is there an active feature in progress?"
-2. If yes, locate the canonical pipeline folder: `framework/reports/pipeline/<NNN>-<feature-name>/`
+2. If yes, locate the canonical pipeline folder: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
 3. Check for `pipeline-state.md` in that folder
 4. If `pipeline-state.md` is missing, check for legacy `.pipeline-state.md` and treat it as the same run state file
 5. If found and status is `IN_PROGRESS`, `WAITING_FOR_HUMAN`, or `ABORTED` → follow this playbook

@@ -6,26 +6,28 @@
 
 Any time a user says "remember this", "note this", "add this to memory", or gives a standing instruction, STOP. Read this file before writing anywhere. This file determines the destination. Writing memory to the wrong location is a routing violation — treat it with the same severity as a spec hash mismatch.
 
+For host-project runs, the authorized memory store is the sibling project workspace at `<ADS_PROJECT_KNOWLEDGE_ROOT>` (default: `ADS-project-knowledge/` next to the toolkit). The toolkit's own `project-knowledge/` tree is framework reference material and is not the default write target for host-project memory.
+
 ---
 
 ## Routing Table
 
 | Content Type | Destination File | Entry Format |
 |---|---|---|
-| Stable conventions that every agent must follow going forward | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [CONVENTION] <fact>` |
-| Project-specific gotchas, integration quirks, non-obvious platform behavior | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [GOTCHA] <fact>` |
-| Standing constraints (security, compliance, performance, platform limits) | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [CONSTRAINT] <fact>` |
-| Architectural patterns or tech decisions ratified for this project | `project-knowledge/memory/project_memory.md` | `- YYYY-MM-DD: [PATTERN] <fact>` |
-| Failures, recurring error clusters, postmortems, what broke and why | `project-knowledge/memory/learnings.md` | `- YYYY-MM-DD: [FAILURE] <what/why/resolution>` |
-| Agent output quality lessons — what a specific agent does wrong repeatedly | `project-knowledge/memory/learnings.md` | `- YYYY-MM-DD: [AGENT-LESSON] <agent> — <what and why>` |
-| Spec gaps that caused downstream failures | `project-knowledge/memory/learnings.md` | `- YYYY-MM-DD: [SPEC-GAP] <gap description and resolution>` |
-| Open questions awaiting a human decision | `project-knowledge/memory/project_notes.md` | `- YYYY-MM-DD: [OPEN] <question — owner — target date>` |
-| Deferred decisions: known issue, not urgent, no owner yet | `project-knowledge/memory/project_notes.md` | `- YYYY-MM-DD: [DEFERRED] <what is deferred and why>` |
-| Parking lot items: things to revisit after current work | `project-knowledge/memory/project_notes.md` | `- YYYY-MM-DD: [PARKING] <item>` |
-| Significant pipeline decisions (architecture, technology, spec direction) | `project-knowledge/memory/memory-store.md` | `[DECISION]` entry per schema in `memory-schema.md` |
-| Structured failure log for Observer pattern tracking | `project-knowledge/memory/memory-store.md` | `[FAILURE]` entry per schema in `memory-schema.md` |
-| Constitution compliance events (exceptions, violations) | `project-knowledge/memory/memory-store.md` | `[CONSTITUTION]` entry per schema in `memory-schema.md` |
-| Agent quality scores from LLM-as-judge passes | `project-knowledge/memory/memory-store.md` | `[QUALITY]` entry per schema in `memory-schema.md` |
+| Stable conventions that every agent must follow going forward | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` | `- YYYY-MM-DD: [CONVENTION] <fact>` |
+| Project-specific gotchas, integration quirks, non-obvious platform behavior | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` | `- YYYY-MM-DD: [GOTCHA] <fact>` |
+| Standing constraints (security, compliance, performance, platform limits) | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` | `- YYYY-MM-DD: [CONSTRAINT] <fact>` |
+| Architectural patterns or tech decisions ratified for this project | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` | `- YYYY-MM-DD: [PATTERN] <fact>` |
+| Failures, recurring error clusters, postmortems, what broke and why | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` | `- YYYY-MM-DD: [FAILURE] <what/why/resolution>` |
+| Agent output quality lessons — what a specific agent does wrong repeatedly | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` | `- YYYY-MM-DD: [AGENT-LESSON] <agent> — <what and why>` |
+| Spec gaps that caused downstream failures | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` | `- YYYY-MM-DD: [SPEC-GAP] <gap description and resolution>` |
+| Open questions awaiting a human decision | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md` | `- YYYY-MM-DD: [OPEN] <question — owner — target date>` |
+| Deferred decisions: known issue, not urgent, no owner yet | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md` | `- YYYY-MM-DD: [DEFERRED] <what is deferred and why>` |
+| Parking lot items: things to revisit after current work | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md` | `- YYYY-MM-DD: [PARKING] <item>` |
+| Significant pipeline decisions (architecture, technology, spec direction) | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md` | `[DECISION]` entry per schema in `memory-schema.md` |
+| Structured failure log for Observer pattern tracking | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md` | `[FAILURE]` entry per schema in `memory-schema.md` |
+| Constitution compliance events (exceptions, violations) | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md` | `[CONSTITUTION]` entry per schema in `memory-schema.md` |
+| Agent quality scores from LLM-as-judge passes | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md` | `[QUALITY]` entry per schema in `memory-schema.md` |
 
 ---
 
@@ -46,7 +48,7 @@ The following files MUST NEVER receive project memory, user instructions, learne
 | Any test file | Tests encode spec behavior. They are not memory stores. |
 | Any source code file | Source code implements specs. Memory does not belong in source. |
 
-**If you are unsure whether a file is forbidden:** ask yourself "does this file belong to the framework or to the project?" Framework files are forbidden. The `project-knowledge/` directory is the only authorized memory store.
+**If you are unsure whether a file is forbidden:** ask yourself "does this file belong to the framework or to the host project?" Framework files are forbidden. For host-project runs, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` is the only authorized memory store.
 
 ---
 
@@ -120,10 +122,10 @@ Reason: Standing code convention every agent must apply.
 ### Incorrect Routing (Violations)
 
 **WRONG:** Adding a "remember always use TypeDoc" rule to `agents/programmer/skills.md`.
-**WHY WRONG:** skills.md is a framework SOP file, not a project memory store. The fix belongs in `project_memory.md`. The Programmer Agent reads `project_memory.md` at dispatch time.
+**WHY WRONG:** skills.md is a framework SOP file, not a project memory store. The fix belongs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md`. The Programmer Agent reads that file at dispatch time.
 
 **WRONG:** Editing `AGENTS.md` to add "Note: this project uses Postgres 15."
-**WHY WRONG:** AGENTS.md is a framework file. Project-specific facts go in `project_memory.md`.
+**WHY WRONG:** AGENTS.md is a framework file. Project-specific facts go in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md`.
 
 **WRONG:** Adding a standing convention to a spec file under `specs/`.
 **WHY WRONG:** Specs are version-pinned artifacts for a specific feature. They are ground truth for what to build, not a place to store general conventions.
@@ -165,10 +167,10 @@ Under no circumstances should a "remember this" instruction result in a write to
 
 | File | Stable? | Written by | Read by | Purpose |
 |---|---|---|---|---|
-| `project_memory.md` | Yes — entries are permanent unless explicitly superseded | Human, Coordinator, any agent with routing authorization | All agents at dispatch | Stable conventions, gotchas, constraints, patterns |
-| `learnings.md` | Yes — append-only | Human, Observer, Coordinator | All agents; especially Spec Agent and TDD Agent | Failures, postmortems, agent quality lessons |
-| `project_notes.md` | No — entries are resolved or expired | Human, Coordinator | Spec Agent, Coordinator | Open questions, deferred decisions, parking lot |
-| `memory-store.md` | Yes — append-only, structured | Observer (primary), Coordinator | Observer, Coordinator | Structured searchable log; future Mem0 migration target |
+| `project_memory.md` under `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` | Yes — entries are permanent unless explicitly superseded | Human, Coordinator, any agent with routing authorization | All agents at dispatch | Stable conventions, gotchas, constraints, patterns |
+| `learnings.md` under `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` | Yes — append-only | Human, Observer, Coordinator | All agents; especially Spec Agent and TDD Agent | Failures, postmortems, agent quality lessons |
+| `project_notes.md` under `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` | No — entries are resolved or expired | Human, Coordinator | Spec Agent, Coordinator | Open questions, deferred decisions, parking lot |
+| `memory-store.md` under `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` | Yes — append-only, structured | Observer (primary), Coordinator | Observer, Coordinator | Structured searchable log; future Mem0 migration target |
 | `knowledge-routing.md` (this file) | Yes — framework update only | Human | All agents before writing any memory | Routing authority — determines destination for all memory writes |
 
 ---
@@ -177,7 +179,7 @@ Under no circumstances should a "remember this" instruction result in a write to
 
 - `memory-schema.md` defines the structured entry format for `memory-store.md`. Use it when an entry warrants the full structured format (significant decisions, failure clusters, constitution events, quality scores).
 - `memory-architecture.md` documents the Option A/B/C/D evaluation and the migration path from structured markdown to Mem0 when the file exceeds ~150 entries.
-- This file (`knowledge-routing.md`) is upstream of both: it determines WHICH file to write to. The schema and architecture files determine HOW to write to `memory-store.md` once routing has determined that is the destination.
+- This file (`knowledge-routing.md`) is upstream of both: it determines WHICH file under `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` to write to. The schema and architecture files determine HOW to write to `memory-store.md` once routing has determined that is the destination.
 
 Routing order of operations:
 1. Read `knowledge-routing.md` → determine destination file.

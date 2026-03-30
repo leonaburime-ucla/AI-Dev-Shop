@@ -1,6 +1,6 @@
 # Memory Schema
 
-Defines the entry format for `project-knowledge/memory/memory-store.md`. The Observer writes entries here. The Coordinator and other agents read entries when relevant context is needed.
+Defines the entry format for `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md`. The Observer writes entries there. The Coordinator and other agents read entries when relevant context is needed.
 
 All entries are append-only. Never edit or delete past entries — add a correction entry instead.
 

@@ -81,7 +81,7 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 ```
 
 Use the discovered `winner.model` only when it matches the requested family/version and it passed both JSON and text mode locally. If discovery finds only a different family/version, stop and ask the user before switching.
-A valid Claude proof is either an exact environment cache hit from `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
+A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
 6. If the exact planned model/version is not resolved by any source above, stop before dispatch and ask:
 
 `Planned auditor CLI: <CLI>. Exact model/version is not proven locally. Reply with auditor=... and claude_model=..., gemini_model=..., or codex_model=... using an exact model name/version to proceed.`
@@ -116,11 +116,11 @@ Default behavior:
 
 Default packet path:
 
-` .local-artifacts/external-audit/packets/<timestamp>-audit-packet.md `
+` <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/packets/<timestamp>-audit-packet.md `
 
 If the user explicitly wants the packet retained as project evidence, save it instead at:
 
-` framework/reports/external-audit/packets/<timestamp>-audit-packet.md `
+` <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/packets/<timestamp>-audit-packet.md `
 
 Packets are scratch by default unless the user explicitly asks to retain them.
 
@@ -132,7 +132,7 @@ Use `skills/llm-operations/references/peer-llm-dispatch.md` for the rule set.
 
 Dispatch workflow:
 
-1. Keep the authoring packet in `.local-artifacts/` or `framework/reports/` according to the user's retention choice.
+1. Keep the authoring packet in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` or `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` according to the user's retention choice.
 2. Prefer a self-contained `stdin` payload when the packet plus any needed excerpts fit cleanly in one bounded audit prompt.
 3. If the peer still needs to read a packet from disk, follow the file-transport and readability-probe rules in `skills/llm-operations/references/peer-llm-dispatch.md`.
 4. Use the dispatch packet path, not the authoring packet path, in the actual audit prompt when file-based transport is used.
@@ -154,8 +154,8 @@ Prefer structured output when the CLI supports it.
 
 - Parse `stdout` only as the auditor answer.
 - Treat `stderr` as diagnostics.
-- Save raw stdout/stderr captures to `.local-artifacts/external-audit/offloads/` by default.
-- Only retain raw offloads in `framework/reports/offloads/` if the user explicitly asks for retained evidence.
+- Save raw stdout/stderr captures to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/offloads/` by default.
+- Only retain raw offloads in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/offloads/` if the user explicitly asks for retained evidence.
 - Use host-specific references for auditor-specific transport quirks instead of restating them inline.
 
 Retry policy:
@@ -194,15 +194,15 @@ Use `skills/external-audit/references/external-audit-report-template.md` as the 
 2. Do not collapse the external audit into a prose blob.
 3. Before writing the final report to disk, if the user has not already specified retention, ask:
 
-`Save external audit report? Reply "save report" to retain it in framework/reports/external-audit/runs/, "local only" to keep it in .local-artifacts/external-audit/runs/, or "inline only" for no file.`
+`Save external audit report? Reply "save report" to retain it in <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/runs/, "local only" to keep it in <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/runs/, or "inline only" for no file.`
 
 4. Default saved location for ad hoc runs:
 
-` .local-artifacts/external-audit/runs/<timestamp>-external-audit-report.md `
+` <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/runs/<timestamp>-external-audit-report.md `
 
 5. Retained location when the user explicitly wants to keep it:
 
-` framework/reports/external-audit/runs/<timestamp>-external-audit-report.md `
+` <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/runs/<timestamp>-external-audit-report.md `
 
 6. The report must explicitly separate:
    - what the external LLM said it was auditing

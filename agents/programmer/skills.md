@@ -8,7 +8,7 @@ Base skills are the default standing context for every Programmer task.
 - `<AI_DEV_SHOP_ROOT>/skills/systematic-debugging/SKILL.md` — mandatory root-cause-first debugging workflow when tests fail or unexpected behavior appears
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — boundaries and contracts to stay within
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — highest-priority micro-level implementation rules (modular/composable/testable units) after macro architecture boundaries are set
-- `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project conventions in `<AI_DEV_SHOP_ROOT>/project-knowledge/` that apply to the current domain
+- `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project conventions in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` that apply to the current domain
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — load the specific pattern reference file(s) matching the architecture chosen in the ADR; provides TypeScript implementation examples, correct layer structure, file placement rules, and boundary enforcement; without this the Programmer cannot reliably implement the chosen pattern correctly
 - `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` — mandatory style-alignment step before production code for a new task or layer
 - `<AI_DEV_SHOP_ROOT>/skills/inline-code-documentation/SKILL.md` — inline documentation contract for all new or materially changed code
@@ -42,7 +42,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 ## Required Inputs
 - Active spec metadata (ID / version / hash)
 - Certified test suite with coverage gap report
-- Architecture boundaries and contracts (from ADRs in `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/`)
+- Architecture boundaries and contracts (from ADRs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
 - Coordinator routing directive with explicit scope and any activated conditional skills
 - `progress-ledger.md` when resuming a long-running task or when retry history matters
 - Self-validation harness template when runtime startup, API, UI, auth, migration, or integration behavior is in scope
@@ -75,7 +75,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - confirm no certified tests were deleted or weakened to manufacture green
    - confirm changed files stayed within scope, or disclose the deviation explicitly
    - record what remains open, if anything
-8. If runtime-changing behavior is in scope, run the appropriate self-validation harness from `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md` and write the result to `<AI_DEV_SHOP_ROOT>/framework/reports/self-validation/`.
+8. If runtime-changing behavior is in scope, run the appropriate self-validation harness from `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md` and write the result to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/self-validation/`.
    - Use the bounded self-validation retry rule from that file. Do not keep rerunning the same runtime check indefinitely.
    - If the failure is still ambiguous after the first repair pass, you may use one bounded diagnosis pass before the final rerun. Follow the definition in `<AI_DEV_SHOP_ROOT>/harness-engineering/self-validation.md`.
    - End with a clear status: `PASS`, `PARTIAL`, or `BLOCKER`.
@@ -145,6 +145,6 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - **Do not paste large raw outputs inline.** Save them as offloads and reference the file paths plus a short summary.
 - **Do not let discovery overwhelm implementation context.** If broad exploration is needed, isolate it into a read-only discovery pass first.
 - Prefer reversible, incremental changes
-- Check `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` for conventions before writing new patterns
+- Check `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` for conventions before writing new patterns
 - **Inline refactoring is permitted and expected** within files you are already modifying: rename for clarity, extract a duplicated helper, remove dead code you just replaced. All tests must stay green. This is good practice, not scope creep.
 - **Cross-file or out-of-scope structural refactoring is not your job.** If you notice tech debt in files you are not touching, flag it in your output as a Recommended finding for the Refactor Agent — do not go fix it. Mixing structural changes with feature implementation makes test failures undiagnosable.

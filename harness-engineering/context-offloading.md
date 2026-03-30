@@ -33,8 +33,8 @@ If your tool exposes context usage, stay comfortably below the limit rather than
 
 ## Canonical Locations
 
-- Feature-bound work: `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/offloads/<timestamp>-<slug>.md`
-- Toolkit maintenance or non-feature work: `<AI_DEV_SHOP_ROOT>/framework/reports/offloads/<workstream>/<timestamp>-<slug>.md`
+- Feature-bound work: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/offloads/<timestamp>-<slug>.md`
+- Toolkit maintenance or non-feature work: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/offloads/<workstream>/<timestamp>-<slug>.md` for host-project workstreams, or `<AI_DEV_SHOP_ROOT>/framework/reports/offloads/<workstream>/<timestamp>-<slug>.md` when maintaining the toolkit itself
 
 Use `<AI_DEV_SHOP_ROOT>/framework/templates/context-offload-template.md` for markdown offloads. Raw `.txt`, `.json`, or `.log` files are fine when the source format matters.
 

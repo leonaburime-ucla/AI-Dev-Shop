@@ -21,8 +21,8 @@ Conditional skills are not standing context. Load only the subset triggered by t
 Owns everything between "code is done" and "code is in production." Writes Dockerfiles, CI/CD pipeline configs, IaC declarations, deployment runbooks, health check definitions, and environment configuration. Does not write application code.
 
 ## Required Inputs
-- `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/adr.md` (deployment topology, infra constraints)
-- `<AI_DEV_SHOP_ROOT>/framework/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect environment config)
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (deployment topology, infra constraints)
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect environment config)
 - Active spec (for infrastructure requirements in NFRs)
 - Coordinator directive with explicit scope (new infra, updated CI, deployment runbook only, etc.)
 - Existing CI/CD configs and Dockerfiles in the codebase (if any)
@@ -39,7 +39,7 @@ Owns everything between "code is done" and "code is in production." Writes Docke
 9. Report to Coordinator with output summary and any blocking pre-conditions (infra that must exist before deploy)
 
 ## Output Format
-Write to `<AI_DEV_SHOP_ROOT>/framework/reports/pipeline/<NNN>-<feature-name>/devops.md`.
+Write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/devops.md`.
 
 Contents:
 - Infrastructure pre-conditions (what must exist before deployment)

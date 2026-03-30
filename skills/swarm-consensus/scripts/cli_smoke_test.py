@@ -19,8 +19,11 @@ from typing import List
 
 END_MARKER = "<<SWARM_END>>"
 DISCOVERY_CACHE_VERSION = 1
-DEFAULT_DISCOVERY_CACHE_PATH = ".local-artifacts/swarm-consensus/smoke-tests/last-known-good.json"
 REPO_ROOT = Path(__file__).resolve().parents[3]
+HOST_ROOT = REPO_ROOT.parent
+WORKSPACE_ROOT = HOST_ROOT / "ADS-project-knowledge"
+DEFAULT_SMOKE_TEST_DIR = WORKSPACE_ROOT / ".local-artifacts" / "swarm-consensus" / "smoke-tests"
+DEFAULT_DISCOVERY_CACHE_PATH = str(DEFAULT_SMOKE_TEST_DIR / "last-known-good.json")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -68,8 +71,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--artifacts-dir",
-        default=".local-artifacts/swarm-consensus/smoke-tests",
-        help="Directory for dated smoke-test artifacts when --save-artifact is used. Override with framework/reports/swarm-consensus/smoke-tests if you want a retained repo artifact.",
+        default=str(DEFAULT_SMOKE_TEST_DIR),
+        help="Directory for dated smoke-test artifacts when --save-artifact is used. Override with ADS-project-knowledge/reports/swarm-consensus/smoke-tests if you want a retained repo artifact.",
     )
     parser.add_argument(
         "--discover-claude",
@@ -208,6 +211,9 @@ def resolve_cache_artifact_path(value: str | None) -> Path | None:
     candidate = Path(str(value))
     if candidate.is_absolute():
         return candidate
+    host_candidate = (HOST_ROOT / candidate).resolve()
+    if host_candidate.exists() or candidate.parts[:1] == (WORKSPACE_ROOT.name,):
+        return host_candidate
     return (REPO_ROOT / candidate).resolve()
 
 

@@ -137,7 +137,7 @@ Important upstream behavior:
 - When `plan.md` exists, treat it as provider-native technical planning rather than pretending AI Dev Shop invented the architecture context from scratch.
 - When `tasks.md` exists, treat it as provider-native delivery planning input and preserve upstream `[P]` markers.
 - Do not relabel AI Dev Shop-local files as though they were native upstream Spec Kit artifacts.
-- Keep AI Dev Shop retained reports under `framework/reports/pipeline/<feature>/` instead of mutating the upstream Spec Kit layout to store toolkit-only artifacts.
+- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` instead of mutating the upstream Spec Kit layout to store toolkit-only artifacts.
 
 ## AI Dev Shop Compatibility Assets
 

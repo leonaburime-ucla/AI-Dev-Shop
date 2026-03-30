@@ -9,7 +9,7 @@ description: Use when analyzing an existing codebase for architectural flaws, co
 
 Analyzing an existing codebase requires token discipline. Reading every file is not viable for production codebases. This skill uses a three-phase approach that builds a complete picture through targeted reads rather than exhaustive ones.
 
-Reports are saved to `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/` — not kept in context. This makes findings persistent and loadable by the `architecture-migration` skill in a separate session.
+Reports are saved to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/` — not kept in context. This makes findings persistent and loadable by the `architecture-migration` skill in a separate session.
 
 ## Token Budget Before You Start
 
@@ -117,7 +117,7 @@ For each dependency found, determine the minimum change to make it injectable or
 
 ## Findings Report Format
 
-**Small/medium codebases:** Save as `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/ANALYSIS-<id>-<YYYY-MM-DD>.md`
+**Small/medium codebases:** Save as `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<YYYY-MM-DD>.md`
 
 **Large codebases:** Split into named parts:
 - `ANALYSIS-<id>-<date>-part1-structure.md`
@@ -177,7 +177,7 @@ State which option applies:
 
 ## Testability Remediation Plan Format
 
-Save to `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/TESTABILITY-<id>-<YYYY-MM-DD>.md`
+Save to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<YYYY-MM-DD>.md`
 
 Only produce this when Phase 4 is run.
 

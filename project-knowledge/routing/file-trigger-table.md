@@ -12,12 +12,12 @@ It is a routing aid, not an absolute law. Human intent and explicit mode switche
 | `project-knowledge/governance/**` | Coordinator or Architect | Governance and policy changes often affect global operating rules or architectural constraints. |
 | `project-knowledge/routing/**` | Coordinator | Routing docs are Coordinator-owned source-of-truth artifacts. |
 | `project-knowledge/operations/**` | Coordinator | Operational quickstarts, reminders, and runtime maps are Coordinator-owned. |
-| `framework/reports/codebase-analysis/**` | CodeBase Analyzer | Analysis artifacts belong to discovery and brownfield mapping. |
+| `ADS-project-knowledge/reports/codebase-analysis/**` | CodeBase Analyzer | Analysis artifacts belong to discovery and brownfield mapping. |
 | `specs/**`, `openspec/**`, `_bmad-output/**`, `**/PRD.md`, `**/ux-spec.md`, `**/story-*.md`, `**/epic-*.md` | Spec Agent | Provider-owned planning artifacts and clarifications belong to Spec until they are handed off downstream. |
-| `framework/reports/pipeline/**/red-team-findings.md` | Red-Team Agent | Adversarial preflight belongs to Red-Team. |
-| `framework/reports/pipeline/**/adr.md`, `framework/reports/pipeline/**/research.md` | Architect | ADRs and architecture research are Architect outputs. |
-| `framework/reports/pipeline/**/tasks.md`, `framework/reports/pipeline/**/pipeline-state.md` | Coordinator | Task generation and pipeline state are Coordinator-owned artifacts. |
-| `framework/reports/pipeline/**/test-certification.md`, `__tests__/**`, `tests/**` (test-definition work) | TDD Agent | Test design and certification belong to TDD. |
+| `ADS-project-knowledge/reports/pipeline/**/red-team-findings.md` | Red-Team Agent | Adversarial preflight belongs to Red-Team. |
+| `ADS-project-knowledge/reports/pipeline/**/adr.md`, `ADS-project-knowledge/reports/pipeline/**/research.md` | Architect | ADRs and architecture research are Architect outputs. |
+| `ADS-project-knowledge/reports/pipeline/**/tasks.md`, `ADS-project-knowledge/reports/pipeline/**/pipeline-state.md` | Coordinator | Task generation and pipeline state are Coordinator-owned artifacts. |
+| `ADS-project-knowledge/reports/pipeline/**/test-certification.md`, `__tests__/**`, `tests/**` (test-definition work) | TDD Agent | Test design and certification belong to TDD. |
 | `src/**/*.sql`, `db/**`, `migrations/**`, `supabase/migrations/**` | Database Agent | Schema, migration, and query ownership start with Database. |
 | `supabase/functions/**`, Supabase platform wiring | Database Agent -> Supabase Sub-Agent when needed | Supabase-specific implementation belongs to the platform specialist under Database. |
 | frontend UI files such as `app/**`, `pages/**`, `components/**`, `src/ui/**` | Programmer or UX/UI Designer depending on task | UI implementation belongs to Programmer; design-system or visual-direction work belongs to UX/UI Designer. |

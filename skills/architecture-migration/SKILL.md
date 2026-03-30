@@ -13,7 +13,7 @@ Architecture migration moves an existing codebase from its current structure to 
 
 ## Inputs
 
-Load from `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/`:
+Load from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/`:
 - The relevant `ANALYSIS-*.md` report(s) — all parts if split
 - Also load `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` for pattern selection
 - Also load `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` for the target pattern's implementation details
@@ -97,7 +97,7 @@ Addresses: FLAW-002, FLAW-008
 
 ## Step 5 — Output Format
 
-Save to `<AI_DEV_SHOP_ROOT>/framework/reports/codebase-analysis/MIGRATION-<analysis-id>-<YYYY-MM-DD>.md`.
+Save to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<analysis-id>-<YYYY-MM-DD>.md`.
 
 ```markdown
 # Architecture Migration Plan: <project-name>
