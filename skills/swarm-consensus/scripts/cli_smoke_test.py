@@ -16,6 +16,7 @@ import subprocess
 import sys
 import time
 from typing import List
+import tomllib
 
 END_MARKER = "<<SWARM_END>>"
 DISCOVERY_CACHE_VERSION = 1
@@ -163,6 +164,37 @@ def load_saved_claude_model() -> str | None:
     return str(model).strip() if model else None
 
 
+def load_saved_gemini_model() -> str | None:
+    payload = load_json_file(Path.home() / ".gemini" / "settings.json")
+    if not isinstance(payload, dict):
+        return None
+    model_block = payload.get("model")
+    if not isinstance(model_block, dict):
+        return None
+    model = model_block.get("name")
+    return str(model).strip() if model else None
+
+
+def load_saved_codex_config() -> dict[str, str]:
+    path = Path.home() / ".codex" / "config.toml"
+    try:
+        with path.open("rb") as handle:
+            payload = tomllib.load(handle)
+    except (FileNotFoundError, OSError, tomllib.TOMLDecodeError):
+        return {}
+
+    result: dict[str, str] = {}
+    model = payload.get("model")
+    reasoning = payload.get("model_reasoning_effort")
+    if model:
+        result["model"] = str(model).strip()
+    if reasoning:
+        result["reasoning_effort"] = str(reasoning).strip()
+    if result:
+        result["config_path"] = str(path)
+    return result
+
+
 def extract_model_suggestion(text: str) -> str | None:
     match = re.search(r"Try --model to switch to ([^\s\"']+)", text)
     if not match:
@@ -305,14 +337,102 @@ def snippet(text: str, limit: int = 160) -> str:
     return compact[: limit - 3] + "..."
 
 
-def build_cases(args: argparse.Namespace) -> list[tuple[str, list[str]]]:
+def resolve_model_plan(
+    args: argparse.Namespace,
+    discovery: dict[str, object] | None,
+    cli_versions: list[dict[str, str]],
+) -> dict[str, dict[str, object]]:
+    installed = {record["cli"] for record in cli_versions if record["path"] != "not installed"}
+    codex_config = load_saved_codex_config()
+    plan: dict[str, dict[str, object]] = {}
+
+    if "claude" in installed:
+        saved_claude_model = load_saved_claude_model()
+        claude_requested = args.claude_model
+        claude_source = "unknown"
+        claude_resolved = claude_requested or saved_claude_model
+        claude_note = ""
+        if claude_requested:
+            claude_source = "per_run_override"
+            claude_note = "explicit --claude-model"
+        elif saved_claude_model:
+            claude_source = "local_default"
+            claude_note = "from ~/.claude/settings.json"
+        if discovery and discovery.get("winner"):
+            winner = discovery["winner"]
+            if isinstance(winner, dict):
+                claude_resolved = winner.get("model") or claude_resolved
+                claude_source = str(winner.get("source") or "smoke_test_discovery")
+                claude_note = f"discovery requirement={discovery.get('requirement', 'json')}"
+        plan["claude"] = {
+            "cli": "claude",
+            "requested_model": claude_requested or "",
+            "resolved_model": claude_resolved or "",
+            "selection_source": claude_source,
+            "command_model": claude_requested or saved_claude_model or "",
+            "note": claude_note,
+        }
+
+    if "gemini" in installed:
+        gemini_saved_model = load_saved_gemini_model()
+        gemini_requested = args.gemini_model
+        gemini_source = "unknown"
+        gemini_resolved = gemini_requested or gemini_saved_model
+        gemini_note = ""
+        if gemini_requested:
+            gemini_source = "per_run_override"
+            gemini_note = "explicit --gemini-model"
+        elif gemini_saved_model:
+            gemini_source = "local_default"
+            gemini_note = "from ~/.gemini/settings.json"
+        plan["gemini"] = {
+            "cli": "gemini",
+            "requested_model": gemini_requested or "",
+            "resolved_model": gemini_resolved or "",
+            "selection_source": gemini_source,
+            "command_model": gemini_resolved or "",
+            "note": gemini_note,
+        }
+
+    if "codex" in installed:
+        codex_requested = args.codex_model
+        codex_saved_model = codex_config.get("model", "")
+        codex_source = "unknown"
+        codex_resolved = codex_requested or codex_saved_model
+        codex_note = ""
+        if codex_requested:
+            codex_source = "per_run_override"
+            codex_note = "explicit --codex-model"
+        elif codex_saved_model:
+            codex_source = "local_default"
+            codex_note = f"from {codex_config.get('config_path', '~/.codex/config.toml')}"
+        reasoning = codex_config.get("reasoning_effort")
+        if reasoning:
+            codex_note = f"{codex_note}; reasoning={reasoning}" if codex_note else f"reasoning={reasoning}"
+        plan["codex"] = {
+            "cli": "codex",
+            "requested_model": codex_requested or "",
+            "resolved_model": codex_resolved or "",
+            "selection_source": codex_source,
+            "command_model": codex_resolved or "",
+            "note": codex_note,
+        }
+
+    return plan
+
+
+def build_cases(
+    args: argparse.Namespace,
+    model_plan: dict[str, dict[str, object]],
+) -> list[tuple[str, list[str]]]:
     prompt = args.prompt
     cases: list[tuple[str, list[str]]] = []
 
     if not args.skip_claude and command_exists("claude"):
         claude_base = ["claude"]
-        if args.claude_model:
-            claude_base += ["--model", args.claude_model]
+        claude_model = str(model_plan.get("claude", {}).get("command_model", "")).strip()
+        if claude_model:
+            claude_base += ["--model", claude_model]
         cases.append(("claude_text", claude_base + ["-p", prompt]))
         cases.append(
             ("claude_json", claude_base + ["-p", "--output-format", "json", prompt])
@@ -320,15 +440,17 @@ def build_cases(args: argparse.Namespace) -> list[tuple[str, list[str]]]:
 
     if not args.skip_gemini and command_exists("gemini"):
         gemini_base = ["gemini"]
-        if args.gemini_model:
-            gemini_base += ["-m", args.gemini_model]
+        gemini_model = str(model_plan.get("gemini", {}).get("command_model", "")).strip()
+        if gemini_model:
+            gemini_base += ["-m", gemini_model]
         cases.append(("gemini_text", gemini_base + ["-p", prompt]))
         cases.append(("gemini_json", gemini_base + ["-o", "json", "-p", prompt]))
 
     if not args.skip_codex and command_exists("codex"):
         codex_base = ["codex", "exec", "--json"]
-        if args.codex_model:
-            codex_base += ["-m", args.codex_model]
+        codex_model = str(model_plan.get("codex", {}).get("command_model", "")).strip()
+        if codex_model:
+            codex_base += ["-m", codex_model]
         codex_base += ["--cd", args.codex_cd, "--skip-git-repo-check"]
         cases.append(("codex_json", codex_base + [prompt]))
 
@@ -603,6 +725,7 @@ def render_report(
     args: argparse.Namespace,
     cli_versions: list[dict[str, str]],
     discovery: dict[str, object] | None,
+    model_plan: dict[str, dict[str, object]],
 ) -> str:
     lines = [
         "# Swarm Consensus CLI Smoke Test",
@@ -621,6 +744,25 @@ def render_report(
     ]
     for record in cli_versions:
         lines.append(f"| `{record['cli']}` | `{record['path']}` | `{record['version']}` |")
+
+    if model_plan:
+        lines += [
+            "",
+            "## Model Resolution",
+            "",
+            "| CLI | Requested | Resolved | Selection Source | Note |",
+            "|---|---|---|---|---|",
+        ]
+        for cli in ("claude", "gemini", "codex"):
+            item = model_plan.get(cli)
+            if not item:
+                continue
+            lines.append(
+                f"| `{cli}` | `{item.get('requested_model') or 'n/a'}` | "
+                f"`{item.get('resolved_model') or 'unknown'}` | "
+                f"`{item.get('selection_source') or 'unknown'}` | "
+                f"`{item.get('note') or 'n/a'}` |"
+            )
 
     lines += [
         "",
@@ -680,6 +822,7 @@ def render_json_report(
     args: argparse.Namespace,
     cli_versions: list[dict[str, str]],
     discovery: dict[str, object] | None,
+    model_plan: dict[str, dict[str, object]],
 ) -> str:
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -689,6 +832,7 @@ def render_json_report(
         "case_timeout_seconds": args.case_timeout,
         "codex_cd": args.codex_cd,
         "cli_versions": cli_versions,
+        "model_resolution": model_plan,
         "results": [slim_case_result(result) for result in results],
         "discovery": discovery,
     }
@@ -708,6 +852,7 @@ def persist_claude_discovery(
     discovery: dict[str, object],
     cli_versions: list[dict[str, str]],
     args: argparse.Namespace,
+    model_plan: dict[str, dict[str, object]],
 ) -> dict[str, str] | None:
     if not discovery or not discovery.get("enabled"):
         return None
@@ -743,7 +888,7 @@ def persist_claude_discovery(
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     artifact_path = artifacts_dir / f"{timestamp}-claude-discovery.md"
 
-    markdown_report = render_report([], args, cli_versions, discovery)
+    markdown_report = render_report([], args, cli_versions, discovery, model_plan)
     artifact_path.write_text(markdown_report + "\n", encoding="utf-8")
 
     cache_path = Path(str(discovery.get("cache_path", args.discovery_cache_path)))
@@ -787,9 +932,17 @@ def persist_claude_discovery(
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
-    cases = build_cases(args)
     discovery: dict[str, object] | None = None
 
+    cli_versions = probe_cli_versions()
+    if args.discover_claude:
+        discovery = run_claude_discovery_with_environment(args, cli_versions)
+    model_plan = resolve_model_plan(args, discovery, cli_versions)
+    if args.discover_claude:
+        persistence = persist_claude_discovery(discovery, cli_versions, args, model_plan)
+        if persistence:
+            discovery["persistence"] = persistence
+    cases = build_cases(args, model_plan)
     if args.discover_claude:
         cases = [case for case in cases if not case[0].startswith("claude_")]
 
@@ -797,18 +950,12 @@ def main() -> int:
         print("No runnable cases found. Install at least one of: claude, gemini, codex.", file=sys.stderr)
         return 1
 
-    cli_versions = probe_cli_versions()
-    if args.discover_claude:
-        discovery = run_claude_discovery_with_environment(args, cli_versions)
-        persistence = persist_claude_discovery(discovery, cli_versions, args)
-        if persistence:
-            discovery["persistence"] = persistence
     results = [run_case(name, command, args.case_timeout) for name, command in cases]
     if args.output_format == "json":
-        report = render_json_report(results, args, cli_versions, discovery)
+        report = render_json_report(results, args, cli_versions, discovery, model_plan)
         suffix = ".json"
     else:
-        report = render_report(results, args, cli_versions, discovery)
+        report = render_report(results, args, cli_versions, discovery, model_plan)
         suffix = ".md"
     print(report)
 
