@@ -10,11 +10,11 @@ Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (us
 Local verification:
 
 ```bash
-bash harness-engineering/validators/probe_host_capabilities.sh
+bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host>
 bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>
 ```
 
-For the current environment, prefer the probe above plus `harness-engineering/runtime/capability-verification.md`. Treat this matrix as a planning default, not the final truth for version-sensitive features.
+For the current environment, prefer the probe above plus `harness-engineering/runtime/capability-verification.md`. Treat this matrix as a planning default, not the final truth for version-sensitive features. Use the resolver for startup; use the full probe when you need an explicit capability audit.
 
 ---
 

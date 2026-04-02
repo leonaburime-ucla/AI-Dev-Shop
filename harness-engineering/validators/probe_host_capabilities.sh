@@ -5,10 +5,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CATALOG_PATH="$ROOT_DIR/framework/routing/capability-probes.tsv"
 MD_OUTPUT=""
 JSON_OUTPUT=""
+HOST_FILTER=""
+CAPABILITY_FILTER=""
 
 usage() {
   cat <<'EOF'
-Usage: probe_host_capabilities.sh [--md <path>] [--json <path>] [--catalog <path>]
+Usage: probe_host_capabilities.sh [--host <host>] [--capability <capability>] [--md <path>] [--json <path>] [--catalog <path>]
 
 Runs local host capability probes from the capability catalog and prints a concise report.
 Optionally writes markdown and JSON artifacts.
@@ -17,6 +19,14 @@ EOF
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --host)
+      HOST_FILTER="$2"
+      shift 2
+      ;;
+    --capability)
+      CAPABILITY_FILTER="$2"
+      shift 2
+      ;;
     --md)
       MD_OUTPUT="$2"
       shift 2
@@ -123,10 +133,22 @@ VERIFIED_ON="$(date -u +"%Y-%m-%d")"
 REPORT_TEXT=$'Harness Host Capability Probe\n-----------------------------\n'
 REPORT_TEXT+="Generated: $GENERATED_AT"$'\n'
 REPORT_TEXT+="Catalog: ${CATALOG_PATH#$ROOT_DIR/}"$'\n'
+if [[ -n "$HOST_FILTER" ]]; then
+  REPORT_TEXT+="Host filter: $HOST_FILTER"$'\n'
+fi
+if [[ -n "$CAPABILITY_FILTER" ]]; then
+  REPORT_TEXT+="Capability filter: $CAPABILITY_FILTER"$'\n'
+fi
 
 MD_TABLE=$'# Host Capability Report\n\n'
 MD_TABLE+="Generated: $GENERATED_AT"$'\n\n'
 MD_TABLE+="Catalog: \`${CATALOG_PATH#$ROOT_DIR/}\`"$'\n\n'
+if [[ -n "$HOST_FILTER" ]]; then
+  MD_TABLE+="Host filter: \`$HOST_FILTER\`"$'\n\n'
+fi
+if [[ -n "$CAPABILITY_FILTER" ]]; then
+  MD_TABLE+="Capability filter: \`$CAPABILITY_FILTER\`"$'\n\n'
+fi
 MD_TABLE+='| Host | Capability | Scope | Status | Verification | Evidence | TTL (days) |'
 MD_TABLE+=$'\n'
 MD_TABLE+='|---|---|---|---|---|---|---|'
@@ -138,6 +160,8 @@ ENTRY_COUNT=0
 while IFS=$'\t' read -r host command_name capability scope probe_type probe_value failure_status ttl_days notes; do
   [[ -z "${host:-}" ]] && continue
   [[ "${host:0:1}" == "#" ]] && continue
+  [[ -n "$HOST_FILTER" && "$host" != "$HOST_FILTER" ]] && continue
+  [[ -n "$CAPABILITY_FILTER" && "$capability" != "$CAPABILITY_FILTER" ]] && continue
 
   probe_result="$(run_probe "$command_name" "$probe_type" "$probe_value" "$failure_status" "$notes")"
   IFS=$'\t' read -r status verification_method evidence <<< "$probe_result"

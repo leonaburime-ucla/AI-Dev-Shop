@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+CATALOG_PATH="$ROOT_DIR/framework/routing/capability-probes.tsv"
 HOST_ARG=""
 JSON_OUTPUT=""
 MD_OUTPUT=""
@@ -11,7 +12,7 @@ usage() {
 Usage: resolve_subagent_mode.sh [--host <host>] [--json <path>] [--md <path>]
 
 Resolves whether the current run should default to subagent-assisted execution
-or single-agent mode based on the host capability probe.
+or single-agent mode using a lightweight current-host subagent probe.
 EOF
 }
 
@@ -45,6 +46,73 @@ json_escape() {
   printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
 }
 
+trim_whitespace() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+run_probe() {
+  local command_name="$1"
+  local probe_type="$2"
+  local probe_value="$3"
+  local failure_status="$4"
+  local notes="$5"
+
+  local status=""
+  local verification_method="local_probe"
+  local evidence=""
+  local output=""
+
+  case "$probe_type" in
+    manual_only)
+      status="unverified"
+      verification_method="manual"
+      evidence="$notes"
+      printf '%s\t%s\t%s\n' "$status" "$verification_method" "$evidence"
+      return 0
+      ;;
+  esac
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    status="unavailable"
+    evidence="command '$command_name' not found on this host"
+    printf '%s\t%s\t%s\n' "$status" "$verification_method" "$evidence"
+    return 0
+  fi
+
+  case "$probe_type" in
+    feature_flag_true)
+      output="$("$command_name" features list 2>/dev/null || true)"
+      if printf '%s\n' "$output" | awk -v key="$probe_value" '$1 == key { print $3 }' | tail -n 1 | grep -qx 'true'; then
+        status="enabled"
+        evidence="'$command_name features list' reported '$probe_value' true"
+      else
+        status="$failure_status"
+        evidence="'$command_name features list' did not report '$probe_value' true"
+      fi
+      ;;
+    help_contains_literal)
+      output="$("$command_name" --help 2>/dev/null || true)"
+      if printf '%s\n' "$output" | grep -Fq -- "$probe_value"; then
+        status="enabled"
+        evidence="'$command_name --help' contained '$probe_value'"
+      else
+        status="$failure_status"
+        evidence="'$command_name --help' did not contain '$probe_value'"
+      fi
+      ;;
+    *)
+      status="unverified"
+      verification_method="manual"
+      evidence="unknown probe type '$probe_type'"
+      ;;
+  esac
+
+  printf '%s\t%s\t%s\n' "$status" "$verification_method" "$evidence"
+}
+
 detect_host() {
   if [[ -n "${HOST_ARG:-}" ]]; then
     printf '%s' "$HOST_ARG"
@@ -68,19 +136,35 @@ detect_host() {
   fi
 }
 
+probe_current_host_subagent_status() {
+  local target_host="$1"
+  local row_found=0
+
+  if [[ ! -f "$CATALOG_PATH" ]]; then
+    echo "Capability catalog not found: $CATALOG_PATH" >&2
+    exit 1
+  fi
+
+  while IFS=$'\t' read -r host command_name capability scope probe_type probe_value failure_status ttl_days notes; do
+    [[ -z "${host:-}" ]] && continue
+    [[ "${host:0:1}" == "#" ]] && continue
+    [[ "$host" != "$target_host" ]] && continue
+    [[ "$capability" != "subagent_spawning" ]] && continue
+
+    row_found=1
+    run_probe "$command_name" "$probe_type" "$probe_value" "$failure_status" "$notes"
+    return 0
+  done < "$CATALOG_PATH"
+
+  if [[ "$row_found" -eq 0 ]]; then
+    printf '%s\t%s\t%s\n' "unverified" "manual" "no subagent capability entry found for host '$target_host'"
+  fi
+}
+
 RESOLVED_HOST="$(detect_host)"
-PROBE_OUTPUT="$(bash "$ROOT_DIR/harness-engineering/validators/probe_host_capabilities.sh")"
-PROBE_LINE="$(printf '%s\n' "$PROBE_OUTPUT" | grep "^${RESOLVED_HOST} subagent_spawning:" || true)"
-
-STATUS="unverified"
-VERIFICATION_METHOD="manual"
-EVIDENCE="no subagent capability entry found for host '$RESOLVED_HOST'"
-
-if [[ -n "$PROBE_LINE" ]]; then
-  STATUS="$(printf '%s\n' "$PROBE_LINE" | sed -E 's/^[^:]+: ([^ ]+) .*/\1/')"
-  VERIFICATION_METHOD="$(printf '%s\n' "$PROBE_LINE" | sed -E 's/^.*\(([^;]+); .*$/\1/')"
-  EVIDENCE="$(printf '%s\n' "$PROBE_LINE" | sed -E 's/^.*; (.*)\)$/\1/')"
-fi
+PROBE_RESULT="$(probe_current_host_subagent_status "$RESOLVED_HOST")"
+IFS=$'\t' read -r STATUS VERIFICATION_METHOD EVIDENCE <<< "$PROBE_RESULT"
+EVIDENCE="$(trim_whitespace "$EVIDENCE")"
 
 MODE="single-agent"
 STARTUP_COPY=""

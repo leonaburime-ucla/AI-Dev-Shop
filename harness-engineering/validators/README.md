@@ -29,9 +29,11 @@ These validators are the first mechanical enforcement layer for this repo.
 - `probe_host_capabilities.sh`
   - checks version-sensitive host capabilities against the local environment when a reliable probe exists
   - prints `enabled`, `unavailable`, or `unverified` instead of relying on stale memory or docs alone
+  - intended for explicit audits, troubleshooting, or filtered host checks rather than mandatory startup
 - `resolve_subagent_mode.sh`
   - resolves whether the current run should default to `subagent-assisted` or `single-agent` mode
   - emits startup-friendly copy that includes the token-cost tradeoff and user toggles
+  - probes only the current host's `subagent_spawning` status so startup stays cheap
 
 ## Run Everything
 
@@ -42,7 +44,7 @@ bash harness-engineering/validators/run-all.sh
 ## Probe Current Host Capabilities
 
 ```bash
-bash harness-engineering/validators/probe_host_capabilities.sh
+bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host>
 ```
 
 Resolve startup mode for the current host:

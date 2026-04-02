@@ -17,13 +17,15 @@ Example:
 
 `We're doing harness engineering here, meaning we're improving the scaffolding around the agents: checks, benchmarks, resume logs, cleanup rules, and feedback loops. This step adds one of those guardrails so future runs are more reliable.`
 
-If the current host does not support true task-tool agent spawning, say that explicitly instead of implying separate helper agents are active. Use `harness-engineering/validators/probe_host_capabilities.sh` when a local probe exists, and `framework/routing/compatibility-matrix.md` only as the coarse fallback.
+If the current host does not support true task-tool agent spawning, say that explicitly instead of implying separate helper agents are active. Use `framework/routing/compatibility-matrix.md` only as the coarse fallback, and use `harness-engineering/validators/probe_host_capabilities.sh` for explicit capability audits or troubleshooting instead of as a startup dependency.
 
 Resolve subagent mode at startup when Bash is available:
 
 ```bash
 bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>
 ```
+
+This startup resolver should do only the current-host subagent check needed for boot. Do not fan out across every installed CLI just to print the startup block.
 
 If the result is `subagent-assisted`, default to helper-agent use for qualifying discovery, review, and parallel-safe work. If the result is `single-agent`, stay sequential and say so plainly. When helper mode is active, also explain that it usually uses more total tokens and that the user can say `single-agent mode` to turn it off.
 

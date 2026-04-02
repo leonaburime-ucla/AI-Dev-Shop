@@ -84,6 +84,8 @@ Use:
 bash harness-engineering/validators/resolve_subagent_mode.sh --host <detected-host>
 ```
 
+Startup should use only this lightweight current-host resolver. Do not run the full `probe_host_capabilities.sh` catalog walk during startup.
+
 Detection rule:
 
 - prefer explicit host identity from the current runtime

@@ -70,7 +70,7 @@ The current repo implementation uses:
 - Runtime mode resolver: `harness-engineering/validators/resolve_subagent_mode.sh`
 - Coarse host summary: `framework/routing/compatibility-matrix.md`
 
-The compatibility matrix is a planning aid. The local probe is the source of truth for the current environment when a reliable probe exists.
+The compatibility matrix is a planning aid. The local probe is the source of truth for explicit verification passes when a reliable probe exists. Startup should use the resolver's current-host-only check instead of shelling out to the full capability report.
 
 ## Extending To Another Host
 
