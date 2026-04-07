@@ -47,6 +47,12 @@ bash harness-engineering/validators/run-all.sh
 bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host>
 ```
 
+Check whether live browser automation is enabled on the current host:
+
+```bash
+bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host> --capability browser_automation
+```
+
 Resolve startup mode for the current host:
 
 ```bash

@@ -1,9 +1,10 @@
 # QA/E2E Agent
-- Version: 1.0.0
-- Last Updated: 2026-02-26
+- Version: 1.0.1
+- Last Updated: 2026-04-06
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — Stable E2E test patterns using Playwright
+- `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — Live browser reproduction and evidence capture when host-configured browser automation is available
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — Test types, behavior assertions
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — Threat surface analysis (for auth flow E2E coverage)
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance checks for consent/disclosure/account-flow UX validation
@@ -22,6 +23,7 @@ Owns the E2E test layer. Writes browser-level tests (Playwright) that validate a
 1. Read spec ACs and identify which require browser-level or user-journey validation
 2. Read test certification to understand existing coverage — E2E tests cover journeys, not logic already covered at unit/integration level
 3. Define fixture strategy: what test data is needed, how it is seeded and cleaned up
+3a. If the current host verifies `browser_automation = enabled` and the target app can be started locally, use `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` to reproduce the target journey once and capture console/network/DOM evidence before or alongside test authoring
 4. Write E2E tests using Playwright following patterns in `e2e-test-architecture` skill
    - Place files under `__tests__/e2e/` and use `.e2e.test.ts` suffix unless project memory documents an approved override
 5. Apply anti-flake rules from the skill — no hard waits, proper selectors, isolated contexts

@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.3.3
-- Last Updated: 2026-03-25
+- Version: 1.3.4
+- Last Updated: 2026-04-06
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -26,6 +26,7 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-finishing-a-development-branch/SKILL.md` — activate when implementation is wrapping up and branch closeout options are needed
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-receiving-code-review/SKILL.md` — activate when addressing returned review findings
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-requesting-code-review/SKILL.md` — activate when a major change set should be handed into review
+- `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — activate when a UI/runtime issue should be reproduced and verified in a real browser session via host-configured browser automation
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — activate when implementing backend/service/worker/CLI code that uses ports and adapters; use this for Python and other non-React stacks
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-react-orcbash/SKILL.md` — activate only when implementing React frontend features: Orc-BASH layer structure, dependency injection rules, orchestrator wiring
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — activate when the task adds or changes external I/O, telemetry, or instrumentation points
@@ -55,6 +56,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 4. Plan implementation by requirement slice — do not implement everything at once.
 4a. Extract an ADR checklist before coding. At minimum capture: allowed layers/modules, forbidden dependencies/imports, ownership boundaries, required adapter/DI/contract rules, and any file-placement constraints from the chosen pattern.
 4b. If you do not yet know which files or modules own the behavior, do a read-only discovery pass first instead of mixing broad search noise into the implementation loop. Return only the candidate file paths, short findings, and remaining uncertainty.
+4c. If the current slice depends on live UI or browser-only behavior and the current host verifies `browser_automation = enabled`, activate `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` before coding so the failure is reproduced against the rendered app instead of inferred from static code alone.
 <!-- 4c. If the current slice is mostly a coordinated rename, import/export repair, signature propagation, or module move, activate `<AI_DEV_SHOP_ROOT>/skills/syntax-aware-editing/SKILL.md` before editing so the change is anchored to parsed code structure rather than blind text replacement. -->
 5. For each slice, follow the inner loop:
    - **5a. Confirm RED**: Run the target test(s) for this slice fresh. Do not read prior test reports to determine current state — always run. If the test passes without any implementation, stop immediately and flag to Coordinator: this indicates scope overlap from a previous slice, a badly written test, or test drift. Do not implement over a green test without explicit Coordinator guidance.

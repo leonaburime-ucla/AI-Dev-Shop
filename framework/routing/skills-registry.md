@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.8
-last_updated: 2026-03-29
+version: 1.2.9
+last_updated: 2026-04-06
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -18,6 +18,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/refactor-patterns/SKILL.md` | Refactor Agent |
 | `skills/coordination/SKILL.md` | Coordinator, Observer |
 | `skills/context-engineering/SKILL.md` | Coordinator, Observer |
+| `skills/browser-live-analysis/SKILL.md` | Programmer, QA/E2E Agent |
 | `skills/memory-systems/SKILL.md` | Coordinator, Observer |
 | `skills/tool-design/SKILL.md` | Programmer |
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |

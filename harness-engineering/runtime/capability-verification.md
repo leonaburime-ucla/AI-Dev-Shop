@@ -45,7 +45,9 @@ Negative claims need evidence too.
 Examples:
 
 - acceptable: `Codex sub-agent spawning is enabled on this host because \`codex features list\` reports \`multi_agent true\`.`
+- acceptable: `Browser automation is enabled on this host because \`claude mcp list\` contained \`playwright\`.`
 - acceptable: `Gemini CLI sub-agent spawning is unverified here because this repo does not yet have a reliable local probe and no current official verification was loaded.`
+- acceptable: `Browser automation is unavailable in this Codex session because \`codex mcp list\` did not contain \`playwright\`.`
 - not acceptable: `Gemini CLI does not support sub-agents` unless the current host or official docs actually prove that
 
 ## User-Facing Language
@@ -61,6 +63,8 @@ Example:
 
 `What we're doing: running sequentially in one session. Why: sub-agent spawning is not verified on this current host, so the framework should not pretend isolated helper agents are active. Next: I'll keep context small with offload files and narrow discovery passes.`
 
+`What we're doing: debugging the live site in a browser. Why: this host has a configured browser automation provider, so the agent can inspect the rendered app instead of guessing from static code alone. What we need from you: usually nothing if the local app can start with the existing project command. Next: I'll reproduce the issue, inspect console and network evidence, then verify the fix in the same browser loop.`
+
 ## Repo Implementation
 
 The current repo implementation uses:
@@ -69,6 +73,13 @@ The current repo implementation uses:
 - Local probe script: `harness-engineering/validators/probe_host_capabilities.sh`
 - Runtime mode resolver: `harness-engineering/validators/resolve_subagent_mode.sh`
 - Coarse host summary: `framework/routing/compatibility-matrix.md`
+
+Current browser-automation mapping:
+
+- capability name: `browser_automation`
+- current provider: Playwright MCP when the current host's `mcp list` output contains `playwright`
+- recommended TTL: `7` days because local MCP server configuration can drift faster than CLI help surfaces or feature flags
+- future providers should extend the mapping instead of renaming the capability
 
 The compatibility matrix is a planning aid. The local probe is the source of truth for explicit verification passes when a reliable probe exists. Startup should use the resolver's current-host-only check instead of shelling out to the full capability report.
 

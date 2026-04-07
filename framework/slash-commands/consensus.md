@@ -8,7 +8,7 @@ Provide a mode and question. The active agent will dispatch this prompt to avail
 
 ## Arguments
 - `[mode] [controls] [prompt]`
-- `mode`: `single-pass` (default) or `debate`
+- `mode`: `single-pass` (default) or `debate` (defaults to `max_rounds=2` when selected)
 - `controls` (optional): `max_rounds=<int>`, `min_confidence=<0.0-1.0>`, `swarm_timeout_seconds=<int>`, `claude_model=<id>`, `gemini_model=<id>`, and/or `codex_model=<id>`
 - `prompt`: the detailed question or architectural problem to analyze
 
@@ -21,7 +21,7 @@ Act as a Swarm Consensus Coordinator.
    - Detect mode from first token when it is `single-pass` or `debate`; otherwise default to `single-pass`.
    - Detect optional controls anywhere in args: `max_rounds=<int>`, `min_confidence=<0.0-1.0>`, `swarm_timeout_seconds=<int>`, `claude_model=<id>`, `gemini_model=<id>`, and `codex_model=<id>`.
    - Remaining text is the prompt.
-   - Defaults if omitted: `max_rounds=3`, `min_confidence=0.90`, `swarm_timeout_seconds=300`.
+   - Defaults if omitted: `max_rounds=2` when `mode=debate`; `min_confidence=0.90`; `swarm_timeout_seconds=300`.
 2. Load the Swarm Consensus skill from `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`.
 3. Follow prerequisite checks to verify which CLIs (`claude`, `gemini`, `codex`) are installed, capture CLI version strings, and resolve the planned model for each peer.
 4. If any peer model is inferred rather than explicitly pinned for this run, or the exact resolved model ID cannot be proven, stop before dispatch and print a confirmation gate:

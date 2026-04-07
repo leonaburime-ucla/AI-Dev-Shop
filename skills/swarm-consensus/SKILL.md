@@ -1,7 +1,7 @@
 ---
 name: swarm-consensus
-version: 1.6.1
-last_updated: 2026-03-24
+version: 1.6.2
+last_updated: 2026-04-03
 description: Orchestrate a multi-model swarm by dispatching a prompt to all available LLM CLIs (whichever ones are installed), collating independent responses, and synthesizing a consensus. Supports single-pass and debate modes. Model-agnostic — the primary model is whoever is currently running this skill. OFF by default.
 ---
 
@@ -65,14 +65,14 @@ If the user does not specify mode, use `single-pass`.
 
 Consensus runs accept runtime controls from the user:
 
-- `max_rounds=<int>`: maximum rebuttal rounds (default `3`)
+- `max_rounds=<int>`: maximum rebuttal rounds (default `2` when mode is `debate`)
 - `min_confidence=<0.0-1.0>`: minimum agreement threshold to stop early (default `0.90`)
 - `swarm_timeout_seconds=<int>`: total wall-clock budget for the full consensus run across all peer calls and debate rounds (default `300`)
 - `claude_model=<id>`: per-run Claude model override
 - `gemini_model=<id>`: per-run Gemini model override
 - `codex_model=<id>`: per-run Codex model override
 
-If controls are not provided, use defaults. If provided values are invalid, state the invalid value and fall back to defaults.
+If controls are not provided, use defaults. In `single-pass`, `max_rounds` is unused. In `debate`, default to `2` rounds unless the user overrides it. If provided values are invalid, state the invalid value and fall back to defaults.
 
 ---
 

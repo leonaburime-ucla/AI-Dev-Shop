@@ -108,8 +108,19 @@ Other hosts do not support native slash commands. For those, open the matching f
 - Copy [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-project-knowledge/.gitignore` so `.local-artifacts/` stays local by default.
 - Copy the toolkit constitution template from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) to `ADS-project-knowledge/governance/constitution.md`, then customize it.
 - Fill in `ADS-project-knowledge/memory/project_memory.md`.
+- Optional for live website debugging: follow [framework/templates/bootstrap/playwright-mcp-setup.md](framework/templates/bootstrap/playwright-mcp-setup.md) to register the current browser-automation provider with your client. This is host setup, not a repo dependency.
 - Start with the Coordinator in Review Mode, or run `/spec` once slash commands are installed.
 - Expect retained pipeline artifacts under `ADS-project-knowledge/reports/`, local scratch under `ADS-project-knowledge/.local-artifacts/`, and spec packages at the user-specified location outside the toolkit.
+
+## Optional Live Browser Analysis
+
+AI Dev Shop can use a host-configured browser automation provider to open a running app, inspect the rendered UI, and verify fixes against real browser behavior.
+
+- Capability name: `browser_automation`
+- Current provider mapping: Playwright MCP
+- Ownership model: the user installs the MCP server in their client; the repo detects and uses it when present
+
+This keeps the framework modular. If a better browser provider replaces Playwright later, the capability can stay the same while the provider mapping changes.
 
 ## Key Files
 
@@ -129,7 +140,7 @@ Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current defa
 This toolkit keeps its engine files grouped while preserving a clean split between framework source and project-owned state:
 
 - **The Engine (Read-Only):** `agents/`, `skills/`, `framework/`, and `harness-engineering/` are the toolkit control surface. They stay read-only during normal host-project work so ADS can be updated independently without mixing framework logic with project state.
-- **The Workspace Mirror (Repo-Local Template):** `project-knowledge/` mirrors the external workspace shape inside this repo so the toolkit can ship defaults, examples, and bootstrap-ready files for governance, memory, reports, metadata, tmp, and local artifacts.
+- **The Workspace Mirror (Repo-Local Template):** `project-knowledge/` is the committed template and mirror of the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for governance, memory, reports, metadata, tmp, local artifacts, and project-owned workflow notes.
 - **The Project Workspace (Writable):** `ADS-project-knowledge/` is the project-owned sibling workspace. Agents write retained artifacts to `ADS-project-knowledge/reports/`, memory to `ADS-project-knowledge/memory/`, the real constitution to `ADS-project-knowledge/governance/constitution.md`, local scratch to `ADS-project-knowledge/.local-artifacts/`, and future workspace metadata to `ADS-project-knowledge/meta/`.
 
 For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop-speckit/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.

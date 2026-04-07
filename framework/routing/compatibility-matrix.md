@@ -25,6 +25,8 @@ For the current environment, prefer the probe above plus `harness-engineering/ru
 | **Slash commands** (`/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/audit-work`) | ✅ Full (after one-time setup) | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
 | **Option B manual workflow** (paste template contents as prompt) | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
 | **Task tool / agent spawning** | ✅ Full | ❌ Not supported | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Not supported |
+| **MCP server management** | ✅ Full | ❌ Not supported | ✅ Full | ✅ Full | ❌ Not supported |
+| **Live browser automation** (`browser_automation`, current provider: Playwright MCP) | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ❌ Not supported | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ❌ Not supported |
 | **Simulated multi-agent** (single session, roleplay stages) | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible |
 | **Filesystem reads** (provider-native spec roots such as `specs/`, `project-knowledge/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
 | **Filesystem writes** (state file, spec artifacts) | ✅ Native | ❌ Requires copy-out | ✅ Native | ✅ Native | ❌ Requires copy-out |
@@ -54,6 +56,14 @@ cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
 
 The Task tool enables true parallel agent dispatch and isolated context windows per agent. This is the recommended host for production use of this framework.
 
+MCP servers are supported. The current browser-automation provider is Playwright MCP. Add it with:
+
+```bash
+claude mcp add playwright npx @playwright/mcp@latest
+```
+
+Do not describe live browser automation as enabled until `claude mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host claude-code --capability browser_automation` proves that `playwright` is configured on the current machine.
+
 ### Claude.ai (web)
 
 No Task tool, no slash commands, no filesystem access. All pipeline stages run in a single conversation with manual routing. Use Option B: paste the contents of `framework/slash-commands/<command>.md` directly as your message.
@@ -66,6 +76,14 @@ Filesystem reads and writes work natively. Slash commands are not supported; use
 
 Do not hardcode task-spawning assumptions from memory alone. Verify current capability status with `bash harness-engineering/validators/probe_host_capabilities.sh` or `codex features list`.
 
+MCP servers are supported. The current browser-automation provider is Playwright MCP. Add it with:
+
+```bash
+codex mcp add playwright npx "@playwright/mcp@latest"
+```
+
+Do not describe live browser automation as enabled until `codex mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host codex-cli --capability browser_automation` proves that `playwright` is configured on the current machine.
+
 If Codex subagent spawning is available, do not assume spawned helpers automatically inherit AI Dev Shop repo personas. Codex platform helpers are only valid delegated AI Dev Shop agents when the spawn prompt explicitly bootstraps `agents/<resolved-agent>/skills.md` and the helper confirms it loaded.
 
 For `/audit-work`-style peer dispatch, the visible dispatch-copy path strategy should translate across OSes, but the shell snippets in this repo are still Bash-oriented and are not yet verified on native Windows shells.
@@ -75,6 +93,14 @@ For `/audit-work`-style peer dispatch, the visible dispatch-copy path strategy s
 Filesystem reads and writes work natively. Bash tool availability depends on your Gemini CLI configuration — verify before relying on TestRunner automation. Slash commands not supported; use Option B.
 
 Some Gemini CLI capabilities still require local or vendor verification in this repo. If the probe cannot prove a feature, describe it as `unverified`, not `unsupported`.
+
+MCP servers are supported. The current browser-automation provider is Playwright MCP. Add it with:
+
+```bash
+gemini mcp add playwright npx @playwright/mcp@latest
+```
+
+Do not describe live browser automation as enabled until `gemini mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host gemini-cli --capability browser_automation` proves that `playwright` is configured on the current machine.
 
 For `/audit-work`-style peer dispatch, the visible dispatch-copy path strategy should translate across OSes, but the shell snippets in this repo are still Bash-oriented and are not yet verified on native Windows shells.
 
@@ -101,6 +127,9 @@ Paste all relevant context into the prompt manually. Use Option B for every pipe
 Claude Code supports true isolated agent dispatch. Other hosts must be treated as runtime-sensitive instead of assumed from memory. Use the local capability probe to decide whether `[P]` means real parallel isolation or only a sequencing hint on the current install.
 
 If parallel agent support is unavailable or unverified on the current host, execute `[P]` tasks sequentially and keep discovery/validation output compact so accumulated context does not sprawl.
+
+**Browser automation via MCP:**
+Treat browser automation as a host capability, not a repo guarantee. The current provider mapping uses a configured `playwright` MCP server. If the current host cannot prove that provider is configured, keep the work in code/test/manual-debug mode instead of pretending live browser evidence exists.
 
 **SHA-256 hashing on web hosts:**
 Without Bash, generate hashes with `shasum -a 256 <file>` on macOS/Linux or `Get-FileHash -Algorithm SHA256 <file>` on Windows. Paste the result into the spec header. A missing or unverified hash degrades spec integrity guarantees but does not break the pipeline — flag it in the pipeline state Notes section.

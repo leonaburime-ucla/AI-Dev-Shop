@@ -117,6 +117,16 @@ run_probe() {
         evidence="'$command_name --help' did not contain '$probe_value'"
       fi
       ;;
+    mcp_list_contains_literal)
+      output="$("$command_name" mcp list 2>/dev/null || true)"
+      if printf '%s\n' "$output" | grep -Fq -- "$probe_value"; then
+        status="enabled"
+        evidence="'$command_name mcp list' contained '$probe_value'"
+      else
+        status="$failure_status"
+        evidence="'$command_name mcp list' did not contain '$probe_value'"
+      fi
+      ;;
     *)
       status="unverified"
       verification_method="manual"
