@@ -22,11 +22,12 @@ For the current environment, prefer the probe above plus `harness-engineering/ru
 
 | Feature | Claude Code | Claude.ai (web) | Codex CLI | Gemini CLI | Generic LLM |
 |---------|------------|-----------------|-----------|------------|-------------|
-| **Slash commands** (`/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/audit-work`) | ✅ Full (after one-time setup) | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
+| **Slash commands** (`/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/debate`, `/audit-work`) | ✅ Full (after one-time setup) | ❌ Not supported | ❌ Not supported | ❌ Not supported | ❌ Not supported |
 | **Option B manual workflow** (paste template contents as prompt) | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
 | **Task tool / agent spawning** | ✅ Full | ❌ Not supported | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Not supported |
 | **MCP server management** | ✅ Full | ❌ Not supported | ✅ Full | ✅ Full | ❌ Not supported |
 | **Live browser automation** (`browser_automation`, current provider: Playwright MCP) | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ❌ Not supported | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ❌ Not supported |
+| **Live Supabase verification** (`supabase_mcp`, current provider: Supabase MCP) | ⚠️ Probe locally; enabled only when a Supabase MCP server is configured | ❌ Not supported | ⚠️ Probe locally; enabled only when a Supabase MCP server is configured | ⚠️ Probe locally; enabled only when a Supabase MCP server is configured | ❌ Not supported |
 | **Simulated multi-agent** (single session, roleplay stages) | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible |
 | **Filesystem reads** (provider-native spec roots such as `specs/`, `project-knowledge/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
 | **Filesystem writes** (state file, spec artifacts) | ✅ Native | ❌ Requires copy-out | ✅ Native | ✅ Native | ❌ Requires copy-out |
@@ -64,6 +65,8 @@ claude mcp add playwright npx @playwright/mcp@latest
 
 Do not describe live browser automation as enabled until `claude mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host claude-code --capability browser_automation` proves that `playwright` is configured on the current machine.
 
+Do not describe live Supabase verification as enabled until `claude mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host claude-code --capability supabase_mcp` proves that `supabase` is configured on the current machine.
+
 ### Claude.ai (web)
 
 No Task tool, no slash commands, no filesystem access. All pipeline stages run in a single conversation with manual routing. Use Option B: paste the contents of `framework/slash-commands/<command>.md` directly as your message.
@@ -84,6 +87,8 @@ codex mcp add playwright npx "@playwright/mcp@latest"
 
 Do not describe live browser automation as enabled until `codex mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host codex-cli --capability browser_automation` proves that `playwright` is configured on the current machine.
 
+Do not describe live Supabase verification as enabled until `codex mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host codex-cli --capability supabase_mcp` proves that `supabase` is configured on the current machine.
+
 If Codex subagent spawning is available, do not assume spawned helpers automatically inherit AI Dev Shop repo personas. Codex platform helpers are only valid delegated AI Dev Shop agents when the spawn prompt explicitly bootstraps `agents/<resolved-agent>/skills.md` and the helper confirms it loaded.
 
 For `/audit-work`-style peer dispatch, the visible dispatch-copy path strategy should translate across OSes, but the shell snippets in this repo are still Bash-oriented and are not yet verified on native Windows shells.
@@ -101,6 +106,8 @@ gemini mcp add playwright npx @playwright/mcp@latest
 ```
 
 Do not describe live browser automation as enabled until `gemini mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host gemini-cli --capability browser_automation` proves that `playwright` is configured on the current machine.
+
+Do not describe live Supabase verification as enabled until `gemini mcp list` or `bash harness-engineering/validators/probe_host_capabilities.sh --host gemini-cli --capability supabase_mcp` proves that `supabase` is configured on the current machine.
 
 For `/audit-work`-style peer dispatch, the visible dispatch-copy path strategy should translate across OSes, but the shell snippets in this repo are still Bash-oriented and are not yet verified on native Windows shells.
 

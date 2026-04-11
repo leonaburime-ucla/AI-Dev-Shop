@@ -74,6 +74,8 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 | `/tasks` | Coordinator | tasks.md with [P] parallelization markers |
 | `/implement` | TDD → Programmer | test-certification.md → implementation to convergence |
 | `/code-review` | Code Review + Security | Required/Recommended findings + security report |
+| `/consensus` | Swarm Consensus | Multi-model consensus or debate report, depending on selected mode |
+| `/debate` | Swarm Consensus (`debate` mode shortcut) | Multi-model debate report with bounded rebuttal rounds |
 | `/audit-work` | External auditor review | Independent auditor findings plus Coordinator agree/disagree synthesis |
 | `/agent <name>` | Named agent (direct) | Enters Agent Direct Mode with the specified agent |
 | `/agent <name> consensus` | Named agent (direct + consensus) | Enters Agent Direct Mode and enables Swarm Consensus for debatable high-level questions |

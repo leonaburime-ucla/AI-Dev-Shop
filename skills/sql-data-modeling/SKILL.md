@@ -1,7 +1,7 @@
 ---
 name: sql-data-modeling
-version: 1.1.1
-last_updated: 2026-03-22
+version: 1.1.2
+last_updated: 2026-04-10
 description: Use when designing relational schemas, producing ERDs, planning migrations, selecting data types, defining constraints, or reasoning about normalization and indexing strategy. Platform-agnostic — applies to any SQL database.
 ---
 
@@ -9,10 +9,13 @@ description: Use when designing relational schemas, producing ERDs, planning mig
 
 A schema is a contract. Downstream implementation quality depends on whether the data model correctly represents the domain, enforces invariants in the database, and supports the required query patterns.
 
+This skill owns design-time scalability checks for relational schemas. Runtime verification against a live Supabase project belongs in `skills/supabase/SKILL.md`.
+
 Keep this file lean. Read it for the modeling contract, then load only the reference files needed for the specific task.
 
 ## Version Notes
 
+- `1.1.2` makes the design-time scalability boundary explicit and adds an index-coverage hard gate for documented query patterns.
 - `1.1.1` clarifies that the lean `SKILL.md` is a routing layer, not a content reduction. The reference files now carry fuller examples for normalization, composite keys, and index design.
 - `1.1.0` converted the old monolithic skill into a map-plus-references structure so agents can load only the relevant depth for the task.
 
@@ -84,6 +87,7 @@ Before modeling, confirm:
 
 - Do not leave ownership or cardinality ambiguous.
 - Do not omit FK constraints when the relationship is real.
+- Do not approve a schema until every documented query pattern has an explicit index story, including all foreign keys and every column used in `WHERE`, join, or `ORDER BY` predicates, or a written reason why an index is intentionally omitted.
 - Do not use application code as the only enforcement layer for schema invariants.
 - Do not denormalize without a documented reason and maintenance strategy.
 - Do not plan destructive or data-transforming migrations without rollback thinking.

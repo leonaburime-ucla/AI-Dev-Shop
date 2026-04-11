@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.9
-last_updated: 2026-04-06
+version: 1.2.10
+last_updated: 2026-04-10
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -26,6 +26,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
 | `skills/architecture-migration/SKILL.md` | CodeBase Analyzer |
 | `skills/design-patterns/SKILL.md` | Architect, CodeBase Analyzer, System Blueprint Agent (secondary) |
+| `skills/backend-implementation/SKILL.md` | Programmer (default backend/service/worker implementation entrypoint) |
 | `skills/hexagonal-architecture/SKILL.md` | Architect, Programmer, CodeBase Analyzer, System Blueprint Agent |
 | `skills/system-blueprint/SKILL.md` | System Blueprint Agent, Coordinator |
 | `skills/system-design/SKILL.md` | System Blueprint Agent, Architect (shared macro-topology and architecture-spec reference) |

@@ -1,13 +1,15 @@
 ---
 name: postgresql
-version: 1.1.0
-last_updated: 2026-03-18
+version: 1.1.1
+last_updated: 2026-04-10
 description: Use when writing advanced PostgreSQL queries, implementing triggers, stored functions, full-text search, JSONB operations, partitioning, or diagnosing query performance. Applies to any PostgreSQL host (Supabase, RDS, Railway, Neon, self-hosted).
 ---
 
 # Skill: PostgreSQL
 
 PostgreSQL is not just a relational database. It is a programmable data platform with strong querying, indexing, search, and performance tooling. Use advanced PostgreSQL features when they solve a real problem, and document why they were chosen.
+
+This skill owns design-time and query-shape scalability checks for PostgreSQL behavior. Runtime verification against a live Supabase project belongs in `skills/supabase/SKILL.md`.
 
 Keep this file lean. Open references only when you need concrete syntax or deeper examples:
 
@@ -22,6 +24,11 @@ Keep this file lean. Open references only when you need concrete syntax or deepe
 - Do not move logic into triggers or stored functions unless the database is the right ownership boundary.
 - Check host support before choosing extensions or operational features.
 - When PostgreSQL behavior is part of the architecture, record the choice in the ADR or spec constraints.
+
+## Hard Gates
+
+- Do not approve DDL or API-facing query design for large, hot, or high-traffic tables without a documented indexing rationale, pagination strategy, and a partitioning rationale when partitioning is proposed.
+- Do not approve performance-sensitive query work without stating how plan shape will be verified later: static reasoning here, and live verification in the Supabase layer when a live project exists.
 
 ## Table Design Guardrails
 

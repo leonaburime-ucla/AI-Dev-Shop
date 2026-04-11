@@ -53,6 +53,12 @@ Check whether live browser automation is enabled on the current host:
 bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host> --capability browser_automation
 ```
 
+Check whether live Supabase verification is enabled on the current host:
+
+```bash
+bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host> --capability supabase_mcp
+```
+
 Resolve startup mode for the current host:
 
 ```bash

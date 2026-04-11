@@ -1,7 +1,7 @@
 # Swarm Consensus Command (/consensus)
 
 ## Purpose
-To invoke the multi-model Swarm Consensus skill to solve a complex problem using the combined reasoning of available CLI LLM tools (Gemini, Claude, Codex).
+To invoke the multi-model Swarm Consensus skill to solve a complex problem using the combined reasoning of available CLI LLM tools (Gemini, Claude, Codex). Use `/debate` as a shorthand when you specifically want debate mode.
 
 ## Usage
 Provide a mode and question. The active agent will dispatch this prompt to available LLM CLIs, collate independent responses, and synthesize a final `consensus-report.md`.

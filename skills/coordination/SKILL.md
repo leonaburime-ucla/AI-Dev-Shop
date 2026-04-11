@@ -1,7 +1,7 @@
 ---
 name: coordination
-version: 1.4.3
-last_updated: 2026-03-25
+version: 1.4.4
+last_updated: 2026-04-10
 description: Use when routing between agents, handling Review Mode intake, activating conditional skills, enforcing convergence policy, managing iteration budgets, formatting cycle summaries, or deciding when to escalate to a human checkpoint.
 ---
 
@@ -109,7 +109,7 @@ When dispatching an agent that separates base skills from conditional skills:
 
 Default Programmer activation rules:
 - `frontend-react-orcbash` when scope includes React, Next.js, frontend components, hooks, or UI state or orchestrator work
-- `hexagonal-architecture` when scope includes backend, service, worker, or CLI code or ADR-selected ports-and-adapters boundaries
+- `backend-implementation` when scope includes backend, service, worker, API-handler, or CLI implementation work; this becomes the default backend entrypoint and loads narrower backend skills such as `hexagonal-architecture`, `api-design`, `api-contracts`, `observability-implementation`, and `change-management` only when the task actually needs them
 - `tool-design` when the task builds agent tools, CLIs, tool interfaces, or operator-facing error or reporting surfaces
 - `observability-implementation` when the task adds or changes external I/O, telemetry, tracing, or instrumentation points
 - `change-management` and `architecture-migration` when dispatch includes `MIGRATION-*.md`, phased rollout, dual writes, backfill, or compatibility-window work

@@ -1,7 +1,7 @@
 ---
 name: supabase
-version: 1.1.1
-last_updated: 2026-03-22
+version: 1.1.3
+last_updated: 2026-04-10
 description: Use when implementing Supabase-specific features including Row Level Security, PostgREST API conventions, realtime subscriptions, storage buckets, edge functions, auth integration, and typed client setup.
 ---
 
@@ -11,10 +11,20 @@ Supabase is PostgreSQL plus platform services: PostgREST, realtime, storage, edg
 
 The core rule is simple: **RLS is the security layer for almost everything.** If RLS is wrong, database queries, PostgREST requests, realtime subscriptions, and storage behavior will be wrong, often silently.
 
+This skill owns runtime verification when a live Supabase project exists. Design-time scalability checks for schema and general PostgreSQL behavior stay in `sql-data-modeling` and `postgresql`.
+
+Current provider boundary:
+
+- AI Dev Shop capability name: `supabase_mcp`
+- Current provider mapping: a configured `supabase` MCP server on the current host
+- Ownership split: the client installs the MCP server; the repo detects and uses it when present
+
 Keep this file lean. Read it for the operational contract, then load only the reference files needed for the task at hand.
 
 ## Version Notes
 
+- `1.1.3` adds explicit MCP capability preflight so live verification runs only when both generic MCP support and a configured `supabase` MCP server are proven on the current host.
+- `1.1.2` makes the runtime-verification boundary explicit and adds a live-project performance gate for query-layer work.
 - `1.1.1` backfills deeper reference coverage for multi-tenant policy patterns, policy debugging, RPC conventions, and edge-function auth context.
 - `1.1.0` converted the old monolithic skill into a map-plus-references structure so agents can load platform depth selectively instead of carrying every Supabase topic at once.
 
@@ -48,6 +58,32 @@ Start here, then load only the reference you need:
 - `references/realtime-and-storage.md` for publications, subscriptions, presence, buckets, and storage policies
 - `references/edge-functions-and-auth.md` for edge functions, secrets, `auth.users`, profiles, and custom claims
 - `references/performance-and-gotchas.md` for indexing, pagination, planning, and silent-failure traps
+
+## Preflight
+
+Run this preflight before claiming live Supabase verification:
+
+1. Resolve the current host.
+2. Verify MCP surface support:
+
+```bash
+bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host> --capability mcp_surface
+```
+
+3. If `mcp_surface` is not `enabled`, stop there and report that live Supabase verification cannot be proven on this host.
+4. Verify Supabase MCP availability:
+
+```bash
+bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host> --capability supabase_mcp
+```
+
+5. Interpret the result exactly:
+   - `enabled`: the current host can use the configured Supabase MCP provider on this machine; this proves provider presence, not project reachability or authentication
+   - `unavailable`: the current host supports MCP, but no `supabase` MCP server is configured
+   - `unverified`: the repo cannot prove live Supabase verification on this host
+
+If `supabase_mcp` is not `enabled`, do not bluff. Fall back to static `sql-data-modeling` and `postgresql` checks plus any manual verification instructions that fit the task.
+If `supabase_mcp` is `enabled` but the actual runtime verification path fails because the provider is unreachable, unauthenticated, or not attached to the expected project, report that explicitly and fall back to static checks plus manual follow-up guidance.
 
 ## When to Use
 
@@ -99,6 +135,10 @@ Before implementing, confirm:
 - Never use `SECURITY DEFINER` without explicit auth checks inside the function.
 - Never assume a public bucket removes the need for object policies.
 - Never bypass RLS accidentally through admin clients imported into shared code.
+
+## Runtime Verification Gate
+
+- When a live Supabase project is connected, `mcp_surface = enabled`, `supabase_mcp = enabled`, and the task changes query-layer behavior, do not mark the work complete without verifying the critical path with the available project tooling. At minimum, confirm actual versus expected query-plan shape and inspect for obvious index, pagination, or RLS-predicate regressions. Express this verification as intent; resolve the exact MCP, advisor, SQL, or dashboard path at runtime.
 
 ## Implementation Defaults
 

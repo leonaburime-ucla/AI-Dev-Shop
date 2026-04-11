@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.3.4
-- Last Updated: 2026-04-06
+- Version: 1.3.5
+- Last Updated: 2026-04-10
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -27,7 +27,7 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-receiving-code-review/SKILL.md` — activate when addressing returned review findings
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-requesting-code-review/SKILL.md` — activate when a major change set should be handed into review
 - `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — activate when a UI/runtime issue should be reproduced and verified in a real browser session via host-configured browser automation
-- `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — activate when implementing backend/service/worker/CLI code that uses ports and adapters; use this for Python and other non-React stacks
+- `<AI_DEV_SHOP_ROOT>/skills/backend-implementation/SKILL.md` — activate as the default entrypoint for backend/service/worker/API implementation; it pulls in narrower backend skills such as hexagonal architecture, API contract guidance, observability, and change management only when those concerns are actually in scope
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-react-orcbash/SKILL.md` — activate only when implementing React frontend features: Orc-BASH layer structure, dependency injection rules, orchestrator wiring
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — activate when the task adds or changes external I/O, telemetry, or instrumentation points
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — activate when implementation includes phased rollout, compatibility windows, or dual writes

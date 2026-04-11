@@ -12,6 +12,7 @@ description: Orchestrate a multi-model swarm by dispatching a prompt to all avai
 ## When to Use
 
 - User explicitly requests "consensus", "swarm analysis", or uses the `/consensus` command
+- User explicitly requests "debate" or uses the `/debate` shortcut command
 - Coordinator directs a specific agent to use Swarm Consensus for a single hard task
 - An ADR has profound architectural consequences and requires multi-perspective validation
 - Red-Team is probing a spec for blind spots that a single model might miss

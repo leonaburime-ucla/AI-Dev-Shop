@@ -81,6 +81,13 @@ Current browser-automation mapping:
 - recommended TTL: `7` days because local MCP server configuration can drift faster than CLI help surfaces or feature flags
 - future providers should extend the mapping instead of renaming the capability
 
+Current live Supabase verification mapping:
+
+- capability name: `supabase_mcp`
+- current provider: Supabase MCP when the current host's `mcp list` output contains `supabase`
+- recommended TTL: `7` days because local MCP server configuration can drift faster than CLI help surfaces or feature flags
+- future providers should extend the mapping instead of renaming the capability
+
 The compatibility matrix is a planning aid. The local probe is the source of truth for explicit verification passes when a reliable probe exists. Startup should use the resolver's current-host-only check instead of shelling out to the full capability report.
 
 ## Extending To Another Host
