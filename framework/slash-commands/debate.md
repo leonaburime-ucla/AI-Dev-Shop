@@ -4,7 +4,7 @@
 Shortcut for `/consensus debate` when the user clearly wants the debate mode of Swarm Consensus rather than the generic umbrella command.
 
 ## Usage
-Provide optional controls and a question. Debate mode is implied.
+Provide optional controls and a question. Debate mode is implied, including round-level rationale reporting about why each model holds or changes its position.
 
 ## Arguments
 - `[controls] [prompt]`

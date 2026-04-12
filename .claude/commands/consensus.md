@@ -41,11 +41,12 @@ Act as a Swarm Consensus Coordinator.
 8. Run consensus in the chosen mode:
    - `single-pass`: independent first pass + one synthesis.
    - `debate`: independent first pass + bounded debate rounds until `min_confidence` agreement or `max_rounds`.
+   - In `debate` mode, each rebuttal round must require every responding model to explain its current position, why it holds that position, whether that position changed this round, the strongest argument against the leading opposing position, and what evidence or assumption change would move it.
    - Apply `swarm_timeout_seconds` as the total wall-clock budget for peer dispatch across the whole run.
 9. Prefer structured output modes for peer CLIs when available. Parse `stdout` only as the peer answer; keep `stderr` as diagnostics.
 10. Treat transient peer failures such as `429`/`503` or clear capacity/rate-limit errors as retryable within the remaining `swarm_timeout_seconds` budget.
 11. Before writing the final report, if the user has not already specified retained vs local-only vs inline-only, ask:
    `Save consensus report? Reply "save report" to retain it in <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/runs/, "local only" to keep it in <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/runs/, or "inline only" for no file.`
    Save the final report to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/runs/<timestamp>-consensus-report.md` by default. If the user explicitly wants a retained artifact, save it to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/runs/<timestamp>-consensus-report.md` instead. If the user wants inline-only output, skip file creation. Follow the Step 5 template from `skills/swarm-consensus/SKILL.md` exactly.
-12. In `debate` mode, include round-by-round movement in an optional `## Debate Trace` section, but do not omit or rename the mandatory Step 5 sections (`The Swarm`, `Dispatch Diagnostics`, `Individual Responses`, `Synthesis`, `Decision Ledger`, `Final Recommendation`).
+12. In `debate` mode, include round-by-round movement in an optional `## Debate Trace` section, including why models held or changed their positions and what would change their minds, but do not omit or rename the mandatory Step 5 sections (`The Swarm`, `Dispatch Diagnostics`, `Individual Responses`, `Synthesis`, `Decision Ledger`, `Final Recommendation`).
 13. A valid consensus report must contain a non-empty `Primary` row in `The Swarm` and a non-empty primary subsection under `Individual Responses`. If either is missing, stop and report an invalid peer-only consensus run instead of returning the report.

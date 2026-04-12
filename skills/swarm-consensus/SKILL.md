@@ -304,7 +304,14 @@ If a peer model's response contains a resource fetch failure signal (e.g. it rep
 In `debate` mode, run bounded rebuttal rounds after Round 1:
 
 1. Build a decision-point ledger (architecture choice, data model strategy, risk posture, migration approach, etc.).
-2. Summarize deltas only (where models disagree) and send the summarized deltas back to each model for rebuttal. 
+2. Summarize deltas only (where models disagree) and send the summarized deltas back to each model for rebuttal.
+   - For each disputed decision point, require every responding model to state:
+     - its current position
+     - why it currently holds that position
+     - the strongest reason against the leading opposing position
+     - whether its position changed this round and, if so, why
+     - what evidence, assumption change, or repo fact would change its mind
+   - Do not accept a bare "still agree/disagree" rebuttal when the model can provide reasoning. The point of the debate round is rationale movement, not just vote counting.
    - **Mid-Debate Dropout Rule:** If a model that participated in Round 1 fails to respond, times out, or reports a resource failure in Round 2+, it **withdraws from the remainder of the debate**. 
    - Do not hallucinate its rebuttal. Note its withdrawal inline to the user. Its Round 1 positions remain in the ledger but are marked as "Final (Withdrawn)".
    - The same `swarm_timeout_seconds` budget applies to debate rounds. If the remaining budget expires mid-debate, stop additional rebuttal calls, mark affected peers as `Withdrawn`, and synthesize with the evidence already collected.
@@ -379,7 +386,7 @@ Produce a `consensus-report.md` (or inline if the user prefers) with this struct
 | codex | json | event stream / agent message | <short summary> | <attempt summary> |
 
 ## Debate Trace
-<Only include in debate mode. Capture round-by-round deltas, withdrawals, and position shifts before synthesis.>
+<Only include in debate mode. Capture round-by-round deltas, rationale changes, withdrawals, and position shifts before synthesis. For each disputed decision point, record each model's current position, why it held that position that round, whether it changed, and what would change its mind.>
 
 ## Individual Responses
 
@@ -407,9 +414,9 @@ Produce a `consensus-report.md` (or inline if the user prefers) with this struct
 <Anything only one model raised>
 
 ### Decision Ledger
-| Decision Point | Primary | Claude | Gemini | Codex | Agreement |
-|---|---|---|---|---|---|
-| <point 1> | <position> | <position> | <position> | <position> | Yes/No |
+| Decision Point | Primary | Claude | Gemini | Codex | Agreement | Key Why / Movement |
+|---|---|---|---|---|---|---|
+| <point 1> | <position> | <position> | <position> | <position> | Yes/No | <main rationale and any round-to-round movement> |
 
 ### Unresolved Deltas
 <Only include if disagreement remains after synthesis/debate>
