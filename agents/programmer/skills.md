@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.3.8
-- Last Updated: 2026-04-11
+- Version: 1.5.0
+- Last Updated: 2026-04-26
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -10,12 +10,17 @@ Base skills are the default standing context for every Programmer task.
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity/scaling awareness, selective complexity notes, query-shape awareness, one-source-of-truth rules, and other implementation-style guardrails
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer on top of coding-foundations with stricter modular/composable/testable-unit constraints
+- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — shared low-level per-function assessment procedure for `@overallScore`, severity-graded findings, complexity notes, fix-before-handoff behavior, and pass/debt/block routing
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project conventions in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` that apply to the current domain
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — load the specific pattern reference file(s) matching the architecture chosen in the ADR; provides TypeScript implementation examples, correct layer structure, file placement rules, and boundary enforcement; without this the Programmer cannot reliably implement the chosen pattern correctly
 - `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` — mandatory style-alignment step before production code for a new task or layer
 - `<AI_DEV_SHOP_ROOT>/skills/inline-code-documentation/SKILL.md` — inline documentation contract for all new or materially changed code
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-verification-before-completion/SKILL.md` — fresh evidence gate before claiming a fix or completion
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/context-firewalls.md` — isolate broad discovery work from implementation context when exploration would otherwise crowd the active fix loop
+
+## Programmer References
+
+- `<AI_DEV_SHOP_ROOT>/agents/programmer/references/inline-documentation-examples.md` — language-specific examples for inline documentation format
 
 ## Conditional Skills
 Conditional skills are not standing context. Load only the subset explicitly activated by the Coordinator for the current task.
@@ -64,10 +69,14 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - **5a. Confirm RED**: Run the target test(s) for this slice fresh. Do not read prior test reports to determine current state — always run. If the test passes without any implementation, stop immediately and flag to Coordinator: this indicates scope overlap from a previous slice, a badly written test, or test drift. Do not implement over a green test without explicit Coordinator guidance.
    - **5a1. Testability pre-check (mandatory before writing code):** State the planned test seam and expected assertions for this slice (branches, statements, functions, lines). If you cannot describe how the slice will be tested directly, redesign/refactor the slice boundary before implementation.
    - **5a2. Complexity/style pre-check (mandatory for non-trivial paths):** If the slice touches caller-controlled collections, nested iteration, batch transforms, custom algorithms, or per-item I/O, identify the effective complexity and query shape before coding. Leave a short inline note only when the cost or tradeoff will not be obvious from the code itself.
+   - **5a2b. Resource bounds pre-check (mandatory for service-backed collections):** If the slice calls an external service for a user-variable collection (roles, permissions, items, records, memberships), identify and document before coding: (a) maximum collection size — add a configurable cap if none exists, (b) timeout on external service calls — add a per-call or per-batch timeout, (c) behavior at the cap — error, truncate, or paginate. Do not assume the collection is small just because typical usage is small.
+   - **5a3. Function quality pre-check (mandatory for new or materially changed logic-bearing functions):** Use `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` to plan the function shape before coding. Exported or boundary functions should default to a required input object as the first parameter and an optional options object as the second parameter unless existing API compatibility or language convention justifies a different shape.
+   - **5a4. Adversarial behavior pre-check (mandatory for rule, validation, batch, reducer, or cross-record workflows):** Name at least one aggregate/cross-item edge case that could pass ordinary happy-path tests but violate the requirement. Add a focused test or direct probe for it before handoff.
    - **5b. Implement**: Write the smallest viable change to make only the target test(s) pass. Do not implement more than the current slice requires.
    - **5c. Confirm GREEN**: Run the target test(s) again and confirm they pass. On success, keep only the short status summary in active context unless exact output is needed later.
    - **5d. Check for regressions**: Run the full local suite. If any previously passing test breaks, revert and diagnose before proceeding.
    - **5e. Inline refactor beat**: Before moving to the next slice, do a local cleanup pass — rename for clarity, extract a duplicate helper, remove dead code you just replaced. All tests must stay green. This is mandatory, not optional. If the inline refactor causes a test to fail, it was a behavior change — revert it and flag to Coordinator.
+   - **5e1. Function quality documentation beat:** For every assessed unit, add or update the language-idiomatic function documentation with purpose, inputs, outputs, errors, side effects when applicable, `@complexity` or the language-equivalent time/space complexity section, optional `@tradeoffs` only when the design tradeoff is meaningful, and `@overallScore`. If the score is below 100, include severity-graded findings. Tiny private helpers may inherit the closest parent assessment only when they have no meaningful branching, I/O, error handling, scale risk, security/privacy risk, or independent reuse pressure. Refactor locally fixable findings before carrying them into handoff.
    - **5f. Loop-detection tripwire:** If the same file has now been edited 3 times for the same failure cluster, or the same test/command has been rerun 3 times with materially identical failure output, stop blind retrying. Write a `Loop Alert` note in `progress-ledger.md` or your handoff notes: current hypothesis, why the last attempt failed, and the next different approach. If you do not have a different approach, escalate instead of retrying.
    - **5g. Next slice**: Repeat from 5a.
 6. Run an Architecture Audit before handoff using the ADR checklist against every changed file. Classify the result:
@@ -89,12 +98,13 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - If self-validation cannot be run at all, state exactly why.
 9. Offload large raw outputs, long logs, DOM dumps, JSON payloads, or trace files per `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/context-offloading.md` instead of pasting them inline. Use success-silent / failure-loud handling for routine command output.
 10. Review own output for inline documentation compliance using `<AI_DEV_SHOP_ROOT>/skills/inline-code-documentation/SKILL.md` before handoff.
+10a. Review own output for function quality compliance using `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` before handoff. Include the compact function-quality table required by that skill, report any remaining assessed unit below 90 as a risk or tech debt item, and state the smallest compliant refactor. If every assessed unit in a non-trivial change is `100/100`, run and report the score skepticism pass before handoff. The skepticism pass must include a variable name audit: verify that each variable's name accurately describes its computed value — misleading names that mask stale data, wrong metrics, or inverted semantics are a finding.
 11. Update `progress-ledger.md` before pause, handoff, or resume-heavy completion so a fresh session can continue without reconstructing context from memory.
 12. Report what was implemented, what remains, and known risks.
 
 ## Output Format
 - Files changed and behavior delivered (mapped to spec requirements)
-- Test results summary (pass/fail counts, failing test names if any)
+- Test results summary (pass/fail counts, failing test names if any, and coverage metrics when a local coverage command is available)
 - Architecture Audit (required):
   - Status: `PASS`, `WARNING`, or `BLOCKER`
   - ADR rules checked
@@ -122,6 +132,11 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - Style Notes (required when applicable):
   - changed paths that needed complexity or query-shape notes
   - purity or effect-boundary decisions
+  - compact function-quality table: `function | score | Critical/High count | below-100 reason | local fix attempted`
+  - score skepticism result when every assessed unit is `100/100` in a non-trivial change
+  - assessed functions with `@overallScore` below 100 and severity-graded findings
+  - adversarial aggregate/cross-item tests or probes added for rule, validation, batch, reducer, or cross-record workflows
+  - justified deviations from the required input object plus optional options object convention
   - justified deviations from the default style rules
 - Offload References:
   - path(s) for large logs, traces, JSON, or screenshots when applicable
@@ -148,7 +163,9 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - Do not make changes outside the scope in the Coordinator directive
 - **Architecture Audit evidence is mandatory before handoff.** The audit must be present even when the result is `WARNING`; do not claim clean architecture adherence if known violations remain.
 - **Pre-Completion Checklist evidence is mandatory before handoff.** Do not claim done, fixed, or ready without fresh proof tied back to the active task/spec.
-- **Coverage self-check is blocking before handoff.** For every changed function in in-scope modules (per the Scope Boundary in `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`): verify compliance with the coverage rules in that skill — can every branch, statement, and function be directly asserted without combinatorial test effort? If not, refactor before reporting handoff complete. Do not hand off with known coverage-unfriendly code.
+- **Coverage self-check is blocking before handoff.** For every changed function in in-scope modules (per the Scope Boundary in `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`): verify compliance with the coverage rules in that skill — can every branch, statement, and function be directly asserted without combinatorial test effort? If not, refactor before reporting handoff complete. Do not hand off with known coverage-unfriendly code. Report coverage metrics when a local coverage command is available; if not available, say why and map assessed units to direct tests or probes.
+- **Function quality self-check is blocking before handoff.** For every new or materially changed logic-bearing assessment unit in scope, apply `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md`. Include `@overallScore` or the language-equivalent score in function documentation, include severity-graded findings when the score is below 100, document time and space complexity, and flag dangerous scale, I/O, resource, determinism, concurrency, security, or extensibility risks. If every assessed unit in a non-trivial change is `100/100`, run a score skepticism pass and report why no findings remain.
+- **Adversarial aggregate/cross-item evidence is blocking for rule, validation, batch, reducer, or cross-record workflows.** Add at least one focused test or direct probe for aggregate behavior such as repeated keys, combined totals, ordering changes, max-limit boundaries, partial invalid batches, retry duplication, or conflicting rules.
 - **If runtime validation is in scope, self-validation evidence is mandatory before claiming done.** Either attach the report path or explicitly say why the runtime loop could not be run.
 - **Do not let self-validation become an infinite loop.** After the bounded retry path is exhausted, hand off as `PARTIAL` with explicit evidence or escalate as `BLOCKER`.
 - **Do not paste large raw outputs inline.** Save them as offloads and reference the file paths plus a short summary.

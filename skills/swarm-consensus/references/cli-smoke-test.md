@@ -10,6 +10,7 @@ What this does:
 - shows how much diagnostic noise lands on `stderr`
 - helps detect repo-local behavior differences, especially for `codex exec`
 - can probe candidate Claude model names and return the first locally proven working exact model
+- can expand a maintained candidate ladder (`model-candidate-ladders.json`) newest-to-oldest instead of guessing ad hoc
 - writes a dated Claude discovery artifact plus an environment-keyed last-known-good cache when discovery mode is used
 
 Run it with current preferences:
@@ -34,6 +35,7 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 
 Interpret the discovery result this way:
 
+- discovery first tries any explicit request, then the requested family ladder, then saved/default-family fallbacks from `skills/swarm-consensus/references/model-candidate-ladders.json`
 - use the discovered `winner.model` when it matches the requested family/version and the required transport mode
 - if discovery finds only an older or different model family/version, stop and ask the user before switching
 - prefer `--claude-require json` for consensus runs that stay in structured-output mode
@@ -66,6 +68,7 @@ Interpretation rules:
 - prefer structured output when it still preserves the peer answer cleanly
 - if a model flag fails, do not update the slash command to assume it; confirm the correct flag pattern first
 - if a requested Claude model fails, do not keep guessing manually; run discovery and use the proven winner or stop
+- update the ladder file when a newer exact model ID becomes available or an older one is retired
 - if there is no exact environment cache hit and no fresh discovery artifact, Claude is not yet proven for that environment
 - if a newer model family looks better, update the saved preference only after rerunning this test
 - runtime consensus runs should still show inferred models to the user and allow per-run overrides

@@ -139,6 +139,17 @@ Cross-agent consultation is enabled by default. If consultation mode is disabled
 - Allowed messages: `CONSULT-REQUEST`, `CONSULT-RESPONSE`, `CONSULT-ACK`, `CONSULT-LEARNING`.
 - Maximum 2 back-and-forth rounds per consultation thread before owner decision or human escalation.
 
+### Debate Routing Guard (Blocking)
+
+When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or otherwise requests multiple agents/models to argue a question, default to **Swarm Consensus debate with external peer LLM CLIs** such as Claude, Gemini, Codex, or other configured external peers.
+
+- Platform subagents, current-LLM helper agents, repo-persona consultations, and same-family child agents must not be used to satisfy a debate request by default.
+- Use platform subagents for a debate only when the user explicitly asks for current-LLM subagents, local subagents, repo-persona debate, or cross-agent consultation.
+- Generic wording such as "agents", "debaters", "external agents", or "models" is not enough to justify current-LLM subagents; route to Swarm Consensus external peers instead.
+- If external peer CLIs are unavailable, say so and stop or continue only under the Swarm Consensus fallback rules. Do not silently fall back to platform subagents.
+- Before launching any debate, state which protocol will be used: `Swarm Consensus debate` or `repo-persona subagent consultation`.
+- When naming debate participants, show the resolved or planned **model name/version** first. CLI version strings are diagnostics only and must not be presented as model identity.
+
 ## Delegated Agent Bootstrap (Required)
 
 When the Coordinator spawns any delegated subagent (parallel worker, subprocess, forked-context agent, or similar), it must resolve the repo agent persona first and explicitly bootstrap that persona in the spawn prompt.

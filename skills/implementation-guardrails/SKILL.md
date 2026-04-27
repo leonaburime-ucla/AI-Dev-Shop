@@ -1,7 +1,7 @@
 ---
 name: implementation-guardrails
-version: 1.2.0
-last_updated: 2026-04-11
+version: 1.3.0
+last_updated: 2026-04-26
 description: Use when implementing or reviewing backend/general code so complexity, scaling, and maintainability guardrails stay consistent: scaling sanity checks, selective complexity comments, query-shape awareness, one-source-of-truth rules, and readable call-site defaults.
 ---
 
@@ -32,6 +32,7 @@ Start here, then load only the reference you need:
 1. Do an author-time scaling sanity check for any changed path that iterates caller-controlled input, nests loops, batches work, or risks per-item I/O.
 2. Add a short inline complexity note only when the cost, query shape, or tradeoff is non-obvious and materially relevant to future maintainers.
 3. For data-heavy code, make query or network fan-out explicit. Prefer bounded bulk reads/writes over hidden per-item I/O.
+3b. For any function that calls an external service for a user-variable collection (roles, items, permissions, records), enforce resource bounds: maximum collection size (configurable cap), timeout on service calls, and defined behavior at the cap (error, truncate, or paginate). Do not assume typical usage equals worst-case usage.
 4. Keep one source of truth for business rules, mapping tables, and config lookups; do not duplicate them across modules.
 5. Avoid boolean flag parameters when an enum, options object, or named variant would make the call site clearer.
 6. Prefer descriptive names and flow over clever compactness on non-trivial paths.

@@ -1,6 +1,6 @@
 # Refactor Agent
-- Version: 1.0.4
-- Last Updated: 2026-04-11
+- Version: 1.1.0
+- Last Updated: 2026-04-26
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md` — tech debt taxonomy, refactor proposal format, rules of safe refactoring, what not to refactor
@@ -9,6 +9,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity/scaling debt, query-shape awareness, and implementation-style guardrails
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer with micro-level refactor rules for modular/composable/testable units; use as the primary standard when evaluating refactor proposals
+- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — use failed `@overallScore` findings as targeted extraction, split, deletion, or boundary-stabilization proposal input
 <!-- Temporarily disabled pending parser-backed tooling adoption:
 - `<AI_DEV_SHOP_ROOT>/skills/syntax-aware-editing/SKILL.md` — use when a proposal depends on coordinated renames, import/export repairs, signature propagation, or module moves that should be executed as parser-backed structural edits rather than raw text replacement
 -->
@@ -23,8 +24,9 @@ Propose non-behavioral improvements that reduce complexity and tech debt. Every 
 - Active spec metadata (to confirm tests exist for code being refactored)
 
 ## Workflow
-1. Review each finding from Code Review or the Coverage Gap List using the taxonomy in `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md`.
+1. Review each finding from Code Review, the Function Quality Assessment section, or the Coverage Gap List using the taxonomy in `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md`.
 2. Classify finding type (naming drift, duplication, oversized unit, structural mismatch, dead code, complexity debt, untestable coupling).
+2a. For Function Quality Assessment findings, name the smallest extraction, split, deletion, dependency injection, error-contract cleanup, or boundary-stabilization move that would improve the score without changing behavior.
 3. **Untestable Code Trigger:** If a file appears in the Coverage Gap List because it has no spec-traceable tests and is hard to unit test (global side effects, mixed concerns, no injectable seams), classify it as `untestable coupling` or `dead code` as appropriate. Propose extraction of pure logic into testable units before any test can be written. Flag this to Coordinator so TDD can be dispatched after the refactor completes.
 4. Assess risk level and blast radius for each proposal.
 <!-- 4a. If the proposal relies on coordinated rename or move work, call out that `<AI_DEV_SHOP_ROOT>/skills/syntax-aware-editing/SKILL.md` should be activated for the implementation dispatch. -->

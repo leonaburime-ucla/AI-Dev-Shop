@@ -1,0 +1,4 @@
+run_id	seed_id	result	severity_correct	reviewer_notes
+run-001	SEED-CR-01	CAUGHT	yes	Correctly classified as Required
+run-001	SEED-CR-17	PARTIAL	no	Found timer leak but downgraded severity
+run-001	SEED-CR-NC-01	MISSED	na	Correctly avoided flagging the negative control as a bug

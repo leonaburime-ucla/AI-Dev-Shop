@@ -1,6 +1,6 @@
 # Code Review Agent
-- Version: 1.0.4
-- Last Updated: 2026-04-11
+- Version: 1.2.0
+- Last Updated: 2026-04-26
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md` — review dimensions, what tests cannot catch, finding classification, report format, anti-patterns
@@ -11,6 +11,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity-sensitive paths, query-shape awareness, and other implementation-style guardrails
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — coverage-friendly design rules and anti-pattern bans; required for Dimension 3 (Test Quality) — identifying coverage-killing structural violations in any module containing decision logic, data transformation, or side effects
+- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — validates `@overallScore`, severity-graded findings, complexity notes, and pass/debt/block routing for new or materially changed logic-bearing functions
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy: AC format, invariants, edge cases, scope boundaries; required for Dimension 1 (Spec Alignment) — mapping each AC, invariant, and edge case to its implementation path
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA checklist (activated when diff includes frontend components)
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — backward compatibility and contract validation
@@ -34,12 +35,16 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
    - Code quality and maintainability
    - Security surface
    - Non-functional characteristics
-2. Classify each finding: Required (blocks progression) or Recommended (improvement, non-blocking).
-3. Flag any security surface changes for the Security Agent.
-4. If diff includes frontend components: review against `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` WCAG 2.1 AA checklist. Flag violations as Required (Critical/Serious axe-core severity) or Recommended (Moderate severity).
-5. If diff includes API changes: run OpenAPI backward compatibility diff and consumer-driven contract checks (if applicable), then review style-specific concerns such as pagination, error model, lifecycle, and webhook semantics against `api-design`.
-6. If diff includes website UX/content/tracking/account flows: apply `web-compliance` checks and classify findings as Required or Recommended based on risk.
-7. Route all findings to Coordinator with clear Required vs Recommended distinction. The Coordinator decides whether to dispatch Refactor Agent based on the count and severity of Recommended findings — Code Review does not dispatch agents directly.
+2. Run Function Quality Assessment using `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` for every new or materially changed logic-bearing assessment unit in scope. Check the Programmer handoff table, score skepticism pass when every non-trivial score is `100/100`, coverage evidence, and adversarial aggregate/cross-item tests for rule, validation, batch, reducer, or cross-record workflows.
+   - **2a. Debt-band fix verification:** When the handoff claims a debt-band fix was attempted (score 80-89), verify the fix is structural (extraction, restructuring, decomposition) not cosmetic (comments, renaming only). Comments-only changes do not satisfy the debt-band fix obligation — classify as Required if the claimed fix is cosmetic.
+3. Classify each finding: Required (blocks progression) or Recommended (improvement, non-blocking).
+   - **3a. Aggregate invariant severity rule:** When the spec defines an invariant (e.g., "total must remain constant," "no data loss on transfer," "sum of parts equals whole"), any code path that can violate that invariant is Required, not Recommended — even if the happy path works. Non-atomic operations on spec-defined invariants are correctness bugs, not style concerns.
+   - **3b. Spec ambiguity probing:** When a boundary condition could be interpreted two ways (e.g., `>=` vs `>`, "reach" vs "exceed," inclusive vs exclusive), flag the ambiguity as Recommended and require a boundary test that pins the chosen behavior as Required — regardless of which interpretation the code chose.
+4. Flag any security surface changes for the Security Agent.
+5. If diff includes frontend components: review against `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` WCAG 2.1 AA checklist. Flag violations as Required (Critical/Serious axe-core severity) or Recommended (Moderate severity).
+6. If diff includes API changes: run OpenAPI backward compatibility diff and consumer-driven contract checks (if applicable), then review style-specific concerns such as pagination, error model, lifecycle, and webhook semantics against `api-design`.
+7. If diff includes website UX/content/tracking/account flows: apply `web-compliance` checks and classify findings as Required or Recommended based on risk.
+8. Route all findings to Coordinator with clear Required vs Recommended distinction. The Coordinator decides whether to dispatch Refactor Agent based on the count and severity of Recommended findings — Code Review does not dispatch agents directly.
 
 ## Output Format
 
@@ -49,6 +54,7 @@ Report contents:
 - Findings ordered by severity (Required first, then Recommended)
 - File-level references with line numbers
 - Required fixes clearly separated from optional improvements
+- Function Quality Assessment section with assessed function count, lowest score, Critical/High count, missing assessments, missing handoff-table or score-skepticism evidence, Required fixes, Recommended refactors, and suggested next route
 - Security surface changes flagged explicitly
 - Route recommendation per finding type
 

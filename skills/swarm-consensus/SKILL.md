@@ -1,7 +1,7 @@
 ---
 name: swarm-consensus
-version: 1.6.2
-last_updated: 2026-04-03
+version: 1.6.4
+last_updated: 2026-04-26
 description: Orchestrate a multi-model swarm by dispatching a prompt to all available LLM CLIs (whichever ones are installed), collating independent responses, and synthesizing a consensus. Supports single-pass and debate modes. Model-agnostic — the primary model is whoever is currently running this skill. OFF by default.
 ---
 
@@ -16,6 +16,25 @@ description: Orchestrate a multi-model swarm by dispatching a prompt to all avai
 - Coordinator directs a specific agent to use Swarm Consensus for a single hard task
 - An ADR has profound architectural consequences and requires multi-perspective validation
 - Red-Team is probing a spec for blind spots that a single model might miss
+
+## Debate Routing Guard (Blocking)
+
+When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or requests multiple agents/models to argue a question, this skill is the default route.
+
+- Debate requests must use external peer LLM CLIs by default.
+- Platform subagents, current-LLM helper agents, repo-persona consultations, and same-family child agents must not be used to satisfy debate requests unless the user explicitly asks for current-LLM subagents, local subagents, repo-persona debate, or cross-agent consultation.
+- If external peer CLIs are unavailable, report that and stop or follow this skill's graceful fallback rules. Do not silently replace Swarm Consensus debate with platform subagents.
+- Before dispatch, announce that the run is `Swarm Consensus debate` and list the external peers found by the prerequisite check.
+
+## Model Identity Disclosure Guard (Blocking)
+
+When naming LLM participants to the user, always show the peer model identity first.
+
+- Use model names or model IDs such as `Claude: <resolved-model>`, `Gemini: <resolved-model>`, and `Codex: <resolved-model>`.
+- Do not present CLI version strings such as `2.1.84`, `0.38.1`, or `codex-cli 0.125.0` as model names or model versions.
+- CLI versions belong only in diagnostics, smoke-test evidence, or the `CLI Version` column of the final report.
+- If the exact model cannot be proven, say `model unresolved` or `local default, exact model unknown`; do not substitute the CLI version.
+- Preflight copy must distinguish `Planned peer models` from `CLI diagnostics`.
 
 ## Model-Agnostic Design
 
@@ -89,12 +108,13 @@ which codex  && codex  --version 2>/dev/null || echo "codex: not installed"
 
 From the output:
 - Record which CLIs are available (installed and returning a version)
-- Record the CLI version string separately from the resolved model ID — these are not the same thing
+- Record the CLI version string separately from the resolved model ID — these are not the same thing, and CLI version must never be displayed as model identity
 - Skip any CLI that is not installed — do not error, just note it as absent in the report
 - Check for any user-saved model version preferences (e.g. from a prior "always use Opus for consensus" instruction) and apply them via CLI flags if the tool supports it
 - Run preflight transparency announcement before asking any model:
-  - `Asking question to Gemini <version>, Codex <version>, Claude <version>`
-  - If a CLI is missing: `Gemini not installed` (or equivalent) in the same announcement.
+  - `Planned peer models: Claude=<resolved-model-or-unresolved>, Gemini=<resolved-model-or-unresolved>, Codex=<resolved-model-or-unresolved>.`
+  - `CLI diagnostics: Claude CLI=<version-or-not-installed>, Gemini CLI=<version-or-not-installed>, Codex CLI=<version-or-not-installed>.`
+  - If a CLI is missing, mark its model as `not installed` and its CLI diagnostic as `not installed`.
 
 A minimum viable swarm is **primary model + 1 peer**. If no peers are available, tell the user and stop — running consensus with only one model produces no value. **This is a graceful stop, not a pipeline failure.** If Swarm Consensus was invoked as part of a pipeline stage, that stage proceeds using the primary model's output alone — the pipeline is not blocked by missing peer CLIs.
 
@@ -137,6 +157,7 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 
 Use the discovered `winner.model` only when it is the same requested family/version and it passed locally in JSON mode. If discovery finds only a different family/version, stop and ask the user before switching.
 A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
+Discovery should expand the maintained ladder at `skills/swarm-consensus/references/model-candidate-ladders.json`: explicit request first, then requested-family candidates newest-to-oldest, then saved/default-family fallbacks. Keep this deterministic and auditable rather than improvising model guesses during a live debate.
 
 ### Freshness policy
 

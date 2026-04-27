@@ -1,7 +1,7 @@
 ---
 name: code-review
-version: 1.0.0
-last_updated: 2026-02-22
+version: 1.1.1
+last_updated: 2026-04-26
 description: Use when reviewing code for spec alignment, architecture violations, test quality, security surface, and non-behavioral improvement opportunities.
 ---
 
@@ -56,6 +56,8 @@ Evaluate every change across all dimensions. Do not skip any.
 - Are names accurate and domain-aligned?
 - Is there duplication that should be extracted?
 - Is the complexity justified by the problem?
+- Are non-trivial complexity-sensitive paths explained when the cost or tradeoff is not obvious from the code?
+- Are hidden mutation, hidden dependencies, or boolean flag parameters making the code harder to reason about than necessary?
 - Will the next agent be able to understand this without reading git history?
 
 ### 5. Security Surface
@@ -67,10 +69,23 @@ Evaluate every change across all dimensions. Do not skip any.
 
 ### 6. Non-Functional Characteristics
 - Are there unbounded queries (SELECT * with no LIMIT on a growing table)?
+- Is there per-item I/O or query fan-out hidden inside loops or collection transforms?
 - Are expensive operations cached where appropriate?
 - Are external calls timeout-protected?
 - Are error paths logged with enough context to diagnose production failures?
 - Are there missing database indexes for new query patterns?
+
+### 7. Function Quality Assessment
+- Did every new or materially changed logic-bearing function receive the required assessment from `function-quality-assessment`?
+- Are `@overallScore`, complexity, optional tradeoffs, and severity-graded findings present where required?
+- Are scores plausible, or did the implementation inflate scores to avoid a blocking route?
+- Did Programmer include the compact function-quality handoff table?
+- If every assessed unit is `100/100` in a non-trivial change, did Programmer document a score skepticism pass?
+- Did tiny helpers get over-documented while meaningful helpers were under-assessed?
+- For rule, validation, batch, reducer, or cross-record workflows, is there at least one adversarial aggregate/cross-item test or direct probe?
+- Did the Programmer attempt a local fix cycle for scores in the `80-89` debt band?
+- Are Critical findings or scores below 80 classified as Required?
+- Does the review report include the Function Quality Assessment summary?
 
 ## Finding Classification
 
@@ -83,6 +98,38 @@ Every finding must be classified. This determines whether it blocks progression.
 **Optional**: Nice to have. Style preferences, minor readability. Log in project notes if worth tracking.
 
 Never mix required and optional findings in the same severity level. The Programmer Agent must know unambiguously what blocks progression.
+
+## Function Quality Assessment Report Section
+
+Every retained code review report must include:
+
+```text
+## Function Quality Assessment
+
+- Status: PASS | DEBT | BLOCKED
+- Functions assessed: <count>
+- Lowest score: <score or n/a>
+- Critical findings: <count>
+- High findings: <count>
+- Missing assessments: <count>
+- Missing handoff-table evidence: <yes/no>
+- Missing score-skepticism evidence: <yes/no/n/a>
+- Missing adversarial aggregate/cross-item evidence: <yes/no/n/a>
+- Required fixes: <summary or none>
+- Recommended refactors: <summary or none>
+- Suggested next route: Programmer | Refactor | Security | Architect | None
+```
+
+Use `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` for the
+thresholds. Missing required assessments, Critical findings, and scores below 80
+are Required findings. Scores in the `80-89` debt band are Recommended only when
+the Programmer already attempted one local fix cycle and the remaining debt is
+documented.
+Missing function-quality handoff tables, missing score skepticism passes for
+all-100 non-trivial changes, and missing adversarial aggregate/cross-item tests
+for rule or batch workflows are Required when they hide correctness, coverage,
+scale, or review-routing risk. Pure documentation noise from over-scoring tiny
+helpers is Recommended unless it obscures a Required finding.
 
 ## Finding Report Format
 

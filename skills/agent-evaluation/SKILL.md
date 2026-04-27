@@ -131,6 +131,30 @@ Awareness of systematic biases in LLM-as-judge evaluation:
 | Authority bias | Confident tone rated higher than equivalent hedged tone | Anchor rubric to factual criteria, not style |
 | Verbosity bias | More detailed justification rated higher | Require specific factual criteria checks |
 
+## Agent Isolation Evals (Seeded Testing)
+
+For testing individual agents in isolation with planted defects, use the **Agent Isolation Eval Framework** at `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/agent-isolation-eval-framework.md`.
+
+Isolation evals differ from the pipeline evaluation checkpoints below. Pipeline evals measure end-to-end quality; isolation evals measure each agent's independent capability by giving it controlled inputs with hidden defects and scoring what it catches.
+
+Key resources:
+- `harness-engineering/quality/agent-isolation-eval-framework.md` — repeatable harness for any agent, with agent-specific eval designs
+- `harness-engineering/quality/eval-coverage-model.md` — canonical bug taxonomy, seed structure taxonomy, control-pack requirements, and benchmark status labels
+- `harness-engineering/quality/function-quality-seeded-evals.md` — the original Programmer/CR seeded eval protocol (seed matrix, project types, scoring rules)
+- `harness-engineering/quality/templates/` — machine-readable TSV templates for coverage matrices, seed catalogs, and run results
+- `harness-engineering/validators/validate_eval_suite.py` — validator for seeded eval suites; use it before treating a suite as benchmark-grade; emits a computed status label (exploratory/pilot/benchmark/stable benchmark)
+- `harness-engineering/quality/scripts/score_eval_suite.py` — scorer that computes all required suite-level metrics from `seed-catalog.tsv` + `run-results.tsv`: per-seed catch rate, breakdowns by dimension/bug-nature/structure/difficulty, false-positive rate, severity accuracy, cross-dimension stability (attention-budget regression detection), and status label
+- `.local-artifacts/agent-evals/` — eval results (not shipped with the toolkit; generated per-project)
+
+Use isolation evals when onboarding a new agent, after applying guard promotions, or when pipeline evals show high combined scores but you suspect one agent is carrying another.
+
+Do not treat a small seeded suite as a stable benchmark unless it has:
+
+- an explicit coverage matrix
+- positive, negative, and regression controls
+- saved run results across at least 3 runs after the last framework change
+- validator pass for the suite metadata and run completeness
+
 ## Pipeline Integration: Where to Evaluate
 
 In the multi-agent pipeline, evaluation occurs at these checkpoints:

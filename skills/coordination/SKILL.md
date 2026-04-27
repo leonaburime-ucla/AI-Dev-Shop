@@ -1,7 +1,7 @@
 ---
 name: coordination
-version: 1.4.4
-last_updated: 2026-04-10
+version: 1.4.5
+last_updated: 2026-04-26
 description: Use when routing between agents, handling Review Mode intake, activating conditional skills, enforcing convergence policy, managing iteration budgets, formatting cycle summaries, or deciding when to escalate to a human checkpoint.
 ---
 
@@ -23,6 +23,27 @@ By default, inter-agent communication flows through the Coordinator with bounded
 8. **Discovery hygiene**: Use read-only discovery passes when broad exploration is needed so implementation context stays focused
 9. **Subagent mode resolution**: Default to helper-agent use only when the current host verifies support; otherwise stay in single-agent mode and explain why
 10. **Artifact intent classification**: Distinguish pipeline-required artifacts from optional retained reports and local scratch outputs before anything is written to disk
+11. **Debate routing guard**: Route debate requests to Swarm Consensus external peers by default and block accidental platform-subagent debates.
+
+## Debate Routing Guard (Blocking)
+
+Check this guard before cross-agent consultation, delegated agent resolution, or any platform subagent spawn.
+
+Trigger phrases include: `debate`, `/debate`, `2 round debate`, `two round debate`, `rounds of debate`, `debaters`, or requests for multiple agents/models to argue a question.
+
+Default route:
+
+- Use `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` in `debate` mode.
+- Use external peer LLM CLIs such as Claude, Gemini, Codex, or other configured peer tools.
+- Announce the protocol before dispatch: `Coordinator(Review Mode): Running Swarm Consensus debate with external peer LLMs...`
+
+Blocking rule:
+
+- Platform subagents, current-LLM helper agents, repo-persona consultations, and same-family child agents must not satisfy a debate request by default.
+- Use platform subagents only when the user explicitly asks for current-LLM subagents, local subagents, repo-persona debate, or cross-agent consultation.
+- If the user asks for "agents", "debaters", "external agents", or "models" without saying current-LLM subagents, treat that as Swarm Consensus external peers.
+- If no external peer is available, report the unavailable peers and stop or follow the Swarm Consensus fallback rules. Do not silently replace the debate with platform subagents.
+- If the Coordinator chooses repo-persona consultation because the user explicitly requested it, announce that it is not formal Swarm Consensus debate.
 
 ## Cross-Agent Consultation Protocol (Default ON)
 

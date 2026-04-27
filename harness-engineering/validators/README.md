@@ -15,6 +15,16 @@ These validators are the first mechanical enforcement layer for this repo.
   - fails when a `progress-ledger.md` marks `evaluator_mode: required` but no retained evaluator contract is recorded
 - `validate_load_bearing_audits.py`
   - checks retained `project-knowledge/reports/maintenance/harness-load-bearing-*.md` reports for required sections and decision labels
+- `validate_debate_routing_guard.py`
+  - checks that debate requests default to Swarm Consensus with external peer LLMs
+  - fails when the guard against silent platform-subagent fallback is removed from root, Coordinator, slash-command, or Swarm Consensus docs
+- `validate_swarm_model_identity_guard.py`
+  - checks that Swarm Consensus preflight shows peer model identity first
+  - fails when CLI version strings can be presented as model names or model versions
+- `validate_eval_suite.py`
+  - validates seeded eval suite metadata and saved run results
+  - checks coverage-matrix cells, seed-catalog taxonomy values, benchmark-vs-regression suite rules, run-manifest model provenance, and per-run seed completeness
+  - intended for targeted use on `.local-artifacts/agent-evals/<suite-id>/` rather than repo-wide `run-all.sh`
 ## Advisory Audit
 
 - `doc_garden_audit.py`
@@ -77,6 +87,32 @@ Provider-local validator:
   - validates the strict Speckit compatibility package
   - checks required files, unresolved clarification markers, manifest integrity, traceability seeding, and DoD completion
   - intended as a targeted pre-handoff validator before `/plan`, not as a repo-wide `run-all.sh` check
+
+Validate a seeded eval suite before using it as benchmark evidence:
+
+```bash
+python3 harness-engineering/validators/validate_eval_suite.py .local-artifacts/agent-evals/<suite-id> --require-run-results --min-runs 3
+```
+
+Score a validated suite and generate the aggregate metrics report:
+
+```bash
+python3 harness-engineering/quality/scripts/score_eval_suite.py .local-artifacts/agent-evals/<suite-id>
+```
+
+Score with attention-budget regression detection against a baseline:
+
+```bash
+python3 harness-engineering/quality/scripts/score_eval_suite.py .local-artifacts/agent-evals/<suite-id> \
+  --baseline-results <path-to-previous-run-results.tsv>
+```
+
+Validate a targeted regression pack that intentionally reruns only previously
+missed or partial seeds:
+
+```bash
+python3 harness-engineering/validators/validate_eval_suite.py .local-artifacts/agent-evals/<suite-id> --suite-kind targeted_regression --require-run-results --min-runs 3
+```
 
 ## Error Format
 

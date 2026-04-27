@@ -8,6 +8,8 @@ python3 "$ROOT_DIR/harness-engineering/validators/validate_path_references.py"
 python3 "$ROOT_DIR/harness-engineering/validators/validate_registry_integrity.py"
 python3 "$ROOT_DIR/harness-engineering/validators/validate_evaluator_artifacts.py"
 python3 "$ROOT_DIR/harness-engineering/validators/validate_load_bearing_audits.py"
+python3 "$ROOT_DIR/harness-engineering/validators/validate_debate_routing_guard.py"
+python3 "$ROOT_DIR/harness-engineering/validators/validate_swarm_model_identity_guard.py"
 
 echo
 echo "==> Harness advisory audit"

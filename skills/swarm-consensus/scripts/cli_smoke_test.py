@@ -23,6 +23,9 @@ DISCOVERY_CACHE_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[3]
 HOST_ROOT = REPO_ROOT.parent
 REPO_WORKSPACE_ROOT = REPO_ROOT / "project-knowledge"
+MODEL_CANDIDATE_LADDERS_PATH = (
+    REPO_ROOT / "skills" / "swarm-consensus" / "references" / "model-candidate-ladders.json"
+)
 
 
 def resolve_workspace_root() -> Path:
@@ -156,6 +159,13 @@ def load_json_file(path: Path) -> dict | None:
         return None
 
 
+def load_model_candidate_ladders() -> dict:
+    payload = load_json_file(MODEL_CANDIDATE_LADDERS_PATH)
+    if not isinstance(payload, dict):
+        return {}
+    return payload
+
+
 def load_saved_claude_model() -> str | None:
     payload = load_json_file(Path.home() / ".claude" / "settings.json")
     if not isinstance(payload, dict):
@@ -217,13 +227,31 @@ def normalize_model_hint(model: str | None) -> str | None:
     return normalized
 
 
+def extract_claude_family(model: str | None) -> str | None:
+    normalized = normalize_model_hint(model)
+    if not normalized:
+        return None
+    for family in ("opus", "sonnet", "haiku"):
+        if f"claude-{family}" in normalized:
+            return family
+    return None
+
+
+def normalize_hostname() -> str:
+    raw = socket.gethostname()
+    for suffix in (".local", ".lan"):
+        if raw.endswith(suffix):
+            raw = raw[: -len(suffix)]
+    return raw
+
+
 def build_claude_environment(cli_versions: list[dict[str, str]], requirement: str) -> dict[str, str]:
     record = next((item for item in cli_versions if item["cli"] == "claude"), None)
     return {
         "cli": "claude",
         "cli_path": record["path"] if record else "not installed",
         "cli_version": record["version"] if record else "n/a",
-        "hostname": socket.gethostname(),
+        "hostname": normalize_hostname(),
         "system": platform.system(),
         "release": platform.release(),
         "machine": platform.machine(),
@@ -275,6 +303,15 @@ def resolve_cache_artifact_path(value: str | None) -> Path | None:
     return (REPO_ROOT / candidate).resolve()
 
 
+def normalize_environment_key(key: str) -> str:
+    parts = key.split("|")
+    if len(parts) >= 3:
+        for suffix in (".local", ".lan"):
+            if parts[2].endswith(suffix):
+                parts[2] = parts[2][: -len(suffix)]
+    return "|".join(parts)
+
+
 def find_cached_discovery(
     cache: dict,
     environment_key: str,
@@ -285,12 +322,14 @@ def find_cached_discovery(
     if not isinstance(entries, list):
         return None
 
+    normalized_key = normalize_environment_key(environment_key)
     exact_match: dict | None = None
     hint_match: dict | None = None
     for entry in reversed(entries):
         if not isinstance(entry, dict):
             continue
-        if entry.get("environment_key") != environment_key:
+        entry_key = normalize_environment_key(entry.get("environment_key", ""))
+        if entry_key != normalized_key:
             continue
         artifact_path = resolve_cache_artifact_path(entry.get("artifact_path"))
         if not artifact_path or not artifact_path.exists():
@@ -587,12 +626,55 @@ def append_candidate(
     seen.add(normalized)
 
 
+def append_family_candidates(
+    queue: list[str],
+    sources: dict[str, str],
+    seen: set[str],
+    ladders: dict,
+    cli: str,
+    family: str | None,
+    source: str,
+) -> None:
+    if not family:
+        return
+    cli_ladders = ladders.get(cli, {})
+    families = cli_ladders.get("families", {})
+    candidates = families.get(family, [])
+    if not isinstance(candidates, list):
+        return
+    for candidate in candidates:
+        append_candidate(queue, sources, seen, str(candidate), f"{source}:{family}")
+
+
+def append_remaining_family_candidates(
+    queue: list[str],
+    sources: dict[str, str],
+    seen: set[str],
+    ladders: dict,
+    cli: str,
+    exclude_families: set[str],
+    source: str,
+) -> None:
+    cli_ladders = ladders.get(cli, {})
+    family_order = cli_ladders.get("default_family_order", [])
+    if not isinstance(family_order, list):
+        return
+    for family in family_order:
+        family_name = str(family)
+        if family_name in exclude_families:
+            continue
+        append_family_candidates(queue, sources, seen, ladders, cli, family_name, source)
+
+
 def run_claude_discovery_with_environment(
     args: argparse.Namespace,
     cli_versions: list[dict[str, str]],
 ) -> dict[str, object]:
+    ladders = load_model_candidate_ladders()
     saved_model = load_saved_claude_model()
     requested_hint = normalize_model_hint(args.claude_model)
+    requested_family = extract_claude_family(args.claude_model)
+    saved_family = extract_claude_family(saved_model)
     cache_path = Path(args.discovery_cache_path)
     cache = load_discovery_cache(cache_path)
     environment = build_claude_environment(cli_versions, args.claude_require)
@@ -625,12 +707,25 @@ def run_claude_discovery_with_environment(
     queue: list[str] = []
     sources: dict[str, str] = {}
     seen: set[str] = set()
+    used_families: set[str] = set()
 
     for candidate in args.claude_candidate:
         append_candidate(queue, sources, seen, candidate, "manual_candidate")
     append_candidate(queue, sources, seen, args.claude_model, "requested_model")
+    append_family_candidates(
+        queue, sources, seen, ladders, "claude", requested_family, "requested_family_ladder"
+    )
+    if requested_family:
+        used_families.add(requested_family)
     append_candidate(queue, sources, seen, saved_model, "saved_claude_settings")
-    append_candidate(queue, sources, seen, "opus", "alias_probe")
+    append_family_candidates(
+        queue, sources, seen, ladders, "claude", saved_family, "saved_family_ladder"
+    )
+    if saved_family:
+        used_families.add(saved_family)
+    append_remaining_family_candidates(
+        queue, sources, seen, ladders, "claude", used_families, "fallback_family_ladder"
+    )
 
     attempts: list[dict[str, object]] = []
     winner: dict[str, object] | None = None
@@ -709,12 +804,15 @@ def run_claude_discovery_with_environment(
         "saved_claude_model": saved_model,
         "requested_claude_model": args.claude_model,
         "requested_model_hint": requested_hint,
+        "requested_family": requested_family,
+        "saved_family": saved_family,
         "candidate_order": queue,
         "winner": winner,
         "attempts": attempts,
         "cache_hit": False,
         "cache_entry": None,
         "cache_path": str(cache_path),
+        "candidate_ladder_path": str(MODEL_CANDIDATE_LADDERS_PATH),
         "environment": environment,
         "environment_key": environment_key,
     }
@@ -731,7 +829,7 @@ def render_report(
         "# Swarm Consensus CLI Smoke Test",
         "",
         f"- Generated at: `{datetime.now(timezone.utc).isoformat()}`",
-        f"- Host: `{socket.gethostname()}`",
+        f"- Host: `{normalize_hostname()}`",
         f"- Working directory: `{os.getcwd()}`",
         f"- Prompt: `{args.prompt}`",
         f"- Case timeout: `{args.case_timeout}s`",
@@ -786,8 +884,11 @@ def render_report(
             f"- Requirement: `{discovery['requirement']}`",
             f"- Saved Claude model: `{discovery['saved_claude_model'] or 'none'}`",
             f"- Requested Claude model: `{discovery['requested_claude_model'] or 'none'}`",
+            f"- Requested Claude family: `{discovery.get('requested_family') or 'none'}`",
+            f"- Saved Claude family: `{discovery.get('saved_family') or 'none'}`",
             f"- Cache hit: `{discovery.get('cache_hit', False)}`",
             f"- Cache path: `{discovery.get('cache_path', 'n/a')}`",
+            f"- Candidate ladder: `{discovery.get('candidate_ladder_path', 'n/a')}`",
             f"- Winning model: `{winner['model'] if winner else 'none'}`",
             f"- Winning source: `{winner['source'] if winner else 'n/a'}`",
             "",
@@ -826,7 +927,7 @@ def render_json_report(
 ) -> str:
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "host": socket.gethostname(),
+        "host": normalize_hostname(),
         "working_directory": os.getcwd(),
         "prompt": args.prompt,
         "case_timeout_seconds": args.case_timeout,
