@@ -70,6 +70,12 @@ def parse_args() -> argparse.Namespace:
         "--model",
         help="Exact Claude model override to pass through to every Claude CLI invocation.",
     )
+    parser.add_argument(
+        "--suggest-changes",
+        choices=("patches", "notes", "none"),
+        default="patches",
+        help="Whether the audit prompt should request proposed changes.",
+    )
     return parser.parse_args()
 
 
@@ -240,15 +246,31 @@ def build_probe_prompt(dispatch: Path) -> str:
     )
 
 
-def build_audit_prompt(dispatch: Path) -> str:
+def build_suggested_changes_instruction(mode: str) -> str:
+    if mode == "none":
+        return "Do not include suggested file changes."
+    if mode == "notes":
+        return (
+            "Include a `Suggested Changes` section with file-level edit guidance "
+            "and concise replacement snippets when useful."
+        )
     return (
-        f"Read the packet at path {quoted(str(dispatch))} and inspect only the files "
-        "listed in its Files And Artifacts section using Read. Follow the packet's "
-        "Auditor Instructions exactly."
+        "Include a `Suggested Changes` section plus `Proposed File Changes` with "
+        "unified diffs or bounded replacement snippets only for files you actually "
+        "reviewed. If the scope is too uncertain for safe patch proposals, fall "
+        "back to note-style suggestions and say why."
     )
 
 
-def build_text_retry_prompt(dispatch: Path, file_paths: list[str]) -> str:
+def build_audit_prompt(dispatch: Path, suggest_changes: str) -> str:
+    return (
+        f"Read the packet at path {quoted(str(dispatch))} and inspect only the files "
+        "listed in its Files And Artifacts section using Read. Follow the packet's "
+        f"Auditor Instructions exactly. {build_suggested_changes_instruction(suggest_changes)}"
+    )
+
+
+def build_text_retry_prompt(dispatch: Path, file_paths: list[str], suggest_changes: str) -> str:
     if file_paths:
         file_block = "\n".join(f"- {quoted(path)}" for path in file_paths)
         file_instruction = f"Inspect only these listed files:\n{file_block}\n"
@@ -256,6 +278,11 @@ def build_text_retry_prompt(dispatch: Path, file_paths: list[str]) -> str:
         file_instruction = (
             "Inspect only the files named in the packet's Files And Artifacts section.\n"
         )
+    suggested_sections = ""
+    if suggest_changes != "none":
+        suggested_sections += "## Suggested Changes\n"
+    if suggest_changes == "patches":
+        suggested_sections += "## Proposed File Changes\n"
     return (
         f"Read the packet at path {quoted(str(dispatch))}. "
         "This is a bounded retry after an empty JSON audit result.\n"
@@ -266,6 +293,7 @@ def build_text_retry_prompt(dispatch: Path, file_paths: list[str]) -> str:
         "## Findings (Ordered by Severity)\n"
         "## Blockers vs. Optional Improvements\n"
         "## What Looks Solid and Should Stay Unchanged\n"
+        f"{suggested_sections}"
         "If any listed path is unreadable, say so in Auditor Scope Check and continue "
         "with the rest."
     )
@@ -311,6 +339,7 @@ def main() -> int:
         "dispatch": str(dispatch),
         "offload_prefix": str(offload_prefix),
         "requested_model": args.model,
+        "suggest_changes": args.suggest_changes,
     }
 
     try:
@@ -369,7 +398,7 @@ def main() -> int:
             "--output-format",
             "json",
             "--",
-            build_audit_prompt(dispatch),
+            build_audit_prompt(dispatch, args.suggest_changes),
         ]
         audit_completed, audit_elapsed, audit_failure, audit_attempts = (
             run_command_with_transient_retries(
@@ -427,7 +456,7 @@ def main() -> int:
                 "--allowedTools",
                 "Read",
                 "--",
-                build_text_retry_prompt(dispatch, packet_file_paths),
+                build_text_retry_prompt(dispatch, packet_file_paths, args.suggest_changes),
             ]
             text_completed, text_elapsed, text_failure, text_attempts = (
                 run_command_with_transient_retries(

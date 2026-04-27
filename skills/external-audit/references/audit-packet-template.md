@@ -5,6 +5,7 @@
 - **User request:** <what the user asked for>
 - **Audit focus:** <what the external auditor should examine most closely>
 - **Scope:** <work-log | current-diff | staged | last-commit | custom>
+- **Suggested changes mode:** <patches | notes | none>
 - **Audit target:** <commit, diff, or explicit file set>
 - **Authoring packet:** <where the coordinator wrote the canonical packet>
 - **Dispatch packet:** <peer-readable packet path actually handed to the external auditor>
@@ -47,3 +48,5 @@ Return:
 3. File references when possible
 4. Which changes are blockers vs optional improvements
 5. What looks solid and should probably stay unchanged
+6. If `Suggested changes mode` is `notes`, include `Suggested Changes` with file-level edit guidance and concise replacement snippets when useful
+7. If `Suggested changes mode` is `patches`, include `Suggested Changes` plus `Proposed File Changes` with unified diffs or bounded replacement snippets only for files you actually reviewed; if the scope is too uncertain for safe patch proposals, fall back to notes and say why

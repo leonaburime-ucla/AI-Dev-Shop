@@ -1,6 +1,6 @@
 ---
 name: function-quality-assessment
-version: 1.2.0
+version: 1.3.0
 last_updated: 2026-04-27
 description: Use when writing, reviewing, or refactoring logic-bearing functions so low-level function quality is assessed consistently with an overall score, severity-graded findings, complexity notes, and clear pass/debt/block routing.
 ---
@@ -9,16 +9,27 @@ description: Use when writing, reviewing, or refactoring logic-bearing functions
 
 Apply this skill to every new or materially changed logic-bearing function.
 
-This skill is both a build-time coding guide and an operational audit wrapper.
-It does not replace the source skills below; it turns their rules into a
-per-function assessment with `@overallScore`, severity findings, fix-before-
-handoff behavior, and review reporting.
+This skill has two distinct jobs: a pre-coding Design Gate and a post-coding
+Assessment Gate. It does not replace the source skills below; it turns their
+rules into a per-function assessment with `@overallScore`, severity findings,
+fix-before-handoff behavior, and review reporting.
 
-Use it twice:
+Use it in two distinct modes:
 
-- before coding, to shape the function correctly from the start
-- after coding, to score the result, catch gaps, and decide whether the change
-  can be handed off
+- **Design Gate (before coding):** shape the function correctly from the start.
+  This gate blocks coding when boundaries, seams, contracts, or scale risks are
+  still implicit. Do not assign `@overallScore`, severity findings, or pass/debt
+  status here.
+- **Assessment Gate (after coding):** score the result, catch gaps, and decide
+  whether the change can be handed off. This is the first stage where scoring,
+  debt-band routing, and block/pass classification apply.
+
+## Design Gate
+
+The Design Gate passes only when the current slice has an explicit function job,
+signature shape, test seam, effect boundary, complexity/resource view, and any
+required aggregate-risk note that another agent could implement or review
+without guessing.
 
 ## Writing Posture
 
@@ -47,9 +58,6 @@ When writing a logic-bearing function:
 9. For rule, validation, batch, reducer, or cross-record workflows, name at
    least one aggregate or adversarial edge case before coding and add coverage
    for it before handoff.
-10. If a function still has avoidable quality findings after implementation,
-    refactor locally before handoff instead of documenting obvious debt as if it
-    were final design.
 
 ## Source Skills
 
@@ -59,6 +67,10 @@ Use these as the source of truth for definitions:
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — two-object exported signatures, typed contracts, coverage-friendly branch design, test seams, typed error paths, and test anti-pattern bans
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — complexity, scale, query shape, resource bounds, per-item I/O, and tradeoff notes
 - `<AI_DEV_SHOP_ROOT>/skills/inline-code-documentation/SKILL.md` — language-idiomatic function documentation format
+
+Use this companion when the workflow has aggregate or cross-item risk:
+
+- `<AI_DEV_SHOP_ROOT>/skills/adversarial-test-design/SKILL.md` — adversarial cases, invariants, property-test fit, and direct-probe selection for workflows that can fail only across multiple records, retries, ordering changes, or partial failures
 
 If this skill appears to conflict with a source skill, keep the source skill's
 definition and use this skill only to score, report, and route the result.
@@ -94,37 +106,44 @@ or complexity tradeoff, assess it directly.
 
 ## Programmer Procedure
 
-Before coding a logic-bearing function:
+Before coding a logic-bearing function (Design Gate):
 
-1. Identify the function's required input object and optional options object,
+1. State the function's single job and why it is the right boundary for the
+   current slice.
+2. Identify the function's required input object and optional options object,
    unless existing API compatibility or language convention justifies another
    shape.
-2. Identify the test seam and expected assertions.
-3. Identify time complexity, space complexity, query/I/O shape, and resource
-   bounds for caller-controlled or unbounded input.
+3. Identify the test seam and expected assertions.
 4. Decide whether the function should be pure decision logic or an explicit
    effect boundary.
+5. Identify time complexity, space complexity, query/I/O shape, and resource
+   bounds for caller-controlled or unbounded input.
+6. If the workflow depends on multiple records, rules, retries, or ordering,
+   activate `<AI_DEV_SHOP_ROOT>/skills/adversarial-test-design/SKILL.md` and
+   name at least one invariant or adversarial case before coding.
 
-After coding:
+After coding (Assessment Gate):
 
-1. Apply the checklist in `references/checklist.md` to each assessment unit.
-2. Refactor locally fixable findings before handoff.
-3. Add or update language-idiomatic function documentation.
-4. Include time and space complexity.
-5. Include `@tradeoffs` or the language-equivalent section only when the tradeoff
-   is meaningful.
-6. Include `@overallScore`.
-7. Include severity-graded findings when the score is below 100.
-8. For rule engines, validators, batch processors, reducers, reconciliation
+1. This is the first point where `@overallScore`, severity findings, and
+   pass/debt/block routing apply.
+2. Apply the checklist in `references/checklist.md` to each assessment unit.
+3. Refactor locally fixable findings before handoff.
+4. Add or update language-idiomatic function documentation.
+5. Include time and space complexity.
+6. Include `@tradeoffs` or the language-equivalent section only when the
+   tradeoff is meaningful.
+7. Include `@overallScore`.
+8. Include severity-graded findings when the score is below 100.
+9. For rule engines, validators, batch processors, reducers, reconciliation
    logic, or any workflow where behavior depends on multiple records, add at
    least one adversarial aggregate/cross-item test or direct probe.
-9. If a non-trivial change has every assessed unit at `100/100`, run a score
-   skepticism pass before handoff. Re-check requirements, edge cases, scale,
-   hidden dependencies, error paths, and test coverage. If every score remains
-   `100/100`, state why in the handoff.
-10. Report coverage metrics when a local coverage command is available. If
-   coverage cannot be measured, say why and identify the direct tests that cover
-   each assessed unit.
+10. If a non-trivial change has every assessed unit at `100/100`, run a score
+    skepticism pass before handoff. Re-check requirements, edge cases, scale,
+    hidden dependencies, error paths, and test coverage. If every score remains
+    `100/100`, state why in the handoff.
+11. Report coverage metrics when a local coverage command is available. If
+    coverage cannot be measured, say why and identify the direct tests that
+    cover each assessed unit.
 
 ## Code Review Procedure
 

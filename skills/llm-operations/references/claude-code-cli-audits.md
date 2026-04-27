@@ -14,8 +14,9 @@ For Claude packet audits, prefer this shape:
 6. Prefer a constrained `Read`-only tool surface when that is sufficient.
 7. If available, use the dedicated runner script at `<AI_DEV_SHOP_ROOT>/skills/external-audit/scripts/run_claude_packet_audit.py` instead of ad hoc shell capture.
 8. Pass an exact `--model` to the runner when the workflow promises exact model reporting.
-9. If the requested Claude model is unproven or rejected, run `skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-require both --output-format json` and use the proven winner only if it matches the requested family/version. Otherwise stop and ask the user.
-10. Treat `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` as environment-scoped only. A cache hit is valid only when the host/OS/machine/Claude CLI version/transport tuple matches and the cached artifact path still exists.
+9. When the audit workflow requests suggested changes, pass the runner's `--suggest-changes <patches|notes|none>` flag so the fallback prompt preserves the same mode.
+10. If the requested Claude model is unproven or rejected, run `skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-require both --output-format json` and use the proven winner only if it matches the requested family/version. Otherwise stop and ask the user.
+11. Treat `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` as environment-scoped only. A cache hit is valid only when the host/OS/machine/Claude CLI version/transport tuple matches and the cached artifact path still exists.
 
 ## Observed Transport Quirks
 

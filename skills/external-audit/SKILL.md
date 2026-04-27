@@ -1,7 +1,7 @@
 ---
 name: external-audit
-version: 1.1.7
-last_updated: 2026-03-25
+version: 1.2.0
+last_updated: 2026-04-27
 description: Package the current work for one external LLM auditor, capture its review, and return a decision-ready synthesis to the user.
 ---
 
@@ -41,12 +41,14 @@ If the planned auditor is Claude, also use `skills/llm-operations/references/cla
 
 - `auditor=<claude|gemini|codex>`: choose the external auditor CLI explicitly
 - `scope=<work-log|current-diff|staged|last-commit>`: choose the default work surface
+- `suggest_changes=<patches|notes|none>`: control whether the auditor should return file-level change proposals; default `patches`
 - `audit_timeout_seconds=<int>`: maximum wall-clock wait for the auditor call (default `300`)
 - `claude_model=<exact-id>`: per-run Claude model override with an exact model name/version
 - `gemini_model=<exact-id>`: per-run Gemini model override with an exact model name/version
 - `codex_model=<exact-id>`: per-run Codex model override with an exact model name/version
 
 If controls are omitted, infer only non-model defaults and tell the user what was chosen before dispatch. Do not infer an exact auditor model name/version unless it is locally proven.
+Default behavior is `suggest_changes=patches`, not audit-only. The auditor should propose changes when changes are warranted and the file context is grounded enough.
 
 ## Step 1 — Preflight
 
@@ -88,6 +90,11 @@ A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT
 
 Do not silently switch to a newer model family/version just because it exists locally.
 Do not dispatch using a local default, alias assumption, or inferred family name when this workflow promises exact model reporting.
+7. Resolve the effective `suggest_changes` mode:
+   - default to `patches`
+   - keep `patches` only when the packet names a bounded enough file set that the auditor can ground file-level proposals safely
+   - if the scope is too broad, ambiguous, or mostly conceptual, downgrade to `notes` and say so before dispatch
+   - use `none` only when the user explicitly disables suggestions
 
 ## Step 2 — Build The Audit Packet
 
@@ -97,6 +104,7 @@ The packet must capture:
 
 - the original user request
 - the exact scope under review
+- the effective `suggest_changes` mode
 - the audit target reference (commit, diff, or explicit file set)
 - what you changed
 - why you changed it
@@ -149,6 +157,9 @@ Audit prompt requirements:
 7. Prefer a short prompt that references the dispatch packet path over embedding the full packet body inline when the peer can read files directly.
 8. If the packet already contains a bounded file list, prefer a bounded sectioned prompt over an open-ended repo audit prompt.
 9. For Claude Code packet-first audits, prefer a constrained `Read`-only tool surface when that is enough to inspect the packet and the listed files.
+10. If `suggest_changes=notes`, require a `Suggested Changes` section with file-level edit guidance and concise replacement snippets when useful.
+11. If `suggest_changes=patches`, require a `Suggested Changes` section plus a `Proposed File Changes` section with unified diffs or bounded replacement snippets only for files the auditor actually reviewed. If safe patching is not grounded enough, require the auditor to fall back to notes and explain why.
+12. Never ask the auditor to apply edits or assume its patches are authoritative. Suggested changes are proposal-only artifacts for later review.
 
 Prefer structured output when the CLI supports it.
 
@@ -176,13 +187,30 @@ You must add your own judgment in separate sections:
 
 - what the external auditor said it was auditing
 - what the external auditor said
+- what suggested changes it returned, if any
 - what you agree with
 - what you think should change
 - what you disagree with and why
+- whether you would accept, adapt, or reject the proposed file changes
 - what decision the user needs to make next
 
 If the auditor is wrong, say so plainly and explain why using inspected evidence.
 If the auditor is right, say what you would change and whether you should patch it now.
+
+If suggested changes were returned, save them as artifacts using
+`skills/external-audit/references/proposed-fixes-template.md`.
+
+Default proposed-fixes path:
+
+` <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/proposed-fixes/<timestamp>/ `
+
+Retained path only when the user explicitly asks:
+
+` <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/proposed-fixes/<timestamp>/ `
+
+Always save the raw proposal extract to `proposed-fixes.md`. Split unified diffs
+into `patches/<nnnn>-<slug>.diff` only when the auditor actually returned
+grounded patch blocks. Do not apply these files automatically.
 
 ## Step 5 — Output
 
@@ -207,8 +235,10 @@ Use `skills/external-audit/references/external-audit-report-template.md` as the 
 6. The report must explicitly separate:
    - what the external LLM said it was auditing
    - what the external LLM said
+   - what suggested changes it returned
    - what you agree with
    - what you would change
    - what you disagree with
+   - how you would handle the proposed changes
    - the resulting audit outcome
 7. If the auditor did not respond successfully, keep the same template and state that clearly in `What The External LLM Said` and `Audit Outcome`.

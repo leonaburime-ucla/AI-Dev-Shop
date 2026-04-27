@@ -8,7 +8,7 @@ Provide optional controls and an audit focus. The active agent will inspect the 
 
 ## Arguments
 - `[controls] [focus]`
-- `controls` (optional): `auditor=<claude|gemini|codex>`, `scope=<work-log|current-diff|staged|last-commit>`, `audit_timeout_seconds=<int>`, `claude_model=<exact-id>`, `gemini_model=<exact-id>`, and/or `codex_model=<exact-id>`
+- `controls` (optional): `auditor=<claude|gemini|codex>`, `scope=<work-log|current-diff|staged|last-commit>`, `suggest_changes=<patches|notes|none>`, `audit_timeout_seconds=<int>`, `claude_model=<exact-id>`, `gemini_model=<exact-id>`, and/or `codex_model=<exact-id>`
 - `focus`: what you want the external auditor to examine most closely
 
 ---
@@ -17,9 +17,9 @@ Provide optional controls and an audit focus. The active agent will inspect the 
 Act as an External Audit Coordinator.
 
 1. Parse `$ARGUMENTS`:
-   - Detect optional controls anywhere in args: `auditor=<claude|gemini|codex>`, `scope=<work-log|current-diff|staged|last-commit>`, `audit_timeout_seconds=<int>`, `claude_model=<exact-id>`, `gemini_model=<exact-id>`, and `codex_model=<exact-id>`.
+   - Detect optional controls anywhere in args: `auditor=<claude|gemini|codex>`, `scope=<work-log|current-diff|staged|last-commit>`, `suggest_changes=<patches|notes|none>`, `audit_timeout_seconds=<int>`, `claude_model=<exact-id>`, `gemini_model=<exact-id>`, and `codex_model=<exact-id>`.
    - Remaining text is the audit focus.
-   - Defaults if omitted: `scope=work-log`; `audit_timeout_seconds=300`.
+   - Defaults if omitted: `scope=work-log`; `suggest_changes=patches`; `audit_timeout_seconds=300`.
 2. Load `<AI_DEV_SHOP_ROOT>/skills/external-audit/SKILL.md`.
 3. Also use `skills/llm-operations/references/peer-llm-dispatch.md` for shared packet, transport, diagnostics, and capability rules.
    - If the planned auditor is Claude, also use `skills/llm-operations/references/claude-code-cli-audits.md`.
@@ -29,9 +29,11 @@ Act as an External Audit Coordinator.
    - separate in-scope work from unrelated worktree changes
    - build a concrete work log of what was changed, why, what was verified, and what remains uncertain
    - default to the curated work log as the main packet payload; include commit or diff references only when they materially help the auditor inspect details
+   - determine whether the packet names a bounded enough file set for grounded file-change suggestions; if `suggest_changes=patches` but the scope is too broad or uncertain for safe file-level proposals, downgrade to `suggest_changes=notes` and say so before dispatch
 5. Build an audit packet using `skills/external-audit/references/audit-packet-template.md`.
    - Save packets to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/packets/<timestamp>-audit-packet.md` by default.
    - If the user explicitly asks to retain the packet, save it to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/packets/` instead.
+   - Record the effective `suggest_changes` mode in the packet.
    - Prefer serving the packet to the peer as a self-contained `stdin` payload when the bounded work log fits cleanly in one prompt.
    - If the peer still needs to read the packet from disk, follow the shared transport fallback rules in `skills/llm-operations/references/peer-llm-dispatch.md` and record both the authoring and dispatch paths in the packet.
 6. Run external-auditor preflight:
@@ -53,6 +55,9 @@ Act as an External Audit Coordinator.
    - prefer a short prompt that points to the dispatch packet over embedding the full packet body inline when the peer can read files directly
    - if the packet already names the relevant files, prefer a bounded sectioned prompt over an open-ended repo-audit prompt
    - if the auditor is Claude, apply the Claude Code reference and prefer its dedicated runner when available
+   - when `suggest_changes=notes`, ask for file-level change suggestions in prose or snippets only
+   - when `suggest_changes=patches`, ask for file-level change suggestions plus candidate unified diffs or bounded replacement snippets only for files the auditor actually reviewed; if the scope is too uncertain for safe patch proposals, require the auditor to fall back to notes and say why
+   - never ask the auditor to apply edits; suggested changes are proposal-only artifacts
    - Prefer structured output modes when available.
    - Parse `stdout` only as the auditor answer.
    - Treat `stderr` as diagnostics.
@@ -62,18 +67,28 @@ Act as an External Audit Coordinator.
    - use any host-specific live-run timing or fallback bounds from the host reference you loaded
    - if the peer exits successfully but returns an empty answer body, classify it as `empty_result_transport_failure` and retry once with a tighter bounded prompt and constrained read-only tool surface when supported
    - when file-based dispatch was used, delete the temporary dispatch copy after the run unless the user explicitly asks to retain it for debugging or evidence
-10. Synthesize the result back to the user. The final answer must include:
+10. If the auditor returned suggested changes, save them as proposal artifacts using `skills/external-audit/references/proposed-fixes-template.md`.
+   - Default save path: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/proposed-fixes/<timestamp>/`
+   - Retained save path only when the user explicitly asks: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/proposed-fixes/<timestamp>/`
+   - Always save the raw extracted proposal bundle to `proposed-fixes.md`.
+   - If the auditor returned grounded unified diffs, split them into `patches/<nnnn>-<slug>.diff` files when practical; otherwise keep them inline in `proposed-fixes.md`.
+   - Treat these artifacts as suggestions only. Do not apply them automatically.
+11. Synthesize the result back to the user. The final answer must include:
    - the exact report structure from `skills/external-audit/references/external-audit-report-template.md`
    - the exact auditor model version used (`Resolved Model`) and the auditor CLI version
+   - the effective `suggest_changes` mode used
    - `Work Log`
    - `Auditor Scope Check`
    - `What The External LLM Said`
+   - `Suggested Changes`
    - `Coordinator Response -> Agree`
    - `Coordinator Response -> Change`
    - `Coordinator Response -> Disagree`
+   - `Coordinator Response -> Proposed Fix Handling`
    - `Audit Outcome`
    - `Decision Points For User`
    - if the exact model version cannot be proven, do not run the audit; ask for a pinned model instead
-11. Before writing the final report, if the user has not already specified retention, ask:
+12. Before writing the final report, if the user has not already specified retention, ask:
    `Save external audit report? Reply "save report" to retain it in <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/runs/, "local only" to keep it in <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/runs/, or "inline only" for no file.`
    Save ad hoc reports to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/runs/<timestamp>-external-audit-report.md` by default. If the user explicitly wants to retain the artifact, save it to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/runs/<timestamp>-external-audit-report.md` instead.
+   - Suggested-change bundles remain in `.local-artifacts` by default even when the report is saved, unless the user explicitly asks to retain the proposed fixes too.

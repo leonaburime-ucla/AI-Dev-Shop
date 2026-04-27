@@ -3,6 +3,7 @@
 **Date:** <ISO-8601>
 **Scope:** <work-log | current-diff | staged | last-commit | custom>
 **Focus:** <the user's audit question>
+**Suggested Changes Mode:** <patches | notes | none>
 **Audit Packet:** <path>
 **Dispatch Packet:** <peer-readable path or "same as audit packet">
 **Auditor CLI:** <claude | gemini | codex>
@@ -12,6 +13,7 @@
 **CLI Version:** <version>
 **Timeout:** <seconds>
 **Audit Status:** <Responded | Failed | Timed out | Retry exhausted | Not installed>
+**Proposed Fixes Artifact:** <path or "none">
 
 ## Work Log
 - <what you did>
@@ -47,6 +49,9 @@
 ### Strengths
 - <what the auditor said looked solid, or "none stated">
 
+### Suggested Changes
+- <summary of file-level suggestions, or "none returned">
+
 ## Coordinator Response
 
 ### Agree
@@ -57,6 +62,9 @@
 
 ### Disagree
 <what you disagree with and why>
+
+### Proposed Fix Handling
+<accept as-is | adapt before applying | reject | none>
 
 ## Audit Outcome
 - <keep as-is | patch now | request second auditor | stop because blocked>
