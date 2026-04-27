@@ -1,7 +1,7 @@
 ---
 name: function-quality-assessment
-version: 1.1.0
-last_updated: 2026-04-26
+version: 1.2.0
+last_updated: 2026-04-27
 description: Use when writing, reviewing, or refactoring logic-bearing functions so low-level function quality is assessed consistently with an overall score, severity-graded findings, complexity notes, and clear pass/debt/block routing.
 ---
 
@@ -9,10 +9,47 @@ description: Use when writing, reviewing, or refactoring logic-bearing functions
 
 Apply this skill to every new or materially changed logic-bearing function.
 
-This is an operational audit wrapper. It does not replace the source skills
-below; it turns their rules into an atomic per-function assessment with
-`@overallScore`, severity findings, fix-before-handoff behavior, and review
-reporting.
+This skill is both a build-time coding guide and an operational audit wrapper.
+It does not replace the source skills below; it turns their rules into a
+per-function assessment with `@overallScore`, severity findings, fix-before-
+handoff behavior, and review reporting.
+
+Use it twice:
+
+- before coding, to shape the function correctly from the start
+- after coding, to score the result, catch gaps, and decide whether the change
+  can be handed off
+
+## Writing Posture
+
+When writing a logic-bearing function:
+
+1. Give the function one clear job. Keep validation, business rules, and
+   orchestration separate unless the existing boundary is intentionally broader.
+2. Prefer pure functions for rules, calculations, and transformations. Keep
+   side effects at explicit boundaries.
+3. Do not mutate input objects unless an in-place contract is required by the
+   existing API and documented clearly.
+4. Make important dependencies explicit. Do not hide behavior behind module
+   state, environment reads, clocks, randomness, caches, or feature flags
+   unless that dependency is intentional, controlled, and testable.
+5. For exported or boundary functions, default to a required input object as
+   the first parameter and an optional options object as the second parameter,
+   unless compatibility or language convention justifies another shape.
+6. Keep return shapes and error behavior stable. Do not mix unrelated failure
+   signals such as booleans, strings, `null`, and thrown errors for the same
+   kind of problem.
+7. Decide the test seam before coding. If the function cannot be tested with
+   direct inputs and direct assertions, redesign the boundary first.
+8. Think about scale before coding. Identify complexity, query or I/O shape,
+   resource bounds, idempotency needs, and concurrency risks for caller-
+   controlled or unbounded input.
+9. For rule, validation, batch, reducer, or cross-record workflows, name at
+   least one aggregate or adversarial edge case before coding and add coverage
+   for it before handoff.
+10. If a function still has avoidable quality findings after implementation,
+    refactor locally before handoff instead of documenting obvious debt as if it
+    were final design.
 
 ## Source Skills
 
