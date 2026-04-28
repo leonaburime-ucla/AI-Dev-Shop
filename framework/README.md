@@ -28,10 +28,10 @@ That project-owned state belongs in the external sibling workspace:
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`
 
-Inside ADS itself, `project-knowledge/` is the repo-local mirror/template of that workspace shape.
+Inside ADS itself, `project-knowledge-template/` is the repo-local template for that workspace shape.
 
 ## Write Rules
 
 - Treat everything under `framework/` as read-only during normal host-project feature work unless the user is explicitly maintaining ADS itself.
 - During normal project work, project-specific writes go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/...`, not `framework/`.
-- During ADS maintenance, use the repo-local `project-knowledge/` mirror for retained artifacts, scratch output, and other workspace-shaped test data.
+- During ADS maintenance, use the repo-local `project-knowledge-template/` template surface for retained artifacts, scratch output, and other workspace-shaped test data.

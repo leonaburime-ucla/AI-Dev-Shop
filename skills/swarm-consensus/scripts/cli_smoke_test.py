@@ -22,7 +22,7 @@ END_MARKER = "<<SWARM_END>>"
 DISCOVERY_CACHE_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[3]
 HOST_ROOT = REPO_ROOT.parent
-REPO_WORKSPACE_ROOT = REPO_ROOT / "project-knowledge"
+REPO_WORKSPACE_ROOT = REPO_ROOT / "project-knowledge-template"
 MODEL_CANDIDATE_LADDERS_PATH = (
     REPO_ROOT / "skills" / "swarm-consensus" / "references" / "model-candidate-ladders.json"
 )
@@ -50,7 +50,8 @@ def display_path(path: Path) -> str:
 
 WORKSPACE_ROOT = resolve_workspace_root()
 WORKSPACE_LABEL = display_path(WORKSPACE_ROOT)
-DEFAULT_SMOKE_TEST_DIR = WORKSPACE_ROOT / ".local-artifacts" / "swarm-consensus" / "smoke-tests"
+DEFAULT_SMOKE_TEST_DIR = WORKSPACE_ROOT / "reports" / "swarm-consensus" / "smoke-tests"
+LEGACY_SMOKE_TEST_DIR = WORKSPACE_ROOT / ".local-artifacts" / "swarm-consensus" / "smoke-tests"
 DEFAULT_DISCOVERY_CACHE_PATH = str(DEFAULT_SMOKE_TEST_DIR / "last-known-good.json")
 
 
@@ -100,7 +101,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--artifacts-dir",
         default=str(DEFAULT_SMOKE_TEST_DIR),
-        help=f"Directory for dated smoke-test artifacts when --save-artifact is used. Override with {WORKSPACE_LABEL}/reports/swarm-consensus/smoke-tests if you want a retained repo artifact.",
+        help=(
+            "Directory for dated smoke-test artifacts when --save-artifact is used. "
+            f"Defaults to the retained cache/proof path at {WORKSPACE_LABEL}/reports/swarm-consensus/smoke-tests. "
+            f"Override with {WORKSPACE_LABEL}/.local-artifacts/swarm-consensus/smoke-tests for transient local-only runs."
+        ),
     )
     parser.add_argument(
         "--discover-claude",
@@ -282,6 +287,16 @@ def load_discovery_cache(path: Path) -> dict:
         payload["entries"] = []
     payload.setdefault("version", DISCOVERY_CACHE_VERSION)
     return payload
+
+
+def resolve_discovery_cache_read_path(path: Path) -> Path:
+    if path.exists():
+        return path
+    default_cache = Path(DEFAULT_DISCOVERY_CACHE_PATH)
+    legacy_cache = LEGACY_SMOKE_TEST_DIR / "last-known-good.json"
+    if path.resolve() == default_cache.resolve() and legacy_cache.exists():
+        return legacy_cache
+    return path
 
 
 def save_discovery_cache(path: Path, payload: dict) -> None:
@@ -676,7 +691,8 @@ def run_claude_discovery_with_environment(
     requested_family = extract_claude_family(args.claude_model)
     saved_family = extract_claude_family(saved_model)
     cache_path = Path(args.discovery_cache_path)
-    cache = load_discovery_cache(cache_path)
+    cache_read_path = resolve_discovery_cache_read_path(cache_path)
+    cache = load_discovery_cache(cache_read_path)
     environment = build_claude_environment(cli_versions, args.claude_require)
     environment_key = build_environment_key(environment)
     cache_entry = find_cached_discovery(cache, environment_key, args.claude_model, requested_hint)
@@ -699,7 +715,8 @@ def run_claude_discovery_with_environment(
             "attempts": [],
             "cache_hit": True,
             "cache_entry": cache_entry,
-            "cache_path": str(cache_path),
+            "cache_path": str(cache_read_path),
+            "cache_write_path": str(cache_path),
             "environment": environment,
             "environment_key": environment_key,
         }
@@ -811,7 +828,8 @@ def run_claude_discovery_with_environment(
         "attempts": attempts,
         "cache_hit": False,
         "cache_entry": None,
-        "cache_path": str(cache_path),
+        "cache_path": str(cache_read_path),
+        "cache_write_path": str(cache_path),
         "candidate_ladder_path": str(MODEL_CANDIDATE_LADDERS_PATH),
         "environment": environment,
         "environment_key": environment_key,
@@ -957,13 +975,15 @@ def persist_claude_discovery(
 ) -> dict[str, str] | None:
     if not discovery or not discovery.get("enabled"):
         return None
+    cache_write_path = Path(str(discovery.get("cache_write_path", args.discovery_cache_path)))
+
     if discovery.get("cache_hit"):
         cache_entry = discovery.get("cache_entry")
         if isinstance(cache_entry, dict):
             resolved_artifact_path = resolve_cache_artifact_path(cache_entry.get("artifact_path"))
-            cache_path = Path(str(discovery.get("cache_path", args.discovery_cache_path)))
-            if resolved_artifact_path and cache_path.exists():
-                cache = load_discovery_cache(cache_path)
+            cache_read_path = Path(str(discovery.get("cache_path", args.discovery_cache_path)))
+            if resolved_artifact_path and cache_read_path.exists():
+                cache = load_discovery_cache(cache_read_path)
                 changed = False
                 for entry in cache.get("entries", []):
                     if not isinstance(entry, dict):
@@ -977,12 +997,16 @@ def persist_claude_discovery(
                         changed = True
                 if changed:
                     cache["updated_at"] = datetime.now(timezone.utc).isoformat()
-                    save_discovery_cache(cache_path, cache)
+                    save_discovery_cache(cache_write_path, cache)
+                    write_cache_snapshot(cache_write_path, cache)
+                elif cache_read_path != cache_write_path:
+                    save_discovery_cache(cache_write_path, cache)
+                    write_cache_snapshot(cache_write_path, cache)
             return {
                 "artifact_path": str(resolved_artifact_path or ""),
-                "cache_path": str(discovery.get("cache_path", "")),
+                "cache_path": str(cache_write_path),
             }
-        return {"artifact_path": "", "cache_path": str(discovery.get("cache_path", ""))}
+        return {"artifact_path": "", "cache_path": str(cache_write_path)}
 
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")
     artifacts_dir = Path(args.artifacts_dir)
@@ -992,8 +1016,7 @@ def persist_claude_discovery(
     markdown_report = render_report([], args, cli_versions, discovery, model_plan)
     artifact_path.write_text(markdown_report + "\n", encoding="utf-8")
 
-    cache_path = Path(str(discovery.get("cache_path", args.discovery_cache_path)))
-    cache = load_discovery_cache(cache_path)
+    cache = load_discovery_cache(cache_write_path)
     environment = discovery.get("environment", {})
     environment_key = str(discovery.get("environment_key", ""))
     winner = discovery.get("winner")
@@ -1022,12 +1045,22 @@ def persist_claude_discovery(
         entries.append(new_entry)
         cache["entries"] = entries
         cache["updated_at"] = datetime.now(timezone.utc).isoformat()
-        save_discovery_cache(cache_path, cache)
+        save_discovery_cache(cache_write_path, cache)
+        write_cache_snapshot(cache_write_path, cache)
 
     return {
         "artifact_path": str(artifact_path),
-        "cache_path": str(cache_path),
+        "cache_path": str(cache_write_path),
     }
+
+
+def write_cache_snapshot(cache_path: Path, payload: dict) -> Path:
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    history_dir = cache_path.parent / "history"
+    history_dir.mkdir(parents=True, exist_ok=True)
+    snapshot_path = history_dir / f"{timestamp}-last-known-good.json"
+    snapshot_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return snapshot_path
 
 
 def main() -> int:

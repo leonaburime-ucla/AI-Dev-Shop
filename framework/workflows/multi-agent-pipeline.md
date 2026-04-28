@@ -12,7 +12,7 @@ All project-owned pipeline artifacts are written under `<ADS_PROJECT_KNOWLEDGE_R
 - Local scratch, raw captures, exploratory prompts, and disposable session evidence → `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
 - Live project memory → `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`
 - Live constitution → `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`
-- **Read-only toolkit source:** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`, and the repo-local `project-knowledge/` workspace mirror
+- **Read-only toolkit source:** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`, and the repo-local `project-knowledge-template/` workspace template
 
 Artifact-intent rule:
 - pipeline-required artifacts save directly to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`

@@ -1,7 +1,7 @@
 ---
 name: system-blueprint
-version: 1.0.0
-last_updated: 2026-03-03
+version: 1.1.0
+last_updated: 2026-04-27
 description: Use when shaping a project at macro level before feature specs: define domains/components, ownership boundaries, integration map, and spec decomposition plan.
 ---
 
@@ -67,11 +67,12 @@ The output must include:
 1. Macro components/domains and responsibilities.
 2. Ownership boundaries and integration map.
 3. High-level runtime/data topology.
-4. Explicit risks and unknowns.
-5. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
-6. Critical cross-domain user journeys for QA/E2E handoff.
-7. Spec decomposition plan (what spec packages to write next).
-8. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
+4. Dominant quality attributes (max 3, no scores) that are likely to govern the downstream ADR.
+5. Explicit risks and unknowns.
+6. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
+7. Critical cross-domain user journeys for QA/E2E handoff.
+8. Spec decomposition plan (what spec packages to write next).
+9. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
 
 ## Spec Decomposition Policy
 
@@ -88,6 +89,7 @@ Default to **vertical/domain slicing** for decomposition.
 
 - Do not produce a feature-level ADR.
 - Do not lock low-level implementation patterns.
+- Name dominant quality attributes only; do not score them at blueprint stage.
 - Keep stack direction non-binding unless a hard constraint already exists.
 - `Core/Foundation` (`P0`) is a thin bootstrap layer only: shell/runtime primitives/shared clients/CI harness. Do not place feature-specific business logic or feature-owned tables in `P0`.
 - Use `[OWNERSHIP UNCLEAR]` markers where needed; unresolved markers block Spec decomposition approval.
@@ -97,5 +99,6 @@ Default to **vertical/domain slicing** for decomposition.
 
 - Inputs used
 - Blueprint summary
+- Dominant quality attributes for Architect handoff
 - Risks/open unknowns
 - Recommended next assignee: Spec Agent

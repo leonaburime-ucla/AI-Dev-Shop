@@ -2,6 +2,8 @@
 
 Quality doctrine, evaluator loops, scorecards, and test-quality references.
 
+Committed seeded eval suites live in [../agent-evals/](/Users/la/Desktop/Multi-Agent%20Swarm%20Foundation/AI-Dev-Shop-speckit/harness-engineering/agent-evals/README.md:1). This directory keeps the shared framework and tooling.
+
 ## Files
 
 - `evaluation-loops.md` - independent evaluator / judge loops and retained evaluator artifacts

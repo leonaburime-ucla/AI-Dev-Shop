@@ -21,7 +21,7 @@ Do not create one for short single-session work just because the task touches fr
 
 - Feature pipeline runs: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md`
 - Non-feature host-project work: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/<workstream>/progress-ledger.md`
-- Non-feature toolkit maintenance or direct framework work: `<AI_DEV_SHOP_ROOT>/project-knowledge/reports/continuity/<workstream>/progress-ledger.md`
+- Non-feature toolkit maintenance or direct framework work: `<AI_DEV_SHOP_ROOT>/project-knowledge-template/reports/continuity/<workstream>/progress-ledger.md`
 
 The state file remains the machine-oriented checkpoint. The progress ledger is the human/agent resume surface.
 

@@ -145,7 +145,9 @@ Use this pattern:
 
 Do not silently upgrade a peer to a newly released model family/version just because it exists. If a newer model may be better, tell the user and let them choose.
 
-If the Claude peer model is requested but not yet proven locally, or the CLI rejects the requested model name, do not keep guessing manually. Run the smoke-test harness in discovery mode first:
+If the Claude peer model is requested, first check whether that exact model already succeeded earlier in the current session on this same host/CLI. If yes, treat that as `session_success` proof and reuse it directly. Do not rerun discovery just because the cache file is absent.
+
+If the Claude peer model is still unproven after the session-success check, or the CLI rejects the requested model name, do not keep guessing manually. Run the smoke-test harness in discovery mode first:
 
 ```bash
 python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
@@ -156,7 +158,10 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 ```
 
 Use the discovered `winner.model` only when it is the same requested family/version and it passed locally in JSON mode. If discovery finds only a different family/version, stop and ask the user before switching.
-A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
+A valid Claude proof is any one of:
+- an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path
+- an exact-model `session_success` earlier in the current session on the same host/CLI
+- a fresh discovery run that writes a new artifact for the current environment
 Discovery should expand the maintained ladder at `skills/swarm-consensus/references/model-candidate-ladders.json`: explicit request first, then requested-family candidates newest-to-oldest, then saved/default-family fallbacks. Keep this deterministic and auditable rather than improvising model guesses during a live debate.
 
 ### Freshness policy
@@ -180,10 +185,10 @@ Before changing saved consensus model preferences or updating the command docs t
 
 Use the smoke test to compare text vs structured output, stderr noise, end-marker behavior, and explicit model-flag handling on the current host.
 
-By default, save ad hoc smoke-test artifacts to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/`.
-If the user explicitly wants a retained host baseline in the repo, set `--artifacts-dir <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests`.
+By default, save smoke-test artifacts and the cross-session proof cache to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/`.
+If the user explicitly wants a transient local-only run, set `--artifacts-dir <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests`.
 
-If there is no recent dated artifact for the current host, or if the host/CLI/model stack has changed materially since the last run, ask the user whether to run the smoke test now and save a dated artifact before changing saved preferences or slash-command guidance.
+If the dated artifacts suggest the proof may be stale for the current host, surface that plainly and let the user decide whether to rerun the smoke test. Staleness is advisory only; do not rerun automatically.
 If a Claude model-resolution failure happens during a live consensus preflight, run the smoke test immediately instead of asking the user to guess another Claude model by hand.
 
 ---

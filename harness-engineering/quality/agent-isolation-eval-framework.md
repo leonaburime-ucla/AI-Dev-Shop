@@ -45,14 +45,41 @@ Every isolation eval now follows this structure:
 The source of truth for the matrix model is
 `harness-engineering/quality/eval-coverage-model.md`.
 
+## Default Execution Protocol
+
+Isolation evals default to the **matching repo persona**, not to an outside
+model.
+
+Use these execution modes:
+
+- `repo_persona_subagent` — default and preferred. Spawn the matching repo
+  agent persona in a fresh context and let it produce its normal artifact.
+- `repo_persona_host` — fallback only when helper-agent support is unavailable
+  or the user explicitly disables subagents.
+- `external_peer_cli` — comparison mode only. Use this only when the user
+  explicitly asks to compare Claude, Gemini, Codex CLI, or another external
+  peer against the repo persona.
+
+Rules:
+
+1. Canonical benchmark claims for an agent should be established with
+   `repo_persona_subagent` unless subagents are unavailable.
+2. External-peer runs are valuable, but they are comparison artifacts, not the
+   default proof of repo-agent capability.
+3. Every saved run must declare `execution_mode` and `persona_source` in
+   `run-manifest.tsv` so later readers can tell whether the run exercised the
+   repo agent or an external comparison target.
+4. When `external_peer_cli` is used, say so plainly in the summary instead of
+   presenting the result as the default agent benchmark.
+
 ---
 
 ## Required Suite Artifacts
 
-New suites should use this layout:
+Committed suites should use this layout:
 
 ```text
-.local-artifacts/agent-evals/<suite-id>/
+harness-engineering/agent-evals/<agent>-evals/<suite-id>/
   coverage-matrix.tsv          # required: planned coverage cells (suite-level)
   seed-catalog.tsv             # required: machine-readable seed metadata (suite-level)
   seed-ledger.md               # required: hidden narrative ledger (suite-level)
@@ -65,7 +92,7 @@ New suites should use this layout:
       src/                     #   source code with planted defects
       specs/                   #   spec artifacts (if applicable)
       reports/                 #   fake upstream handoffs
-    runs/                      # created by prepare_eval_run.py (never hand-edited)
+    runs/                      # created by prepare_eval_run.py; kept with the suite when retained
       <run-id>/                #   fresh copy of seed-state/ for one run
         src/
         specs/
@@ -90,7 +117,8 @@ during a run.
 
 `prepare_eval_run.py` copies `seed-state/` into `runs/<run-id>/` so each run
 gets a fresh working directory. This keeps the benchmark inputs stable across
-reruns.
+reruns while keeping run history, scored results, and human-readable reports
+colocalized under the suite.
 
 ```bash
 # Prepare all evals in the suite for a new run:
@@ -179,13 +207,17 @@ Every scored run must declare which agent/model executed it and which seeds it
 was intended to cover.
 
 ```text
-run_id  agent  llm_family  model_id  model_label  cli_name  cli_version  selection_source  run_scope  target_seed_ids  workdir  prompt_path  output_path  executed_at
+run_id  agent  execution_mode  persona_source  llm_family  model_id  model_label  cli_name  cli_version  selection_source  run_scope  target_seed_ids  workdir  prompt_path  output_path  executed_at
 ```
 
 Required columns:
 
 - `run_id`: stable identifier used in `run-results.tsv`
 - `agent`: target agent, for example `programmer`
+- `execution_mode`: `repo_persona_subagent`, `repo_persona_host`, or
+  `external_peer_cli`
+- `persona_source`: repo persona bootstrap file such as
+  `agents/architect/skills.md`; use `none` only for `external_peer_cli`
 - `llm_family`: provider or family label such as `openai`, `anthropic`, or
   `google`
 - `model_id`: exact model identifier used for the run
@@ -203,7 +235,8 @@ Required columns:
 - `executed_at`: ISO-8601 UTC timestamp
 
 This is how rerun claims stay attributable to a specific LLM/model instead of
-being summarized from chat memory.
+being summarized from chat memory, and how the harness distinguishes canonical
+repo-persona runs from explicit comparison runs.
 
 ## Run Results Format
 
@@ -401,7 +434,11 @@ that bypass the shared coverage model.
 
 ### During the eval
 
-8. Dispatch the agent in a fresh context.
+8. Dispatch the matching repo persona in a fresh context.
+   - Default to `repo_persona_subagent`.
+   - Use `repo_persona_host` only when subagents are unavailable or disabled.
+   - Use `external_peer_cli` only when the user explicitly asks for cross-model
+     comparison.
 9. Let the agent produce its normal output with no intervention.
 10. Score the run into `run-results.tsv`.
 

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-REPORT_DIR = ROOT / "project-knowledge/reports/maintenance"
+REPORT_DIR = ROOT / "project-knowledge-template/reports/maintenance"
 META_RE = re.compile(r"^- ([A-Za-z][A-Za-z0-9 /_-]*):\s*(.+)$")
 SEPARATOR_RE = re.compile(r"^\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$")
 REQUIRED_HEADINGS = [
@@ -106,7 +106,7 @@ def validate_report(path: Path) -> list[Violation]:
             Violation(
                 path,
                 "load-bearing audit report does not use the canonical filename prefix",
-                "rename it to harness-load-bearing-<YYYY-MM-DD>.md under project-knowledge/reports/maintenance/",
+                "rename it to harness-load-bearing-<YYYY-MM-DD>.md under project-knowledge-template/reports/maintenance/",
             )
         )
 

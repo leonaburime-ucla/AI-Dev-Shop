@@ -77,7 +77,7 @@ The default should follow evidence from current runs, not inherited lore from ol
 
 Use a retained report when the audit is meant to become reusable project evidence or when it changes the default harness:
 
-`<AI_DEV_SHOP_ROOT>/project-knowledge/reports/maintenance/harness-load-bearing-<YYYY-MM-DD>.md`
+`<AI_DEV_SHOP_ROOT>/project-knowledge-template/reports/maintenance/harness-load-bearing-<YYYY-MM-DD>.md`
 
 For exploratory removal checks, local-only runs, or inline-only decisions, a scratch note is enough until the result is worth promoting.
 
@@ -104,4 +104,4 @@ If an audit changes the default harness:
 
 `harness-engineering/validators/validate_load_bearing_audits.py` is the executable audit check for retained load-bearing reports.
 
-It should fail when a retained `project-knowledge/reports/maintenance/harness-load-bearing-*.md` report is missing the required sections, benchmark inventory, or component decisions.
+It should fail when a retained `project-knowledge-template/reports/maintenance/harness-load-bearing-*.md` report is missing the required sections, benchmark inventory, or component decisions.

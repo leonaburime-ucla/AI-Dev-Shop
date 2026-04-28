@@ -1,8 +1,8 @@
 ---
 name: architecture-decisions
-version: 1.1.0
-last_updated: 2026-03-15
-description: Use when selecting architecture patterns, writing ADRs, deciding whether research is required, evaluating tradeoffs, or defining module and service boundaries and testable contracts.
+version: 1.2.0
+last_updated: 2026-04-27
+description: Use when selecting architecture patterns, writing ADRs, deciding whether research is required, evaluating tradeoffs, defining module and service boundaries and testable contracts, or producing quality-attribute scorecards with explicit tradeoff reasoning.
 ---
 
 # Skill: Architecture Decisions
@@ -48,11 +48,146 @@ Before selecting a pattern, classify the system's primary drivers:
 - Produce `research.md` when the spec forces a choice between libraries, frameworks, services, persistence mechanisms, messaging, or infrastructure components, or when multiple viable approaches remain open.
 - Run `constitution-compliance` before final pattern selection. Unjustified `EXCEPTION` entries block the ADR.
 - Score every viable candidate with the Pattern Evaluation Format. Adaptability weights at minimum 30% of total match.
+- Score the selected candidate with the Architecture Scorecard below. Activate optional axes only through the trigger rules and cite the activation source.
 - Define module or service boundaries and explicit contracts before locking the pattern.
 - For each API or event contract, assign one test approach: consumer-driven, schema validation, or integration test.
 - If `system-blueprint.md` assigns data ownership, encode owner and non-owner constraints in the ADR.
 - Identify parallelizable slices and sequencing constraints for `tasks.md`.
-- Write `adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Complete Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision below.
+- Write `adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Complete Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Re-evaluation Triggers, Complexity Justification, and the directory structure decision below.
+
+## Architecture Scorecard
+
+Use this scorecard to explain why the chosen architecture is acceptable, what it is naturally good at, what it is weak at, and what mitigations are required.
+
+The scorecard supports the ADR. It does not replace judgment.
+
+### Core Axes (always score)
+
+- `modifiability` — how easily behavior can be changed or extended safely
+- `modularity` — how cleanly the system is partitioned into stable, isolated boundaries
+- `scalability` — how well the architecture handles growth in load, data volume, or organizational scale
+- `reliability` — how well the system tolerates faults, degrades safely, and recovers
+- `security` — how well the architecture supports secure boundaries, access control, secrets handling, and reduced attack surface
+- `operability` — how easy the system is to deploy, monitor, debug, roll back, and run
+- `cost` — total ownership cost, including infrastructure cost and operational overhead
+- `testability` — how well the architecture supports unit, integration, contract, and system verification
+
+### Optional Axes (activate only when triggered)
+
+| Axis | Activate When |
+|---|---|
+| `performance` | The spec or NFRs contain explicit latency, throughput, or response-time targets |
+| `data_consistency` | The design introduces distributed writes, async workflows, multiple stores, or critical invariants |
+| `compliance_auditability` | The system has legal, regulatory, audit-trail, or evidentiary requirements |
+| `tenant_isolation` | The product is multi-tenant or has explicit customer isolation requirements |
+| `integration_complexity` | The system depends on 3+ external systems or brittle partner integrations |
+| `cognitive_load` | Team experience, onboarding burden, ownership fragmentation, or operator burden is a major constraint |
+| `disaster_recovery` | Explicit backup, failover, RPO, or RTO requirements exist |
+| `deployment_independence` | Independent release cadence is a named system driver |
+
+**Activation rule:** optional axes are not judgment calls. If an activation condition is present, the axis becomes required in the ADR. Cite the activation source explicitly in the scorecard row.
+
+### Score Scale
+
+Use `1-5` only:
+
+- `1` — poor fit; major liability
+- `2` — weak fit; significant mitigation required
+- `3` — workable; meaningful tradeoffs accepted
+- `4` — strong fit; only minor concerns
+- `5` — excellent fit; naturally supports this quality
+
+Do not use weighted sums or arithmetic winner logic. The scorecard is structured evidence for the final tradeoff narrative, not a calculator.
+
+### Confidence Values
+
+Every scored row needs one confidence value:
+
+- `measured` — backed by prototype, benchmark, or direct evidence
+- `prior_art` — backed by real team or organization experience
+- `analogical` — inferred from sufficiently similar systems or proven patterns
+- `assumed` — mostly judgment with weak direct evidence
+
+If more than half of core axes are `assumed`, the ADR is too speculative. Stop and require more research before finalizing the decision.
+
+### Required Fields Per Scored Axis
+
+Every scored axis must include:
+
+- `axis`
+- `definition`
+- `score`
+- `confidence`
+- `strengths`
+- `weaknesses`
+- `rationale`
+- `assumptions`
+- `review_trigger`
+- `delta_vs_runner_up`
+
+Conditional fields:
+
+- `activation_source` — required for any optional axis
+- `mitigation` — required when `score <= 2`
+- `owner` — required when mitigation exists
+- `enforcement` — required when mitigation exists
+- `deadline_or_trigger` — required when mitigation exists
+
+### Scorecard Guardrails
+
+- No naked scores. Every score must include rationale.
+- No generic platitudes. Explain the mechanism, not the slogan.
+  - Bad: `Microservices scale better.`
+  - Good: `Independent service read paths let the catalog scale separately from checkout during seasonal peaks.`
+- `weaknesses` must describe a concrete failure mode or change-friction scenario.
+- `rationale` must tie back to a named system driver, constraint, or requirement.
+- `assumptions` must be falsifiable. State what would prove them wrong.
+- Do not copy the same strengths/weaknesses text across axes. If two rows say the same thing, the analysis is too shallow.
+- The selected architecture must acknowledge at least one meaningful weakness. If every axis looks perfect, the scorecard is not credible.
+
+### Blocking Rules
+
+A candidate cannot win if any of the following are true:
+
+1. A critical axis is scored `1` and no explicit mitigation exists.
+2. The ADR has an unjustified Constitution violation.
+3. More than half of the core axes are `assumed`.
+4. An optional axis tied to a hard requirement should have activated but is missing from the scorecard.
+
+**Critical axis definition:** any core axis named in the dominant quality attributes, or any axis directly tied to a hard requirement in the spec, NFRs, blueprint, or coordinator directive.
+
+### Required Architecture-Level Synthesis
+
+After the per-axis scorecard, the ADR must include:
+
+- `Overall Strengths`
+- `Overall Weaknesses`
+- `Tradeoff Tension`
+- `Why This Won`
+- `Runner-Up Comparison`
+- `Mitigations Required`
+- `Re-evaluation Triggers`
+
+`Tradeoff Tension` must explicitly name the main sacrifice being accepted.
+
+Examples:
+
+- `We are trading deployment independence for lower operational cost.`
+- `We are trading strict consistency for scale and responsiveness.`
+- `We are trading modularity for delivery speed in the first release.`
+
+### Relationship To Pattern Evaluation
+
+Keep the existing Pattern Evaluation table for cross-candidate comparison:
+
+- `Match %`
+- `Adaptability`
+- `Pros`
+- `Cons`
+- `Key Tradeoffs`
+- `Verdict`
+
+Use the Architecture Scorecard to explain the selected candidate in more detail. Keep `adaptability` in the Pattern Evaluation table as a cross-candidate tiebreaker instead of duplicating it as a default scorecard axis.
 
 ## Pattern Selection Guide
 

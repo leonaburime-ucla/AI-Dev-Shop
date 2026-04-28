@@ -12,6 +12,7 @@ What this does:
 - can probe candidate Claude model names and return the first locally proven working exact model
 - can expand a maintained candidate ladder (`model-candidate-ladders.json`) newest-to-oldest instead of guessing ad hoc
 - writes a dated Claude discovery artifact plus an environment-keyed last-known-good cache when discovery mode is used
+- keeps retained proof under `reports/swarm-consensus/smoke-tests/` by default, with dated history snapshots for cache updates
 
 Run it with current preferences:
 
@@ -40,8 +41,10 @@ Interpret the discovery result this way:
 - if discovery finds only an older or different model family/version, stop and ask the user before switching
 - prefer `--claude-require json` for consensus runs that stay in structured-output mode
 - prefer `--claude-require both` for Claude audit flows that may need plain-text fallback
-- discovery mode auto-saves a dated artifact under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/`
-- discovery mode also updates `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json`
+- discovery mode auto-saves a dated artifact under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/`
+- discovery mode also updates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`
+- each cache update also writes a dated snapshot under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/history/`
+- the script still falls back to the legacy `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` cache if the retained cache is missing
 - cache hits are valid only for the same environment tuple: hostname, OS, machine, Claude CLI version, and transport requirement, and only when the cached artifact path still exists
 
 Run Codex in an isolated directory to compare raw CLI behavior against repo-local behavior:
@@ -57,10 +60,11 @@ Suggested operating pattern:
 
 - run a dated baseline once after setting up consensus on a host
 - rerun after CLI upgrades, major model-family changes, or parser regressions
-- save ad hoc runs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/` by default
-- only write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/` when you explicitly want a retained host baseline in the repo
+- save retained runs and discovery proof in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/` by default
+- use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/` only when you explicitly want a transient local-only run
 - treat the saved artifact as evidence for updating saved model preferences or slash-command guidance
 - do not treat one machine's winning Claude model string as globally valid for other environments
+- treat dated snapshots as staleness indicators for human review, not as an automatic rerun trigger
 
 Interpretation rules:
 

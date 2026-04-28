@@ -14,7 +14,7 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks retained evaluator contracts and evaluator reports for required fields and sections
   - fails when a `progress-ledger.md` marks `evaluator_mode: required` but no retained evaluator contract is recorded
 - `validate_load_bearing_audits.py`
-  - checks retained `project-knowledge/reports/maintenance/harness-load-bearing-*.md` reports for required sections and decision labels
+  - checks retained `project-knowledge-template/reports/maintenance/harness-load-bearing-*.md` reports for required sections and decision labels
 - `validate_debate_routing_guard.py`
   - checks that debate requests default to Swarm Consensus with external peer LLMs
   - fails when the guard against silent platform-subagent fallback is removed from root, Coordinator, slash-command, or Swarm Consensus docs
@@ -24,7 +24,7 @@ These validators are the first mechanical enforcement layer for this repo.
 - `validate_eval_suite.py`
   - validates seeded eval suite metadata and saved run results
   - checks coverage-matrix cells, seed-catalog taxonomy values, benchmark-vs-regression suite rules, run-manifest model provenance, and per-run seed completeness
-  - intended for targeted use on `.local-artifacts/agent-evals/<suite-id>/` rather than repo-wide `run-all.sh`
+  - intended for targeted use on `harness-engineering/agent-evals/<agent>-evals/<suite-id>/` rather than repo-wide `run-all.sh`
 ## Advisory Audit
 
 - `doc_garden_audit.py`
@@ -34,7 +34,7 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks a narrow watchlist of high-risk docs against concrete source-of-truth targets and review cadence
   - advisory only; intended to catch silent routing/workflow drift early
 - `generate_maintenance_report.py`
-  - refreshes `project-knowledge/reports/maintenance/harness-maintenance.md` from current repo state
+  - refreshes `project-knowledge-template/reports/maintenance/harness-maintenance.md` from current repo state
   - intended for scheduled maintenance workflows and manual maintainer passes
 - `probe_host_capabilities.sh`
   - checks version-sensitive host capabilities against the local environment when a reliable probe exists
@@ -91,19 +91,19 @@ Provider-local validator:
 Validate a seeded eval suite before using it as benchmark evidence:
 
 ```bash
-python3 harness-engineering/validators/validate_eval_suite.py .local-artifacts/agent-evals/<suite-id> --require-run-results --min-runs 3
+python3 harness-engineering/validators/validate_eval_suite.py harness-engineering/agent-evals/<agent>-evals/<suite-id> --require-run-results --min-runs 3
 ```
 
 Score a validated suite and generate the aggregate metrics report:
 
 ```bash
-python3 harness-engineering/quality/scripts/score_eval_suite.py .local-artifacts/agent-evals/<suite-id>
+python3 harness-engineering/quality/scripts/score_eval_suite.py harness-engineering/agent-evals/<agent>-evals/<suite-id>
 ```
 
 Score with attention-budget regression detection against a baseline:
 
 ```bash
-python3 harness-engineering/quality/scripts/score_eval_suite.py .local-artifacts/agent-evals/<suite-id> \
+python3 harness-engineering/quality/scripts/score_eval_suite.py harness-engineering/agent-evals/<agent>-evals/<suite-id> \
   --baseline-results <path-to-previous-run-results.tsv>
 ```
 
@@ -111,7 +111,7 @@ Validate a targeted regression pack that intentionally reruns only previously
 missed or partial seeds:
 
 ```bash
-python3 harness-engineering/validators/validate_eval_suite.py .local-artifacts/agent-evals/<suite-id> --suite-kind targeted_regression --require-run-results --min-runs 3
+python3 harness-engineering/validators/validate_eval_suite.py harness-engineering/agent-evals/<agent>-evals/<suite-id> --suite-kind targeted_regression --require-run-results --min-runs 3
 ```
 
 ## Error Format

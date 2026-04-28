@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HOST_ROOT = ROOT.parent
-REPO_WORKSPACE_ROOT = ROOT / "project-knowledge"
+REPO_WORKSPACE_ROOT = ROOT / "project-knowledge-template"
 
 
 def resolve_workspace_root() -> Path:

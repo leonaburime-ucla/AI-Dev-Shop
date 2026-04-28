@@ -7,5 +7,5 @@ __pycache__/
 coverage/
 dist/
 build/
-project-knowledge/.local-artifacts/
+project-knowledge-template/.local-artifacts/
 ADS-project-knowledge/

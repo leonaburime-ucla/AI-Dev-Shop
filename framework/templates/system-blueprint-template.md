@@ -53,6 +53,7 @@
 - Suggested stack direction (optional):
 - Why this direction is plausible:
 - Unknowns requiring later ADR validation:
+- Dominant quality attributes for later ADR scoring (max 3, no scores):
 
 ## 8) Risks and Unknowns
 

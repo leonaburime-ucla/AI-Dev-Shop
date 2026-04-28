@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import math
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -41,6 +42,7 @@ RESULTS = {"CAUGHT", "PARTIAL", "MISSED", "FALSE_POSITIVE"}
 SEVERITY_CORRECT = {"yes", "no", "na"}
 RUN_SCOPES = {"benchmark_full", "targeted_regression"}
 SUITE_KINDS = {"benchmark", "targeted_regression"}
+EXECUTION_MODES = {"repo_persona_subagent", "repo_persona_host", "external_peer_cli"}
 
 # Negative-control calibration: benchmark suites need NCs >= 15% of standard seeds.
 NEGATIVE_CONTROL_RATIO = 0.15
@@ -90,6 +92,8 @@ RUN_COLUMNS = {
 RUN_MANIFEST_COLUMNS = {
     "run_id",
     "agent",
+    "execution_mode",
+    "persona_source",
     "llm_family",
     "model_id",
     "model_label",
@@ -370,8 +374,7 @@ def validate_seed_catalog(
         # Negative-control calibration: NCs >= 15% of standard seeds.
         standard_count = control_counts["standard"]
         nc_count = control_counts["negative_control"]
-        import math as _math
-        required_nc = _math.ceil(standard_count * NEGATIVE_CONTROL_RATIO) if standard_count > 0 else 1
+        required_nc = math.ceil(standard_count * NEGATIVE_CONTROL_RATIO) if standard_count > 0 else 1
         if nc_count < required_nc:
             errors.append(
                 violation(
@@ -463,6 +466,8 @@ def validate_run_manifest(
 
         for column in (
             "agent",
+            "execution_mode",
+            "persona_source",
             "llm_family",
             "model_id",
             "model_label",
@@ -481,6 +486,33 @@ def validate_run_manifest(
                         f"Populate '{column}' in run-manifest.tsv for run '{run_id}'.",
                     )
                 )
+
+        execution_mode = row["execution_mode"]
+        persona_source = row["persona_source"]
+        if execution_mode not in EXECUTION_MODES:
+            errors.append(
+                violation(
+                    f"{path}:{index} uses unknown execution_mode '{execution_mode}'",
+                    "Use repo_persona_subagent, repo_persona_host, or external_peer_cli.",
+                )
+            )
+        else:
+            if execution_mode == "external_peer_cli":
+                if persona_source != "none":
+                    errors.append(
+                        violation(
+                            f"{path}:{index} marks run '{run_id}' as external_peer_cli but persona_source is '{persona_source}'",
+                            "Use persona_source 'none' for external_peer_cli runs.",
+                        )
+                    )
+            else:
+                if persona_source == "none":
+                    errors.append(
+                        violation(
+                            f"{path}:{index} marks run '{run_id}' as {execution_mode} but persona_source is 'none'",
+                            "Record the repo persona bootstrap path, such as agents/<agent>/skills.md.",
+                        )
+                    )
 
         run_scope = row["run_scope"]
         if run_scope not in RUN_SCOPES:
@@ -737,7 +769,6 @@ def main() -> int:
         return 1
 
     # Compute and emit status label.
-    import math as _math2
     total_seeds = len(seed_rows)
     total_standard = sum(1 for r in seed_rows if r.get("control_type", "standard") == "standard")
     control_types_found = {r.get("control_type") for r in seed_rows}
@@ -752,7 +783,7 @@ def main() -> int:
         structures_found & {"combined", "layered", "distributed", "camouflaged", "interference"}
     )
     nc_count = sum(1 for r in seed_rows if r.get("control_type") == "negative_control")
-    required_nc = _math2.ceil(total_standard * NEGATIVE_CONTROL_RATIO) if total_standard > 0 else 0
+    required_nc = math.ceil(total_standard * NEGATIVE_CONTROL_RATIO) if total_standard > 0 else 0
     nc_ratio_ok = nc_count >= required_nc
 
     dim_counts: Counter = Counter()

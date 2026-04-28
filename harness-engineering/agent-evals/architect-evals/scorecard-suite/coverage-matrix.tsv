@@ -1,0 +1,36 @@
+cell_id	agent	agent_dimension	bug_nature	seed_structure	difficulty	requirement	rationale	seed_ids
+AR-COV-SEC-E-01	architect	2. Tradeoff Judgment & ADR Synthesis	semantic_mismatch	single	Easy	required	Security must stay explicit and not disappear inside a merged umbrella	SEED-AR-01
+AR-COV-TENANT-E-01	architect	1. Scorecard Coverage & Activation	omission	single	Easy	required	Multi-tenant SaaS should activate tenant isolation	SEED-AR-02
+AR-COV-MODULAR-E-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	combined	Easy	required	Separate modularity from modifiability in a future-plugin scenario	SEED-AR-03
+AR-COV-COMP-E-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	camouflaged	Easy	required	Explicit admin audit-trail requirements should activate compliance_auditability even without a formal regulated regime	SEED-AR-04
+AR-COV-TRADE-E-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	camouflaged	Easy	required	ADR must explain why the winner won without weighted-score theater	SEED-AR-05
+AR-COV-CONF-E-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	single	Easy	required	Confidence must reflect evidence quality rather than overclaim measurement	SEED-AR-06
+AR-COV-COG-E-01	architect	1. Scorecard Coverage & Activation	omission	distributed	Easy	required	Small generalist team should trigger cognitive load	SEED-AR-07
+AR-COV-OVERALL-E-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	single	Easy	required	ADR should summarize overall strengths and weaknesses instead of hiding everything in row detail	SEED-AR-22
+AR-COV-NC-DR-E-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	camouflaged	Easy	required	False-positive bait: no disaster recovery requirement exists in the SaaS brief	SEED-AR-23
+AR-COV-NOUTOPIA-E-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	camouflaged	Easy	required	Chosen architecture should acknowledge a meaningful weakness rather than score everything as strong	SEED-AR-24
+AR-COV-PERF-M-01	architect	1. Scorecard Coverage & Activation	omission	combined	Medium	required	Explicit dashboard SLO should activate performance	SEED-AR-08
+AR-COV-INTEG-M-01	architect	1. Scorecard Coverage & Activation	omission	distributed	Medium	required	Four external systems should activate integration complexity	SEED-AR-09
+AR-COV-DEPLOY-M-01	architect	1. Scorecard Coverage & Activation	omission	combined	Medium	required	Different release cadences should activate deployment independence	SEED-AR-10
+AR-COV-MIT-M-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	layered	Medium	required	Explicitly low operational staffing plus async complexity should force mitigation details when operability weakens	SEED-AR-11
+AR-COV-NC-TENANT-M-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	camouflaged	Medium	required	False-positive bait: internal enterprise platform is not multi-tenant	SEED-AR-12
+AR-COV-MECH-M-01	architect	2. Tradeoff Judgment & ADR Synthesis	anti_pattern	interference	Medium	required	Generic architecture slogans should fail the rationale bar	SEED-AR-13
+AR-COV-REVIEW-M-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	distributed	Medium	required	Scorecard must define a review trigger tied to system change	SEED-AR-14
+AR-COV-ACTSRC-M-01	architect	1. Scorecard Coverage & Activation	omission	distributed	Medium	required	Activated optional axes need a cited activation source, not silent inclusion	SEED-AR-25
+AR-COV-ASSUME-M-01	architect	2. Tradeoff Judgment & ADR Synthesis	hidden_dependency	interference	Medium	required	Planted vague assumptions should be sharpened into falsifiable terms rather than copied through	SEED-AR-26
+AR-COV-COSTOPS-M-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	combined	Medium	required	Low-headcount operations cost should appear as an explicit tradeoff, not vanish behind architecture slogans	SEED-AR-27
+AR-COV-NC-COMP-M-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	camouflaged	Medium	required	Replayability and observability do not automatically create compliance_auditability without a real evidentiary or regulatory trigger	SEED-AR-31
+AR-COV-COMP-H-01	architect	1. Scorecard Coverage & Activation	omission	combined	Hard	required	Regulated payments should activate compliance and auditability	SEED-AR-15
+AR-COV-CONS-H-01	architect	1. Scorecard Coverage & Activation	invariant_violation	layered	Hard	required	Ledger invariants and async side effects should activate data consistency	SEED-AR-16
+AR-COV-BLOCK-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	severity_misclassification	interference	Hard	required	A candidate with catastrophic security or consistency cannot win on cost alone	SEED-AR-17
+AR-COV-MIT2-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	distributed	Hard	required	Weak-axis mitigation needs owner, enforcement, and deadline	SEED-AR-18
+AR-COV-RUNNER-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	camouflaged	Hard	required	Runner-up comparison and delta should make the tradeoff auditable	SEED-AR-19
+AR-COV-REG-MOD-H-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	layered	Hard	required	Regression seed to preserve separate modularity scoring after the scorecard change	SEED-AR-20
+AR-COV-NC-DEPLOY-H-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	camouflaged	Hard	required	False-positive bait: regulated coordinated release windows should not auto-activate deployment independence	SEED-AR-21
+AR-COV-CRITDEF-H-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	distributed	Hard	required	Critical-axis blocking should follow dominant quality attributes and hard requirements, not a generic fixed list	SEED-AR-28
+AR-COV-RETRIG-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	layered	Hard	required	Re-evaluation triggers should include concrete structural triggers for async growth and topology change	SEED-AR-29
+AR-COV-RUNNER2-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	interference	Hard	required	Runner-up comparison should use a plausible alternative rather than a straw man	SEED-AR-30
+AR-COV-ADAPT-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	semantic_mismatch	interference	Hard	required	When candidate fit is close, Adaptability First should break the tie explicitly rather than letting raw match pretend to decide it	SEED-AR-32
+AR-COV-ASSUMED-H-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	interference	Hard	required	A thin-evidence concept should trigger research escalation or provisional scoring when too many core axes would otherwise be assumed	SEED-AR-34
+AR-COV-NC-PERF-E-01	architect	1. Scorecard Coverage & Activation	semantic_mismatch	camouflaged	Easy	required	Latency-sensitive product shape alone should not activate performance without an explicit latency or throughput target	SEED-AR-35
+AR-COV-DIR-E-01	architect	2. Tradeoff Judgment & ADR Synthesis	omission	single	Easy	required	Every ADR must state where __specs__ and __tests__ live for the selected pattern	SEED-AR-33

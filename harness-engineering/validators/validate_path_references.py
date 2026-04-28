@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PROJECT_KNOWLEDGE_MIRROR = ROOT / "project-knowledge"
+PROJECT_KNOWLEDGE_TEMPLATE = ROOT / "project-knowledge-template"
 SCAN_TARGETS = [
     ROOT / "AGENTS.md",
     ROOT / "CLAUDE.md",
@@ -17,20 +17,20 @@ SCAN_TARGETS = [
     ROOT / "agents",
     ROOT / "skills",
     ROOT / "framework",
-    ROOT / "project-knowledge/README.md",
-    ROOT / "project-knowledge/governance",
-    ROOT / "project-knowledge/memory",
-    ROOT / "project-knowledge/meta",
+    ROOT / "project-knowledge-template/README.md",
+    ROOT / "project-knowledge-template/governance",
+    ROOT / "project-knowledge-template/memory",
+    ROOT / "project-knowledge-template/meta",
     ROOT / "harness-engineering",
 ]
 
 AI_DEV_SHOP_ROOT_RE = re.compile(r"<AI_DEV_SHOP_ROOT>/([A-Za-z0-9_./-]+)")
 ADS_PROJECT_KNOWLEDGE_ROOT_RE = re.compile(r"<ADS_PROJECT_KNOWLEDGE_ROOT>/([A-Za-z0-9_./-]+)")
 BACKTICK_PATH_RE = re.compile(
-    r"`((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|(?:\.claude/commands|agents|skills|framework|project-knowledge|harness-engineering)/[A-Za-z0-9_./-]+(?:\.[A-Za-z0-9_-]+)?)`"
+    r"`((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|(?:\.claude/commands|agents|skills|framework|project-knowledge-template|harness-engineering)/[A-Za-z0-9_./-]+(?:\.[A-Za-z0-9_-]+)?)`"
 )
 MARKDOWN_LINK_RE = re.compile(
-    r"\]\(((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|(?:\.claude/commands|agents|skills|framework|project-knowledge|harness-engineering)/[^)#\s]+)"
+    r"\]\(((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|(?:\.claude/commands|agents|skills|framework|project-knowledge-template|harness-engineering)/[^)#\s]+)"
 )
 
 
@@ -67,7 +67,7 @@ def check_repo_reference(path_text: str) -> bool:
         return True
     if path_text.startswith("specs/"):
         return True
-    if path_text.startswith("project-knowledge/reports/"):
+    if path_text.startswith("project-knowledge-template/reports/"):
         base_name = Path(path_text).name
         stem = Path(path_text).stem
         if not path_text.endswith(".md"):
@@ -78,7 +78,9 @@ def check_repo_reference(path_text: str) -> bool:
 
 
 def check_workspace_reference(path_text: str) -> bool:
-    return check_repo_reference(str(Path("project-knowledge") / path_text))
+    if path_text.startswith(".local-artifacts/"):
+        return True
+    return check_repo_reference(str(Path("project-knowledge-template") / path_text))
 
 
 def find_violations() -> list[Violation]:

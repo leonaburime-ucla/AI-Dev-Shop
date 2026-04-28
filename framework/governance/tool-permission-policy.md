@@ -15,7 +15,7 @@ Each agent role has an explicit allowed tool scope. Agents operating outside thi
 | TestRunner Agent | Read, Bash (test runner only) | Run tests. No file writes. |
 | Code Review Agent | Read | Read-only. |
 | Security Agent | Read, Grep | Read-only. Pattern search only. |
-| Observer Agent | Read, Write (`project-knowledge/` only) | Write to memory-store.md and traces only. |
+| Observer Agent | Read, Write (`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/observer/`, and toolkit-maintenance `project-knowledge-template/reports/maintenance/` only) | Write to memory-store.md, observer reports, traces, and toolkit maintenance reports only. |
 | CodeBase Analyzer | Read, Glob, Grep | Read-only. No writes, no script execution. |
 | Refactor Agent | Read | Read-only. Proposals only — no implementation. |
 

@@ -22,4 +22,4 @@ When starting a TypeScript project with this toolkit, copy the entries below int
 
 - Replace `YYYY-MM-DD` with the date you start the project.
 - These conventions are enforced by the Programmer Agent (self-check before handoff) and the Code Review Agent (Required finding if violated).
-- For similar starter conventions in other languages, see `project-knowledge/` for any `starter-conventions-<language>.md` files.
+- For similar starter conventions in other languages, see `project-knowledge-template/` for any `starter-conventions-<language>.md` files.

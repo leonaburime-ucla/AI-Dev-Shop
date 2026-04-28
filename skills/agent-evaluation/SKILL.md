@@ -144,9 +144,18 @@ Key resources:
 - `harness-engineering/quality/templates/` — machine-readable TSV templates for coverage matrices, seed catalogs, and run results
 - `harness-engineering/validators/validate_eval_suite.py` — validator for seeded eval suites; use it before treating a suite as benchmark-grade; emits a computed status label (exploratory/pilot/benchmark/stable benchmark)
 - `harness-engineering/quality/scripts/score_eval_suite.py` — scorer that computes all required suite-level metrics from `seed-catalog.tsv` + `run-results.tsv`: per-seed catch rate, breakdowns by dimension/bug-nature/structure/difficulty, false-positive rate, severity accuracy, cross-dimension stability (attention-budget regression detection), and status label
-- `.local-artifacts/agent-evals/` — eval results (not shipped with the toolkit; generated per-project)
+- `harness-engineering/agent-evals/` — committed canonical eval suites, with suite-local manifests, results, reports, and retained runs when present
 
 Use isolation evals when onboarding a new agent, after applying guard promotions, or when pipeline evals show high combined scores but you suspect one agent is carrying another.
+
+Default execution rule for isolation evals:
+
+- run the matching repo persona first
+- prefer `repo_persona_subagent` when helper-agent support exists
+- use `repo_persona_host` only when subagents are unavailable or intentionally disabled
+- use external CLI peers such as Claude, Gemini, or Codex CLI only when the user explicitly asks for a comparison run
+
+Do not treat an external-peer comparison run as the default capability benchmark for the repo agent unless the user explicitly chose that protocol.
 
 Do not treat a small seeded suite as a stable benchmark unless it has:
 

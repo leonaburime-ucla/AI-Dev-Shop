@@ -23,7 +23,7 @@ Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` for durable project conventions, lear
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` as the live constitution for the host project. Keep the toolkit's bootstrap default in `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
 
 **Project-owned writable root:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
-**Read-only during normal feature work under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `framework/`, `harness-engineering/`, and the repo-local `project-knowledge/` mirror. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in these directories.
+**Read-only during normal feature work under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `framework/`, `harness-engineering/`, and the repo-local `project-knowledge-template/` template. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in these directories.
 
 ---
 

@@ -72,7 +72,8 @@ Then:
    - saved user preference naming an exact model/version
    - documented model IDs in `skills/swarm-consensus/references/cli-smoke-test.md` (the canonical source for locally verified peer model names)
    - local CLI or config evidence that proves the exact model/version
-5. If the auditor is Claude and the requested or saved Claude model is unproven locally or rejected by the CLI, run the smoke-test harness in discovery mode before asking the user to supply another model:
+5. Before running any Claude discovery, check whether the exact requested Claude model already succeeded earlier in the current session on this same host/CLI combination. If yes, treat that as `session_success` proof and reuse the exact model directly. Do not rerun the smoke-test harness just because the on-disk cache is absent. Only fall through to discovery when the exact model is still unknown, the earlier session proof is ambiguous, or the Claude CLI rejects the same model on this run.
+6. If the auditor is Claude and the requested or saved Claude model is still unproven after the session-success check, or the CLI rejects it, run the smoke-test harness in discovery mode before asking the user to supply another model:
 
 ```bash
 python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
@@ -83,14 +84,18 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 ```
 
 Use the discovered `winner.model` only when it matches the requested family/version and it passed both JSON and text mode locally. If discovery finds only a different family/version, stop and ask the user before switching.
-A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact for the current environment.
-6. If the exact planned model/version is not resolved by any source above, stop before dispatch and ask:
+A valid Claude proof is any one of:
+- an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path
+- an exact-model `session_success` earlier in the current session on the same host/CLI, with a known prior audit/consensus artifact or explicit operator confirmation
+- a fresh discovery run that writes a new artifact for the current environment
+Discovery is fallback, not default. Do not rerun it just because the cache file is absent when the exact model is already proven in-session.
+7. If the exact planned model/version is not resolved by any source above, stop before dispatch and ask:
 
 `Planned auditor CLI: <CLI>. Exact model/version is not proven locally. Reply with auditor=... and claude_model=..., gemini_model=..., or codex_model=... using an exact model name/version to proceed.`
 
 Do not silently switch to a newer model family/version just because it exists locally.
 Do not dispatch using a local default, alias assumption, or inferred family name when this workflow promises exact model reporting.
-7. Resolve the effective `suggest_changes` mode:
+8. Resolve the effective `suggest_changes` mode:
    - default to `patches`
    - keep `patches` only when the packet names a bounded enough file set that the auditor can ground file-level proposals safely
    - if the scope is too broad, ambiguous, or mostly conceptual, downgrade to `notes` and say so before dispatch

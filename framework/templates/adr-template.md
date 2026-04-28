@@ -72,6 +72,52 @@ All candidate patterns evaluated before selection. Adaptability score reflects h
 | Vertical Slice | 72% | Medium | Feature-focused; clean feature addition and deletion | Overhead not justified for team size | Cross-slice duplication expected; shared logic extraction required at scale | Not selected — team size doesn't justify feature ownership model |
 | Microservices | 45% | Medium | Independent deployment per service | Distributed systems complexity pre-PMF | Operational overhead slows delivery; complexity not justified at current stage | Not selected — pre-PMF; 43 points below selected pattern |
 
+## Quality Attribute Scorecard
+
+Score the selected architecture across all core axes plus any triggered optional axes from `skills/architecture-decisions/SKILL.md`.
+
+- Core axes are always required.
+- Optional axes require an `Activation Source`.
+- If `Score <= 2`, mitigation details are required.
+- Do not use weighted sums. The scorecard supports judgment; it does not replace it.
+
+| Axis | Definition | Score (1-5) | Confidence | Strengths | Weaknesses | Rationale | Assumptions | Activation Source | Mitigation / Owner / Enforcement / Deadline | Review Trigger | Delta vs Runner-up |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| modifiability | | | `measured` / `prior_art` / `analogical` / `assumed` | | | | | `always-on` | | | |
+| modularity | | | | | | | | `always-on` | | | |
+| scalability | | | | | | | | `always-on` | | | |
+| reliability | | | | | | | | `always-on` | | | |
+| security | | | | | | | | `always-on` | | | |
+| operability | | | | | | | | `always-on` | | | |
+| cost | | | | | | | | `always-on` | | | |
+| testability | | | | | | | | `always-on` | | | |
+| <optional-axis> | | | | | | | | <cite the activating requirement or blueprint signal> | | | |
+
+## Overall Strengths
+
+- <What this architecture naturally does well overall>
+
+## Overall Weaknesses
+
+- <What this architecture makes harder overall>
+
+## Tradeoff Tension
+
+State the main sacrifice this decision accepts.
+
+- Example: `We are trading deployment independence for lower operational cost.`
+
+## Why This Won
+
+Explain why the selected candidate won despite its weaknesses. Reference dominant drivers, critical constraints, and the runner-up tradeoff.
+
+## Runner-Up Comparison
+
+Identify the strongest rejected alternative and the decisive differences.
+
+- Runner-up:
+- Why it lost:
+
 ## Consequences
 
 **Positive:**
@@ -87,6 +133,25 @@ All candidate patterns evaluated before selection. Adaptability score reflects h
 **Risks:**
 - Risk: Projection rebuild time not tested early → plan: include rebuild time in acceptance criteria for first projection
 - Risk: ...
+
+## Mitigations Required
+
+List mitigations for any axis scored `1` or `2`.
+
+- Weak axis:
+- Mitigation:
+- Owner:
+- Enforcement:
+- Deadline or trigger:
+
+## Re-evaluation Triggers
+
+Define when this scorecard must be revisited.
+
+- Calendar trigger:
+- Scale trigger:
+- Topology trigger:
+- Dependency trigger:
 
 ## Module / Service Boundaries
 

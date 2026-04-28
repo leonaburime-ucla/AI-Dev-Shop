@@ -103,7 +103,7 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 - Follow `<AI_DEV_SHOP_ROOT>/framework/workflows/conventions.md` for artifact placement.
 - Follow `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md` and `<AI_DEV_SHOP_ROOT>/framework/workflows/job-lifecycle.md` for state and retry tracking.
 - Follow `<AI_DEV_SHOP_ROOT>/framework/governance/knowledge-routing.md` before writing any memory entry.
-- If the user says "remember this" or similar, classify it, confirm destination, then write it to the correct project-knowledge file.
+- If the user says "remember this" or similar, classify it, confirm destination, then write it to the correct project-knowledge-template file.
 - During normal feature work, do not modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/` unless the user is explicitly asking to maintain the toolkit itself.
 
 ## Special Coordinator Cases

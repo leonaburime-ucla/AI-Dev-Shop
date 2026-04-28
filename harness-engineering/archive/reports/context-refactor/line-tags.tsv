@@ -15,7 +15,7 @@ agents/architect/skills.md	16	EXECUTE	Select and enforce architecture patterns t
 agents/architect/skills.md	18	EXECUTE	## Required Inputs
 agents/architect/skills.md	19	DUPLICATE	- Active spec file (full content + hash) — must be human-approved, zero unresolved [NEEDS CLARIFICATION] markers
 agents/architect/skills.md	20	EXECUTE	- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced — use domain ownership boundaries and core/foundation sequencing)
-agents/architect/skills.md	21	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`
+agents/architect/skills.md	21	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md`
 agents/architect/skills.md	22	OTHER	- Non-functional constraints (scale, reliability, latency, cost)
 agents/architect/skills.md	23	OTHER	- Existing system boundaries and dependencies (existing ADRs in `<AI_DEV_SHOP_ROOT>/reports/pipeline/`)
 agents/architect/skills.md	24	OTHER	- Coordinator directive
@@ -25,7 +25,7 @@ agents/architect/skills.md	27	EXECUTE	- `<AI_DEV_SHOP_ROOT>/reports/codebase-ana
 agents/architect/skills.md	28	EXECUTE	- `<AI_DEV_SHOP_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as a draft architectural recommendation; validate or refine the proposed target pattern in the ADR rather than accepting it uncritically)
 agents/architect/skills.md	30	OTHER	## Workflow
 agents/architect/skills.md	31	EXECUTE	0. **Research** (conditional): Produce `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` using `<AI_DEV_SHOP_ROOT>/templates/research-template.md` if **any** of the following are true: (a) the spec requires choosing between two or more libraries, frameworks, or external services; (b) the spec introduces a new persistence mechanism, messaging system, or infrastructure component; (c) the Architect is uncertain which of multiple viable technical approaches best satisfies the spec's non-functional constraints. Skip research.md only when the technical approach is fully determined by the existing architecture with no new choices required.
-agents/architect/skills.md	32	EXECUTE	1. **Constitution Check**: Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For each article, determine if the proposed architecture complies. For any violation: either (a) revise the architecture to comply, or (b) document a justified exception in the ADR's Complexity Justification table. An unjustified violation is a blocking escalation — do not proceed to Step 2.
+agents/architect/skills.md	32	EXECUTE	1. **Constitution Check**: Read `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md`. For each article, determine if the proposed architecture complies. For any violation: either (a) revise the architecture to comply, or (b) document a justified exception in the ADR's Complexity Justification table. An unjustified violation is a blocking escalation — do not proceed to Step 2.
 agents/architect/skills.md	33	OTHER	2. Review requirements and classify system drivers (complexity, scale, coupling, release cadence) using the framework in `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 agents/architect/skills.md	34	EXECUTE	3. Evaluate all viable candidate patterns from the pattern catalog. Produce a **Pattern Evaluation Table** (format: `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` → Pattern Evaluation Format section) for every candidate before selecting one. Score each pattern against all active system drivers, with adaptability weighted at minimum 30% of Match %. When two patterns score within 10 points, prefer the higher adaptability rating and document this in the Verdict column.
 agents/architect/skills.md	35	OTHER	4. Select primary pattern and optional secondary patterns. Justify against system drivers.
@@ -293,12 +293,12 @@ agents/coordinator/skills.md	92	OTHER	- Current iteration count and budget per f
 agents/coordinator/skills.md	93	EXECUTE	- Latest outputs from all downstream agents (with handoff contracts)
 agents/coordinator/skills.md	94	OTHER	- `.pipeline-state.md` from active feature folder (if exists)
 agents/coordinator/skills.md	96	OTHER	## Workflow
-agents/coordinator/skills.md	97	EXECUTE	0. **Session start:** Check for `.pipeline-state.md` in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` feature subfolders. If found with status `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md` before doing anything else. Check for `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` — if the file does not exist, create it now with the header: `# Memory Store\n\n_No entries yet. See memory-schema.md for entry format._`
+agents/coordinator/skills.md	97	EXECUTE	0. **Session start:** Check for `.pipeline-state.md` in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` feature subfolders. If found with status `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow `<AI_DEV_SHOP_ROOT>/workflows/recovery-playbook.md` before doing anything else. Check for `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/memory-store.md` — if the file does not exist, create it now with the header: `# Memory Store\n\n_No entries yet. See memory-schema.md for entry format._`
 agents/coordinator/skills.md	98	EXECUTE	1. Validate all incoming outputs reference the active spec version/hash. Reject stale references.
 agents/coordinator/skills.md	99	EXECUTE	2. Verify each output includes the full handoff contract (input refs, output summary, risks, suggested next).
 agents/coordinator/skills.md	100	OTHER	3. Build routing plan for this cycle using the decision tree in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`.
-agents/coordinator/skills.md	101	EXECUTE	4. **Before dispatching any agent**, scan `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` for relevant entries. Injection policy: (1) match tags against current feature domain and current stage, (2) rank results — FAILURE entries for the current stage first, then CONSTITUTION entries if dispatching Architect, then by most recent date, then by tag match count, (3) inject at most 5 entries, (4) skip entries older than 90 days unless tagged #architecture, #gotcha, or #constitution (those never expire). Prefix injected entries with "Relevant past memory:" in the dispatch. If more than 5 entries match, inject the top 5 by rank and discard the rest.
-agents/coordinator/skills.md	102	EXECUTE	5. Dispatch to agents with explicit scope, constraints, and deliverables. Always include `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` in Spec Agent, Red-Team Agent, and Architect Agent dispatches. Include the recommended model tier from `<AI_DEV_SHOP_ROOT>/framework/routing/model-routing.md` in each dispatch. Record job state in `.pipeline-state.md` using `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`.
+agents/coordinator/skills.md	101	EXECUTE	4. **Before dispatching any agent**, scan `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/memory-store.md` for relevant entries. Injection policy: (1) match tags against current feature domain and current stage, (2) rank results — FAILURE entries for the current stage first, then CONSTITUTION entries if dispatching Architect, then by most recent date, then by tag match count, (3) inject at most 5 entries, (4) skip entries older than 90 days unless tagged #architecture, #gotcha, or #constitution (those never expire). Prefix injected entries with "Relevant past memory:" in the dispatch. If more than 5 entries match, inject the top 5 by rank and discard the rest.
+agents/coordinator/skills.md	102	EXECUTE	5. Dispatch to agents with explicit scope, constraints, and deliverables. Always include `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md` in Spec Agent, Red-Team Agent, and Architect Agent dispatches. Include the recommended model tier from `<AI_DEV_SHOP_ROOT>/framework/routing/model-routing.md` in each dispatch. Record job state in `.pipeline-state.md` using `<AI_DEV_SHOP_ROOT>/workflows/job-lifecycle.md`.
 agents/coordinator/skills.md	103	EXECUTE	6. After ADR is human-approved: generate `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/templates/tasks-template.md`, based on the ADR's parallel delivery plan.
 agents/coordinator/skills.md	104	EXECUTE	   - If `system-blueprint.md` exists, enforce `Depends on` sequencing from the decomposition plan before applying `[P]` markers.
 agents/coordinator/skills.md	105	EXECUTE	   - Do not parallelize tasks with schema/API/event dependencies across domains; schedule them in later waves.
@@ -318,7 +318,7 @@ agents/coordinator/skills.md	119	EXECUTE	3. NEVER write project memory into AGEN
 agents/coordinator/skills.md	120	EXECUTE	4. Confirm with the user where it will be written before writing
 agents/coordinator/skills.md	122	EXECUTE	### Write Path Enforcement
 agents/coordinator/skills.md	123	EXECUTE	Before writing any artifact (spec, ADR, tasks, pipeline state, checklists):
-agents/coordinator/skills.md	124	EXECUTE	1. Spec files go to the user-specified location (stored in `spec_path` in `.pipeline-state.md`). Pipeline artifacts (ADR, research, tasks, red-team findings, test certification, pipeline state) go to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. All other reports go to `<AI_DEV_SHOP_ROOT>/reports/` subfolders. Memory goes to `<AI_DEV_SHOP_ROOT>/project-knowledge/`.
+agents/coordinator/skills.md	124	EXECUTE	1. Spec files go to the user-specified location (stored in `spec_path` in `.pipeline-state.md`). Pipeline artifacts (ADR, research, tasks, red-team findings, test certification, pipeline state) go to `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. All other reports go to `<AI_DEV_SHOP_ROOT>/reports/` subfolders. Memory goes to `<AI_DEV_SHOP_ROOT>/project-knowledge-template/`.
 agents/coordinator/skills.md	125	EXECUTE	2. Never modify `agents/`, `skills/`, `templates/`, or `workflows/` — these are read-only toolkit source files
 agents/coordinator/skills.md	126	EXECUTE	3. `<AI_DEV_SHOP_ROOT>` defaults to `AI-Dev-Shop-speckit/`. If the folder is renamed, update `<AI_DEV_SHOP_ROOT>` in the tool's entry-point file accordingly.
 agents/coordinator/skills.md	128	EXECUTE	## Checkpointing Rules
@@ -591,7 +591,7 @@ agents/observer/skills.md	31	OTHER	- Coordinator cycle summaries (every cycle)
 agents/observer/skills.md	32	EXECUTE	- Agent outputs and routing events
 agents/observer/skills.md	33	OTHER	- Spec and test certification metadata
 agents/observer/skills.md	34	OTHER	- Iteration budget consumption per cluster
-agents/observer/skills.md	35	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/memory-store.md` — prior decisions, failures, facts, constitution events
+agents/observer/skills.md	35	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/memory-store.md` — prior decisions, failures, facts, constitution events
 agents/observer/skills.md	37	OTHER	## Workflow
 agents/observer/skills.md	38	EXECUTE	1. **Read memory before acting.** Before producing any recommendation or pattern analysis, scan `memory-store.md` for entries with tags matching the current feature domain or failure cluster. Surface relevant past context to inform analysis.
 agents/observer/skills.md	39	EXECUTE	2. Record per-cycle timeline: which agents ran, what they produced, how long cycles took.
@@ -653,7 +653,7 @@ agents/programmer/skills.md	5	OTHER	## Skills
 agents/programmer/skills.md	6	DUPLICATE	- `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 agents/programmer/skills.md	7	OTHER	- `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — boundaries and contracts to stay within
 agents/programmer/skills.md	8	EXECUTE	- `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — highest-priority micro-level implementation rules (modular/composable/testable units) after macro architecture boundaries are set
-agents/programmer/skills.md	9	EXECUTE	- `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project conventions in `<AI_DEV_SHOP_ROOT>/project-knowledge/` that apply to the current domain
+agents/programmer/skills.md	9	EXECUTE	- `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project conventions in `<AI_DEV_SHOP_ROOT>/project-knowledge-template/` that apply to the current domain
 agents/programmer/skills.md	10	RATIONALE	- `<AI_DEV_SHOP_ROOT>/skills/tool-design/SKILL.md` — tool description engineering, consolidation principle, error message design when building agent tools
 agents/programmer/skills.md	11	OTHER	- `<AI_DEV_SHOP_ROOT>/skills/frontend-react-orcbash/SKILL.md` — load when implementing React frontend features: Orc-BASH layer structure, dependency injection rules, orchestrator wiring
 agents/programmer/skills.md	12	EXECUTE	- `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — load the specific pattern reference file(s) matching the architecture chosen in the ADR; provides TypeScript implementation examples, correct layer structure, file placement rules, and boundary enforcement; without this the Programmer cannot reliably implement the chosen pattern correctly
@@ -746,7 +746,7 @@ agents/programmer/skills.md	119	EXECUTE	- Do not bypass failing tests to ship
 agents/programmer/skills.md	120	EXECUTE	- Do not make changes outside the scope in the Coordinator directive
 agents/programmer/skills.md	121	EXECUTE	- **Coverage self-check is blocking before handoff.** For every changed function in in-scope modules (per the Scope Boundary in `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md`): verify compliance with the coverage rules in that skill — can every branch, statement, and function be directly asserted without combinatorial test effort? If not, refactor before reporting handoff complete. Do not hand off with known coverage-unfriendly code.
 agents/programmer/skills.md	122	OTHER	- Prefer reversible, incremental changes
-agents/programmer/skills.md	123	EXECUTE	- Check `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` for conventions before writing new patterns
+agents/programmer/skills.md	123	EXECUTE	- Check `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` for conventions before writing new patterns
 agents/programmer/skills.md	124	EXECUTE	- **Inline refactoring is permitted and expected** within files you are already modifying: rename for clarity, extract a duplicated helper, remove dead code you just replaced. All tests must stay green. This is good practice, not scope creep.
 agents/programmer/skills.md	125	EXECUTE	- **Cross-file or out-of-scope structural refactoring is not your job.** If you notice tech debt in files you are not touching, flag it in your output as a Recommended finding for the Refactor Agent — do not go fix it. Mixing structural changes with feature implementation makes test failures undiagnosable.
 agents/qa-e2e/skills.md	1	OTHER	# QA/E2E Agent
@@ -807,7 +807,7 @@ agents/red-team/skills.md	14	OTHER	## Activates
 agents/red-team/skills.md	15	EXECUTE	After human spec approval, before Architect dispatch. Coordinator dispatches Red-Team Agent as an intermediate step.
 agents/red-team/skills.md	17	EXECUTE	## Required Inputs
 agents/red-team/skills.md	18	EXECUTE	- Approved spec file (ID, version, hash) — human approval is required before Red-Team runs
-agents/red-team/skills.md	19	EXECUTE	- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Architect encounters it
+agents/red-team/skills.md	19	EXECUTE	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Architect encounters it
 agents/red-team/skills.md	20	OTHER	- Coordinator directive
 agents/red-team/skills.md	22	OTHER	## Attack Vectors
 agents/red-team/skills.md	24	OTHER	**Ambiguity probes:**
@@ -959,7 +959,7 @@ agents/spec/skills.md	16	EXECUTE	- Existing spec metadata (if updating — inclu
 agents/spec/skills.md	17	OTHER	- Coordinator directive and scope boundaries
 agents/spec/skills.md	19	OTHER	## Workflow
 agents/spec/skills.md	20	OTHER	1. Normalize request into clear scope and explicit non-goals.
-agents/spec/skills.md	21	EXECUTE	2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
+agents/spec/skills.md	21	EXECUTE	2. Read `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text.
 agents/spec/skills.md	22	EXECUTE	3. Assign FEAT number by scanning existing feature folders in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
 agents/spec/skills.md	23	EXECUTE	4. Ask the user two questions before writing anything:
 agents/spec/skills.md	25	EXECUTE	   **a) Where to save the spec package** (if not already specified).
@@ -2037,20 +2037,20 @@ skills/context-engineering/SKILL.md	31	EXECUTE	**Level 3 — Deep reference**: A
 skills/context-engineering/SKILL.md	33	RATIONALE	The Coordinator controls what context each agent receives. A Programmer Agent working on invoice creation does not need the authentication architecture document unless the invoice creation spec involves auth. Load it when needed, not by default.
 skills/context-engineering/SKILL.md	35	OTHER	## Project Knowledge Files
 skills/context-engineering/SKILL.md	37	RATIONALE	These three files capture shared context that no individual `skills.md` covers:
-skills/context-engineering/SKILL.md	39	OTHER	**`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md`**
+skills/context-engineering/SKILL.md	39	OTHER	**`<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md`**
 skills/context-engineering/SKILL.md	40	OTHER	Stable, project-specific facts: conventions, gotchas, tribal knowledge.
 skills/context-engineering/SKILL.md	41	EXECUTE	- "We use UTC everywhere for all timestamps"
 skills/context-engineering/SKILL.md	42	EXECUTE	- "The legacy billing API returns HTTP 200 even on errors — check the response body for error codes"
 skills/context-engineering/SKILL.md	43	OTHER	- "camelCase in API responses, snake_case in database columns"
 skills/context-engineering/SKILL.md	45	EXECUTE	Update when: A convention is established or changed. A gotcha is discovered.
 skills/context-engineering/SKILL.md	46	EXECUTE	Do not include: Architecture decisions (those belong in ADRs). Lessons learned (those belong in learnings.md).
-skills/context-engineering/SKILL.md	48	OTHER	**`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md`**
+skills/context-engineering/SKILL.md	48	OTHER	**`<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md`**
 skills/context-engineering/SKILL.md	49	RATIONALE	Retrospective lessons: what went wrong, why, and what to do instead.
 skills/context-engineering/SKILL.md	50	EXECUTE	- "2026-02-15: TDD Agent wrote tests against a draft spec that hadn't been approved yet. Tests had to be rewritten when spec changed. Fix: TDD Agent must verify spec is human-approved before certifying tests."
 skills/context-engineering/SKILL.md	51	EXECUTE	- "2026-02-18: Programmer Agent bypassed the repository interface and queried the DB directly. Code Review caught it. Reminder: all DB access must go through the repository layer."
 skills/context-engineering/SKILL.md	53	EXECUTE	Update when: A failure pattern reveals something worth remembering.
 skills/context-engineering/SKILL.md	54	EXECUTE	Governance: Entries are permanent. Do not delete old lessons.
-skills/context-engineering/SKILL.md	56	OTHER	**`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md`**
+skills/context-engineering/SKILL.md	56	OTHER	**`<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_notes.md`**
 skills/context-engineering/SKILL.md	57	OTHER	Open questions, parking lot items, in-progress thinking.
 skills/context-engineering/SKILL.md	58	EXECUTE	- "Open: Should EC-02 (idempotency) be handled at the API layer or the service layer? Waiting on architect decision."
 skills/context-engineering/SKILL.md	59	OTHER	- "Parked: Rate limiting on invoice creation — deferred to v1.1."
@@ -5253,7 +5253,7 @@ skills/enterprise-spec/SKILL.md	335	OTHER	Signs: the failing scenario is covered
 skills/enterprise-spec/SKILL.md	337	EXECUTE	Fix path: route to Programmer Agent with the failing test (or, if no test exists, to TDD Agent first). The implementation must be brought into alignment with the spec. Do not patch the spec to match the broken code — the spec is ground truth.
 skills/enterprise-spec/SKILL.md	339	EXECUTE	**Rule: never manually patch code to fix a bug.** A manual code patch that bypasses the spec and test cycle will be overwritten by the next AI-driven implementation run on that code path. All fixes must be expressed first as specs or tests, then as implementation. No exceptions.
 skills/enterprise-spec/SKILL.md	341	EXECUTE	### Step 2 — Record in learnings.md
-skills/enterprise-spec/SKILL.md	343	EXECUTE	Every post-ship defect is recorded in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` using this structure:
+skills/enterprise-spec/SKILL.md	343	EXECUTE	Every post-ship defect is recorded in `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` using this structure:
 skills/enterprise-spec/SKILL.md	345	OTHER	```
 skills/enterprise-spec/SKILL.md	346	OTHER	[FAILURE] <ISO-8601 date> | Gap type: intent-to-spec | spec-to-implementation
 skills/enterprise-spec/SKILL.md	347	OTHER	Spec: <SPEC-ID and version at time of failure>
@@ -5357,7 +5357,7 @@ skills/enterprise-spec/SKILL.md	484	OTHER	| Program-level cross-repo traceabilit
 skills/enterprise-spec/SKILL.md	485	OTHER	| Work item to requirement mapping | `<spec-package>/work-items.md` |
 skills/enterprise-spec/SKILL.md	486	OTHER	| Approval trail | `<spec-package>/approvals.md` |
 skills/enterprise-spec/SKILL.md	487	EXECUTE	| Shift-left harness constraints (appended before Programmer dispatch) | `<spec-package>/tasks.md` — "Constraints" section |
-skills/enterprise-spec/SKILL.md	488	EXECUTE	| Post-ship defect records and harness improvements | `project-knowledge/memory/learnings.md` |
+skills/enterprise-spec/SKILL.md	488	EXECUTE	| Post-ship defect records and harness improvements | `project-knowledge-template/memory/learnings.md` |
 skills/enterprise-spec/SKILL.md	490	OTHER	---
 skills/enterprise-spec/SKILL.md	492	EXECUTE	## Enterprise Spec Package: Required Files
 skills/enterprise-spec/SKILL.md	494	EXECUTE	An enterprise spec package extends the strict-mode spec package defined in `spec-writing`. In addition to all files required by strict mode, an enterprise spec package requires:
@@ -5473,7 +5473,7 @@ skills/evaluation/eval-rubrics.md	138	OTHER	---
 skills/evaluation/eval-rubrics.md	140	OTHER	## Observer Responsibilities
 skills/evaluation/eval-rubrics.md	142	EXECUTE	- After each pipeline run, run a judge pass on the Spec Agent output (highest value; most common failure point)
 skills/evaluation/eval-rubrics.md	143	EXECUTE	- Weekly: run judge passes on all agent outputs from that week's features
-skills/evaluation/eval-rubrics.md	144	EXECUTE	- Record each pass as a `[QUALITY]` entry in `project-knowledge/memory/memory-store.md`
+skills/evaluation/eval-rubrics.md	144	EXECUTE	- Record each pass as a `[QUALITY]` entry in `project-knowledge-template/memory/memory-store.md`
 skills/evaluation/eval-rubrics.md	145	OTHER	- Flag regressions to the Coordinator immediately
 skills/evaluation/eval-rubrics.md	146	OTHER	- Track constitution compliance scores separately — a declining trend on Architect's Constitution Compliance dimension signals ADR template or constitution clarity issues
 skills/frontend-accessibility/SKILL.md	1	OTHER	---
@@ -6488,7 +6488,7 @@ skills/memory-systems/SKILL.md	1	OTHER	---
 skills/memory-systems/SKILL.md	2	OTHER	name: memory-systems
 skills/memory-systems/SKILL.md	3	OTHER	version: 1.0.0
 skills/memory-systems/SKILL.md	4	EXECUTE	last_updated: 2026-02-22
-skills/memory-systems/SKILL.md	5	EXECUTE	description: Use when designing agent memory persistence, choosing between memory frameworks, managing project-knowledge files, or preventing telephone-game context degradation across agent handoffs.
+skills/memory-systems/SKILL.md	5	EXECUTE	description: Use when designing agent memory persistence, choosing between memory frameworks, managing project-knowledge-template files, or preventing telephone-game context degradation across agent handoffs.
 skills/memory-systems/SKILL.md	6	OTHER	---
 skills/memory-systems/SKILL.md	8	OTHER	# Skill: Memory Systems
 skills/memory-systems/SKILL.md	10	RATIONALE	Agent memory is how knowledge persists beyond a single context window. Without deliberate memory architecture, every agent session starts cold — no knowledge of past decisions, conventions, or failures. With it, agents accumulate expertise and avoid repeating mistakes.
@@ -6504,13 +6504,13 @@ skills/memory-systems/SKILL.md	22	EXECUTE	| **Temporal knowledge** | How facts c
 skills/memory-systems/SKILL.md	24	OTHER	In our pipeline:
 skills/memory-systems/SKILL.md	25	RATIONALE	- **Working memory** = agent's in-context reasoning during a task
 skills/memory-systems/SKILL.md	26	OTHER	- **Short-term memory** = cycle summary passed between pipeline stages
-skills/memory-systems/SKILL.md	27	OTHER	- **Long-term memory** = the three `<AI_DEV_SHOP_ROOT>/project-knowledge/` files
+skills/memory-systems/SKILL.md	27	OTHER	- **Long-term memory** = the three `<AI_DEV_SHOP_ROOT>/project-knowledge-template/` files
 skills/memory-systems/SKILL.md	28	EXECUTE	- **Entity memory** = individual spec files, ADRs, agent output artifacts
 skills/memory-systems/SKILL.md	29	RATIONALE	- **Temporal knowledge** = learnings.md entries with dated context
 skills/memory-systems/SKILL.md	31	OTHER	## The Three Project Knowledge Files as Long-Term Memory
-skills/memory-systems/SKILL.md	33	EXECUTE	`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` — Stable facts about this project that do not change unless a convention is revised. Read by the Coordinator when injecting context per agent. No size limit but entries should be self-contained facts, not essays.
-skills/memory-systems/SKILL.md	35	OTHER	`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` — Failure log. Past mistakes and what to do instead. Append-only. Entries grow the system's "negative space" — what not to do. The most valuable entries are the ones that correct a mistake that happened more than once.
-skills/memory-systems/SKILL.md	37	EXECUTE	`<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md` — Live working memory for the project: open questions, deferred decisions, in-progress thinking. Items graduate to `project_memory.md` when they become conventions, or are marked `[RESOLVED]` when answered.
+skills/memory-systems/SKILL.md	33	EXECUTE	`<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` — Stable facts about this project that do not change unless a convention is revised. Read by the Coordinator when injecting context per agent. No size limit but entries should be self-contained facts, not essays.
+skills/memory-systems/SKILL.md	35	OTHER	`<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` — Failure log. Past mistakes and what to do instead. Append-only. Entries grow the system's "negative space" — what not to do. The most valuable entries are the ones that correct a mistake that happened more than once.
+skills/memory-systems/SKILL.md	37	EXECUTE	`<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_notes.md` — Live working memory for the project: open questions, deferred decisions, in-progress thinking. Items graduate to `project_memory.md` when they become conventions, or are marked `[RESOLVED]` when answered.
 skills/memory-systems/SKILL.md	39	EXECUTE	## Invalidate, Don't Discard
 skills/memory-systems/SKILL.md	41	EXECUTE	When a fact becomes outdated, do not delete it. Mark it with the date it became invalid and why.
 skills/memory-systems/SKILL.md	43	OTHER	```
@@ -6548,7 +6548,7 @@ skills/memory-systems/SKILL.md	91	OTHER	| **Letta** | Filesystem-backed, agent-n
 skills/memory-systems/SKILL.md	92	EXECUTE	| **Mem0** | Semantic + keyword hybrid | 68.5% LoCoMo | Fast recall with minimal setup |
 skills/memory-systems/SKILL.md	93	EXECUTE	| **LangMem** | LangChain ecosystem | N/A | Teams already in LangChain |
 skills/memory-systems/SKILL.md	94	OTHER	| **Flat files** | Maximum simplicity, zero infra | N/A | This project's current approach — sufficient until scale demands more |
-skills/memory-systems/SKILL.md	96	OTHER	The flat-file approach (our three project-knowledge files) outperforms specialized frameworks in simplicity, debuggability, and operational cost for small-to-medium projects. Migrate when: retrieval latency becomes a bottleneck, or the knowledge base exceeds 500+ entries and keyword search becomes unreliable.
+skills/memory-systems/SKILL.md	96	OTHER	The flat-file approach (our three project-knowledge-template files) outperforms specialized frameworks in simplicity, debuggability, and operational cost for small-to-medium projects. Migrate when: retrieval latency becomes a bottleneck, or the knowledge base exceeds 500+ entries and keyword search becomes unreliable.
 skills/memory-systems/SKILL.md	98	OTHER	## Common Failure Modes
 skills/memory-systems/SKILL.md	100	EXECUTE	**Every agent reads all memory**: Loading the entire project_memory.md into every agent dispatch balloons token cost and degrades attention. Coordinator must filter to relevant entries only.
 skills/memory-systems/SKILL.md	102	EXECUTE	**Memory as a junk drawer**: project_notes.md filling with resolved questions never marked resolved, stale conventions, implementation details. Governance: weekly review to mark resolved items and graduate stable conventions.
@@ -7128,7 +7128,7 @@ skills/refactor-patterns/SKILL.md	123	OTHER	## What Not to Refactor
 skills/refactor-patterns/SKILL.md	125	OTHER	- Code that is about to be deleted
 skills/refactor-patterns/SKILL.md	126	OTHER	- Code that has no test coverage (add tests first, then refactor)
 skills/refactor-patterns/SKILL.md	127	OTHER	- Code in the middle of an active bug fix (complete the fix, then refactor)
-skills/refactor-patterns/SKILL.md	128	OTHER	- Code whose "messiness" is a deliberate temporary workaround tracked in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md`
+skills/refactor-patterns/SKILL.md	128	OTHER	- Code whose "messiness" is a deliberate temporary workaround tracked in `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_notes.md`
 skills/refactor-patterns/SKILL.md	129	OTHER	- Working code that is slightly inconsistent with your personal style preferences (style is not tech debt)
 skills/security-review/SKILL.md	1	OTHER	---
 skills/security-review/SKILL.md	2	OTHER	name: security-review
@@ -7375,9 +7375,9 @@ skills/spec-writing/SKILL.md	173	OTHER	| Content | Location |
 skills/spec-writing/SKILL.md	174	OTHER	|---|---|
 skills/spec-writing/SKILL.md	175	EXECUTE	| Requirements, acceptance criteria, invariants, edge cases | Spec file — at user-specified location |
 skills/spec-writing/SKILL.md	176	OTHER	| Architecture decisions and pattern choices | ADR — see `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` |
-skills/spec-writing/SKILL.md	177	OTHER	| Project conventions and tribal knowledge | `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` |
-skills/spec-writing/SKILL.md	178	OTHER	| Lessons learned from past mistakes | `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` |
-skills/spec-writing/SKILL.md	179	OTHER	| Open questions and parking lot items | `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md` |
+skills/spec-writing/SKILL.md	177	OTHER	| Project conventions and tribal knowledge | `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` |
+skills/spec-writing/SKILL.md	178	OTHER	| Lessons learned from past mistakes | `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` |
+skills/spec-writing/SKILL.md	179	OTHER	| Open questions and parking lot items | `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_notes.md` |
 skills/spec-writing/SKILL.md	181	OTHER	## Strict Mode — Spec Package
 skills/spec-writing/SKILL.md	183	EXECUTE	In strict mode, a spec is a PACKAGE, not a single file. A feature that enters the delivery pipeline in strict mode must have all required files present and complete before any downstream agent (TDD, Architect, Programmer) is dispatched.
 skills/spec-writing/SKILL.md	185	EXECUTE	**Required files for a strict-mode spec package:**
@@ -8389,7 +8389,7 @@ skills/test-design/SKILL.md	73	OTHER	Examples:
 skills/test-design/SKILL.md	75	OTHER	- `__tests__/unit/req-001.submit-order.unit.test.ts`
 skills/test-design/SKILL.md	76	OTHER	- `__tests__/integration/req-004.model-selection.integration.test.ts`
 skills/test-design/SKILL.md	77	OTHER	- `__tests__/e2e/chat-sidebar.e2e.test.ts`
-skills/test-design/SKILL.md	79	EXECUTE	If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/memory/project_memory.md` and referenced in the certification output. Without an explicit override, this directory rule is mandatory.
+skills/test-design/SKILL.md	79	EXECUTE	If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge-template/memory/project_memory.md` and referenced in the certification output. Without an explicit override, this directory rule is mandatory.
 skills/test-design/SKILL.md	81	EXECUTE	Use explicit test-type suffixes in filenames:
 skills/test-design/SKILL.md	83	OTHER	- Unit tests: `*.unit.test.ts`
 skills/test-design/SKILL.md	84	EXECUTE	- Integration tests (including internal contract/integration boundary checks): `*.integration.test.ts`
@@ -8398,7 +8398,7 @@ skills/test-design/SKILL.md	87	OTHER	Examples:
 skills/test-design/SKILL.md	89	OTHER	- `req-001.submit-order.unit.test.ts`
 skills/test-design/SKILL.md	90	OTHER	- `req-004.model-selection.integration.test.ts`
 skills/test-design/SKILL.md	91	OTHER	- `chat-sidebar.e2e.test.ts`
-skills/test-design/SKILL.md	93	EXECUTE	If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge/memory/project_memory.md` and referenced in the certification output. Without an explicit override, this naming rule is mandatory.
+skills/test-design/SKILL.md	93	EXECUTE	If a repository has an approved existing convention that differs, the override must be documented in `project-knowledge-template/memory/project_memory.md` and referenced in the certification output. Without an explicit override, this naming rule is mandatory.
 skills/test-design/SKILL.md	95	OTHER	## Test Certification Protocol
 skills/test-design/SKILL.md	97	EXECUTE	Every test suite must include a certification record. This is the mechanism that prevents "green tests, wrong behavior." Use `<AI_DEV_SHOP_ROOT>/templates/test-certification-template.md` as the starting point.
 skills/test-design/SKILL.md	99	OTHER	```
@@ -8442,7 +8442,7 @@ skills/test-design/SKILL.md	152	OTHER	| Infrastructure adapters | Repositories, 
 skills/test-design/SKILL.md	153	OTHER	| View / UI components | React components, templates, presentational-only code | 70%+ OR documented E2E coverage | — |
 skills/test-design/SKILL.md	154	OTHER	| Configuration / type definitions | Constants, enums, pure type files, interface-only files | Exempt | Exempt |
 skills/test-design/SKILL.md	156	EXECUTE	**Touched-file non-regression rule:** Once a file reaches its threshold, a subsequent change to that file cannot drop coverage below that threshold. A PR that regresses a file must either add tests (route to TDD) or explicitly document the regression justification in the certification record.
-skills/test-design/SKILL.md	158	EXECUTE	**Project-level override:** If the risk profile of a project justifies globally higher or lower thresholds (e.g., a payment processor requiring 100% branch coverage on business logic, or a prototype where 70% is acceptable across the board), document the override in `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` and reference it in the test certification record. Without a documented override, the table above governs.
+skills/test-design/SKILL.md	158	EXECUTE	**Project-level override:** If the risk profile of a project justifies globally higher or lower thresholds (e.g., a payment processor requiring 100% branch coverage on business logic, or a prototype where 70% is acceptable across the board), document the override in `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` and reference it in the test certification record. Without a documented override, the table above governs.
 skills/test-design/SKILL.md	160	OTHER	**Integration and acceptance coverage (non-negotiable regardless of module class):**
 skills/test-design/SKILL.md	161	OTHER	- All public API contracts and database boundaries: covered by integration tests
 skills/test-design/SKILL.md	162	OTHER	- All acceptance criteria in the spec: covered by acceptance tests
@@ -8810,7 +8810,7 @@ skills/tool-design/SKILL.md	69	EXECUTE	  If it persists after 5 minutes, escalat
 skills/tool-design/SKILL.md	70	OTHER	```
 skills/tool-design/SKILL.md	72	EXECUTE	Each error should tell the agent: what went wrong, why, and what to do.
 skills/tool-design/SKILL.md	74	OTHER	## Parameter Design
-skills/tool-design/SKILL.md	76	EXECUTE	Apply the two-object paradigm consistently (see `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_notes.md`):
+skills/tool-design/SKILL.md	76	EXECUTE	Apply the two-object paradigm consistently (see `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_notes.md`):
 skills/tool-design/SKILL.md	77	EXECUTE	- First argument: required parameters
 skills/tool-design/SKILL.md	78	OTHER	- Second argument: optional parameters with defaults
 skills/tool-design/SKILL.md	80	EXECUTE	For tools with many optional filters, use a structured options object rather than individual parameters.
@@ -20041,9 +20041,9 @@ workflows/multi-agent-pipeline.md	104	EXECUTE	- Dependency-aware sequencing (`De
 workflows/multi-agent-pipeline.md	106	OTHER	### Spec Agent
 workflows/multi-agent-pipeline.md	107	OTHER	- Product intent from human (verbatim)
 workflows/multi-agent-pipeline.md	108	OTHER	- `system-blueprint.md` (if produced) for domain boundaries and decomposition guidance
-workflows/multi-agent-pipeline.md	109	EXECUTE	- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
-workflows/multi-agent-pipeline.md	110	OTHER	- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` (domain conventions)
-workflows/multi-agent-pipeline.md	111	OTHER	- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` (recent failure patterns)
+workflows/multi-agent-pipeline.md	109	EXECUTE	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
+workflows/multi-agent-pipeline.md	110	OTHER	- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` (domain conventions)
+workflows/multi-agent-pipeline.md	111	OTHER	- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` (recent failure patterns)
 workflows/multi-agent-pipeline.md	112	OTHER	- Existing FEAT folders in `<AI_DEV_SHOP_ROOT>/reports/pipeline/` (to avoid ID collisions, detect overlap, assign next FEAT number)
 workflows/multi-agent-pipeline.md	114	EXECUTE	**Integration contracts:** If the spec depends on another feature's API, data schema, or event contract, the Spec Agent must include an `## Integration Contracts` section in the spec listing:
 workflows/multi-agent-pipeline.md	115	OTHER	- Which features this spec depends on (by SPEC-ID)
@@ -20052,7 +20052,7 @@ workflows/multi-agent-pipeline.md	117	OTHER	- Which ACs require the integration 
 workflows/multi-agent-pipeline.md	119	EXECUTE	The Coordinator records these dependencies in `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/.pipeline-state.md`. When all referenced features reach Done, the Coordinator may trigger an optional Integration Verification run against the combined system.
 workflows/multi-agent-pipeline.md	121	EXECUTE	### Red-Team Agent (runs after Spec approval, before Architect dispatch)
 workflows/multi-agent-pipeline.md	122	EXECUTE	- Active spec (full content + hash) — must have zero [NEEDS CLARIFICATION] markers
-workflows/multi-agent-pipeline.md	123	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` (for Constitution pre-flight)
+workflows/multi-agent-pipeline.md	123	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md` (for Constitution pre-flight)
 workflows/multi-agent-pipeline.md	124	OTHER	- `<AI_DEV_SHOP_ROOT>/agents/red-team/skills.md`
 workflows/multi-agent-pipeline.md	126	EXECUTE	**Routing after Red-Team output:**
 workflows/multi-agent-pipeline.md	127	EXECUTE	- 3+ BLOCKING findings → route to Spec Agent with findings; do not dispatch Architect
@@ -20080,7 +20080,7 @@ workflows/multi-agent-pipeline.md	152	OTHER	Reference: `<AI_DEV_SHOP_ROOT>/harne
 workflows/multi-agent-pipeline.md	154	OTHER	### Architect Agent
 workflows/multi-agent-pipeline.md	155	DUPLICATE	- Active spec file (full content + hash) — must be human-approved, zero unresolved [NEEDS CLARIFICATION] markers
 workflows/multi-agent-pipeline.md	156	EXECUTE	- Red-Team findings from `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (all ADVISORY and CONSTITUTION-FLAG findings; BLOCKING findings mean spec is not yet ready for Architect)
-workflows/multi-agent-pipeline.md	157	EXECUTE	- `<AI_DEV_SHOP_ROOT>/project-knowledge/governance/constitution.md` (for Step 0 constitution check)
+workflows/multi-agent-pipeline.md	157	EXECUTE	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md` (for Step 0 constitution check)
 workflows/multi-agent-pipeline.md	158	OTHER	- Current system boundaries (existing ADRs in `<AI_DEV_SHOP_ROOT>/reports/pipeline/`)
 workflows/multi-agent-pipeline.md	159	OTHER	- Non-functional constraints from spec
 workflows/multi-agent-pipeline.md	160	OTHER	- `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`
@@ -20112,7 +20112,7 @@ workflows/multi-agent-pipeline.md	191	EXECUTE	- Active spec (full content + hash
 workflows/multi-agent-pipeline.md	192	EXECUTE	- `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` — generated by Coordinator after ADR approval; defines scope and parallelization for this TDD run
 workflows/multi-agent-pipeline.md	193	OTHER	- ADR for the module being tested (`<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`)
 workflows/multi-agent-pipeline.md	194	OTHER	- `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`
-workflows/multi-agent-pipeline.md	195	OTHER	- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` for the domain
+workflows/multi-agent-pipeline.md	195	OTHER	- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` for the domain
 workflows/multi-agent-pipeline.md	196	EXECUTE	- `<AI_DEV_SHOP_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets and seam candidates before writing tests for migrated modules)
 workflows/multi-agent-pipeline.md	198	EXECUTE	### Pattern Priming (runs between TDD dispatch and first Programmer dispatch)
 workflows/multi-agent-pipeline.md	200	EXECUTE	Before Programmer begins implementation:
@@ -20125,7 +20125,7 @@ workflows/multi-agent-pipeline.md	207	OTHER	### Programmer Agent
 workflows/multi-agent-pipeline.md	208	EXECUTE	- Active spec (hash must match TDD certification hash)
 workflows/multi-agent-pipeline.md	209	OTHER	- Certified test names and which ACs they cover
 workflows/multi-agent-pipeline.md	210	OTHER	- ADR for the module (architecture constraints)
-workflows/multi-agent-pipeline.md	211	OTHER	- Relevant `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/project_memory.md` entries
+workflows/multi-agent-pipeline.md	211	OTHER	- Relevant `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` entries
 workflows/multi-agent-pipeline.md	212	EXECUTE	- Handoff output from TDD Agent (summary only, not full session)
 workflows/multi-agent-pipeline.md	213	EXECUTE	- Confirmed pattern-priming reference (from Pattern Priming step above)
 workflows/multi-agent-pipeline.md	215	EXECUTE	### TestRunner Agent
@@ -20178,7 +20178,7 @@ workflows/multi-agent-pipeline.md	267	EXECUTE	- Coordinator directive specifying
 workflows/multi-agent-pipeline.md	269	EXECUTE	### Observer Agent (runs alongside, not in sequence)
 workflows/multi-agent-pipeline.md	270	EXECUTE	- All agent outputs from the current cycle (summaries, not full sessions)
 workflows/multi-agent-pipeline.md	271	OTHER	- Previous Observer reports (for trend analysis)
-workflows/multi-agent-pipeline.md	272	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge/memory/learnings.md` (to cross-reference new patterns against known ones)
+workflows/multi-agent-pipeline.md	272	OTHER	- `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` (to cross-reference new patterns against known ones)
 workflows/multi-agent-pipeline.md	274	OTHER	---
 workflows/multi-agent-pipeline.md	276	OTHER	## Routing Rules (Coordinator-owned)
 workflows/multi-agent-pipeline.md	278	EXECUTE	| Finding | Route To | Context to Include |
@@ -20434,7 +20434,7 @@ workflows/conventions.md	8	OTHER	# Conventions
 workflows/conventions.md	10	EXECUTE	## Output Root
 workflows/conventions.md	12	RATIONALE	`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
 workflows/conventions.md	13	EXECUTE	Spec files are written to the **user-specified location** — the Spec Agent asks before writing. Pipeline artifacts (ADR, research, tasks, test-certification, red-team findings, pipeline state) are written under `<AI_DEV_SHOP_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Reports (analysis, test runs, code review, security, observer) live in `<AI_DEV_SHOP_ROOT>/reports/` subfolders.
-workflows/conventions.md	15	OTHER	**Writable under `<AI_DEV_SHOP_ROOT>`:** `reports/`, `project-knowledge/`
+workflows/conventions.md	15	OTHER	**Writable under `<AI_DEV_SHOP_ROOT>`:** `reports/`, `project-knowledge-template/`
 workflows/conventions.md	16	EXECUTE	**Read-only under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `templates/`, `workflows/` — toolkit source files, never modify.
 workflows/conventions.md	18	OTHER	---
 workflows/conventions.md	20	OTHER	## Spec Folder Convention
@@ -20516,7 +20516,7 @@ workflows/state-validator-checklist.md	32	OTHER	### Failure clusters
 workflows/state-validator-checklist.md	33	OTHER	- [ ] Each cluster row has a `First Seen` date and `Retry Count`
 workflows/state-validator-checklist.md	34	OTHER	- [ ] No cluster has retry count above its stage budget without an escalation note
 workflows/state-validator-checklist.md	36	OTHER	---
-workflows/state-validator-checklist.md	38	OTHER	## 2. Memory Store Entries (`project-knowledge/memory/memory-store.md`)
+workflows/state-validator-checklist.md	38	OTHER	## 2. Memory Store Entries (`project-knowledge-template/memory/memory-store.md`)
 workflows/state-validator-checklist.md	40	EXECUTE	Run this when reviewing entries written by the Observer, or when a human is promoting Observer recommendations to agent skills.md files.
 workflows/state-validator-checklist.md	42	EXECUTE	### Per-entry checks
 workflows/state-validator-checklist.md	43	EXECUTE	- [ ] `entry_id` is present and follows format: `TYPE-YYYYMMDD-NNN` (e.g. `FAILURE-20260222-001`)

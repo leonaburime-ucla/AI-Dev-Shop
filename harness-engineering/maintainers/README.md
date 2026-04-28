@@ -28,7 +28,7 @@ Do **not** use this area for:
   - `agents/`
   - `skills/`
   - `framework/`
-  - `project-knowledge/` (repo-local mirror of the workspace surface: governance, memory, reports, meta, tmp, local artifacts)
+  - `project-knowledge-template/` (repo-local template of the workspace surface: governance, memory, reports, meta, tmp, local artifacts)
 - Maintainer authority for framework evolution stays in:
   - `harness-engineering/maintainers/`
 

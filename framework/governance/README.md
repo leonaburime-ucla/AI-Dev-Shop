@@ -10,4 +10,4 @@ Toolkit-owned governance policies and hard rules.
 - `tool-permission-policy.md`
 - `data-classification.md`
 
-The live project constitution does not live here. It lives in the workspace surface at `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`, mirrored in-repo under `project-knowledge/governance/constitution.md`.
+The live project constitution does not live here. It lives in the workspace surface at `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`, with the repo-local template copy at `project-knowledge-template/governance/constitution.md`.

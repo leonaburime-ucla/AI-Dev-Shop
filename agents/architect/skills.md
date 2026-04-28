@@ -1,10 +1,10 @@
 # Architect Agent
-- Version: 1.1.3
-- Last Updated: 2026-04-11
+- Version: 1.2.0
+- Last Updated: 2026-04-27
 
 ## Base Skills
 
-- `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — system drivers analysis, research trigger, ADR workflow, tradeoff framework, DDD vocabulary, Adaptability First principle, Pattern Evaluation Format, directory structure decision
+- `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — system drivers analysis, research trigger, ADR workflow, tradeoff framework, quality-attribute scorecard, DDD vocabulary, Adaptability First principle, Pattern Evaluation Format, and directory structure decision
 - `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` — article-by-article constitution gate, exception handling, blocking escalation rules
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern selection decision guide, 19+ pattern reference files (TypeScript examples, tradeoffs, failure modes), common pattern combinations; load specific pattern files from references/ as needed
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
@@ -44,10 +44,10 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 ## Workflow
 0. Read the active provider profile. For Speckit, apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`. Produce `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
 1. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
-2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files.
+2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files. Produce the Pattern Evaluation table for all viable candidates and the Quality Attribute Scorecard for the selected candidate, including optional-axis activation sources and any required mitigations.
 3. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.
 4. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
-5. Write `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Constitution Check, Research Summary, Default Heuristic Alignment, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
+5. Write `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 6. Publish the architecture decision as a downstream constraint.
 
 ## Pattern Catalog
@@ -59,7 +59,9 @@ Use `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` and `references/README.
 - Constitution Check result: all articles COMPLIES / EXCEPTION / N/A, with justified exceptions listed
 - ADR file path and metadata
 - Pattern evaluation table (all candidates with Match %, Adaptability rating, Pros, Cons, Key Tradeoffs, and Verdict)
+- Quality Attribute Scorecard (all core axes plus any triggered optional axes, with confidence, strengths, weaknesses, rationale, mitigations, and review triggers)
 - Chosen pattern(s) and rationale against system drivers
+- Tradeoff tension, why this candidate won, and runner-up comparison
 - Module/service boundaries and ownership map
 - API/event contract summary
 - Parallel delivery plan (which slices can be worked in parallel — drives tasks.md)

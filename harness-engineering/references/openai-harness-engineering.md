@@ -38,7 +38,7 @@ Agent systems copy existing patterns, including bad ones. Continuous cleanup, qu
 ## Direct Implications For AI Dev Shop
 
 - Keep `AGENTS.md` short and index-like.
-- Treat `project-knowledge/` and related docs as the canonical memory system.
+- Treat `project-knowledge-template/` and related docs as the canonical memory system.
 - Turn markdown rules into validators before adding more prose.
 - Add recurring cleanup loops rather than large occasional rewrites.
 - Build project-level self-validation harnesses in downstream repos that use this toolkit.

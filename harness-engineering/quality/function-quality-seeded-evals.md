@@ -69,6 +69,24 @@ python3 harness-engineering/validators/validate_eval_suite.py <suite-dir> --suit
 This is the efficient rerun path. Do not re-run cleanly caught seeds after
 every framework tweak.
 
+## Execution Surface Rule
+
+Function-quality evals default to the matching repo persona, not to external
+peer models.
+
+- Default: `repo_persona_subagent`
+- Fallback when helper agents are unavailable or explicitly disabled:
+  `repo_persona_host`
+- Comparison-only mode: `external_peer_cli`
+
+Use `external_peer_cli` only when the user explicitly asks to compare the repo
+agent against Claude, Gemini, Codex CLI, or another outside model. Those runs
+are useful comparison evidence, but they are not the default proof of
+Programmer, Code Review, or Refactor capability.
+
+Record the chosen execution mode and persona bootstrap path in
+`run-manifest.tsv` for every saved run.
+
 ## Function-Quality Coverage Axes
 
 ### 1. Domain Dimensions

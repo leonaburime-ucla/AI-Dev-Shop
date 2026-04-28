@@ -6,7 +6,7 @@
 
 Any time a user says "remember this", "note this", "add this to memory", or gives a standing instruction, STOP. Read this file before writing anywhere. This file determines the destination. Writing memory to the wrong location is a routing violation — treat it with the same severity as a spec hash mismatch.
 
-For host-project runs, the authorized memory store is the sibling project workspace at `<ADS_PROJECT_KNOWLEDGE_ROOT>` (default: `ADS-project-knowledge/` next to the toolkit). The toolkit's own `project-knowledge/` tree is framework reference material and is not the default write target for host-project memory.
+For host-project runs, the authorized memory store is the sibling project workspace at `<ADS_PROJECT_KNOWLEDGE_ROOT>` (default: `ADS-project-knowledge/` next to the toolkit). The toolkit's own `project-knowledge-template/` tree is framework reference material and is not the default write target for host-project memory.
 
 ---
 
@@ -39,7 +39,7 @@ The following files MUST NEVER receive project memory, user instructions, learne
 |---|---|
 | `AGENTS.md` | Framework operating instructions. Changes require an explicit framework upgrade decision, not a memory write. |
 | `CLAUDE.md` | Claude Code entry point. Contains only bootstrap instructions. Never a memory target. |
-| Any `agents/*/skills.md` | Agent-specific SOPs. Conventions belong in project-knowledge files, not inside agent definitions. Updating a skills.md to remember a project fact couples project state to a framework file. |
+| Any `agents/*/skills.md` | Agent-specific SOPs. Conventions belong in project-knowledge-template files, not inside agent definitions. Updating a skills.md to remember a project fact couples project state to a framework file. |
 | Any `skills/*/SKILL.md` | Shared skill definitions. These are framework primitives, not project-specific stores. |
 | Any file under `framework/templates/` | Templates generate artifacts. They must remain project-agnostic. |
 | Any file under `framework/workflows/` | Pipeline workflow definitions. Same reason as templates. |

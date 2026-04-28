@@ -140,7 +140,7 @@ Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current defa
 This toolkit keeps its engine files grouped while preserving a clean split between framework source and project-owned state:
 
 - **The Engine (Read-Only):** `agents/`, `skills/`, `framework/`, and `harness-engineering/` are the toolkit control surface. They stay read-only during normal host-project work so ADS can be updated independently without mixing framework logic with project state.
-- **The Workspace Mirror (Repo-Local Template):** `project-knowledge/` is the committed template and mirror of the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for governance, memory, reports, metadata, tmp, local artifacts, and project-owned workflow notes.
+- **The Workspace Template (Repo-Local):** `project-knowledge-template/` is the committed template for the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for governance, memory, reports, metadata, tmp, local artifacts, and project-owned workflow notes.
 - **The Project Workspace (Writable):** `ADS-project-knowledge/` is the project-owned sibling workspace. Agents write retained artifacts to `ADS-project-knowledge/reports/`, memory to `ADS-project-knowledge/memory/`, the real constitution to `ADS-project-knowledge/governance/constitution.md`, local scratch to `ADS-project-knowledge/.local-artifacts/`, and future workspace metadata to `ADS-project-knowledge/meta/`.
 
 For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop-speckit/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.

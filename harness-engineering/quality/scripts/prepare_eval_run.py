@@ -86,6 +86,14 @@ def main() -> int:
         run_dir = prepare_run(eval_dir, args.run_id, args.force)
         print(f"{eval_dir.name}\t{run_dir}")
 
+    print(
+        "NEXT STEP: default execution mode for seeded agent evals is "
+        "'repo_persona_subagent'. Use 'repo_persona_host' only when subagents "
+        "are unavailable or disabled. Use external peers only for explicit "
+        "comparison runs.",
+        file=sys.stderr,
+    )
+
     return 0
 
 

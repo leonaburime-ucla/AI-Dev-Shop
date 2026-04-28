@@ -2,7 +2,7 @@
 name: memory-systems
 version: 1.0.0
 last_updated: 2026-02-22
-description: Use when designing agent memory persistence, choosing between memory frameworks, managing project-knowledge files, or preventing telephone-game context degradation across agent handoffs.
+description: Use when designing agent memory persistence, choosing between memory frameworks, managing project-knowledge-template files, or preventing telephone-game context degradation across agent handoffs.
 ---
 
 # Skill: Memory Systems

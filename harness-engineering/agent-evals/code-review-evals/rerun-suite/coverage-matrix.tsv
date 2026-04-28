@@ -1,0 +1,5 @@
+cell_id	agent	agent_dimension	bug_nature	seed_structure	difficulty	requirement	rationale	seed_ids
+CR-RERUN-INV-01	code-review	1. Spec Alignment	invariant_violation	distributed	Hard	required	Previously underclassified transfer atomicity against a spec-defined invariant	SEED-CR-13
+CR-RERUN-ERR-01	code-review	4. Code Quality	anti_pattern	interference	Hard	required	Previously underclassified catch-all error handling that swallows unexpected failures	SEED-CR-14
+CR-RERUN-FQ-01	code-review	7. Function Quality Assessment	cosmetic_fix	camouflaged	Hard	required	Previously accepted comments-only debt-band fix as sufficient	SEED-CR-15
+CR-RERUN-BOUND-01	code-review	1. Spec Alignment + 3. Test Quality	boundary_error	layered	Hard	required	Previously missed the combination of ambiguous boundary semantics and missing pin test	SEED-CR-16

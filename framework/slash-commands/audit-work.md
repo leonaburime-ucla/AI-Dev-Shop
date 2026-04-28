@@ -42,13 +42,14 @@ Act as an External Audit Coordinator.
    - if `auditor=` is omitted, filter out the current host family and choose the first available CLI in this exact order: `claude`, `gemini`, `codex`
    - if no different-family external CLI is available, stop and tell the user instead of silently using the same family
    - resolve the planned model only by: per-run override naming an exact model/version, saved pinned preference naming an exact model/version, or local CLI/config proof of the exact model/version
-7. If the planned auditor is Claude and the requested or saved Claude model is unproven or rejected, do not keep guessing manually. Run `python3 skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-model <requested-or-saved-model> --claude-require both --output-format json` first.
-   - A valid Claude proof is either an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, or a fresh discovery run that writes a new artifact.
+7. If the planned auditor is Claude, first check whether the exact requested model already succeeded earlier in the current session on this same host/CLI. If yes, treat that as `session_success` proof and reuse it directly. Do not rerun discovery just because the cache file is absent.
+8. If the planned auditor is Claude and the requested or saved Claude model is still unproven after the session-success check, or it is rejected by the CLI, do not keep guessing manually. Run `python3 skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-model <requested-or-saved-model> --claude-require both --output-format json` first.
+   - A valid Claude proof is an exact environment cache hit with a real artifact path, an exact-model `session_success` earlier in the current session on the same host/CLI, or a fresh discovery run that writes a new artifact.
    - If discovery finds a working exact Claude model in the same requested family/version, use it and continue.
    - If discovery finds only a different family/version, stop and ask the user before switching.
-8. If the exact auditor model/version is not explicitly pinned or locally proven, stop and print a model-pinning gate:
+9. If the exact auditor model/version is not explicitly pinned or locally proven, stop and print a model-pinning gate:
    `Planned auditor CLI: <CLI>. Exact model/version is not proven locally. Reply with auditor=... and claude_model=..., gemini_model=..., or codex_model=... using an exact model name/version to proceed.`
-9. If the exact auditor model/version is explicit or locally proven, dispatch the audit prompt.
+10. If the exact auditor model/version is explicit or locally proven, dispatch the audit prompt.
    - do not hand `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` paths directly to the peer when file-based reads are required; use the shared transport fallback rules from `skills/llm-operations/references/peer-llm-dispatch.md`
    - run a cheap readability probe first when using file-based transport: ask the peer to read the dispatch packet and echo the first Markdown heading
    - require the auditor to begin with an `Auditor Scope Check` that states what it believes it is auditing, the scope and target it used, which files or artifacts it reviewed, and any mismatch or uncertainty it noticed before giving findings
