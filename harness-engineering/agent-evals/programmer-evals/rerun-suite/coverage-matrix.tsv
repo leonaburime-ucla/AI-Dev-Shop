@@ -1,8 +1,0 @@
-cell_id	agent	agent_dimension	bug_nature	seed_structure	difficulty	requirement	rationale	seed_ids
-PR-RERUN-AGG-01	programmer	Adversarial aggregate behavior	invariant_violation	camouflaged	Hard	required	Previously missed cross-line aggregate rule interpretation in the rule engine	SEED-1A
-PR-RERUN-IO-01	programmer	I/O shape	anti_pattern	single	Medium	required	Previously missed per-item lookup pattern in a batch workflow	SEED-2A
-PR-RERUN-IDEMP-01	programmer	Idempotency	omission	combined	Hard	required	Previously missed duplicate-send risk under retry semantics	SEED-2C
-PR-RERUN-DEPS-01	programmer	Explicit dependencies	hidden_dependency	single	Medium	required	Previously partial catch on non-injected time dependency	SEED-2D
-PR-RERUN-BOUNDS-01	programmer	Resource bounds	omission	single	Hard	required	Previously partial catch on unbounded cache growth and missing caps	SEED-4C
-PR-RERUN-NAMING-01	programmer	Variable name audit	semantic_mismatch	camouflaged	Hard	required	Previously partial catch where the name/value mismatch hid the real metric	SEED-CL-TRICK-02
-PR-RERUN-BOUNDS-02	programmer	Resource bounds	omission	combined	Hard	required	Previously missed missing size cap and timeout on service-backed permission checks	SEED-CL-14

@@ -2,7 +2,7 @@
 
 Quality doctrine, evaluator loops, scorecards, and test-quality references.
 
-Committed seeded eval suites live in [../agent-evals/](/Users/la/Desktop/Multi-Agent%20Swarm%20Foundation/AI-Dev-Shop-speckit/harness-engineering/agent-evals/README.md:1). This directory keeps the shared framework and tooling.
+Committed seeded eval suites live in `../agent-evals/`. This directory keeps the shared framework and tooling.
 
 ## Files
 
@@ -13,7 +13,7 @@ Committed seeded eval suites live in [../agent-evals/](/Users/la/Desktop/Multi-A
 - `quality-score.md` - current repo-level harness quality snapshot
 - `function-quality-seeded-evals.md` - seeded eval protocol for testing Programmer, Code Review, and Refactor against function-quality traps
 - `agent-isolation-eval-framework.md` - repeatable harness for testing any agent in isolation with seeded defects, hidden ledgers, and post-hoc scoring; includes agent-specific eval designs for Spec, Security, Refactor, Architect, TDD, and Red Team agents
-- `templates/` - TSV starter templates for new eval suites (`coverage-matrix`, `seed-catalog`, `run-manifest`, and `run-results`)
+- `templates/` - TSV starter templates for new eval suites (`coverage-matrix`, `seed-catalog`, and `run-results`)
 - `scripts/prepare_eval_run.py` - creates fresh `runs/<run-id>/` working copies from immutable `seed-state/` fixtures so reruns never overwrite the benchmark inputs
 - `scripts/score_eval_suite.py` - computes all required suite-level metrics from `seed-catalog.tsv` + `run-results.tsv`: per-seed catch rate, per-dimension/bug-nature/structure/difficulty breakdowns, false-positive rate, severity accuracy, cross-dimension stability (attention-budget regression detection), negative-control calibration, dimension density, and computed status label
 - `spec-definition-of-done.md`

@@ -47,9 +47,7 @@ Each suite should include the generic framework files:
 - `seed-catalog.tsv`
 - `seed-ledger.md`
 - `controls.md`
-- `run-manifest.tsv`
 - `run-results.tsv`
-- `reports/coordinator-eval-summary.md`
 
 Use the templates under `harness-engineering/quality/templates/`.
 
@@ -84,8 +82,8 @@ agent against Claude, Gemini, Codex CLI, or another outside model. Those runs
 are useful comparison evidence, but they are not the default proof of
 Programmer, Code Review, or Refactor capability.
 
-Record the chosen execution mode and persona bootstrap path in
-`run-manifest.tsv` for every saved run.
+Record the chosen execution mode and model provenance in
+`run-results.tsv` for every saved run.
 
 ## Function-Quality Coverage Axes
 
@@ -204,7 +202,7 @@ Use both, but do not confuse them:
 2. **Targeted regression runs**
    Use these after a prompt/skill/guard change. Re-run only the seeds that were
    previously `MISSED` or `PARTIAL` for the target agent. Save at least 3 runs
-   per unresolved seed and record the exact LLM/model in `run-manifest.tsv`.
+   per unresolved seed and record the exact LLM/model in `run-results.tsv`.
 
 Targeted regression runs answer:
 

@@ -83,28 +83,16 @@ SEED_COLUMNS = {
 
 RUN_COLUMNS = {
     "run_id",
+    "eval_name",
+    "run_scope",
+    "execution_mode",
+    "agent",
+    "model_id",
+    "model_label",
     "seed_id",
     "result",
     "severity_correct",
     "reviewer_notes",
-}
-
-RUN_MANIFEST_COLUMNS = {
-    "run_id",
-    "agent",
-    "execution_mode",
-    "persona_source",
-    "llm_family",
-    "model_id",
-    "model_label",
-    "cli_name",
-    "cli_version",
-    "selection_source",
-    "run_scope",
-    "target_seed_ids",
-    "workdir",
-    "prompt_path",
-    "output_path",
     "executed_at",
 }
 
@@ -402,162 +390,6 @@ def validate_seed_catalog(
     return seed_ids, errors
 
 
-def parse_target_seed_ids(value: str, seed_ids: set[str]) -> tuple[set[str], list[str]]:
-    if value == "all":
-        return set(seed_ids), []
-    targets = {item.strip() for item in value.split(",") if item.strip()}
-    if not targets:
-        return set(), [
-            violation(
-                "run-manifest.tsv contains an empty target_seed_ids field",
-                "Use 'all' or a comma-separated list of seed IDs.",
-            )
-        ]
-    unknown = sorted(targets.difference(seed_ids))
-    if unknown:
-        return set(), [
-            violation(
-                f"run-manifest.tsv references unknown seed IDs: {', '.join(unknown)}",
-                "Use only seed IDs declared in seed-catalog.tsv.",
-            )
-        ]
-    return targets, []
-
-
-def validate_run_manifest(
-    rows: list[dict[str, str]],
-    path: Path,
-    seed_ids: set[str],
-    require_runs: bool,
-    suite_kind: str,
-) -> tuple[dict[str, set[str]], dict[str, str], list[str]]:
-    errors: list[str] = []
-    run_targets: dict[str, set[str]] = {}
-    run_scopes: dict[str, str] = {}
-
-    if not rows:
-        if require_runs:
-            errors.append(
-                violation(
-                    f"{path} is missing or empty but run results are required",
-                    "Persist run-manifest.tsv alongside run-results.tsv.",
-                )
-            )
-        return run_targets, run_scopes, errors
-
-    for index, row in enumerate(rows, start=2):
-        run_id = row["run_id"]
-        if not run_id:
-            errors.append(
-                violation(
-                    f"{path}:{index} has an empty run_id",
-                    "Give every manifest row a stable run_id.",
-                )
-            )
-            continue
-        if run_id in run_targets:
-            errors.append(
-                violation(
-                    f"{path}:{index} duplicates run_id '{run_id}'",
-                    "Use unique run_id values in run-manifest.tsv.",
-                )
-            )
-            continue
-
-        for column in (
-            "agent",
-            "execution_mode",
-            "persona_source",
-            "llm_family",
-            "model_id",
-            "model_label",
-            "cli_name",
-            "cli_version",
-            "selection_source",
-            "workdir",
-            "prompt_path",
-            "output_path",
-            "executed_at",
-        ):
-            if not row[column]:
-                errors.append(
-                    violation(
-                        f"{path}:{index} leaves '{column}' empty for run '{run_id}'",
-                        f"Populate '{column}' in run-manifest.tsv for run '{run_id}'.",
-                    )
-                )
-
-        execution_mode = row["execution_mode"]
-        persona_source = row["persona_source"]
-        if execution_mode not in EXECUTION_MODES:
-            errors.append(
-                violation(
-                    f"{path}:{index} uses unknown execution_mode '{execution_mode}'",
-                    "Use repo_persona_subagent, repo_persona_host, or external_peer_cli.",
-                )
-            )
-        else:
-            if execution_mode == "external_peer_cli":
-                if persona_source != "none":
-                    errors.append(
-                        violation(
-                            f"{path}:{index} marks run '{run_id}' as external_peer_cli but persona_source is '{persona_source}'",
-                            "Use persona_source 'none' for external_peer_cli runs.",
-                        )
-                    )
-            else:
-                if persona_source == "none":
-                    errors.append(
-                        violation(
-                            f"{path}:{index} marks run '{run_id}' as {execution_mode} but persona_source is 'none'",
-                            "Record the repo persona bootstrap path, such as agents/<agent>/skills.md.",
-                        )
-                    )
-
-        run_scope = row["run_scope"]
-        if run_scope not in RUN_SCOPES:
-            errors.append(
-                violation(
-                    f"{path}:{index} uses unknown run_scope '{run_scope}'",
-                    "Use benchmark_full or targeted_regression.",
-                )
-            )
-            continue
-
-        targets, target_errors = parse_target_seed_ids(row["target_seed_ids"], seed_ids)
-        errors.extend(target_errors)
-        if target_errors:
-            continue
-
-        if run_scope == "benchmark_full" and targets != seed_ids:
-            errors.append(
-                violation(
-                    f"{path}:{index} marks run '{run_id}' as benchmark_full but target_seed_ids is not 'all'",
-                    "Benchmark full runs must target every seed in the suite.",
-                )
-            )
-        if run_scope == "targeted_regression" and targets == seed_ids and suite_kind == "targeted_regression":
-            errors.append(
-                violation(
-                    f"{path}:{index} marks run '{run_id}' as targeted_regression but targets every seed in the suite",
-                    "Targeted regression runs should list only the unresolved seed subset. Use benchmark_full for all-seed runs.",
-                )
-            )
-
-        run_targets[run_id] = targets
-        run_scopes[run_id] = run_scope
-
-    if suite_kind == "benchmark" and require_runs and "benchmark_full" not in set(run_scopes.values()):
-        errors.append(
-            violation(
-                f"{path} does not contain any benchmark_full runs",
-                "Benchmark suite validation requires at least one full-suite run in run-manifest.tsv.",
-            )
-        )
-
-    return run_targets, run_scopes, errors
-
-
 def validate_run_results(
     rows: list[dict[str, str]],
     path: Path,
@@ -565,8 +397,6 @@ def validate_run_results(
     min_runs: int,
     require_runs: bool,
     suite_kind: str,
-    run_targets: dict[str, set[str]],
-    run_scopes: dict[str, str],
 ) -> list[str]:
     errors: list[str] = []
 
@@ -582,7 +412,9 @@ def validate_run_results(
 
     runs_by_seed: defaultdict[str, set[str]] = defaultdict(set)
     benchmark_runs_by_seed: defaultdict[str, set[str]] = defaultdict(set)
-    seeds_by_run: defaultdict[str, set[str]] = defaultdict(set)
+    targeted_runs_by_seed: defaultdict[str, set[str]] = defaultdict(set)
+    seeds_by_benchmark_run: defaultdict[str, set[str]] = defaultdict(set)
+    run_scopes_seen: set[str] = set()
 
     for index, row in enumerate(rows, start=2):
         run_id = row["run_id"]
@@ -594,15 +426,7 @@ def validate_run_results(
             errors.append(
                 violation(
                     f"{path}:{index} has an empty run_id",
-                    "Give every scored pass a run_id.",
-                )
-            )
-            continue
-        if run_id not in run_targets:
-            errors.append(
-                violation(
-                    f"{path}:{index} references unknown run_id '{run_id}'",
-                    "Declare every scored run in run-manifest.tsv before using it in run-results.tsv.",
+                    "Give every scored row a run_id.",
                 )
             )
             continue
@@ -629,25 +453,66 @@ def validate_run_results(
                 )
             )
 
+        for column in ("agent", "model_id", "run_scope", "execution_mode"):
+            if not row.get(column):
+                errors.append(
+                    violation(
+                        f"{path}:{index} leaves '{column}' empty for run '{run_id}'",
+                        f"Populate '{column}' in run-results.tsv.",
+                    )
+                )
+
+        run_scope = row.get("run_scope", "")
+        if run_scope and run_scope not in RUN_SCOPES:
+            errors.append(
+                violation(
+                    f"{path}:{index} uses unknown run_scope '{run_scope}'",
+                    "Use benchmark_full or targeted_regression.",
+                )
+            )
+
+        execution_mode = row.get("execution_mode", "")
+        if execution_mode and execution_mode not in EXECUTION_MODES:
+            errors.append(
+                violation(
+                    f"{path}:{index} uses unknown execution_mode '{execution_mode}'",
+                    "Use repo_persona_subagent, repo_persona_host, or external_peer_cli.",
+                )
+            )
+
+        run_scopes_seen.add(run_scope)
         runs_by_seed[seed_id].add(run_id)
-        if run_scopes.get(run_id) == "benchmark_full":
+        if run_scope == "benchmark_full":
             benchmark_runs_by_seed[seed_id].add(run_id)
-        seeds_by_run[run_id].add(seed_id)
+            seeds_by_benchmark_run[run_id].add(seed_id)
+        elif run_scope == "targeted_regression":
+            targeted_runs_by_seed[seed_id].add(run_id)
 
     if suite_kind == "benchmark":
+        if require_runs and "benchmark_full" not in run_scopes_seen:
+            errors.append(
+                violation(
+                    f"{path} does not contain any benchmark_full runs",
+                    "Benchmark suite validation requires at least one benchmark_full run.",
+                )
+            )
         counted_runs = benchmark_runs_by_seed
-        target_union = set(seed_ids)
+        target_seeds = seed_ids
         run_count_fix = f"Persist at least {min_runs} benchmark_full runs per seed before treating the suite as benchmark-grade."
     else:
-        counted_runs = runs_by_seed
-        target_union: set[str] = set()
-        for run_id, targets in run_targets.items():
-            if run_scopes.get(run_id) == "targeted_regression":
-                target_union.update(targets)
+        if require_runs and "targeted_regression" not in run_scopes_seen:
+            errors.append(
+                violation(
+                    f"{path} does not contain any targeted_regression runs",
+                    "Targeted regression suite validation requires at least one targeted_regression run.",
+                )
+            )
+        counted_runs = targeted_runs_by_seed
+        target_seeds = {sid for sid, rids in targeted_runs_by_seed.items()}
         run_count_fix = f"Persist at least {min_runs} targeted_regression runs per targeted seed."
 
-    for seed_id in sorted(target_union):
-        run_count = len(counted_runs[seed_id])
+    for seed_id in sorted(target_seeds):
+        run_count = len(counted_runs.get(seed_id, set()))
         if run_count < min_runs:
             errors.append(
                 violation(
@@ -656,22 +521,13 @@ def validate_run_results(
                 )
             )
 
-    for run_id, scored_seed_ids in sorted(seeds_by_run.items()):
-        target_seed_ids = run_targets.get(run_id, set())
-        missing = target_seed_ids.difference(scored_seed_ids)
-        extras = scored_seed_ids.difference(target_seed_ids)
+    for run_id, run_seeds in sorted(seeds_by_benchmark_run.items()):
+        missing = seed_ids - run_seeds
         if missing:
             errors.append(
                 violation(
-                    f"Run '{run_id}' does not score every targeted seed; missing: {', '.join(sorted(missing))}",
-                    "Record one run-results.tsv row per targeted seed for every declared run.",
-                )
-            )
-        if extras:
-            errors.append(
-                violation(
-                    f"Run '{run_id}' scored non-target seeds: {', '.join(sorted(extras))}",
-                    "For targeted regression runs, score only the seeds listed in run-manifest.tsv.",
+                    f"benchmark_full run '{run_id}' is missing {len(missing)} seed(s): {', '.join(sorted(missing))}",
+                    "A benchmark_full run must score every seed in the suite. Complete the run or change run_scope.",
                 )
             )
 
@@ -700,7 +556,6 @@ def main() -> int:
     seed_path = suite_dir / "seed-catalog.tsv"
     ledger_path = suite_dir / "seed-ledger.md"
     controls_path = suite_dir / "controls.md"
-    manifest_path = suite_dir / "run-manifest.tsv"
     runs_path = suite_dir / "run-results.tsv"
 
     errors: list[str] = []
@@ -721,7 +576,6 @@ def main() -> int:
     try:
         matrix_rows, matrix_fields = load_tsv(coverage_path)
         seed_rows, seed_fields = load_tsv(seed_path)
-        manifest_rows, manifest_fields = load_tsv(manifest_path) if manifest_path.exists() else ([], [])
         run_rows, run_fields = load_tsv(runs_path) if runs_path.exists() else ([], [])
     except ValueError as exc:
         print(
@@ -734,8 +588,6 @@ def main() -> int:
 
     errors.extend(require_columns(matrix_fields, MATRIX_COLUMNS, coverage_path))
     errors.extend(require_columns(seed_fields, SEED_COLUMNS, seed_path))
-    if manifest_rows or args.require_run_results:
-        errors.extend(require_columns(manifest_fields, RUN_MANIFEST_COLUMNS, manifest_path))
     if run_rows or args.require_run_results:
         errors.extend(require_columns(run_fields, RUN_COLUMNS, runs_path))
 
@@ -743,14 +595,6 @@ def main() -> int:
     errors.extend(matrix_errors)
     seed_ids, seed_errors = validate_seed_catalog(seed_rows, seed_path, cells, args.suite_kind)
     errors.extend(seed_errors)
-    run_targets, run_scopes, manifest_errors = validate_run_manifest(
-        manifest_rows,
-        manifest_path,
-        seed_ids,
-        args.require_run_results,
-        args.suite_kind,
-    )
-    errors.extend(manifest_errors)
     errors.extend(
         validate_run_results(
             run_rows,
@@ -759,8 +603,6 @@ def main() -> int:
             args.min_runs,
             args.require_run_results,
             args.suite_kind,
-            run_targets,
-            run_scopes,
         )
     )
 

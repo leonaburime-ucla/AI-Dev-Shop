@@ -66,8 +66,8 @@ Rules:
    `repo_persona_subagent` unless subagents are unavailable.
 2. External-peer runs are valuable, but they are comparison artifacts, not the
    default proof of repo-agent capability.
-3. Every saved run must declare `execution_mode` and `persona_source` in
-   `run-manifest.tsv` so later readers can tell whether the run exercised the
+3. Every saved run must declare `agent` and `model_id` in
+   `run-results.tsv` so later readers can tell whether the run exercised the
    repo agent or an external comparison target.
 4. When `external_peer_cli` is used, say so plainly in the summary instead of
    presenting the result as the default agent benchmark.
@@ -84,7 +84,6 @@ harness-engineering/agent-evals/<agent>-evals/<suite-id>/
   seed-catalog.tsv             # required: machine-readable seed metadata (suite-level)
   seed-ledger.md               # required: hidden narrative ledger (suite-level)
   controls.md                  # required: positive/negative/regression controls (suite-level)
-  run-manifest.tsv             # required once runs begin (suite-level)
   run-results.tsv              # required once runs begin (suite-level)
   <eval-name>/                 # one directory per mini-project
     project-brief.md           # what the agent sees
@@ -105,10 +104,9 @@ harness-engineering/agent-evals/<agent>-evals/<suite-id>/
 
 ### Suite-Level vs Per-Eval Artifacts
 
-The six TSV/MD files at the suite root (`coverage-matrix.tsv`,
-`seed-catalog.tsv`, `seed-ledger.md`, `controls.md`, `run-manifest.tsv`,
-`run-results.tsv`) describe the **entire suite** and reference seeds across all
-mini-projects.
+The five TSV/MD files at the suite root (`coverage-matrix.tsv`,
+`seed-catalog.tsv`, `seed-ledger.md`, `controls.md`, `run-results.tsv`)
+describe the **entire suite** and reference seeds across all mini-projects.
 
 Each `<eval-name>/` subdirectory contains the **per-project fixtures**: the
 actual code, specs, and handoffs the agent will see. The `seed-state/`
@@ -201,57 +199,33 @@ Required columns:
 Keep the long-form seeded issue narrative, deception notes, and expected signal
 in `seed-ledger.md`. Keep normalized fields in `seed-catalog.tsv`.
 
-## Run Manifest Format
-
-Every scored run must declare which agent/model executed it and which seeds it
-was intended to cover.
-
-```text
-run_id  agent  execution_mode  persona_source  llm_family  model_id  model_label  cli_name  cli_version  selection_source  run_scope  target_seed_ids  workdir  prompt_path  output_path  executed_at
-```
-
-Required columns:
-
-- `run_id`: stable identifier used in `run-results.tsv`
-- `agent`: target agent, for example `programmer`
-- `execution_mode`: `repo_persona_subagent`, `repo_persona_host`, or
-  `external_peer_cli`
-- `persona_source`: repo persona bootstrap file such as
-  `agents/architect/skills.md`; use `none` only for `external_peer_cli`
-- `llm_family`: provider or family label such as `openai`, `anthropic`, or
-  `google`
-- `model_id`: exact model identifier used for the run
-- `model_label`: human-readable display label
-- `cli_name`: execution surface such as `codex-cli` or `claude-code`
-- `cli_version`: CLI version string used for diagnostics
-- `selection_source`: how the model was chosen, for example
-  `per_run_override`, `host_config`, or `smoke_test_discovery`
-- `run_scope`: `benchmark_full` or `targeted_regression`
-- `target_seed_ids`: `all` for a full benchmark pass, otherwise a
-  comma-separated seed subset
-- `workdir`: run-specific working directory
-- `prompt_path`: exact prompt used
-- `output_path`: where the agent's saved output lives
-- `executed_at`: ISO-8601 UTC timestamp
-
-This is how rerun claims stay attributable to a specific LLM/model instead of
-being summarized from chat memory, and how the harness distinguishes canonical
-repo-persona runs from explicit comparison runs.
-
 ## Run Results Format
 
 Every scored run must be persisted in `run-results.tsv`.
 
 ```text
-run_id  seed_id  result  severity_correct  reviewer_notes
+run_id  eval_name  run_scope  execution_mode  agent  model_id  model_label  seed_id  result  severity_correct  reviewer_notes  executed_at
 ```
+
+Required columns:
+
+- `run_id`: stable identifier for the run
+- `eval_name`: which eval was executed
+- `run_scope`: `benchmark_full` or `targeted_regression`
+- `execution_mode`: `repo_persona_subagent`, `repo_persona_host`, or
+  `external_peer_cli`
+- `agent`: target agent, for example `programmer`
+- `model_id`: exact model identifier used for the run
+- `model_label`: human-readable display label
+- `seed_id`: seed being scored
+- `result`: `CAUGHT`, `PARTIAL`, `MISSED`, or `FALSE_POSITIVE`
+- `severity_correct`: `yes`, `no`, or `na`
+- `reviewer_notes`: free-text scoring rationale
+- `executed_at`: ISO-8601 UTC timestamp
 
 Rules:
 
 - one row per seed per run
-- `result` must be `CAUGHT`, `PARTIAL`, `MISSED`, or `FALSE_POSITIVE`
-- `severity_correct` must be `yes`, `no`, or `na`
-- every `run_id` must exist in `run-manifest.tsv`
 - a benchmark claim requires at least 3 distinct `benchmark_full` runs after
   any agent, skill, or prompt change
 - a targeted regression claim requires at least 3 distinct
@@ -342,7 +316,7 @@ The validator checks:
 - seed metadata uses valid taxonomy values
 - benchmark suites have positive, negative, and regression controls
 - benchmark suites include advanced structures and difficulty spread
-- saved run data covers exactly the seeds declared by each run manifest row
+- saved run data covers all required seeds for the specified `run_scope`
 
 If the validator fails, the suite is not benchmark-ready.
 

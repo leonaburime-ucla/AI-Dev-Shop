@@ -1,11 +1,8 @@
 # Code Review Evals
 
-Canonical Code Review suites:
+Canonical Code Review suite:
 
-- `isolation-suite`
-- `rerun-suite`
+- `benchmark-suite/`
 
-Status:
-
-- `isolation-suite` is the broader committed baseline suite.
-- `rerun-suite` is the focused unresolved-seed follow-up suite and should not be treated as a full replacement for the isolation baseline.
+Re-run subsets are derived from saved benchmark results, not committed as
+separate suites.

@@ -36,7 +36,7 @@ def prepare_run(eval_dir: Path, run_id: str, force: bool) -> Path:
 
     copy_optional(eval_dir / "project-brief.md", run_dir / "project-brief.md")
     copy_optional(eval_dir / "prompts", run_dir / "prompts")
-    (run_dir / "reports").mkdir(parents=True, exist_ok=True)
+    (run_dir / "eval-results").mkdir(parents=True, exist_ok=True)
 
     return run_dir
 
