@@ -1,99 +1,76 @@
 # Seed Ledger — Eval 3: Payment Gateway Adapter
 
-## Seeds
+Rewritten against the current Python fixture on `2026-04-29`.
+Seed IDs are retained for suite backfill compatibility.
 
 ID: SEED-3A
 Category: Security/privacy
-Seeded issue: The starter code logs the full cardToken in the charge operation log line. Card tokens should never appear in logs.
+Seeded issue: The adapter logs and returns the raw provider error message. If the SDK echoes a card token, PAN fragment, or other sensitive payload in its error string, the adapter forwards that secret directly into logs and caller-visible results.
 Expected owner: Programmer
 Expected severity: Critical
-Expected signal: Programmer removes PII/secrets from logs
-Evidence path: src/adapter.py — charge_card method log line
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Sanitize provider error text before logging or returning it.
+Evidence path: `src/adapter.py` — `safe_message()`, `charge_card()`, `refund()`, `get_transaction()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-3B
 Category: Typed/stable result
-Seeded issue: The adapter catches SDK errors with a broad `catch(e: any)` and returns `{ error: e.message }` — a raw string, not the typed error union specified in the brief.
+Seeded issue: The outbound result union is typed, but the public request boundary is still plain `dict` input plus `dict` options with `Any` logger types. The adapter contract is cleaner internally than it is at the edge.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer maps to typed error codes
-Evidence path: src/adapter.py — except blocks
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Add typed request/option contracts for the three public adapter methods.
+Evidence path: `src/adapter.py` — `PaymentAdapterOptions`, `charge_card()`, `refund()`, `get_transaction()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-3C
 Category: Resource bounds
-Seeded issue: No timeout protection exists despite the brief requiring 5-second timeouts. SDK calls can hang indefinitely.
+Seeded issue: Timeout overrides are accepted without validation. A caller can pass `timeoutMs=0`, a negative timeout, or a non-sensical value and get immediate or unpredictable failures instead of a clean validation error.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer adds AbortController or Promise.race timeout
-Evidence path: src/adapter.py — no timeout logic
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Validate timeout overrides at construction and per-call entry points.
+Evidence path: `src/adapter.py` — timeout selection in `charge_card()`, `refund()`, `get_transaction()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-3D
 Category: Explicit dependencies
-Seeded issue: The adapter creates its own `new Date()` for timing and uses `console.log` directly instead of accepting a logger dependency.
+Seeded issue: Duration measurement still depends on direct `time.time()` reads, and the default logger writes to global process stdout/stderr. The adapter is only partially dependency-injected.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Inject logger and clock
-Evidence path: src/adapter.py — print() and time.time()
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Inject the clock used for durations and make the default logger explicitly opt-in.
+Evidence path: `src/adapter.py` — `time.time()` and `_DefaultLogger`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-3E
 Category: Pure logic vs effects
-Seeded issue: The error mapping logic (SDK code -> internal code) is embedded inside the catch block with the logging and retry logic, not a separate pure function.
+Seeded issue: `map_error_code()` relies on substring matches against freeform exception messages. Stable error classification is coupled to provider wording instead of a structured adapter-owned mapping boundary.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Extract error mapping to pure function
-Evidence path: src/adapter.py — except blocks
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Separate message redaction from error classification and prefer structured provider signals when available.
+Evidence path: `src/adapter.py` — `map_error_code()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-3F
 Category: Handoff/reporting
-Seeded issue: The starter code has no function-quality table, no coverage metrics, no risk disclosure in any documentation.
-Expected owner: Programmer (should include in handoff)
-Expected severity: Medium
-Expected signal: Programmer handoff should include quality table
-Evidence path: All source files (src/*.py) — no handoff documentation
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Low
-Framework change needed: No
+Seeded issue: The inline quality notes acknowledge heuristic drift in error-code mapping, but there is no retained risk note about raw provider message forwarding or secret-bearing error text. The documented risk surface is incomplete.
+Expected owner: Programmer
+Expected severity: Recommended
+Expected signal: Add explicit risk disclosure for provider-message redaction and heuristic code mapping.
+Evidence path: `src/adapter.py` — module docstring and `@overallScore` notes
+False positive risk: Medium
 
 ID: SEED-3G
-Category: Test anti-patterns
-Seeded issue: Tests mock the SDK by monkey-patching a global object. The mock doesn't reset between tests. One test asserts on console.log output by spying on the global console.
+Category: Test anti-patterns / missing adversarial coverage
+Seeded issue: The tests never simulate provider error messages that contain sensitive data, and they never exercise invalid timeout overrides. The happy-path and typed-error coverage misses the riskiest rewritten boundary cases.
 Expected owner: Code Review
-Expected severity: High
-Expected signal: Global mocks, no isolation, console spy as assertion
-Evidence path: tests/test_adapter.py
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Add adversarial tests for secret-bearing provider errors and bad timeout inputs.
+Evidence path: `tests/test_adapter.py`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-3H
-Category: Observability for effects
-Seeded issue: The refund and getTransaction methods have no logging at all — only charge logs anything.
+Category: Error boundary clarity
+Seeded issue: Error results expose the raw provider message directly as `message`. That makes the caller-visible API depend on provider phrasing and can leak internals even when logs are later sanitized.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: All external calls need observability
-Evidence path: src/adapter.py — refund and get_transaction methods
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Return stable, adapter-owned external messages while preserving detailed provider text only in safe internal telemetry.
+Evidence path: `src/adapter.py` — `safe_message()` and error result returns
 False positive risk: Low
-Framework change needed: No

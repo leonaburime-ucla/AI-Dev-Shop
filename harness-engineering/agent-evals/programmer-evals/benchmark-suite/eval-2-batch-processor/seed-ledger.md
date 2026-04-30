@@ -1,99 +1,76 @@
-Seeds targeting: resource bounds, idempotency, I/O shape, explicit dependencies, observability, complexity/scale, concurrency safety, test anti-patterns, handoff/reporting
+Seeds targeting: batching boundaries, idempotency, contract shape, hidden state, observability, and regression coverage.
 
-```
+Rewritten against the current Python fixture on `2026-04-29`.
+Seed IDs are retained for suite backfill compatibility.
+
 ID: SEED-2A
 Category: I/O shape / N+1
-Seeded issue: The starter code calls userService.getUser() inside a for loop for every single notification — classic N+1. Should batch-resolve users.
+Seeded issue: `_process_one()` resolves the user and renders the template separately for every notification. Chunking limits concurrency, but the implementation still performs per-item external lookups instead of reusing or batching repeated user/template work across a batch.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer flags per-item I/O and batches
-Evidence path: src/processor.py — process_batch loop
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Batch or cache repeated user/template lookups across the current batch.
+Evidence path: `src/processor.py` — `_process_one()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-2B
 Category: Resource bounds
-Seeded issue: No pagination/chunking despite brief requiring chunks of 50. The starter processes all items in one pass. No max batch size enforcement.
+Seeded issue: Runtime overrides are not validated. `chunkSize=0` breaks `_chunk()`, `maxRetries=0` silently skips the send loop, and negative delay / batch-size overrides produce nonsense behavior while still passing the public type surface.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer adds chunking and max batch guard
-Evidence path: src/processor.py — no chunking logic
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Validate operational options before processing begins.
+Evidence path: `src/processor.py` — `process_batch()` options handling and `_chunk()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-2C
 Category: Idempotency
-Seeded issue: Retry logic resends the email without any idempotency key. If the email provider times out but actually sent the email, retrying duplicates the send.
+Seeded issue: Retry still resends the email without any stable idempotency key at the email boundary. If the provider times out after actually delivering, the retried send duplicates the notification.
 Expected owner: Programmer
 Expected severity: Critical
-Expected signal: Programmer adds idempotency key to email send
-Evidence path: src/processor.py — retry loop
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Add an idempotency token derived from the notification identity and pass it to the effect boundary.
+Evidence path: `src/processor.py` — `_process_one()` retry loop
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-2D
 Category: Explicit dependencies
-Seeded issue: The processor reads Date.now() directly for elapsed time calculation and uses Math.random() for jitter in retry backoff. Not injectable, not testable.
+Seeded issue: The batch result's `elapsedMs` still depends on direct `time.time()` reads. Delay injection exists for backoff, but the clock used for duration measurement is not injectable, so the timing contract is only partially deterministic.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Programmer injects clock and random source
-Evidence path: src/processor.py — time.time() calls
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Inject the clock used for elapsed-time measurement, not just the delay function.
+Evidence path: `src/processor.py` — `process_batch()` start/end timing
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-2E
-Category: Concurrency safety
-Seeded issue: The deduplication Set is populated during processing, not before. In an async scenario, parallel chunk processing could miss deduplication window.
-Expected owner: Programmer (or Code Review)
-Expected severity: Medium
-Expected signal: Dedup should happen before processing begins
-Evidence path: src/processor.py — seen set inside the loop
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Medium (depends on async model)
-Framework change needed: No
+Category: Deduplication correctness
+Seeded issue: Deduplication only keys on `userId` and `templateId`. Distinct notifications for the same user/template but different `data` payloads or `priority` collapse into a single send and are reported as duplicates.
+Expected owner: Programmer
+Expected severity: Required
+Expected signal: Define the dedup identity explicitly and include the fields that make two notifications meaningfully different.
+Evidence path: `src/processor.py` — dedup key in `process_batch()`
+False positive risk: Low
 
 ID: SEED-2F
 Category: Observability for effects
-Seeded issue: No logging, metrics, or traces on any of the external calls (user lookup, template render, email send). Silent failure/success.
+Seeded issue: Structured logs exist, but there is no batch/run correlation ID and no per-attempt duration metric. When a chunk partially fails, the logs are hard to group back into one batch execution.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Programmer adds observability at effect boundaries
-Evidence path: src/processor.py — no log/metric/trace calls
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Low
-Framework change needed: No
+Expected severity: Recommended
+Expected signal: Add a batch identifier and richer attempt metadata so retries and failures can be correlated.
+Evidence path: `src/processor.py` — logger calls in `process_batch()` and `_process_one()`
+False positive risk: Medium
 
 ID: SEED-2G
 Category: Typed/stable result
-Seeded issue: The function returns a plain object with inconsistent shape — sometimes has `error` string, sometimes has `results` array, sometimes has both. Return type is `any`.
+Seeded issue: `ItemResult.status` is still just `str`, and several option hooks are typed as `Any`. The runtime behavior is more specific than the public contract, so the boundary still allows invalid status values and malformed option callables.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Programmer should define a typed result
-Evidence path: src/processor.py — return statements
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Tighten the status and option types to reflect the actual supported contract.
+Evidence path: `src/processor.py` — `ItemResult`, `ProcessBatchOptions`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-2H
-Category: Test anti-patterns
-Seeded issue: Tests use real setTimeout via retry logic (sleeps in tests), and mock the email service with a shared mutable counter that leaks between tests.
+Category: Test anti-patterns / missing regression coverage
+Seeded issue: The tests correctly avoid real sleeps now, but they do not cover the rewritten failure modes: invalid runtime overrides, deduplication of distinct payloads, or the missing idempotency boundary at the send step.
 Expected owner: Code Review
-Expected severity: High
-Expected signal: Sleeps in tests, shared mutable mock state
-Evidence path: tests/test_processor.py
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Add regression coverage for the rewritten edge cases instead of relying only on the legacy happy-path suite.
+Evidence path: `tests/test_processor.py`
 False positive risk: Low
-Framework change needed: No
-```

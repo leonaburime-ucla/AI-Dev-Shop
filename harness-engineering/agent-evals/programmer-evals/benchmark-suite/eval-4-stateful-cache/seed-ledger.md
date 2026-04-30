@@ -1,99 +1,76 @@
 # Seed Ledger — Eval 4: Rate Limiter Cache
 
-## Seeds
+Rewritten against the current Python fixture on `2026-04-29`.
+Seed IDs are retained for suite backfill compatibility.
 
 ID: SEED-4A
 Category: Concurrency safety
-Seeded issue: The cache uses a plain Map. If checkLimit and recordRequest are called concurrently for the same clientId, the timestamps array can have a race condition — one call reads stale length while another pushes.
-Expected owner: Code Review (Programmer should note)
-Expected severity: Medium
-Expected signal: Document concurrency assumption or add guard
-Evidence path: src/rate_limiter.py — dict access pattern
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Medium (single-threaded JS mitigates, but worth documenting)
-Framework change needed: No
+Seeded issue: The limiter closes over a shared `windows` dict with mutable per-client timestamp lists. The API is synchronous, but nothing protects that state if the limiter is used from multiple threads or callbacks at once.
+Expected owner: Code Review
+Expected severity: Recommended
+Expected signal: Document the single-thread assumption or protect the shared state explicitly.
+Evidence path: `src/rate_limiter.py` — `windows` and per-client list mutation
+False positive risk: Medium
 
 ID: SEED-4B
-Category: Determinism / Hidden dependencies
-Seeded issue: The starter code uses `Date.now()` directly instead of an injected clock, despite the brief requiring injectable clock. Tests will be non-deterministic.
+Category: Defaults / hidden behavior
+Seeded issue: The brief promises default 60-second / 100-request behavior, but `create_rate_limiter()` still requires both `window_ms` and `max_requests`. The documented default path is not actually part of the public API.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer injects clock
-Evidence path: src/rate_limiter.py — time.time() calls
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Support the documented defaults in the constructor surface instead of requiring both values every time.
+Evidence path: `src/rate_limiter.py` — `RateLimiterInput`, `create_rate_limiter()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-4C
-Category: Resource bounds / Memory growth
-Seeded issue: The cleanup function only runs when checkLimit is called. If a burst of clients hit the system and never check again, their entries stay in memory forever. No periodic or max-entries cleanup.
+Category: Resource bounds / memory growth
+Seeded issue: Expired clients are only pruned when that specific client is touched again or when `get_stats()` is called. Idle expired clients can stay resident indefinitely, so the cleanup guarantee is only partial.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer adds max entries or periodic cleanup
-Evidence path: src/rate_limiter.py — cleanup only in check_limit
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Add a global cleanup strategy or bounded eviction policy for untouched stale clients.
+Evidence path: `src/rate_limiter.py` — `_prune_client()`, `check_limit()`, `record_request()`, `get_stats()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-4D
 Category: Complexity and scale
-Seeded issue: The cleanup function iterates ALL entries in the map on every checkLimit call — O(n * m) where n is client count and m is timestamps per client. This doesn't scale.
+Seeded issue: `get_stats()` walks every tracked client and prunes each one on every call. That turns a read-oriented stats query into an `O(n * k)` maintenance pass across the whole cache.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer should scope cleanup to current client or amortize
-Evidence path: src/rate_limiter.py — _prune_client
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Separate stats reads from global cleanup or amortize the cleanup work.
+Evidence path: `src/rate_limiter.py` — `get_stats()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-4E
-Category: Stable boundaries / Typed contract
-Seeded issue: checkLimit returns `{ allowed: boolean, remaining: number }` but is missing `resetAt` as specified in the brief. Unstable contract.
+Category: Stable boundaries / typed contract
+Seeded issue: The brief specifies `resetAt`, but the public result surface returns `reset_at`. The runtime contract is Pythonic, but it no longer matches the documented API shape.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Programmer adds missing resetAt field
-Evidence path: src/rate_limiter.py — check_limit return
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Align the returned field name with the published contract or update the brief and callers consistently.
+Evidence path: `src/rate_limiter.py` — `LimitStatus`, `check_limit()`, `record_request()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-4F
 Category: Function scoring
-Seeded issue: All functions scored 100/100 despite Date.now() dependency, missing contract field, O(n*m) cleanup, and no memory bounds. No skepticism pass.
+Seeded issue: The current quality scores stay in the mid-90s even though the fixture still misses the documented defaults, retains partial cleanup semantics, and exposes a contract-name mismatch on `resetAt`.
 Expected owner: Code Review
 Expected severity: Required
-Expected signal: Code Review flags inflated scores
-Evidence path: All docstring blocks in src/rate_limiter.py
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Flag the scores as too generous relative to the remaining contract and scale issues.
+Evidence path: `src/rate_limiter.py` — `@overallScore` annotations
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-4G
-Category: Test anti-patterns
-Seeded issue: Tests use real `Date.now()` with `setTimeout` delays to test the sliding window, making them slow and flaky. One test uses a hardcoded timestamp that only works in a specific timezone.
+Category: Test quality / missing contract coverage
+Seeded issue: The tests are deterministic now, but they never assert the documented default 60-second / 100-request API and never check the published `resetAt` field name. The suite follows the implementation instead of the brief.
 Expected owner: Code Review
-Expected severity: High
-Expected signal: Real clock in tests, timezone dependency
-Evidence path: tests/test_rate_limiter.py
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Add coverage for the documented defaults and the public return-field naming contract.
+Evidence path: `tests/test_rate_limiter.py`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-4H
-Category: Documentation noise
-Seeded issue: The tiny `reset` one-liner and `getStats` two-liner both have full @overallScore 100/100 documentation blocks that are longer than the functions themselves. Pure documentation noise.
-Expected owner: Code Review (Recommended)
-Expected severity: Low/Medium
-Expected signal: Over-documentation of trivial helpers
-Evidence path: src/rate_limiter.py — reset and get_stats docstrings
-Caught by Programmer:
-Caught by Code Review:
+Category: Query side effects
+Seeded issue: `get_stats()` looks like a read helper, but it mutates internal state by pruning expired clients as a side effect. That behavior is useful, but it is surprising and not surfaced in the API contract.
+Expected owner: Code Review
+Expected severity: Recommended
+Expected signal: Call out the hidden mutation or split maintenance from the stats query.
+Evidence path: `src/rate_limiter.py` — `get_stats()`
 False positive risk: Medium
-Framework change needed: No

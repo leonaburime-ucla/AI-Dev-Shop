@@ -1,113 +1,87 @@
 # Seed Ledger — Eval 1: Discount Rule Engine
 
+Rewritten against the current Python fixture on `2026-04-29`.
+Seed IDs are retained for suite backfill compatibility.
+
 ## Seeds
 
-```
 ID: SEED-1A
 Category: Adversarial aggregate behavior
-Seeded issue: The starter code has a bulkDiscount function that checks quantity per line item but does NOT aggregate quantity across duplicate SKUs in the cart. A cart with two lines of "WIDGET-A" (qty 6 + qty 5 = 11) should trigger bulk discount but won't.
+Seeded issue: `bulk_discount()` checks each line item independently. If the cart splits the same SKU across multiple lines, the engine never aggregates quantity across those lines, so a 6 + 5 split for the same SKU misses the 10+ threshold.
 Expected owner: Programmer
 Expected severity: High
-Expected signal: Aggregate test or probe for repeated SKUs
-Evidence path: src/rules.py — bulk_discount function
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Aggregate repeated-SKU quantities before applying the bulk rule, or normalize the cart first.
+Evidence path: `src/rules.py` — `bulk_discount()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-1B
-Category: Hidden branching / Determinism
-Seeded issue: The starter code applies rules using a Set iteration and object property order, making discount application order non-deterministic. Rule ordering affects the final amount when the 40% cap is reached.
-Expected owner: Programmer (should expose), Code Review (required if missed)
-Expected severity: High
-Expected signal: Tests with all rules applying should assert deterministic ordering
-Evidence path: src/engine.py — apply_discounts function
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Low
-Framework change needed: No
+Category: Hidden branching / determinism
+Seeded issue: The 40% cap is applied in the order the injected `rules` list happens to run. Two callers with the same cart but different rule ordering can get different totals, and the engine does not document a priority contract for rule order under the cap.
+Expected owner: Programmer
+Expected severity: Medium
+Expected signal: Define and document rule priority, or make cap application independent of caller-provided ordering.
+Evidence path: `src/engine.py` — `apply_discounts()` rule loop and cap handling
+False positive risk: Medium
 
 ID: SEED-1C
 Category: Extension point
-Seeded issue: The starter code has all rules hardcoded in a switch statement inside the main engine loop. Adding a new rule requires editing the core function.
+Seeded issue: Extensibility still relies on raw callables and a mutable shared `DEFAULT_RULES` list. Adding a new rule by mutating that module-level list changes global behavior for every later caller and test in the process.
 Expected owner: Programmer
 Expected severity: Medium
-Expected signal: Programmer should use a rule table/strategy pattern
-Evidence path: src/engine.py — if/elif chain
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Prefer an immutable default registry or explicit rule injection at the call site instead of shared mutable module state.
+Evidence path: `src/rules.py` — `DEFAULT_RULES`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-1D
-Category: Function scoring / Score inflation
-Seeded issue: The starter code has JSDoc with @overallScore 100/100 on every function, including the clearly flawed engine function with CC > 4 and hidden aggregate bug. No skepticism pass documented.
+Category: Function scoring / score calibration
+Seeded issue: The current quality annotations still score the core functions in the low-to-mid 90s even though the engine misses split-line bulk aggregation and leaves cap behavior dependent on implicit rule order. The scores read cleaner than the fixture really is.
 Expected owner: Code Review
-Expected severity: Required (score inflation)
-Expected signal: Code Review flags inflated scores and missing skepticism pass
-Evidence path: src/engine.py, src/rules.py — all docstring blocks
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Flag that the quality scores are overstated relative to the remaining correctness and contract risks.
+Evidence path: `src/engine.py`, `src/rules.py`, `src/validation.py` — `@overallScore` annotations
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-1E
 Category: Predictable errors
-Seeded issue: The validation function returns `false` for invalid items but throws an Error for empty cart. Mixed error signaling for the same failure category (invalid cart input).
+Seeded issue: `validate_cart()` raises generic `Exception` for user-input failures. Callers cannot distinguish expected validation errors from programmer/system failures without string-matching the message.
 Expected owner: Programmer
 Expected severity: Medium
-Expected signal: Programmer should normalize error handling
-Evidence path: src/validation.py
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Raise a specific validation exception type such as `ValueError` or a domain error class.
+Evidence path: `src/validation.py` — `validate_cart()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-1F
-Category: Stable boundaries / Typed contract
-Seeded issue: The applyDiscounts function takes positional arguments (items, loyaltyTier, rules) instead of a required input object. Return type is `any`.
+Category: Stable boundaries / typed contract
+Seeded issue: The rule contract is still under-specified. `ApplyDiscountsOptions.rules` is `List[Callable]` and `AppliedDiscount` is `TypedDict(total=False)`, so custom rules can omit required fields and still satisfy the type surface.
 Expected owner: Programmer
 Expected severity: Medium
-Expected signal: Programmer should use two-object parameter convention and typed return
-Evidence path: src/engine.py — function signature
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Tighten the rule callable type and make the returned discount shape fully required.
+Evidence path: `src/types.py` — `AppliedDiscount`, `ApplyDiscountsOptions`, `DiscountRule`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-1G
 Category: Single responsibility
-Seeded issue: The main engine function validates, calculates subtotals, applies rules, caps discounts, formats output, AND logs to console. 6 responsibilities in one function.
-Expected owner: Programmer
-Expected severity: High
-Expected signal: Should extract into focused functions
-Evidence path: src/engine.py — apply_discounts (CC ~8)
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Low
-Framework change needed: No
-
-ID: SEED-1H
-Category: Pure logic vs effects
-Seeded issue: The discount calculation functions call console.log inside pure math logic.
+Seeded issue: `apply_discounts()` still validates input, computes subtotal, orchestrates rule execution, enforces the discount cap, assembles warnings, and formats the final result in one place. The core flow remains hard to reason about when rules or cap behavior change.
 Expected owner: Programmer
 Expected severity: Medium
-Expected signal: Programmer should split logging from calculation
-Evidence path: src/rules.py — all discount functions
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Extract subtotal/cap orchestration into focused helpers and leave the top-level function as an orchestration shell.
+Evidence path: `src/engine.py` — `apply_discounts()`
 False positive risk: Low
-Framework change needed: No
+
+ID: SEED-1H
+Category: State leakage
+Seeded issue: The shared `DEFAULT_RULES` module list is process-wide mutable state. Any code that appends, removes, or reorders rules mutates later behavior for unrelated callers and tests.
+Expected owner: Programmer
+Expected severity: Medium
+Expected signal: Freeze the default registry or copy it defensively before use.
+Evidence path: `src/rules.py` — `DEFAULT_RULES`
+False positive risk: Low
 
 ID: SEED-1I
-Category: Test anti-patterns
-Seeded issue: Tests use `toMatchObject` with partial assertions that would pass even if discount amounts are wrong, and one test depends on execution order of previous test (shared mutable cart object).
+Category: Test anti-patterns / missing adversarial coverage
+Seeded issue: The tests never cover the split-line duplicate-SKU case or the rule-order-dependent cap behavior. The happy-path coverage makes the engine look more complete than it is.
 Expected owner: Code Review
-Expected severity: High
-Expected signal: Weak assertions and order-dependent shared state
-Evidence path: tests/test_engine.py
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Call out the missing adversarial cases and add explicit tests for them.
+Evidence path: `tests/test_engine.py`
 False positive risk: Low
-Framework change needed: No
-```

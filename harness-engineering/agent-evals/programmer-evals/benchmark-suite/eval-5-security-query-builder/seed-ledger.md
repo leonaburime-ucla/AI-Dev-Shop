@@ -1,111 +1,85 @@
 # Seed Ledger — Eval 5: Secure Search Query Builder
 
-## Seeds
+Rewritten against the current Python fixture on `2026-04-29`.
+Seed IDs are retained for suite backfill compatibility.
 
 ID: SEED-5A
-Category: Security/privacy — SQL injection
-Seeded issue: The starter code string-interpolates the sort field directly into SQL: `ORDER BY ${sortField}`. Since sortField comes from user input, this is SQL injection.
+Category: Public contract drift
+Seeded issue: The implementation now exposes snake_case request/response fields (`query_text`, `date_range`, `page_size`, `total_count_sql`) while the brief still defines the API in camelCase (`queryText`, `dateRange`, `pageSize`, `totalCountSql`). A caller following the brief does not hit the actual contract.
 Expected owner: Programmer
-Expected severity: Critical
-Expected signal: Programmer must validate against allowlist before interpolating
-Evidence path: src/query_builder.py — ORDER BY clause
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Align the external field names with the published API contract or update the brief and all consumers together.
+Evidence path: `src/query_builder.py` — `SearchInput`, `SearchOptions`, `SearchQueryResult`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5B
-Category: Security/privacy — PII logging
-Seeded issue: The log line includes the raw query text and filter values, which the brief says could contain PII. Violates the brief's "never log query text or filter values" requirement.
+Category: Operational telemetry
+Seeded issue: `_log_search_operation()` counts every non-`None` filter value as active. Empty structures like `tags=[]` or `date_range={}` still inflate `filterCount`, so the logs misstate how much filtering a query actually used.
 Expected owner: Programmer
-Expected severity: Critical
-Expected signal: Programmer removes PII from logs
-Evidence path: src/query_builder.py — print() line
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Count only meaningful, populated filters in the telemetry path.
+Evidence path: `src/query_builder.py` — `_log_search_operation()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5C
-Category: Resource bounds
-Seeded issue: pageSize validation is missing. User can pass pageSize: 999999 and get an unbounded query. The brief says max 100.
+Category: Input validation gap
+Seeded issue: `date_range` shape is not validated before indexing. A partial or malformed date-range dict raises raw `KeyError` instead of a clean `ValidationError`.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Programmer adds pageSize validation
-Evidence path: src/query_builder.py — no page_size check
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Validate nested filter shapes before SQL assembly and raise a stable adapter-owned validation error.
+Evidence path: `src/query_builder.py` — date-range handling in `build_search_query()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5D
 Category: Predictable errors
-Seeded issue: Invalid sort direction silently defaults to ASC instead of returning an error. Invalid page silently defaults to 1. This hides bad input.
+Seeded issue: Bad input still fails through multiple error surfaces. Invalid page/sort values raise `ValidationError`, but malformed nested filters can bubble raw `KeyError` or `TypeError`, so callers cannot handle bad search input uniformly.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Fail-fast on invalid input per coding-foundations
-Evidence path: src/query_builder.py — default fallbacks
-Caught by Programmer:
-Caught by Code Review:
-False positive risk: Medium (could argue defaults are fine)
-Framework change needed: No
+Expected severity: Recommended
+Expected signal: Normalize invalid-input failures to one consistent error boundary.
+Evidence path: `src/query_builder.py` — validation helpers vs nested filter access
+False positive risk: Low
 
 ID: SEED-5E
 Category: Typed/stable result
-Seeded issue: The function return type is `any`. The brief specifies a typed return with sql, params, totalCountSql, totalCountParams.
+Seeded issue: The returned field names are typed, but the result contract itself no longer matches the documented API (`total_count_sql` / `total_count_params` vs `totalCountSql` / `totalCountParams`). The shape is internally consistent and externally drifted.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Programmer types the return
-Evidence path: src/query_builder.py — return type
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Treat the documented output keys as part of the stable contract and align them.
+Evidence path: `src/query_builder.py` — `SearchQueryResult` and final return dict
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5F
 Category: Stable boundaries
-Seeded issue: The function takes 4 positional arguments instead of a required input object + optional options object.
+Seeded issue: Several public types still fall back to loose `dict` / `list` members for nested shapes (`date_range`, params arrays). The contract communicates less structure than the builder actually depends on.
 Expected owner: Programmer
-Expected severity: Medium
-Expected signal: Two-object parameter convention
-Evidence path: src/query_builder.py — function signature
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Recommended
+Expected signal: Tighten the nested types so malformed filter shapes are harder to express and easier to validate.
+Evidence path: `src/query_builder.py` — `SearchFilters`, `SearchQueryResult`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5G
 Category: Single responsibility
-Seeded issue: The function validates input, builds WHERE clauses, builds ORDER BY, builds pagination, builds count query, AND logs — all in one 80+ line function.
+Seeded issue: `build_search_query()` still performs validation, telemetry logging, WHERE construction, ORDER BY assembly, pagination, and total-count query generation in one large function. The logic is correct more often than not, but the boundary is still dense.
 Expected owner: Programmer
-Expected severity: High
-Expected signal: Extract into focused helpers
-Evidence path: src/query_builder.py — monolithic function
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Medium
+Expected signal: Extract clause builders and keep the top-level function as composition/orchestration.
+Evidence path: `src/query_builder.py` — `build_search_query()`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5H
-Category: Adversarial aggregate behavior
-Seeded issue: No test for SQL injection attempts. No test for boundary values (pageSize=0, pageSize=101, empty tags array, tags with special characters). No test for combined filters.
+Category: Test quality / missing adversarial coverage
+Seeded issue: The tests cover SQL injection well, but they do not cover the rewritten contract risks: camelCase caller input, malformed partial `date_range`, or `filterCount` behavior for empty filters such as `tags=[]`.
 Expected owner: Code Review
-Expected severity: High
-Expected signal: Missing adversarial/boundary tests
-Evidence path: tests/test_query_builder.py
-Caught by Programmer:
-Caught by Code Review:
+Expected severity: Required
+Expected signal: Add regression coverage for contract drift and malformed nested-filter handling, not just injection cases.
+Evidence path: `tests/test_query_builder.py`
 False positive risk: Low
-Framework change needed: No
 
 ID: SEED-5I
 Category: Function scoring
-Seeded issue: @overallScore 100/100 on a function with SQL injection, PII logging, missing validation, and CC > 4. Blatant score inflation.
+Seeded issue: The main builder still carries an `@overallScore 88` annotation even though the public API contract drift and raw nested-filter error path remain unresolved. The score reads more stable than the actual boundary contract.
 Expected owner: Code Review
 Expected severity: Required
-Expected signal: Code Review blocks on inflated score with Critical findings
-Evidence path: src/query_builder.py — docstrings
-Caught by Programmer:
-Caught by Code Review:
+Expected signal: Call out the mismatch between the retained score and the remaining contract bugs.
+Evidence path: `src/query_builder.py` — `build_search_query()` docstring
 False positive risk: Low
-Framework change needed: No
