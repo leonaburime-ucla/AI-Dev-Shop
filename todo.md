@@ -11,6 +11,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 - AGENTS.md Map Reduction: **DONE / MONITORED** (root map was slimmed to the safer range and detail moved into local quickstart/index docs; keep watching for re-expansion)
 - Observer Agent Operational Cadence: **DONE / MONITORED** (cadence is now explicit in Observer, Coordinator, and workflow docs; keep it aligned as the pipeline evolves)
+- Harness Audit Follow-Ons (Executable Controls / Runtime Validation / Drift): **OPEN**
 - Git Branching and PR Strategy: **OPEN**
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Protocol Split: MCP + A2A: **OPEN**
@@ -92,6 +93,254 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ---
 
 ## Pipeline Gaps
+
+### Harness Audit Follow-Ons (Claude Opus 4.6 + Gemini 3.1 + Coordinator) **[OPEN]**
+**What it is:** Consolidated follow-on work from the harness review comparing the current framework against the Fowler / ThoughtWorks framing plus the Medium summary of OpenAI / Anthropic / ThoughtWorks harness patterns, then pressure-testing the proposed backlog with Claude Opus 4.6 and Gemini 3.1.
+**Current state:** The framework is already strong on routing, resumability, durable project state, evaluator-loop concepts, observer-driven maintenance, and harness self-governance. The review found the biggest gaps in executable quality controls: computational checks, runtime / behavior validation, architecture-fitness verification, continuous drift sensing, and explicit code-documentation expectations.
+**Audit decisions already made:**
+- Keep `ADS-project-knowledge/` as the single shared writable project workspace for team use; do **not** split it into a separate memory root unless a later operational need justifies it.
+- Treat `ADS-project-knowledge/memory/` as the memory layer inside that workspace; terminology cleanup for the root remains optional / last.
+- Merge the earlier "architecture fitness" and "rebalance validator strategy" ideas into one workstream so product-facing validation becomes concrete instead of abstract.
+- Keep the model-upgrade / harness-validity audit idea, but only after the core executable contracts exist; do not prioritize it ahead of the core validation surfaces.
+- Keep the machine-readable feature-state question as a bounded investigation only; do not let it become open-ended design work.
+**Severity legend:**
+- `Critical` — foundational harness gaps that should shape the next round of framework changes
+- `High` — important follow-ons once the critical contract layer exists
+- `Medium` — useful, but should wait until the core contract surfaces are stable
+- `Optional` — clarity/polish work, not a structural blocker
+**Implementation note for future sessions:** This section is intentionally detailed enough to serve as the source brief for a fresh session. Before implementing any item below, re-read the referenced docs, confirm whether newer harness work has partially addressed the gap, and then update this todo item rather than recreating the rationale from memory.
+
+#### 1. `Critical` — Add a first-class computational controls contract
+**Why:** The review was consistent that the framework is currently better at validating workflow and artifact hygiene than validating the software being produced. Deterministic executable checks need to become a first-class harness surface instead of downstream tribal knowledge.
+**What this workstream must define:**
+- One canonical host-project declaration point for executable quality checks.
+- Named command slots for:
+  - lint
+  - typecheck
+  - build / compile
+  - unit tests
+  - integration tests
+  - stack-specific static analysis
+- Which stages must read and use this contract (`Programmer`, `TestRunner`, `Code Review`, closeout flows, and any future CI / merge-gate guidance).
+- What the framework should do when the contract is missing, incomplete, or failing.
+**Likely files to inspect/update first:**
+- `harness-engineering/runtime/self-validation.md`
+- `framework/workflows/conventions.md`
+- `framework/workflows/multi-agent-pipeline.md`
+- `agents/programmer/skills.md`
+- `agents/code-review/skills.md`
+- `agents/testrunner/skills.md` (or equivalent test-runner surface if renamed / relocated)
+- `framework/templates/` for any new reusable contract template
+**Open design questions to resolve during implementation:**
+- Should this contract live under `ADS-project-knowledge/meta/`, `ADS-project-knowledge/governance/`, or a new canonical project-level file?
+- Which checks are globally required vs optional by stack?
+- How should brownfield repos declare partial coverage when some checks do not exist yet?
+**Done when:**
+- The framework has a documented computational-controls contract.
+- Host projects have one unambiguous place to declare executable quality checks.
+- Implementation and verification stages can rely on the same contract instead of guessing.
+
+#### 2. `Critical` — Turn runtime self-validation into an enforceable harness requirement
+**Why:** The current runtime harness is conceptually solid but too template-level. For runtime-changing work, the framework needs executable proof of behavior, not just guidance about what a host project should eventually supply.
+**What this workstream must define:**
+- A required runtime-validation contract for runtime-changing work with fields for:
+  - boot / start command
+  - healthy signal
+  - critical-path check
+  - negative / edge-path check
+  - artifact capture location
+  - stack-specific runtime/static checks
+- When runtime validation is mandatory.
+- When `PASS`, `PARTIAL`, and `BLOCKER` are valid outcomes.
+- What counts as an acceptable documented exception when runtime validation cannot run.
+**Likely files to inspect/update first:**
+- `harness-engineering/runtime/self-validation.md`
+- `framework/templates/self-validation/`
+- `agents/programmer/skills.md`
+- `agents/qa-e2e/skills.md`
+- `framework/workflows/multi-agent-pipeline.md`
+- `framework/templates/handoff-template.md`
+**Important constraint:** Do not let "runtime validation" silently degrade into "the agent said it clicked around." The result must be tied to named commands, signals, or captured evidence.
+**Done when:**
+- Runtime-changing work cannot be treated as fully complete without executable runtime validation or an explicit documented exception.
+- Host-project validation expectations are operational, not just advisory.
+
+#### 3. `Critical` — Add architecture-fitness checks and explicitly rebalance validator work toward product-facing validation
+**Why:** The framework has ADRs and architectural reasoning, but not enough executable structure for dependency direction, boundary enforcement, or architecture drift detection. This item also absorbs the earlier validator-rebalancing work: future validator effort should bias toward software/product quality, not more framework self-policing.
+**What this workstream must define:**
+- A formal way for host projects to declare architecture-fitness rules such as:
+  - allowed dependency directions
+  - forbidden cross-layer imports
+  - ownership boundaries
+  - framework-specific structural constraints
+- Which of those rules are blocking vs advisory.
+- How those checks flow into implementation and verification.
+- A written priority rule for future validator work: prefer product-facing / architecture-facing checks before more harness-internal hygiene checks.
+**Likely files to inspect/update first:**
+- `harness-engineering/validators/README.md`
+- `framework/workflows/multi-agent-pipeline.md`
+- `framework/workflows/conventions.md`
+- `agents/architect/skills.md`
+- `agents/code-review/skills.md`
+- `skills/architecture-decisions/SKILL.md`
+- any future architecture-fitness template or policy file added under `framework/` or `harness-engineering/`
+**Important implementation note:** This should not stay purely prose-driven. The deliverable is not "better ADR language"; it is a framework surface that can eventually power executable checks.
+**Done when:**
+- Architecture verification is partially executable instead of only narrative.
+- Validator strategy explicitly favors product/code validation expansion before more framework-internal hygiene work.
+
+#### 4. `Critical` — Add a contract bootstrap and enforcement story for host projects
+**Why:** Items 1-3 introduce new contracts. The review correctly pointed out that the backlog needs an explicit adoption story for new and existing host projects, plus clear enforcement behavior when contracts are absent or violated.
+**What this workstream must define:**
+- How a new host project creates the required contracts for the first time.
+- How a brownfield repo adopts them incrementally without blocking all work immediately.
+- Which templates / bootstrap commands / onboarding steps exist.
+- Enforcement consequences when:
+  - a required contract is missing
+  - a declared check fails
+  - a contract is stale or obviously incomplete
+- Which failures are hard blockers, which are escalations, and which are temporary waivers.
+**Likely files to inspect/update first:**
+- `framework/templates/bootstrap/`
+- `framework/workflows/conventions.md`
+- `framework/operations/pipeline-quickstart.md`
+- `agents/coordinator/skills.md`
+- `framework/workflows/multi-agent-pipeline.md`
+- any new onboarding / contract-template docs added under `framework/templates/`
+**Done when:**
+- A fresh or brownfield host project can adopt the new contract surfaces without guesswork.
+- The framework has explicit behavior for missing or failing contracts instead of vague "should" language.
+
+#### 5. `High` — Add continuous drift sensors, but keep phase 1 intentionally narrow
+**Why:** The original drift-sensor idea was too broad. The harness needs recurring codebase-health sensing, but the first phase should focus on a small set of actionable signals rather than turning into a full platform-engineering observability roadmap.
+**Phase 1 scope only:**
+- dead-code detection
+- dependency / security drift
+- coverage-quality analysis
+**Later candidates (not phase 1 unless explicitly promoted):**
+- runtime SLO review
+- log anomaly review
+- broader observability quality signals
+**Likely files to inspect/update first:**
+- `agents/observer/skills.md`
+- `harness-engineering/quality/README.md`
+- `harness-engineering/quality/failure-promotion-policy.md`
+- `harness-engineering/maintenance/observer-cadence.md`
+- `framework/workflows/multi-agent-pipeline.md`
+- `project-knowledge-template/reports/maintenance/README.md`
+**Important implementation note:** This workstream should define who consumes the signals, where artifacts live, and how they route into maintenance / refactor / escalation. Do not add recurring sensors with no ownership path.
+**Done when:**
+- The harness has a small, named set of recurring drift sensors with clear outputs and owners.
+- Observer / maintenance flows know how to ingest and act on those findings.
+
+#### 6. `High` — Add explicit code-documentation standards and enforcement
+**Why:** The framework is strong on external workflow documentation, but the actual code documentation expectations are still under-specified. This needs to become part of the maintainability harness, not a matter of taste.
+**What this workstream must define:**
+- What must be documented:
+  - public interfaces
+  - complex orchestration paths
+  - non-obvious invariants
+  - side effects
+  - important constraints
+- What should **not** be over-documented:
+  - obvious leaf logic
+  - noise comments
+  - comments that only restate the code
+- How enforcement works:
+  - code review expectations
+  - any doc-lint / doc-coverage checks available by stack
+  - handoff expectations for changed public APIs
+**Likely files to inspect/update first:**
+- `agents/programmer/skills.md`
+- `agents/code-review/skills.md`
+- `agents/docs/skills.md`
+- `framework/templates/handoff-template.md`
+- any code-style or documentation-reference skills already used by Programmer / Code Review
+**Important implementation note:** The standard should improve maintainability and agent reliability, not create comment bloat. Keep the "what not to document" guardrail explicit.
+**Done when:**
+- The framework has one clear "enough documentation" rule.
+- Programmer, Code Review, and Docs stages all enforce the same expectation.
+
+#### 7. `High` — Make the evaluator contract the concrete sprint/build contract
+**Why:** The backlog should stop leaving this as an abstract "determine whether" question. The intent is to resolve whether `evaluator-contract-<slug>.md` is already the builder/judge agreement artifact and, if so, strengthen it enough that future sessions do not recreate the debate.
+**What this workstream must do:**
+- Time-box the decision instead of letting it linger.
+- If `evaluator-contract-<slug>.md` is the right artifact, strengthen it so it explicitly carries:
+  - scope
+  - non-goals
+  - evidence surfaces
+  - completion criteria
+  - fail conditions
+  - required artifacts
+- If it is **not** the right artifact, document why and define the replacement contract clearly.
+**Likely files to inspect/update first:**
+- `harness-engineering/quality/evaluation-loops.md`
+- `framework/templates/evaluator-contract-template.md`
+- `framework/templates/evaluator-report-template.md`
+- `framework/workflows/conventions.md`
+- any agent docs that already talk about evaluator-mode work
+**Done when:**
+- Evaluator-mode work has one unmistakable pre-build contract artifact.
+- A fresh session can tell from the docs exactly how builder/judge scope is supposed to be agreed before implementation starts.
+
+#### 8. `Medium` — Add a formal model-upgrade / harness-validity audit loop
+**Why:** The articles and review both agreed that model improvements can make older harness rules stale. This is still important, but it should land only after the core executable contracts exist; otherwise the framework is auditing a weak baseline.
+**What this workstream must define:**
+- audit triggers:
+  - new major model family
+  - meaningful model version jump
+  - host/runtime change
+  - repeated evidence that a step feels redundant
+- a benchmark set for revalidation
+- one-component-at-a-time ablation method
+- retained report fields:
+  - benchmark tasks
+  - quality delta
+  - latency delta
+  - cost delta
+  - keep / remove / conditional decision
+**Likely files to inspect/update first:**
+- `harness-engineering/quality/load-bearing-harness-audit.md`
+- `framework/templates/load-bearing-harness-audit-template.md`
+- `harness-engineering/quality/README.md`
+- `project-knowledge-template/reports/maintenance/README.md`
+**Important implementation note:** Do not start here. This item depends on items 1-3 being real enough to measure.
+**Done when:**
+- Model and host upgrades can retire stale harness rules based on evidence instead of intuition.
+
+#### 9. `Medium` — Run a bounded investigation on whether a machine-readable feature-state tracker is needed
+**Why:** This should remain a bounded spike, not open-ended design work. The question is whether long autonomous runs actually need a single machine-friendly progress surface beyond `tasks.md`, `pipeline-state.md`, `progress-ledger.md`, and report artifacts.
+**What this investigation must answer:**
+- What concrete failure mode the current state surfaces do **not** solve well.
+- Whether a single tracker materially improves autonomous progression or resumability.
+- Whether the existing trio is already sufficient if used consistently.
+**Likely files to inspect/update first:**
+- `framework/workflows/pipeline-state-format.md`
+- `harness-engineering/runtime/session-continuity.md`
+- `framework/workflows/multi-agent-pipeline.md`
+- `framework/templates/tasks-template.md`
+- any existing feature / state artifacts in `project-knowledge-template/reports/pipeline/`
+**Decision rule:** Either propose a specific artifact with a real owner and purpose, or explicitly close the item by saying the current state surfaces are sufficient.
+**Done when:**
+- The framework either adopts a machine-readable feature/progress surface or records a deliberate reason not to.
+
+#### 10. `Optional` — Clarify `ADS-project-knowledge/` terminology without splitting it
+**Why:** This is clarity work, not a structural blocker. For team usage, the current single workspace root remains the preferred shape.
+**What this workstream must do:**
+- Clarify consistently that:
+  - `ADS-project-knowledge/` is the writable project harness workspace
+  - `ADS-project-knowledge/memory/` is the memory layer inside it
+- Avoid language that implies the whole root is "memory"
+- Do **not** split the root into separate workspace and memory roots unless a later operational need clearly justifies it
+**Likely files to inspect/update first:**
+- `AGENTS.md`
+- `project-knowledge-template/README.md`
+- `framework/workflows/conventions.md`
+- `framework/memory/README.md`
+- `project-knowledge-template/memory/README.md`
+**Done when:**
+- The docs stop implying that the entire root is memory.
+- The existing team-friendly single-workspace shape remains intact.
 
 ### Specialized Harness Follow-Ons From Video **[OPEN]**
 **Source video:** `https://www.youtube.com/watch?v=I2K81s0OQto`
