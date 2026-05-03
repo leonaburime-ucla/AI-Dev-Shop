@@ -19,7 +19,7 @@ On the first user message in this repository (including greetings), before any r
 4. Read `<AI_DEV_SHOP_ROOT>/framework/operations/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt inside the startup block after the startup notices and before `------------End of Startup Info------------`.
 5. When Bash is available, detect the current host and resolve subagent mode with `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/resolve_subagent_mode.sh`. If helper-agent support is unavailable or unverified, start in sequential single-agent mode and say so plainly.
 **slash-commands-setup** (skip if dismissed):
-Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/debate`, `/consensus`, and more)? Say **yes** and I'll walk you through it."
+Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/debate`, `/consensus`, `/cowork`, and more)? Say **yes** and I'll walk you through it."
 If the user says yes: read the `## slash-commands-setup` section in `reminders.md`, detect the host, and follow the instructions there.
 If the user says "skip" / "don't show again" / "dismiss": append `- slash-commands-setup` to the Dismissed section in `reminders.md` and confirm: "Dismissed. Say 're-enable reminder: slash-commands-setup' anytime to bring it back."
 
@@ -121,34 +121,25 @@ These rules apply to every agent when operating in Agent Direct Mode (invoked vi
 - **VibeCoder exception.** VibeCoder output is exploratory unless the user or Coordinator explicitly promotes it.
 - **Coordinator observes silently.** The Coordinator tracks state and memory but does not route or interrupt unless addressed directly.
 
-### Agent Consensus Variant
+### Consensus And Consultation
 
-If Agent Direct Mode is started with `consensus` enabled (`/agent <name> consensus`):
+Detailed Agent Direct consensus and cross-agent consultation rules live in `<AI_DEV_SHOP_ROOT>/framework/operations/interaction-modes.md`.
 
-- The active direct agent may invoke Swarm Consensus for high-level debatable questions.
-- Consensus mode defaults to `single-pass` unless the user requests `debate`.
-- On entry, the active agent briefly explains the current consensus setting and how to switch back to normal direct mode.
-
-### Cross-Agent Consultation (Default ON)
-
-Cross-agent consultation is enabled by default. If consultation mode is disabled, agents stop consulting and the Coordinator uses strict single-agent routing.
-
-- Coordinator remains the router of record when consultation is on.
-- One owner agent stays accountable for final output quality and delivery.
-- Consultation is advice-only unless Coordinator explicitly escalates scope.
-- Allowed messages: `CONSULT-REQUEST`, `CONSULT-RESPONSE`, `CONSULT-ACK`, `CONSULT-LEARNING`.
-- Maximum 2 back-and-forth rounds per consultation thread before owner decision or human escalation.
+- `/agent <name> consensus` enables the active direct agent to use Swarm Consensus for high-level debatable questions.
+- Consultation mode is default ON; Coordinator remains router of record, one owner stays accountable, and consultation is advice-only unless escalated.
 
 ### Debate Routing Guard (Blocking)
 
-When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or otherwise requests multiple agents/models to argue a question, default to **Swarm Consensus debate with external peer LLM CLIs** such as Claude, Gemini, Codex, or other configured external peers.
+Detailed routing guards live in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md`.
 
-- Platform subagents, current-LLM helper agents, repo-persona consultations, and same-family child agents must not be used to satisfy a debate request by default.
-- Use platform subagents for a debate only when the user explicitly asks for current-LLM subagents, local subagents, repo-persona debate, or cross-agent consultation.
-- Generic wording such as "agents", "debaters", "external agents", or "models" is not enough to justify current-LLM subagents; route to Swarm Consensus external peers instead.
-- If external peer CLIs are unavailable, say so and stop or continue only under the Swarm Consensus fallback rules. Do not silently fall back to platform subagents.
-- Before launching any debate, state which protocol will be used: `Swarm Consensus debate` or `repo-persona subagent consultation`.
-- When naming debate participants, show the resolved or planned **model name/version** first. CLI version strings are diagnostics only and must not be presented as model identity.
+When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or requests multiple agents/models to argue a question, default to **Swarm Consensus debate with external peer LLM CLIs**; show the resolved or planned **model name/version** first, and CLI version strings are diagnostics only.
+
+- Platform subagents, current-LLM helper agents, repo-persona consultations, and same-family child agents are not the default route for debate requests.
+- Do not silently fall back to platform subagents.
+
+### Cowork Routing Guard
+
+When the user asks multiple LLMs to change files together, route bounded collaborative implementation to `<AI_DEV_SHOP_ROOT>/framework/slash-commands/cowork.md`, not `/debate` or `/audit-work`; unbounded or full-delivery work still routes to the normal pipeline.
 
 ## Delegated Agent Bootstrap (Required)
 
@@ -192,6 +183,7 @@ Use these files for operating detail instead of expanding this file:
 - Pipeline startup, command entrypoints, and checkpoints: `<AI_DEV_SHOP_ROOT>/framework/operations/pipeline-quickstart.md`
 - Startup block wording and layout: `<AI_DEV_SHOP_ROOT>/framework/operations/startup-info.md`
 - Plain-language explanation pattern for users: `<AI_DEV_SHOP_ROOT>/framework/operations/plain-language-explanations.md`
+- Interaction modes and routing guards: `<AI_DEV_SHOP_ROOT>/framework/operations/interaction-modes.md`, `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md`
 - Capability verification and subagent defaulting: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/capability-verification.md`, `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/subagent-usage-policy.md`
 - Pipeline flow and stage context: `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`
 - Coordinator behavior and routing guardrails: `<AI_DEV_SHOP_ROOT>/agents/coordinator/skills.md`
