@@ -283,30 +283,49 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Evaluator-mode work has one unmistakable pre-build contract artifact.
 - A fresh session can tell from the docs exactly how builder/judge scope is supposed to be agreed before implementation starts.
 
-#### 8. `Medium` — Add a formal model-upgrade / harness-validity audit loop
-**Why:** The articles and review both agreed that model improvements can make older harness rules stale. This is still important, but it should land only after the core executable contracts exist; otherwise the framework is auditing a weak baseline.
+#### 8. `Medium` — Add a formal model-upgrade / harness-validity eval program
+**Why:** Model improvements can make older harness rules stale, but harness simplification needs evidence instead of intuition. This remains important, but it should land only after the core executable contracts exist; otherwise the framework is auditing a weak baseline.
 **What this workstream must define:**
-- audit triggers:
-  - new major model family
-  - meaningful model version jump
-  - host/runtime change
-  - repeated evidence that a step feels redundant
-- a benchmark set for revalidation
-- one-component-at-a-time ablation method
+- eval triggers:
+  - new major model family adopted or actively evaluated
+  - meaningful model version jump within a family
+  - host/runtime change that affects tool access, orchestration, context, or cost
+  - repeated logged evidence that a harness step feels redundant or is routinely skipped / overridden
+- pinned model baselines:
+  - every retained run records exact provider model IDs, model labels, host/runtime, and execution mode in the run manifest
+  - aliases such as `opus` are not enough for retained model-upgrade evidence
+- benchmark packs for revalidation:
+  - select representative seeds from the existing Architect, Programmer, and Code Review eval suites
+  - include positive controls, negative controls, false-positive restraint, planning, implementation, review, runtime, and adversarial behavior where available
+- ablation modes:
+  - single-component ablation for planner/spec expansion, sprint decomposition, evaluator loops, context reset / compaction behavior, file-backed handoffs, per-slice QA, and helper-agent decomposition
+  - whole-layer or multi-component ablation as the evidence-based way to detect discontinuous model capability jumps
 - retained report fields:
-  - benchmark tasks
-  - quality delta
+  - benchmark tasks and seed count
+  - baseline model / harness variant
+  - upgrade model / harness variant
+  - quality delta first
   - latency delta
   - cost delta
-  - keep / remove / conditional decision
+  - error-recovery / resumability delta when relevant
+  - `essential` / `conditional` / `stale` decision
+  - follow-through docs or deprecation PR required
 **Likely files to inspect/update first:**
 - `harness-engineering/quality/load-bearing-harness-audit.md`
 - `framework/templates/load-bearing-harness-audit-template.md`
+- `harness-engineering/quality/evaluation-loops.md`
+- `harness-engineering/agent-evals/README.md`
+- `harness-engineering/agent-evals/architect-evals/benchmark-suite/controls.md`
+- `harness-engineering/agent-evals/code-review-evals/benchmark-suite/controls.md`
+- `harness-engineering/agent-evals/programmer-evals/benchmark-suite/controls.md`
+- `harness-engineering/quality/scripts/score_eval_suite.py`
+- `harness-engineering/validators/validate_eval_suite.py`
 - `harness-engineering/quality/README.md`
 - `project-knowledge-template/reports/maintenance/README.md`
-**Important implementation note:** Do not start here. This item depends on items 1-3 being real enough to measure.
+**Important implementation note:** Define the program now, but do not build a concrete ablation runner until items 1-4 are stable enough to provide trustworthy baselines. If a whole-layer ablation shows broad stale signals, escalate to architecture review before removing default harness structure.
 **Done when:**
-- Model and host upgrades can retire stale harness rules based on evidence instead of intuition.
+- Model and host upgrades can classify harness components as `essential`, `conditional`, or `stale` from retained eval evidence.
+- Stale harness rules are retired only with a retained load-bearing audit report and follow-through changes to source-of-truth docs.
 
 #### 9. `Medium` — Run a bounded investigation on whether a machine-readable feature-state tracker is needed
 **Why:** This should remain a bounded spike, not open-ended design work. The question is whether long autonomous runs actually need a single machine-friendly progress surface beyond `tasks.md`, `pipeline-state.md`, `progress-ledger.md`, and report artifacts.
