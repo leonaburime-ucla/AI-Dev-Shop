@@ -62,6 +62,7 @@ Do not assume every peer CLI can read every local path.
   - give the peer the dispatch copy path, not the authoring path
 - If needed, create a dispatch copy inside:
   - `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/peer-dispatch/<workflow>/` inside the workspace root for local-only runs, or
+  - `<AI_DEV_SHOP_ROOT>/tmp/peer-dispatch/<workflow>/` when the toolkit is a subfolder install and `<ADS_PROJECT_KNOWLEDGE_ROOT>` is a sibling path outside the peer CLI's allowed workspace,
   - a retained `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/...` path only when the user explicitly wants a repo-kept artifact or the workflow itself is already being retained
 - Do not put the dispatch copy under a gitignored or tool-ignored path if the peer needs to read it with file tools.
 - Do not promote a local-only packet into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` just to satisfy peer readability. Use the workspace `tmp/` fallback first.
@@ -121,12 +122,43 @@ If that retry falls back to plain text, keep the fallback on a shorter bounded t
 - Pin the model when the user requests it or when reproducibility matters.
 - If the workflow promises exact model reporting, do not dispatch on an inferred or alias-only model. Require an explicit or locally proven exact model name/version before running.
 - When resolving model names, always check `skills/swarm-consensus/references/cli-smoke-test.md` for documented model IDs before falling back to CLI probes or asking the user. That file is the canonical source for locally verified peer model names/versions.
+- Before declaring a peer model unresolved, run the Model Memory Map below. Do not stop at `which <cli>` or `<cli> --version`; CLI version strings prove tool availability only, not model identity.
 - If a requested Claude model is unproven locally or the CLI rejects it, run `skills/swarm-consensus/scripts/cli_smoke_test.py` in discovery mode before asking the user for another model. Do not keep guessing manually when the smoke harness already exists.
+- If Claude rejects an alias and prints `Try --model to switch to ...`, treat that suggestion as a discovery candidate only. Do not switch to a different family/version until the Model Memory Map has been checked for an exact saved preference or model-plan `command_model`.
 - For Claude consensus flows, use discovery with `--claude-require json`. For Claude audit flows that may need plain-text fallback, use `--claude-require both`.
 - A valid Claude proof is any one of: an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, an exact-model `session_success` earlier in the current session on the same host/CLI, or a fresh discovery run that writes a new artifact.
 - If discovery finds a working exact model in the same requested family/version, use that exact model and say it was smoke-proven on this host. If discovery only finds a different family/version, stop and ask the user before switching.
 - Keep the ask explicit: what to inspect, what to ignore, what output shape to return.
 - Require strengths as well as findings so the user sees what should stay unchanged.
+
+### Model Memory Map
+
+Use this checklist for `/consensus`, `/debate`, `/audit-work`, `/cowork`, and any other external peer LLM dispatch. Its purpose is to prevent the Coordinator from forgetting where saved peer model preferences and proof artifacts live.
+
+Check model sources in this order:
+
+1. Per-run controls: `claude_model=...`, `gemini_model=...`, `codex_model=...`.
+2. Project knowledge root evidence: resolve `<ADS_PROJECT_KNOWLEDGE_ROOT>` from `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-project-knowledge/`, then inspect retained and local smoke-test caches, discovery reports, and consensus reports there.
+3. AI Dev Shop repo evidence: inspect repo `.local-artifacts/`, repo `reports/`, and bounded peer-dispatch packets under `tmp/peer-dispatch/`.
+4. Home CLI config files that expose model defaults. Claude CLI uses `~/.claude/settings.json`; Gemini CLI uses `~/.gemini/settings.json` and the model name is at `model.name`; these are fallback preferences such as `us.anthropic.claude-opus-4-6-v1[1m]` or `gemini-3.1-pro-preview`.
+5. Candidate ladders: `skills/swarm-consensus/references/model-candidate-ladders.json`. These are discovery candidates, not proof by themselves.
+
+To make this lookup mechanical, run:
+
+```bash
+python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
+  --model-plan-only \
+  --output-format json
+```
+
+Interpretation rules:
+
+- Prefer exact model IDs over aliases. A provider-qualified saved model string is stronger retained evidence than a family alias.
+- For Claude, the exact saved preference in `~/.claude/settings.json` can be passed directly to `claude --model` when `--model-plan-only` reports it as `command_model`; do not replace it with a lower-version CLI suggestion produced by an invalid alias.
+- Treat a Claude cache entry as environment-exact proof only when hostname, OS, machine, Claude CLI version, transport requirement, and artifact path match the current run. If those do not match but an exact model appears in retained smoke reports or consensus reports, use it as a saved preference and say current-host proof is stale or requires a fresh smoke test.
+- Treat project knowledge and repo-local evidence as higher priority than home CLI defaults; home defaults are still required fallback sources when project/repo evidence is absent.
+- Treat `~/.gemini/settings.json` `model.name` as the saved Gemini model preference when present. Do not demote it to unresolved just because `gemini --version` only returns the CLI version.
+- Never print `model unresolved` until every source in this map has been checked or is unavailable.
 
 ## Capability Discovery
 

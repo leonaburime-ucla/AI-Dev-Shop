@@ -123,9 +123,12 @@ A minimum viable swarm is **primary model + 1 peer**. If no peers are available,
 Before dispatching prompts, resolve the planned model for each available peer CLI in this order:
 
 1. Per-run override from the current prompt (`claude_model=...`, `gemini_model=...`, `codex_model=...`)
-2. Saved user preference for consensus runs
-3. Local CLI config/default model
-4. Alias assumption such as `sonnet`, `opus`, `latest`, or `preview`
+2. Project knowledge root evidence from `<ADS_PROJECT_KNOWLEDGE_ROOT>` or sibling `ADS-project-knowledge/`
+3. AI Dev Shop repo-local evidence such as repo `.local-artifacts/`, repo `reports/`, and `tmp/peer-dispatch/`
+4. Home CLI defaults such as `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`
+5. Alias assumption such as `sonnet`, `opus`, `latest`, or `preview`
+
+Use `skills/llm-operations/references/peer-llm-dispatch.md` as the canonical Model Memory Map. The smoke-test harness implements that order with `--model-plan-only`.
 
 For each peer, record:
 

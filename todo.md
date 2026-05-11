@@ -64,6 +64,10 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - `agency-agents`
   - Why it is useful: broad agent-role starter kit that can accelerate experimentation with specialist personas and startup-like multi-agent staffing patterns.
   - Likely value here: role ideas, agent templates, and prompt structure comparisons against this toolkit's current agent set.
+- `archon` — `https://github.com/coleam00/archon`
+  - Why it is useful: open-source harness/workflow engine for AI coding with YAML-defined workflows, validation gates, isolated git worktrees, and mixed deterministic + AI execution nodes.
+  - Likely value here: compare its workflow engine, worktree isolation model, approval gates, artifact flow, and repo-local workflow definitions against AI Dev Shop's coordinator/pipeline design.
+  - Review intent: `learn from only` for now. Revisit later to extract concrete ideas worth adopting or explicitly rejecting after a focused comparison pass.
 - `squad`
   - Why it is useful: multi-agent team runtime with persistent in-repo agent state, routing, orchestration logs, skills, templates, and sample projects.
   - Likely value here: go through the repo's projects/samples/templates and extract anything useful for coordinator routing, persistent agent memory, context hygiene, observability, and team bootstrap patterns.
@@ -109,6 +113,12 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - `Medium` — useful, but should wait until the core contract surfaces are stable
 - `Optional` — clarity/polish work, not a structural blocker
 **Implementation note for future sessions:** This section is intentionally detailed enough to serve as the source brief for a fresh session. Before implementing any item below, re-read the referenced docs, confirm whether newer harness work has partially addressed the gap, and then update this todo item rather than recreating the rationale from memory.
+
+**What still looks missing or underpowered after reading both (Loiane Groner 2026-04-14 + Birgitta Bockeler / Martin Fowler 2026-04-02):**
+- **A first-class sensor paradigm is still missing.** The framework has validators, Observer checks, capability probes, and evaluator loops, but not a canonical sensor catalog that names each sensor's class (`computational` / `inferential`), timing (`pre-commit` / `PR` / `continuous` / `runtime`), owner, artifact output, and action-on-fail. Today the sensors exist implicitly; the articles argue for making that control surface explicit.
+- **Harnessability / ambient affordances are not yet a first-class assessment surface.** The framework has CodeBase Analyzer and System Blueprint stages, but it does not yet explicitly score or classify how governable a host repo is for agent work: typedness, module-boundary clarity, testability, topology simplicity, and other properties that determine which sensors are even possible.
+- **Topology-level harness templates are still thin.** Current templates are mostly stack-specific runtime validation templates. The articles point toward reusable harness bundles for common application shapes or topologies (for example CRUD API, async worker, event-driven service, full-stack web app), not just per-language smoke-check templates.
+- **Do not reopen already-captured gaps as if they were new.** Computational controls, runtime validation, architecture-fitness checks, continuous drift sensing, and machine-readable state questions are already covered in the numbered workstreams below. Reusable templates / CI gating and default retry / escalation behavior are also mostly present and should not be reclassified as greenfield design gaps unless a concrete failure shows the current implementation is insufficient.
 
 #### 1. `Critical` — Add a first-class computational controls contract
 **Why:** The review was consistent that the framework is currently better at validating workflow and artifact hygiene than validating the software being produced. Deterministic executable checks need to become a first-class harness surface instead of downstream tribal knowledge.
@@ -425,6 +435,30 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ## Consensus Orchestration
 
+### Execution Topology Default: Strong Single-Agent Baseline First
+**What it is:** Default the framework toward a strong single-agent baseline for most implementation work, and treat delegated specialist agents as an exception that must justify their added coordination cost.
+**Why it matters:** Current research does **not** support assuming that same-model multi-agent workflows are better by default. In many comparisons, a strong single-agent baseline matches or beats homogeneous multi-agent setups once compute is normalized.
+**Current state:** The toolkit supports delegated specialist routing, but the docs should reflect that this is not automatically the better path for quality, cost, or long-horizon work.
+**Research-backed default to document:**
+- Prefer one active agent/session with compact offloads, explicit review passes, and structured handoffs as the baseline.
+- Do **not** treat role labels inside one shared context as true adversarial independence.
+- Use delegated specialist agents only when there is a concrete reason:
+  - true isolated context windows are available
+  - model heterogeneity is available and useful
+  - the task is long-horizon enough that keeping implementation traces out of the main context is materially helpful
+  - independent review pressure is important enough to justify extra token and orchestration cost
+**What to add:**
+- Update routing docs so Coordinator defaults to the single-agent baseline unless an exception condition is met.
+- Add explicit language that same-model multi-agent comparisons must beat the single-agent baseline, not just a weak one-pass baseline.
+- Keep any future topology eval bounded to exception-testing, not as an open question about the default path.
+**Likely files to inspect/update first:**
+- `agents/coordinator/skills.md`
+- `harness-engineering/runtime/subagent-usage-policy.md`
+- `harness-engineering/runtime/context-offloading.md`
+- `harness-engineering/quality/evaluation-loops.md`
+**Done when:**
+- The docs state a clear default: start single-agent, escalate to delegated specialists only when isolation, heterogeneity, or review independence is expected to add value.
+
 ### Multi-LLM Consensus Modes and Guardrails **[PARTIAL]**
 **What it is:** `/consensus` and `skills/swarm-consensus/SKILL.md` exist, but they need stronger orchestration rules for architecture/data-modeling debates and reproducible runs with explicit mode control.
 **Current state:** Core orchestration flow is implemented; this section now tracks only remaining gaps.
@@ -481,6 +515,44 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Deepen secrets-management treatment
 - Deepen rate-limiting treatment
 - Add abuse-detection coverage
+
+---
+
+## Agent Eval Depth
+
+### Deep-Dive: Production-Level Complexity for Agent Evals **[PARTIAL]**
+**What it is:** The current agent evals (Architect, Code Review) are shallow — they test process compliance and textbook bugs, not the production-level failures that LLMs actually struggle with. The Programmer evals are the exception and already have more depth.
+**Why it matters:** Shallow evals give false confidence and don't surface agent skill gaps. The evals should tell you what skills to build next by revealing what classes of failure the agents cannot reason about.
+**What was done:**
+- Added a **Domain Complexity Taxonomy** to `eval-coverage-model.md` with five tiers: `textbook`, `production`, `staff`, `principal`, `distinguished`
+- **80% of seeds must be staff/principal/distinguished** (85% for Architect/CR)
+- Defined 14 complexity categories (concurrency composition, distributed state divergence, scale threshold collapse, retry amplification, data loss windows, security escalation chains, invariant erosion, observability blind spots, configuration interaction, temporal coupling, migration hazards, resource exhaustion leaks, consensus violations, type system escapes)
+- Added a full **Engineering Concept Taxonomy** (~50 concept codes across 6 domains: Systems & Infrastructure, Data & Storage, Concurrency & Performance, Security & Trust, Correctness & Logic, Architecture & Design, Testing & Quality)
+- Added **concept probing rules**: Architect must touch 15+ concepts, Code Review 20+, Programmer 25+
+- Added **seed design criteria** to `function-quality-seeded-evals.md` with concrete examples at each tier (staff through distinguished)
+- Updated `seed-catalog.tsv` schema with `domain_complexity`, `complexity_category`, and `engineering_concepts` columns
+- Added per-concept and per-category catch rates as primary diagnostics
+- Added **skill gap diagnostic reporting**: concepts with < 50% catch rate are confirmed gaps, reported with full context for human decision-making (no automatic skill creation)
+- **Eval-driven development** available as optional human-initiated workflow: write seeds → verify failure → build skill → re-eval
+- Minimum seed count for Architect/CR/Security: **72+ seeds**
+**What still needs to happen:**
+- Regenerate Architect eval seeds with emergent-tier defects (current 59 seeds are all textbook/production process compliance)
+- Regenerate Code Review eval seeds with production and emergent defects (current 21 seeds are mostly textbook)
+- Add `domain_complexity` and `complexity_category` columns to existing seed-catalog TSVs
+- Update the scorer (`score_eval_suite.py`) to compute per-complexity-category catch rates
+- Update the validator (`validate_eval_suite.py`) to enforce the depth floors
+- Run the new suites and use the category-level miss data to prioritize new skills
+**Likely files to inspect/update first:**
+- `harness-engineering/agent-evals/architect-evals/benchmark-suite/seed-catalog.tsv`
+- `harness-engineering/agent-evals/code-review-evals/benchmark-suite/seed-catalog.tsv`
+- `harness-engineering/agent-evals/programmer-evals/benchmark-suite/seed-catalog.tsv`
+- `harness-engineering/quality/scripts/score_eval_suite.py`
+- `harness-engineering/validators/validate_eval_suite.py`
+**Done when:**
+- Architect and Code Review eval suites include emergent (Staff+) seeds that test genuinely dangerous, hard to solve, or hard to even see production failures
+- Per-complexity-category catch rates are reported in eval summaries
+- Category-level misses directly inform which skills to build next
+- The eval creation protocol structurally prevents future suites from being all-textbook
 
 ---
 

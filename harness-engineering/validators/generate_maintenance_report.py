@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
+"""Generate the repo's maintenance summary from validator outputs.
+
+By default the script refreshes the tracked maintenance report in
+`project-knowledge-template/reports/maintenance/`. The CLI also supports
+stdout/check modes so callers can inspect the generated content without
+silently mutating tracked files.
+"""
+
 from __future__ import annotations
 
+import argparse
 import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-REPORT = ROOT / "project-knowledge-template/reports/maintenance/harness-maintenance.md"
+DEFAULT_REPORT = ROOT / "project-knowledge-template/reports/maintenance/harness-maintenance.md"
 EXPECTED_BENCHMARK_DIRS = [
     "spec-agent",
     "architect-agent",
@@ -17,7 +26,47 @@ EXPECTED_BENCHMARK_DIRS = [
 ]
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output",
+        help=(
+            "Write the generated report to this path. Relative paths are resolved "
+            "from the repo root. Defaults to the tracked maintenance report."
+        ),
+    )
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument(
+        "--stdout",
+        action="store_true",
+        help="Print the generated report to stdout instead of writing a file.",
+    )
+    mode_group.add_argument(
+        "--check",
+        action="store_true",
+        help="Exit non-zero if the target report is stale instead of rewriting it.",
+    )
+    return parser.parse_args()
+
+
+def resolve_output_path(raw_output: str | None) -> Path:
+    if not raw_output:
+        return DEFAULT_REPORT
+    candidate = Path(raw_output)
+    if candidate.is_absolute():
+        return candidate
+    return ROOT / candidate
+
+
+def display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 def run_script(path: str) -> tuple[int, str]:
+    """Execute one validator and return its combined textual output."""
     result = subprocess.run(
         ["python3", str(ROOT / path)],
         cwd=ROOT,
@@ -50,6 +99,7 @@ def registry_exception_count() -> int:
 
 
 def build_report() -> str:
+    """Assemble the human-readable maintenance report body."""
     path_rc, path_output = run_script("harness-engineering/validators/validate_path_references.py")
     registry_rc, registry_output = run_script("harness-engineering/validators/validate_registry_integrity.py")
     audit_rc, audit_output = run_script("harness-engineering/validators/doc_garden_audit.py")
@@ -125,8 +175,25 @@ def build_report() -> str:
 
 
 def main() -> int:
-    REPORT.write_text(build_report(), encoding="utf-8")
-    print(f"WROTE: {REPORT.relative_to(ROOT)}")
+    args = parse_args()
+    report = build_report()
+
+    if args.stdout:
+        print(report)
+        return 0
+
+    output_path = resolve_output_path(args.output)
+    if args.check:
+        current = output_path.read_text(encoding="utf-8") if output_path.exists() else ""
+        if current != report:
+            print(f"STALE: {display_path(output_path)}")
+            return 1
+        print(f"OK: {display_path(output_path)}")
+        return 0
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(report, encoding="utf-8")
+    print(f"WROTE: {display_path(output_path)}")
     return 0
 
 

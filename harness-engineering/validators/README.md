@@ -23,7 +23,7 @@ These validators are the first mechanical enforcement layer for this repo.
   - fails when CLI version strings can be presented as model names or model versions
 - `validate_eval_suite.py`
   - validates seeded eval suite metadata and saved run results
-  - checks coverage-matrix cells, seed-catalog taxonomy values, benchmark-vs-regression suite rules, run-results model provenance, and per-run benchmark completeness
+  - checks coverage-matrix cells, seed-catalog taxonomy values, benchmark-vs-regression suite rules, run-manifest execution proof, scope-confirmation metadata, run-results evidence, and per-run benchmark completeness
   - intended for targeted use on `harness-engineering/agent-evals/<agent>-evals/<suite-id>/` rather than repo-wide `run-all.sh`
 ## Advisory Audit
 

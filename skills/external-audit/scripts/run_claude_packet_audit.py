@@ -86,7 +86,34 @@ def write_output_text(path: Path, value: str | bytes | None) -> None:
         text = value.decode("utf-8", errors="replace")
     else:
         text = value
-    path.write_text(text)
+    path.write_text(text, encoding="utf-8")
+
+
+def require_file(path: Path, label: str) -> None:
+    """Raise a human-readable error before subprocess work begins."""
+    if not path.exists():
+        raise FileNotFoundError(f"{label} does not exist: {path}")
+    if not path.is_file():
+        raise IsADirectoryError(f"{label} is not a file: {path}")
+
+
+def validate_paths(packet: Path, dispatch: Path, offload_prefix: Path) -> None:
+    require_file(packet, "Packet")
+    if dispatch.exists() and dispatch.is_dir():
+        raise IsADirectoryError(f"Dispatch path points to a directory: {dispatch}")
+    if offload_prefix.exists() and offload_prefix.is_dir():
+        raise IsADirectoryError(
+            f"Offload prefix points to a directory, not a file prefix: {offload_prefix}"
+        )
+    if packet.resolve() == dispatch.resolve():
+        raise ValueError(
+            "--dispatch must differ from --packet because the dispatch copy is transient."
+        )
+
+
+def ensure_claude_cli_available() -> None:
+    if shutil.which("claude") is None:
+        raise FileNotFoundError("Claude CLI was not found on PATH; expected `claude`.")
 
 
 def run_command(
@@ -216,7 +243,7 @@ def run_command_with_transient_retries(
 
 
 def extract_file_paths_from_packet(packet: Path) -> list[str]:
-    text = packet.read_text()
+    text = packet.read_text(encoding="utf-8")
     in_table = False
     paths: list[str] = []
     for line in text.splitlines():
@@ -312,26 +339,6 @@ def main() -> int:
     packet = Path(args.packet)
     dispatch = Path(args.dispatch)
     offload_prefix = Path(args.offload_prefix)
-    packet_file_paths = extract_file_paths_from_packet(packet)
-
-    dispatch.parent.mkdir(parents=True, exist_ok=True)
-    offload_prefix.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(packet, dispatch)
-
-    probe_stdout = offload_prefix.with_name(offload_prefix.name + "-probe.stdout.json")
-    probe_stderr = offload_prefix.with_name(offload_prefix.name + "-probe.stderr.txt")
-    audit_stdout = offload_prefix.with_name(offload_prefix.name + "-audit.stdout.json")
-    audit_stderr = offload_prefix.with_name(offload_prefix.name + "-audit.stderr.txt")
-    audit_result = offload_prefix.with_name(offload_prefix.name + "-audit.result.md")
-    text_stdout = offload_prefix.with_name(
-        offload_prefix.name + "-audit.text-retry.stdout.txt"
-    )
-    text_stderr = offload_prefix.with_name(
-        offload_prefix.name + "-audit.text-retry.stderr.txt"
-    )
-    text_result = offload_prefix.with_name(
-        offload_prefix.name + "-audit.text-retry.result.txt"
-    )
 
     summary: dict[str, object] = {
         "status": "failed",
@@ -343,6 +350,30 @@ def main() -> int:
     }
 
     try:
+        validate_paths(packet, dispatch, offload_prefix)
+        ensure_claude_cli_available()
+        packet_file_paths = extract_file_paths_from_packet(packet)
+
+        dispatch.parent.mkdir(parents=True, exist_ok=True)
+        offload_prefix.parent.mkdir(parents=True, exist_ok=True)
+        # The dispatch copy is the immutable packet Claude reads during the run.
+        shutil.copyfile(packet, dispatch)
+
+        probe_stdout = offload_prefix.with_name(offload_prefix.name + "-probe.stdout.json")
+        probe_stderr = offload_prefix.with_name(offload_prefix.name + "-probe.stderr.txt")
+        audit_stdout = offload_prefix.with_name(offload_prefix.name + "-audit.stdout.json")
+        audit_stderr = offload_prefix.with_name(offload_prefix.name + "-audit.stderr.txt")
+        audit_result = offload_prefix.with_name(offload_prefix.name + "-audit.result.md")
+        text_stdout = offload_prefix.with_name(
+            offload_prefix.name + "-audit.text-retry.stdout.txt"
+        )
+        text_stderr = offload_prefix.with_name(
+            offload_prefix.name + "-audit.text-retry.stderr.txt"
+        )
+        text_result = offload_prefix.with_name(
+            offload_prefix.name + "-audit.text-retry.result.txt"
+        )
+
         claude_base_cmd = build_claude_base_cmd(args)
         probe_cmd = claude_base_cmd + [
             "-p",
@@ -446,7 +477,7 @@ def main() -> int:
         }
 
         if result_text:
-            audit_result.write_text(result_text)
+            audit_result.write_text(result_text, encoding="utf-8")
             summary["status"] = "responded"
             summary["audit"]["result_path"] = str(audit_result)
             summary["audit"]["result_length"] = len(result_text)
@@ -487,7 +518,7 @@ def main() -> int:
                     "stderr_length": len(text_completed.stderr),
                 }
                 if text_completed.returncode == 0 and text_output.strip():
-                    text_result.write_text(text_output)
+                    text_result.write_text(text_output, encoding="utf-8")
                     summary["status"] = "responded_text_retry"
                     summary["text_retry"]["result_path"] = str(text_result)
                 else:
@@ -495,6 +526,12 @@ def main() -> int:
 
         print(json.dumps(summary, indent=2))
         return 0 if summary["status"] in {"responded", "responded_text_retry"} else 1
+    except (FileNotFoundError, IsADirectoryError, ValueError) as exc:
+        message = str(exc)
+        summary["status"] = "missing_dependency" if "claude" in message.lower() else "invalid_input"
+        summary["error"] = message
+        print(json.dumps(summary, indent=2))
+        return 1
     finally:
         if not args.retain_dispatch:
             try:

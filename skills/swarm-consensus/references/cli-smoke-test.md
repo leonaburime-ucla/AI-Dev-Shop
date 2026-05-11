@@ -11,6 +11,7 @@ What this does:
 - helps detect repo-local behavior differences, especially for `codex exec`
 - can probe candidate Claude model names and return the first locally proven working exact model
 - can expand a maintained candidate ladder (`model-candidate-ladders.json`) newest-to-oldest instead of guessing ad hoc
+- resolves model plans from project knowledge and repo-local evidence before falling back to home CLI defaults
 - writes a dated Claude discovery artifact plus an environment-keyed last-known-good cache when discovery mode is used
 - keeps retained proof under `reports/swarm-consensus/smoke-tests/` by default, with dated history snapshots for cache updates
 
@@ -23,6 +24,21 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
   --codex-model gpt-5.4 \
   --save-artifact
 ```
+
+Resolve the saved model plan without dispatching peer prompts:
+
+```bash
+python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
+  --model-plan-only \
+  --output-format json
+```
+
+Model-plan-only lookup order:
+
+1. Per-run model flags.
+2. `<ADS_PROJECT_KNOWLEDGE_ROOT>` evidence, resolved from `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-project-knowledge/`.
+3. AI Dev Shop repo-local evidence in repo `.local-artifacts/`, repo `reports/`, and `tmp/peer-dispatch/`.
+4. Home CLI defaults in `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`.
 
 If a Claude model is requested but rejected or unproven locally, run discovery first:
 

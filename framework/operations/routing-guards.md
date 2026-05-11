@@ -17,7 +17,8 @@ When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or
 
 When the user asks multiple LLMs to work together on a bounded file-editing task, asks for `/cowork`, or describes agents changing files in tandem, route to `<AI_DEV_SHOP_ROOT>/framework/slash-commands/cowork.md`.
 
-- Use `/cowork` for collaborative implementation where all participants read the scoped files, independently diagnose, converge on one edit plan, write under file-level leases, and peer-verify the resulting diffs.
+- Use `/cowork` for collaborative implementation where all participants read the scoped files, independently design or diagnose the whole task without seeing each other's proposals, compare blind spots and disagreements, converge on one shared design/edit plan, then have one writer implement while non-writers peer-verify the resulting diff.
+- Do not treat `/cowork` as parallel subagent decomposition. File leases are merge-control only; they must not become isolated model-owned design slices.
 - Do not route collaborative file-editing requests to `/debate`; `/debate` is reasoning-only.
 - Do not route collaborative file-editing requests to `/audit-work`; `/audit-work` is independent review-only and must not apply edits.
 - If the file set is unbounded or the task needs the full staged delivery pipeline, route to the normal pipeline instead of `/cowork`.

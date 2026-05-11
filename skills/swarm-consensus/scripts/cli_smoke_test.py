@@ -22,7 +22,6 @@ END_MARKER = "<<SWARM_END>>"
 DISCOVERY_CACHE_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[3]
 HOST_ROOT = REPO_ROOT.parent
-REPO_WORKSPACE_ROOT = REPO_ROOT / "project-knowledge-template"
 MODEL_CANDIDATE_LADDERS_PATH = (
     REPO_ROOT / "skills" / "swarm-consensus" / "references" / "model-candidate-ladders.json"
 )
@@ -33,10 +32,7 @@ def resolve_workspace_root() -> Path:
         raw = os.environ.get(key)
         if raw:
             return Path(raw).expanduser().resolve()
-    sibling = HOST_ROOT / "ADS-project-knowledge"
-    if sibling.exists():
-        return sibling
-    return REPO_WORKSPACE_ROOT
+    return HOST_ROOT / "ADS-project-knowledge"
 
 
 def display_path(path: Path) -> str:
@@ -97,6 +93,11 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("markdown", "json"),
         default="markdown",
         help="Report format for stdout.",
+    )
+    parser.add_argument(
+        "--model-plan-only",
+        action="store_true",
+        help="Resolve peer model identities from saved preferences/proof artifacts without dispatching any peer prompt.",
     )
     parser.add_argument(
         "--artifacts-dir",
@@ -177,6 +178,195 @@ def load_saved_claude_model() -> str | None:
         return None
     model = payload.get("model")
     return str(model).strip() if model else None
+
+
+def is_exact_model_identifier(model: str | None) -> bool:
+    if not model:
+        return False
+    normalized = model.strip().lower()
+    if normalized in {"opus", "sonnet", "haiku", "latest", "default"}:
+        return False
+    if not any(character.isdigit() for character in normalized):
+        return False
+    if any(marker in normalized for marker in (".", "[", ":", "/")):
+        return True
+    if normalized.startswith(("gemini-", "gpt-")):
+        return True
+    # Claude family strings like `claude-opus-4-6` are still aliases unless
+    # they carry a dated model suffix.
+    if normalized.startswith("claude-"):
+        return re.search(r"\d{8}", normalized) is not None
+    return False
+
+
+def extract_markdown_model(pattern: str, text: str) -> str | None:
+    match = re.search(pattern, text, flags=re.IGNORECASE)
+    if not match:
+        return None
+    model = match.group(1).strip()
+    return model if is_exact_model_identifier(model) else None
+
+
+def unique_paths(paths: list[Path]) -> list[Path]:
+    seen: set[Path] = set()
+    result: list[Path] = []
+    for path in paths:
+        try:
+            key = path.expanduser().resolve(strict=False)
+        except OSError:
+            key = path.expanduser().absolute()
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(key)
+    return result
+
+
+def model_memory_roots() -> list[Path]:
+    roots: list[Path] = []
+    for key in ("ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
+        raw = os.environ.get(key)
+        if raw:
+            roots.append(Path(raw))
+    roots.extend(
+        [
+            WORKSPACE_ROOT,
+            REPO_ROOT,
+        ]
+    )
+    return unique_paths(roots)
+
+
+def model_memory_cache_paths() -> list[Path]:
+    paths: list[Path] = [
+        DEFAULT_SMOKE_TEST_DIR / "last-known-good.json",
+        LEGACY_SMOKE_TEST_DIR / "last-known-good.json",
+    ]
+    for root in model_memory_roots():
+        paths.extend(
+            [
+                root / "reports" / "swarm-consensus" / "smoke-tests" / "last-known-good.json",
+                root
+                / ".local-artifacts"
+                / "swarm-consensus"
+                / "smoke-tests"
+                / "last-known-good.json",
+            ]
+        )
+    return unique_paths(paths)
+
+
+def model_memory_report_patterns() -> list[tuple[Path, str]]:
+    patterns: list[tuple[Path, str]] = []
+    for root in model_memory_roots():
+        patterns.extend(
+            [
+                (root / "reports" / "swarm-consensus" / "smoke-tests", "*-claude-discovery.md"),
+                (
+                    root / ".local-artifacts" / "swarm-consensus" / "smoke-tests",
+                    "*-claude-discovery.md",
+                ),
+                (root / "reports" / "swarm-consensus" / "runs", "*.md"),
+                (root / ".local-artifacts" / "swarm-consensus" / "runs", "*.md"),
+                (root / "tmp" / "peer-dispatch", "**/*.md"),
+            ]
+        )
+    return [(path, pattern) for path, pattern in unique_report_patterns(patterns)]
+
+
+def unique_report_patterns(patterns: list[tuple[Path, str]]) -> list[tuple[Path, str]]:
+    seen: set[tuple[Path, str]] = set()
+    result: list[tuple[Path, str]] = []
+    for directory, pattern in patterns:
+        try:
+            key = (directory.expanduser().resolve(strict=False), pattern)
+        except OSError:
+            key = (directory.expanduser().absolute(), pattern)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(key)
+    return result
+
+
+def peer_markdown_patterns(peer: str) -> list[str]:
+    display = {
+        "claude": "Claude",
+        "gemini": "Gemini",
+        "codex": "Codex",
+    }.get(peer, peer.title())
+    cli = re.escape(peer)
+    name = re.escape(display)
+    return [
+        rf"Saved {name} model:\s*`([^`]+)`",
+        rf"\|\s*Peer\s*\|\s*{name}\s*\|\s*`([^`]+)`\s*\|",
+        rf"\|\s*(?:Peer|Primary)\s*\|\s*{name}\s*\|\s*`([^`]+)`\s*\|",
+        rf"\|\s*Peer\s*\|\s*{cli}\s*\|\s*(?:`[^`]*`|[^|]*)\|\s*`([^`]+)`\s*\|",
+        rf"\|\s*Primary\s*\|\s*{cli}(?:\s+session)?\s*\|\s*(?:`[^`]*`|[^|]*)\|\s*`([^`]+)`\s*\|",
+        rf"(?:^|\n)\s*[-*]\s*{name}:\s*`([^`]+)`",
+        rf"(?:^|\n)\s*[-*]\s*{name}\s+peer:\s*`([^`]+)`",
+    ]
+
+
+def extract_peer_model_from_text(peer: str, text: str) -> str | None:
+    for pattern in peer_markdown_patterns(peer):
+        model = extract_markdown_model(pattern, text)
+        if model:
+            return model
+    return None
+
+
+def load_saved_peer_model_from_memory_map(peer: str) -> dict[str, str] | None:
+    """Find a saved peer model preference from ADS and repo-local evidence."""
+
+    cache_paths = model_memory_cache_paths() if peer == "claude" else []
+    for cache_path in cache_paths:
+        payload = load_json_file(cache_path)
+        if not isinstance(payload, dict):
+            continue
+        entries = payload.get("entries")
+        if not isinstance(entries, list):
+            continue
+        for entry in reversed(entries):
+            if not isinstance(entry, dict):
+                continue
+            for field in ("winner_model", "requested_model"):
+                model = str(entry.get(field) or "").strip()
+                if is_exact_model_identifier(model):
+                    artifact_path = resolve_cache_artifact_path(entry.get("artifact_path"))
+                    note = f"from {display_path(cache_path)} field {field}"
+                    if artifact_path and not artifact_path.exists():
+                        note += "; artifact path is stale"
+                    return {
+                        "model": model,
+                        "source": "saved_smoke_cache",
+                        "note": note,
+                    }
+
+    for directory, pattern in model_memory_report_patterns():
+        try:
+            candidates = sorted(directory.glob(pattern), key=lambda path: path.stat().st_mtime)
+        except OSError:
+            candidates = []
+        for report_path in reversed(candidates):
+            try:
+                text = report_path.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            model = extract_peer_model_from_text(peer, text)
+            if model:
+                return {
+                    "model": model,
+                    "source": f"saved_{peer}_report",
+                    "note": f"from {display_path(report_path)}",
+                }
+    return None
+
+
+def load_saved_claude_model_from_memory_map() -> dict[str, str] | None:
+    """Find a saved Claude model preference without running a fresh smoke test."""
+
+    return load_saved_peer_model_from_memory_map("claude")
 
 
 def load_saved_gemini_model() -> str | None:
@@ -402,16 +592,34 @@ def resolve_model_plan(
 
     if "claude" in installed:
         saved_claude_model = load_saved_claude_model()
+        saved_claude_is_exact = is_exact_model_identifier(saved_claude_model)
+        memory_map_claude = load_saved_claude_model_from_memory_map()
         claude_requested = args.claude_model
         claude_source = "unknown"
-        claude_resolved = claude_requested or saved_claude_model
+        claude_resolved = (
+            claude_requested
+            or (memory_map_claude.get("model") if memory_map_claude else None)
+            or (saved_claude_model if saved_claude_is_exact else None)
+            or saved_claude_model
+        )
         claude_note = ""
         if claude_requested:
             claude_source = "per_run_override"
             claude_note = "explicit --claude-model"
-        elif saved_claude_model:
+        elif memory_map_claude:
+            claude_source = memory_map_claude["source"]
+            claude_note = memory_map_claude["note"]
+            if saved_claude_is_exact:
+                claude_note += f"; home fallback {saved_claude_model!r} from ~/.claude/settings.json"
+        elif saved_claude_is_exact:
             claude_source = "local_default"
             claude_note = "from ~/.claude/settings.json"
+        elif saved_claude_model:
+            claude_source = "local_default_alias"
+            claude_note = (
+                f"alias {saved_claude_model!r} from ~/.claude/settings.json; "
+                "no exact ID found in memory map"
+            )
         if discovery and discovery.get("winner"):
             winner = discovery["winner"]
             if isinstance(winner, dict):
@@ -423,19 +631,35 @@ def resolve_model_plan(
             "requested_model": claude_requested or "",
             "resolved_model": claude_resolved or "",
             "selection_source": claude_source,
-            "command_model": claude_requested or saved_claude_model or "",
+            "command_model": (
+                claude_requested
+                or (memory_map_claude.get("model") if memory_map_claude else "")
+                or (saved_claude_model if saved_claude_is_exact else None)
+                or saved_claude_model
+                or ""
+            ),
             "note": claude_note,
         }
 
     if "gemini" in installed:
         gemini_saved_model = load_saved_gemini_model()
+        memory_map_gemini = load_saved_peer_model_from_memory_map("gemini")
         gemini_requested = args.gemini_model
         gemini_source = "unknown"
-        gemini_resolved = gemini_requested or gemini_saved_model
+        gemini_resolved = (
+            gemini_requested
+            or (memory_map_gemini.get("model") if memory_map_gemini else None)
+            or gemini_saved_model
+        )
         gemini_note = ""
         if gemini_requested:
             gemini_source = "per_run_override"
             gemini_note = "explicit --gemini-model"
+        elif memory_map_gemini:
+            gemini_source = memory_map_gemini["source"]
+            gemini_note = memory_map_gemini["note"]
+            if gemini_saved_model:
+                gemini_note += f"; home fallback {gemini_saved_model!r} from ~/.gemini/settings.json"
         elif gemini_saved_model:
             gemini_source = "local_default"
             gemini_note = "from ~/.gemini/settings.json"
@@ -451,12 +675,25 @@ def resolve_model_plan(
     if "codex" in installed:
         codex_requested = args.codex_model
         codex_saved_model = codex_config.get("model", "")
+        memory_map_codex = load_saved_peer_model_from_memory_map("codex")
         codex_source = "unknown"
-        codex_resolved = codex_requested or codex_saved_model
+        codex_resolved = (
+            codex_requested
+            or (memory_map_codex.get("model") if memory_map_codex else None)
+            or codex_saved_model
+        )
         codex_note = ""
         if codex_requested:
             codex_source = "per_run_override"
             codex_note = "explicit --codex-model"
+        elif memory_map_codex:
+            codex_source = memory_map_codex["source"]
+            codex_note = memory_map_codex["note"]
+            if codex_saved_model:
+                codex_note += (
+                    f"; home fallback {codex_saved_model!r} "
+                    f"from {codex_config.get('config_path', '~/.codex/config.toml')}"
+                )
         elif codex_saved_model:
             codex_source = "local_default"
             codex_note = f"from {codex_config.get('config_path', '~/.codex/config.toml')}"
@@ -1072,6 +1309,14 @@ def main() -> int:
     if args.discover_claude:
         discovery = run_claude_discovery_with_environment(args, cli_versions)
     model_plan = resolve_model_plan(args, discovery, cli_versions)
+    if args.model_plan_only:
+        if args.output_format == "json":
+            report = render_json_report([], args, cli_versions, discovery, model_plan)
+        else:
+            report = render_report([], args, cli_versions, discovery, model_plan)
+        print(report)
+        return 0
+
     if args.discover_claude:
         persistence = persist_claude_discovery(discovery, cli_versions, args, model_plan)
         if persistence:

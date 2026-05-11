@@ -47,6 +47,7 @@ Each suite should include the generic framework files:
 - `seed-catalog.tsv`
 - `seed-ledger.md`
 - `controls.md`
+- `run-manifest.tsv`
 - `run-results.tsv`
 
 Use the templates under `harness-engineering/quality/templates/`.
@@ -83,6 +84,7 @@ are useful comparison evidence, but they are not the default proof of
 Programmer, Code Review, or Refactor capability.
 
 Record the chosen execution mode and model provenance in
+`run-manifest.tsv`, then persist the per-seed grading evidence in
 `run-results.tsv` for every saved run.
 
 ## Function-Quality Coverage Axes
@@ -173,6 +175,105 @@ Good Hard seeds in this domain usually involve:
 - naming or comment camouflage
 - distributed evidence across code, tests, and handoff artifacts
 
+## Domain Complexity For This Domain
+
+Beyond structural difficulty, every seed must also declare its domain complexity
+tier: `textbook`, `production`, `staff`, `principal`, or `distinguished`. See
+`eval-coverage-model.md` for the full taxonomy and classification rules.
+
+For function-quality evals, the key insight is:
+
+- `textbook` seeds test whether the agent recognizes known patterns — use only
+  for positive controls
+- `production` seeds test whether the agent reasons about runtime behavior that
+  tests don't cover — the senior-level baseline
+- `staff` seeds test whether the agent can see failures that emerge from the
+  interaction of locally correct components under production conditions
+- `principal` seeds test whether the agent can identify structural ceilings —
+  the code works today but has a predictable breaking point at future scale or
+  constraints
+- `distinguished` seeds test whether the agent has deep domain expertise —
+  failures that exploit subtle system properties most engineers don't know exist
+
+### Seed Design Criteria By Complexity Tier
+
+**Textbook seeds** (max 10% of suite) — plant defects that a linter or careful
+reading would surface. Positive controls only. Do not waste suite capacity on
+these.
+
+**Production seeds** (max 10% of suite) — plant defects where:
+- The code passes all local tests
+- The failure manifests only under production conditions
+- A senior engineer would catch it during a focused review
+
+Examples:
+- A retry loop that works in unit tests but thundering herds under concurrency
+- A batch processor that passes 100-record tests but OOMs at production volume
+
+**Staff seeds** (at least 35% of suite) — plant defects where:
+- Every component is locally correct and passes review individually
+- The failure arises from the *interaction* between components under specific
+  conditions (timing, scale, concurrency, partial failure)
+- A senior engineer would approve each piece; a Staff engineer would see the
+  system-level risk
+
+Examples:
+- Two modules both validate-then-write to shared state; individually correct,
+  together they race under concurrent requests
+- A connection pool grows by 1 on each error-path invocation; invisible for
+  hours, OOMs after 48h of production error rate
+- Event ordering assumption holds in single-node tests but breaks under
+  partition; downstream consumer silently processes stale state
+- Cache invalidation race: write completes, invalidation fires, but a read
+  initiated before the write repopulates the cache with stale data
+
+**Principal seeds** (at least 25% of suite) — plant defects where:
+- The system works correctly today under all tested conditions
+- The failure is a structural ceiling that will break at a predictable future
+  state (10x data, regulatory change, team scaling, new integration)
+- Finding it requires modeling the system's growth trajectory
+
+Examples:
+- A data pipeline that silently loses precision through floating-point
+  accumulation — all assertions pass but the 90-day aggregate drifts past
+  acceptable thresholds
+- An authorization model that works for the current org chart but creates a
+  combinatorial explosion in evaluation time as delegation depth grows
+- A schema design that's performant now but requires a full-table rewrite when
+  a new compliance requirement adds a mandatory field to historical records
+- A service mesh configuration that works at current RPS but will cascade-fail
+  at 3x load because circuit breaker thresholds interact with retry budgets
+
+**Distinguished seeds** (at least 20% of suite) — plant defects where:
+- The failure exploits a subtle property of the underlying system
+- Finding it requires specialized domain knowledge (distributed systems theory,
+  numerical analysis, protocol specifications, cryptographic properties)
+- Even a Staff engineer would need specific domain expertise to see it
+
+Examples:
+- A permission check that passes for all tested roles but has a graph traversal
+  gap granting escalation through a 3-hop delegation chain that only exists
+  when two specific role assignments co-occur
+- A consensus protocol implementation that's correct under symmetric partition
+  but violates linearizability under asymmetric message delay — provable from
+  the spec but invisible without formal reasoning
+- A compression-before-encryption pattern that leaks plaintext length through
+  output size variation (CRIME/BREACH class)
+- A monotonic ID generator that's unique per-node but produces duplicates
+  during leader failover because the new leader's starting point depends on a
+  replicated log entry that hasn't been applied yet
+
+### Minimum Depth For Benchmark Suites
+
+Function-quality benchmark suites must satisfy:
+
+- **At least 80% of seeds must be staff, principal, or distinguished**
+- No more than 10% textbook (positive controls only)
+- No more than 10% production (senior baseline)
+- Every seed at staff or above must cite its complexity category
+- No more than **20%** of Hard seeds may be `textbook` or `production` — Hard
+  structural difficulty without domain complexity is packaging, not substance
+
 ## Minimum Suite Shape
 
 For Programmer, Code Review, and Refactor, use this as the default target:
@@ -202,7 +303,7 @@ Use both, but do not confuse them:
 2. **Targeted regression runs**
    Use these after a prompt/skill/guard change. Re-run only the seeds that were
    previously `MISSED` or `PARTIAL` for the target agent. Save at least 3 runs
-   per unresolved seed and record the exact LLM/model in `run-results.tsv`.
+   per unresolved seed and record the exact LLM/model in `run-manifest.tsv`.
 
 Targeted regression runs answer:
 
@@ -235,6 +336,37 @@ Use multiple mini-project shapes so failures stay attributable:
    Tests trust boundaries, unsafe interpolation, and privacy exposure.
 6. **Transfer/accounting workflow**
    Tests invariants, rollback/compensation, partial failure, and boundary math.
+
+### Required High-Tier Scenario Families
+
+Staff+ seeds must exercise failure modes that emerge from production system
+complexity, not just function-level bugs in simple shapes. Benchmark suites
+must include seeds drawn from at least **5 of the following 8 families**:
+
+| Family | What it forces the agent to reason about |
+|---|---|
+| **Multi-tenant authorization graph with delegated permissions** | Escalation paths through delegation chains, cross-tenant leakage via shared role inheritance, combinatorial evaluation cost as delegation depth grows |
+| **Queue/retry/idempotency system under partial failure** | Thundering herd after broker restart, duplicate delivery during rebalance, poison pill blocking, idempotency key expiry window races |
+| **Cache invalidation with stale repopulation race** | Read initiated before write completes repopulates cache with stale data after invalidation fires, TTL/version mismatches across layers |
+| **Migration with dual-write/read-compatibility window** | Old code reading new schema, new code writing old schema, data loss during the rollover window, backfill races with live traffic |
+| **Accounting/ledger workflow with precision and compensation** | Floating-point accumulation drift, compensation transaction ordering, partial-failure double-credit, reconciliation timing windows |
+| **Event stream with ordering, replay, and dedupe assumptions** | Out-of-order delivery breaking consumer state machines, replay after checkpoint causing duplicate effects, dedupe window expiry |
+| **Service boundary where typed contracts lie after serialization** | API returns string where interface says number, protobuf default values masking missing fields, enum evolution breaking deserialization |
+| **Feature flags whose combinations bypass safety invariants** | Flag A enables new path, flag B disables old safety check, combination bypasses auth; stale flag cache during rollout creates inconsistent behavior windows |
+
+**Rules:**
+
+- These families are scenario-level requirements, not one-mini-project-per-family
+  requirements. A single mini-project can exercise multiple families.
+- The existing 6 project shapes (rule engine, batch processor, adapter, cache,
+  security formatter, transfer workflow) remain valid foundations. High-tier
+  scenario families layer on top of or extend those shapes with production
+  failure modes.
+- A seed that claims one of these families must demonstrate that the failure
+  cannot be caught without understanding the family's characteristic interaction
+  pattern. If it reduces to a single-component bug, it does not qualify.
+- Suites that cover fewer than 5 families cannot claim benchmark status for
+  staff+ depth.
 
 ## Agent-Specific Input Modes
 
