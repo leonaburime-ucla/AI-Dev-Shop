@@ -81,6 +81,47 @@ tables or endpoints.
 > Clarification guard: ask at most 5 blocking questions per blueprint pass.
 > For non-blocking ambiguity, record a safe default assumption and continue.
 
+### 3.6 Non-Functional Requirements Discovery
+
+Run the NFR discovery light pass. Do not load NFR references during the light
+pass. Trigger targeted deepening only when risk signals are present or the
+human/Coordinator asks for depth.
+
+#### 3.6.1 Light Pass
+
+| Category | Status (Applicable/N/A/Unknown) | Summary / Assumption | Unknown Class | Downstream Owner |
+|---|---|---|---|---|
+| Scale / Capacity | | | | |
+| Performance / Latency | | | | |
+| Availability / Uptime | | | | |
+| Reliability / Fault Tolerance | | | | |
+| Consistency / Freshness | | | | |
+| Durability / Disaster Recovery | | | | |
+| Security | | | | |
+| Privacy | | | | |
+| Data Integrity | | | | |
+| Compliance / Auditability | | | | |
+| Observability | | | | |
+| Operability / Deployability | | | | |
+| Maintainability / Evolvability | | | | |
+| Cost / Resource Efficiency | | | | |
+| Interoperability / External Integrations | | | | |
+| Portability / Environment Constraints | | | | |
+| Usability / Accessibility | | | | |
+| Testability / Verifiability | | | | |
+
+#### 3.6.2 Risk Signals
+
+- Risk signals detected:
+- Deep pass triggered: YES | NO
+- Blocking NFR questions asked (max 5):
+
+#### 3.6.3 Deep Pass Records (Only For Triggered Categories)
+
+| Category | Requirement / Target | Assumption | Measurement / Evidence | Risk If Missed | Priority | Unknown Class | Downstream Owner |
+|---|---|---|---|---|---|---|---|
+| | | | | | | | |
+
 ## 4) Macro Components / Domains
 
 | Domain / Component | Responsibility | Owner Suggestion | Notes |
@@ -111,7 +152,7 @@ tables or endpoints.
 - Suggested stack direction (optional):
 - Why this direction is plausible:
 - Unknowns requiring later ADR validation:
-- Dominant quality attributes for later ADR scoring (max 3, no scores):
+- Dominant quality attributes derived from the NFR table for later ADR scoring (max 3, no scores):
 
 ## 9) Risks and Unknowns
 
@@ -156,6 +197,7 @@ Define which specs should be written next and at what granularity.
 ## 13) Handoff to Spec Agent
 
 - Functional model status: COMPLETE | COMPLETE WITH SAFE DEFAULTS | BLOCKED
+- NFR model status: COMPLETE | COMPLETE WITH SAFE DEFAULTS | BLOCKED
 - Safe default assumptions Spec should preserve:
 - Approved boundaries to preserve:
 - Open decisions that Spec should mark with `[NEEDS CLARIFICATION]` if unresolved:

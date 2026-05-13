@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.15
-last_updated: 2026-04-27
+version: 1.2.16
+last_updated: 2026-05-13
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -32,6 +32,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/hexagonal-architecture/SKILL.md` | Architect, Programmer, CodeBase Analyzer, System Blueprint Agent |
 | `skills/implementation-guardrails/SKILL.md` | Architect, Programmer, Refactor Agent, Code Review Agent (child layer for complexity, scaling, and maintainability guardrails; always load alongside `coding-foundations`) |
 | `skills/function-quality-assessment/SKILL.md` | Programmer, Code Review Agent, Refactor Agent (shared per-function scoring, findings, and pass/debt/block routing wrapper over coding foundations, testable design, implementation guardrails, and inline docs) |
+| `skills/non-functional-requirements-discovery/SKILL.md` | System Blueprint Agent, Spec Agent, Architect (targeted deepening) |
 | `skills/system-blueprint/SKILL.md` | System Blueprint Agent, Coordinator |
 | `skills/system-design/SKILL.md` | System Blueprint Agent, Architect (shared macro-topology and architecture-spec reference) |
 | `skills/frontend-react-orcbash/SKILL.md` | Programmer (React frontends) |

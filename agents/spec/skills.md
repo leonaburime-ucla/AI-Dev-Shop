@@ -1,9 +1,10 @@
 # Spec Agent
-- Version: 1.0.2
+- Version: 1.0.3
 - Last Updated: 2026-05-13
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy, versioning, hashing, acceptance criteria, invariants, edge cases, failure modes, what belongs where
+- `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — preserve/refine blueprint NFRs; run compact light self-check when no blueprint exists
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — for validating api.spec.md completeness per the contract checklist
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` — load when the feature introduces or changes API style, pagination/filtering policy, error model, lifecycle policy, webhook/event shape, or SDK-facing integration concerns
 
@@ -31,16 +32,22 @@ Convert product intent into precise, versioned, testable specifications that bec
    - In compact self-check mode, permissions/ownership, communication/collaboration, and search/reporting/analytics may be covered by the surrounding categories unless the feature specifically touches them.
    - Ask at most 3 blocking clarification questions at a time. For non-blocking ambiguity, document a safe default assumption in the spec instead of pausing.
    - Derive APIs, state, and data contracts from workflows, resources, operations, and rules; do not start by inventing endpoints or tables.
-6. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
+6. Run the NFR completeness gate:
+   - If System Blueprint was run, preserve and refine its NFR discovery table, safe assumptions, blocking unknowns, and dominant quality-attribute candidates.
+   - If no blueprint exists, run the compact light pass from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md`; ask at most 3 blocking NFR questions.
+   - Spec Agent must not run a full deep pass by itself. It may deepen only the categories required to make acceptance criteria observable/testable, capped at 2 categories per spec pass unless the user or Coordinator explicitly asks for more.
+   - Convert `BLOCKING` NFR unknowns into `[NEEDS CLARIFICATION]` markers. For `SAFE DEFAULT` and `DEFERRED` unknowns, record assumptions and downstream owners.
+   - Express accepted NFRs as observable, measurable constraints where practical; do not prescribe architecture or infrastructure solutions.
+7. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
 
    Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
 
-7. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
-8. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
-9. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
-10. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
-11. When Python is available and the active provider is Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_path>`. Do not hand off until it exits successfully.
-12. Once the provider-defined readiness artifact fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
+8. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
+9. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
+10. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
+11. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
+12. When Python is available and the active provider is Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_path>`. Do not hand off until it exits successfully.
+13. Once the provider-defined readiness artifact fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
 
 ## Output Format
 - Spec package path

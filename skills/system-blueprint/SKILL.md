@@ -1,8 +1,8 @@
 ---
 name: system-blueprint
-version: 1.2.0
+version: 1.3.0
 last_updated: 2026-05-13
-description: Use when shaping a project at macro level before feature specs: define the functional model, domains/components, ownership boundaries, integration map, and spec decomposition plan.
+description: Use when shaping a project at macro level before feature specs: define the functional and non-functional models, domains/components, ownership boundaries, integration map, and spec decomposition plan.
 ---
 
 # Skill: System Blueprint
@@ -17,6 +17,7 @@ This stage exists to prevent downstream spec drift: if specs are written before 
 
 - This is problem-space and system-shape planning.
 - This is where generic functional discovery is modeled before specs.
+- This is where generic NFR discovery is surfaced before ADR tradeoffs.
 - This is not a feature-level ADR.
 - This does not make binding micro-level implementation decisions.
 
@@ -39,9 +40,10 @@ Run before Spec when one or more are true:
 ## Skill Loading Priority
 
 1. Primary: this skill (`system-blueprint`) controls process and artifact shape.
-2. Secondary (always): `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` for macro architecture option language and tradeoff framing.
-3. Secondary (always): `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` for system-driver framing (without producing ADR decisions here).
-4. Conditional tertiary skills (load only when needed):
+2. Secondary (always): `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` for structured NFR elicitation before quality-attribute naming; load its `SKILL.md` for the light pass and keep references gated.
+3. Secondary (always): `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` for macro architecture option language and tradeoff framing.
+4. Secondary (always): `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` for system-driver framing (without producing ADR decisions here).
+5. Conditional tertiary skills (load only when needed):
    - `sql-data-modeling` for ambiguous data ownership boundaries
    - `api-contracts` for integration-heavy domain boundaries
    - `change-management` for legacy migration planning
@@ -114,6 +116,29 @@ Elicitation rules:
 - If a missing functional decision would force Programmer to invent product
   policy, mark it `BLOCKING` before Spec dispatch.
 
+## Non-Functional Discovery Requirement
+
+Before finalizing runtime/data topology or naming dominant quality attributes,
+run the light pass from
+`<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md`.
+
+For each NFR category, mark it `Applicable`, `N/A`, or `Unknown`. For `Unknown`,
+classify it as `BLOCKING`, `SAFE DEFAULT`, or `DEFERRED`.
+
+Discovery rules:
+
+- Do not load NFR reference files during the light pass.
+- Trigger targeted deepening only when risk signals are present or the
+  user/Coordinator asks for depth.
+- Ask at most 5 blocking NFR questions per blueprint pass.
+- For non-blocking ambiguity, record safe default assumptions and downstream
+  owners instead of pausing.
+- Keep requirement discovery separate from candidate solutions.
+- Derive dominant quality-attribute candidates from material NFR records; do
+  not score them in Blueprint.
+- If a missing NFR would force a downstream agent to invent policy, mark it
+  `BLOCKING` before Spec dispatch.
+
 ## Required Output
 
 Write one artifact using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md` to:
@@ -124,15 +149,17 @@ The output must include:
 
 1. Functional discovery summary with category applicability, safe assumptions,
    and blocking unknowns.
-2. Macro components/domains and responsibilities.
-3. Ownership boundaries and integration map.
-4. High-level runtime/data topology.
-5. Dominant quality attributes (max 3, no scores) that are likely to govern the downstream ADR.
-6. Explicit risks and unknowns.
-7. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
-8. Critical cross-domain user journeys for QA/E2E handoff.
-9. Spec decomposition plan (what spec packages to write next).
-10. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
+2. NFR discovery summary with category applicability, safe assumptions, blocking
+   unknowns, risk signals, and downstream owners.
+3. Macro components/domains and responsibilities.
+4. Ownership boundaries and integration map.
+5. High-level runtime/data topology.
+6. Dominant quality attributes (max 3, no scores) that are derived from material NFR records and likely to govern the downstream ADR.
+7. Explicit risks and unknowns.
+8. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
+9. Critical cross-domain user journeys for QA/E2E handoff.
+10. Spec decomposition plan (what spec packages to write next).
+11. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
 
 ## Spec Decomposition Policy
 
@@ -150,6 +177,8 @@ Default to **vertical/domain slicing** for decomposition.
 - Do not produce a feature-level ADR.
 - Do not lock low-level implementation patterns.
 - Name dominant quality attributes only; do not score them at blueprint stage.
+- Use `non-functional-requirements-discovery` for NFR discovery; do not inline
+  ad hoc NFR checklists or prescribe solutions during discovery.
 - Keep stack direction non-binding unless a hard constraint already exists.
 - `Core/Foundation` (`P0`) is a thin bootstrap layer only: shell/runtime primitives/shared clients/CI harness. Do not place feature-specific business logic or feature-owned tables in `P0`.
 - Use `[OWNERSHIP UNCLEAR]` markers where needed; unresolved markers block Spec decomposition approval.
@@ -165,6 +194,7 @@ Default to **vertical/domain slicing** for decomposition.
 
 - Inputs used
 - Blueprint summary
+- NFR discovery summary
 - Dominant quality attributes for Architect handoff
 - Risks/open unknowns
 - Recommended next assignee: Spec Agent

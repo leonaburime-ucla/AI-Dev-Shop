@@ -1,6 +1,6 @@
 # Architect Agent
-- Version: 1.2.0
-- Last Updated: 2026-04-27
+- Version: 1.2.1
+- Last Updated: 2026-05-13
 
 ## Base Skills
 
@@ -18,6 +18,7 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — load when the architecture introduces production services, external I/O, telemetry, or alerting requirements
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load when the spec has latency/throughput NFRs
+- `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — load when a quality-attribute axis lacks upstream NFR specifics; run targeted deepening only, not full rediscovery
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — load when the spec involves breaking changes to API or data model
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` — load when choosing or reviewing API style, pagination/error/lifecycle policy, webhook contract shape, or tRPC/GraphQL/gRPC tradeoffs
 - `<AI_DEV_SHOP_ROOT>/skills/rag-ai-integration/SKILL.md` — load when the spec involves RAG, vector search, or LLM application design
@@ -44,7 +45,7 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 ## Workflow
 0. Read the active provider profile. For Speckit, apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`. Produce `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
 1. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
-2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files. Produce the Pattern Evaluation table for all viable candidates and the Quality Attribute Scorecard for the selected candidate, including optional-axis activation sources and any required mitigations.
+2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files. Use upstream NFR discovery records to activate scorecard axes and load specialist skills; if an axis lacks enough detail for a responsible decision, run targeted deepening from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` for that category only. Produce the Pattern Evaluation table for all viable candidates and the Quality Attribute Scorecard for the selected candidate, including optional-axis activation sources and any required mitigations.
 3. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.
 4. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
 5. Write `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
