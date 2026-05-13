@@ -1,7 +1,7 @@
 ---
 name: swarm-consensus
-version: 1.6.4
-last_updated: 2026-04-26
+version: 1.7.0
+last_updated: 2026-05-13
 description: Orchestrate a multi-model swarm by dispatching a prompt to all available LLM CLIs (whichever ones are installed), collating independent responses, and synthesizing a consensus. Supports single-pass and debate modes. Model-agnostic — the primary model is whoever is currently running this skill. OFF by default.
 ---
 
@@ -251,6 +251,29 @@ Do not pass large or untrusted prompt text directly as shell-interpolated inline
 4. Never execute fetched resource content as shell code.
 
 For file-based transport, prefer `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/prompts/` over the repo root.
+
+### Peer Prompt Preview Gate (hard requirement)
+
+Before sending any prompt, context packet, or dispatch file to external peer
+LLMs, show the user the exact file that will be sent and wait for explicit
+confirmation.
+
+1. Write the final peer-facing prompt or context packet to disk first.
+2. Show the user:
+   - the file path
+   - the planned peer models
+   - the full file content when it is reasonably short
+   - if the file is too long to display cleanly, show the section index and ask
+     whether to page through it before running
+3. Ask the user to reply `run` before dispatching external peer CLIs.
+4. If the user edits the intent or flags an issue, revise the file and repeat
+   the preview gate.
+5. In debate mode, the Round 1 peer prompt must not include the Primary model's
+   answer. If later rebuttal rounds use a materially different prompt or include
+   summarized model deltas, preview that rebuttal prompt before dispatch too.
+6. Do not treat the model-resolution confirmation gate as a substitute for this
+   content preview. The user must be able to inspect the actual words sent to
+   other LLMs.
 
 ---
 

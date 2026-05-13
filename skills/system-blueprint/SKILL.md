@@ -1,8 +1,8 @@
 ---
 name: system-blueprint
-version: 1.1.0
-last_updated: 2026-04-27
-description: Use when shaping a project at macro level before feature specs: define domains/components, ownership boundaries, integration map, and spec decomposition plan.
+version: 1.2.0
+last_updated: 2026-05-13
+description: Use when shaping a project at macro level before feature specs: define the functional model, domains/components, ownership boundaries, integration map, and spec decomposition plan.
 ---
 
 # Skill: System Blueprint
@@ -16,6 +16,7 @@ Provide a high-level system layout so Spec Agent knows what to spec and at what 
 This stage exists to prevent downstream spec drift: if specs are written before macro boundaries are clear, they often encode the wrong granularity, assumptions, and ownership model. That causes rework in Architect/TDD/Programmer later.
 
 - This is problem-space and system-shape planning.
+- This is where generic functional discovery is modeled before specs.
 - This is not a feature-level ADR.
 - This does not make binding micro-level implementation decisions.
 
@@ -27,6 +28,7 @@ Run before Spec when one or more are true:
 - Unclear ownership of data or integration boundaries.
 - Expected parallel team/slice delivery.
 - Greenfield product with uncertain system decomposition.
+- The user's product intent names features, entities, or flows but not the actor goals, resource operations, or lifecycle/rule model behind them.
 
 ## Inputs
 
@@ -56,6 +58,62 @@ Before finalizing the blueprint, run a short exploratory tradeoff discussion wit
 
 This stage should help the user learn options and choose intentionally, not receive a one-shot static output.
 
+## Functional Discovery Requirement
+
+Before finalizing domains, components, APIs, or data topology, produce a generic
+functional model. Use it to understand what the software must do before deciding
+how the system is partitioned.
+
+For each category, mark it `Applicable`, `N/A`, or `Unknown`. Do not force every
+project to fill every category. For small or narrow changes, collapse N/A
+categories into one concise note.
+
+Core categories:
+
+1. **Actors / user types** — who uses, administers, supports, or integrates with
+   the system.
+2. **User goals and capabilities** — what each actor needs to accomplish.
+3. **Core workflows / user journeys** — happy paths and meaningful alternate
+   paths, described before APIs or data models are chosen.
+4. **Resources and operations** — core nouns/resources plus operations such as
+   create, view, update, delete, submit, approve, cancel, archive, search,
+   import, export, assign, comment, or configure.
+5. **Permissions and ownership** — only where relevant; who may act on which
+   resources, who owns them, and what access boundaries matter.
+6. **Resource lifecycle / state** — statuses and legal transitions for resources
+   with meaningful state.
+7. **Business rules and invariants** — validations, limits, uniqueness rules,
+   calculations, eligibility, and always/never conditions.
+8. **Error, exception, and recovery flows** — rejected inputs, unavailable
+   dependencies, retries, cancellation, rollback, and user-visible failures.
+9. **Communication and collaboration** — notifications, messages, comments,
+   assignments, approvals, and reminders when relevant.
+10. **Search, reporting, and analytics** — filtering, sorting, dashboards,
+    exports, audit views, and metrics when relevant.
+11. **Integrations and external dependencies** — external APIs, webhooks, batch
+    imports/exports, identity providers, storage, third-party providers, or
+    other systems when relevant.
+12. **Admin, support, moderation, and operations** — internal tools, overrides,
+    support workflows, review queues, and operational controls when relevant.
+13. **Audit, history, and compliance evidence** — activity logs, change history,
+    approval history, and retention evidence when relevant.
+14. **Settings, preferences, and configuration** — user, workspace, organization,
+    or system-level configurable behavior.
+15. **Account and data lifecycle** — onboarding, invitation, suspension,
+    deletion, retention, recovery, and data export when relevant.
+
+Elicitation rules:
+
+- Propose the likely main flows from the user's intent, then ask the human to
+  correct or confirm them.
+- Ask at most 5 blocking clarification questions per blueprint pass.
+- Classify unknowns as `BLOCKING`, `SAFE DEFAULT`, or `DEFERRED`.
+- For non-blocking ambiguity, record a safe default assumption and continue.
+- Derive API/contracts and data model candidates from workflows, resources,
+  operations, and rules; do not start by guessing tables/endpoints.
+- If a missing functional decision would force Programmer to invent product
+  policy, mark it `BLOCKING` before Spec dispatch.
+
 ## Required Output
 
 Write one artifact using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md` to:
@@ -64,15 +122,17 @@ Write one artifact using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprin
 
 The output must include:
 
-1. Macro components/domains and responsibilities.
-2. Ownership boundaries and integration map.
-3. High-level runtime/data topology.
-4. Dominant quality attributes (max 3, no scores) that are likely to govern the downstream ADR.
-5. Explicit risks and unknowns.
-6. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
-7. Critical cross-domain user journeys for QA/E2E handoff.
-8. Spec decomposition plan (what spec packages to write next).
-9. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
+1. Functional discovery summary with category applicability, safe assumptions,
+   and blocking unknowns.
+2. Macro components/domains and responsibilities.
+3. Ownership boundaries and integration map.
+4. High-level runtime/data topology.
+5. Dominant quality attributes (max 3, no scores) that are likely to govern the downstream ADR.
+6. Explicit risks and unknowns.
+7. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
+8. Critical cross-domain user journeys for QA/E2E handoff.
+9. Spec decomposition plan (what spec packages to write next).
+10. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
 
 ## Spec Decomposition Policy
 
@@ -93,7 +153,13 @@ Default to **vertical/domain slicing** for decomposition.
 - Keep stack direction non-binding unless a hard constraint already exists.
 - `Core/Foundation` (`P0`) is a thin bootstrap layer only: shell/runtime primitives/shared clients/CI harness. Do not place feature-specific business logic or feature-owned tables in `P0`.
 - Use `[OWNERSHIP UNCLEAR]` markers where needed; unresolved markers block Spec decomposition approval.
+- Use `[FUNCTIONAL UNKNOWN]` markers for missing actor, workflow, resource,
+  lifecycle, rule, or integration decisions. Only `BLOCKING` functional unknowns
+  block Spec dispatch; `SAFE DEFAULT` and `DEFERRED` unknowns must have an
+  explicit assumption or follow-up owner.
 - Include `Critical User Journeys (Cross-Domain)` so QA/E2E can validate slice convergence end to end.
+- Do not turn functional discovery into a questionnaire dump. Keep the artifact
+  proportional to the system size and risk.
 
 ## Handoff Contract
 

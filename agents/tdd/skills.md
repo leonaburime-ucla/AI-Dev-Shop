@@ -1,11 +1,12 @@
 # TDD Agent
-- Version: 1.0.2
-- Last Updated: 2026-04-11
+- Version: 1.0.3
+- Last Updated: 2026-05-12
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — requirement-to-test matrix, test types, certification protocol, drift detection, anti-patterns, coverage targets
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer defining micro-level testability contracts to enforce in tests (stable outputs, seams, thin orchestrators, coverage-friendly structure)
+- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — Design Gate only; derive test-observable function-quality targets from spec/ADR/task constraints without assigning scores or post-code findings
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy and hash protocol (to verify inputs are valid before certifying tests)
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — ADR format and API/Event Contract Summary structure; required for step 3b contract tests — reading which contracts the Architect defined and which testing approach (consumer-driven, schema validation, integration) was specified
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/react-component-testing-policy.md` — enforces component detection and required tests (render, interaction, a11y, edge cases)
@@ -27,6 +28,15 @@ Encode the spec into executable tests before implementation. Certify each test s
    - Each invariant → dedicated assertion set
    - Each edge case → explicit scenario test
 2a. Alongside the requirement matrix, build an **Outcome Matrix** for each module being tested: for each distinct state + input combination, define the expected outcome (Given State X + Input Y → Outcome Z). This is not a structural branch map — do not specify how the Programmer must implement branches or conditionals. The matrix defines what must be true for every observable outcome. The Programmer is responsible for ensuring their implementation contains only the branches needed to produce those outcomes, with no dead defensive code beyond what the matrix defines.
+2b. For logic-bearing function targets, consult `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` in **Design Gate only** mode and derive executable tests for observable quality contracts defined by the spec, ADR, or task constraints. Do not assign `@overallScore`, severity findings, or pass/debt/block status. Add tests or certification notes for applicable contracts:
+   - stable input/output shape and typed result/error contracts
+   - validation-first behavior and expected error paths
+   - no input mutation or partial writes where observable
+   - deterministic behavior for time, randomness, config, and ordering-sensitive logic
+   - pure decision behavior where the spec expects pure rules or transformations
+   - explicit effect-boundary behavior where I/O, persistence, logging, events, or external calls are expected
+   - idempotency, retry, cancellation, timeout, limit, and resource-bound behavior
+   - adversarial aggregate/cross-record behavior for validators, reducers, reconciliation, batch, rule, retry, or ordering-sensitive workflows
 3. Write tests before code, prioritizing: unit tests for invariants, integration tests for boundary contracts, acceptance tests for criteria.
    - Place tests in `__tests__/unit/` and `__tests__/integration/` by type.
    - Enforce naming convention from test-design skill: `.unit.test.ts`, `.integration.test.ts`, `.e2e.test.ts` (if writing browser tests).

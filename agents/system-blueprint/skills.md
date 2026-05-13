@@ -1,6 +1,6 @@
 # System Blueprint Agent
-- Version: 1.1.0
-- Last Updated: 2026-04-27
+- Version: 1.2.0
+- Last Updated: 2026-05-13
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — macro-level system planning and decomposition
@@ -25,23 +25,28 @@ Create a macro-level system blueprint that defines what is being built and how i
 
 ## Workflow
 1. Normalize intent into system scope and non-goals.
-2. Identify candidate domains/components and ownership boundaries.
-3. Explore macro technology direction with the user before committing it:
+2. Run the generic functional discovery pass from `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` before choosing domains, APIs, or data topology:
+   - Identify actors/user types, goals/capabilities, core workflows, resources/operations, lifecycle/state, business rules, exceptions, integrations, admin/support needs, audit/history, settings, and account/data lifecycle where relevant.
+   - Mark each category `Applicable`, `N/A`, or `Unknown`; classify unknowns as `BLOCKING`, `SAFE DEFAULT`, or `DEFERRED`.
+   - Propose likely main flows and ask the human to correct them.
+   - Ask at most 5 blocking clarification questions per blueprint pass; document safe default assumptions for non-blocking ambiguity.
+3. Identify candidate domains/components and ownership boundaries from the functional model.
+4. Explore macro technology direction with the user before committing it:
    - Present 2-3 plausible macro stack directions.
    - Explain tradeoffs in plain language (speed, cost, scaling, operations, team familiarity).
    - Ask what the user is leaning toward and confirm constraints.
-4. Map integration boundaries and high-level runtime/data topology.
-5. Name the dominant quality attributes (max 3, no scores) that should shape the downstream ADR.
-6. Identify risks and unresolved ownership/integration decisions.
-7. Define the required `Core/Foundation` package at `P0` that must block parallel domain slice execution.
-8. Capture `Critical User Journeys (Cross-Domain)` for QA/E2E planning.
-9. Propose a spec decomposition plan (default to domain/vertical slices; use horizontal slicing only with explicit justification).
-10. Encode dependency-aware sequencing in the decomposition plan:
+5. Map integration boundaries and high-level runtime/data topology.
+6. Name the dominant quality attributes (max 3, no scores) that should shape the downstream ADR.
+7. Identify risks and unresolved functional/ownership/integration decisions.
+8. Define the required `Core/Foundation` package at `P0` that must block parallel domain slice execution.
+9. Capture `Critical User Journeys (Cross-Domain)` for QA/E2E planning.
+10. Propose a spec decomposition plan (default to domain/vertical slices; use horizontal slicing only with explicit justification).
+11. Encode dependency-aware sequencing in the decomposition plan:
    - Any package with API/event/schema dependency on another package must list it in `Depends on` and be placed in a later phase.
    - Any package requiring a foreign key to another domain-owned table must be sequenced after the owner domain.
-11. Keep `P0` thin: no feature-specific business logic or feature-owned schema in Core/Foundation.
-12. Write `system-blueprint.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md`.
-13. Hand off to Coordinator for human review and Spec dispatch.
+12. Keep `P0` thin: no feature-specific business logic or feature-owned schema in Core/Foundation.
+13. Write `system-blueprint.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md`.
+14. Hand off to Coordinator for human review and Spec dispatch.
 
 ## Output Format
 - Blueprint artifact path

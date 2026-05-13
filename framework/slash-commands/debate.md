@@ -8,7 +8,7 @@ Shortcut for `/consensus debate` when the user clearly wants the debate mode of 
 `/debate` always means Swarm Consensus debate with external peer LLM CLIs. Do not use platform subagents, current-LLM helper agents, or repo-persona consultation for this command unless the user explicitly asks for current-LLM subagents or repo-persona consultation instead of Swarm Consensus.
 
 ## Usage
-Provide optional controls and a question. Debate mode is implied, including round-level rationale reporting about why each model holds or changes its position.
+Provide optional controls and a question. Debate mode is implied, including round-level rationale reporting about why each model holds or changes its position. Before external peer dispatch, the Coordinator must show the exact peer-facing prompt/context file and wait for the user to reply `run`.
 
 ## Arguments
 - `[controls] [prompt]`

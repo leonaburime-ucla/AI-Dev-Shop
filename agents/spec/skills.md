@@ -1,6 +1,6 @@
 # Spec Agent
-- Version: 1.0.1
-- Last Updated: 2026-03-19
+- Version: 1.0.2
+- Last Updated: 2026-05-13
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy, versioning, hashing, acceptance criteria, invariants, edge cases, failure modes, what belongs where
@@ -14,6 +14,7 @@ Convert product intent into precise, versioned, testable specifications that bec
 - Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
 - Problem statement and business outcome
 - Constraints (regulatory, performance, platform)
+- Approved or draft `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Blueprint was run
 - Existing spec metadata (if updating — include current hash)
 - Coordinator directive and scope boundaries
 
@@ -22,16 +23,24 @@ Convert product intent into precise, versioned, testable specifications that bec
 2. Normalize request into clear scope and explicit non-goals.
 3. Read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text when the provider supports inline clarification markers.
 4. Assign FEAT number by scanning existing feature folders in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
-5. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
+5. Run the functional model completeness gate before writing detailed specs:
+   - If System Blueprint was run, read its Functional Discovery Model and Handoff to Spec sections.
+   - Preserve approved actors/user types, goals/capabilities, workflows, resources/operations, lifecycle/state, rules, integrations, assumptions, and boundaries.
+   - If the blueprint marks `Functional model status: BLOCKED` or includes `BLOCKING` functional unknowns, convert those into `[NEEDS CLARIFICATION]` markers and do not advance to Architect until resolved.
+   - If no blueprint exists for a small/no-blueprint change, perform a compact functional-model self-check directly from the user's intent: actors, goals, workflows, resources/operations, state/lifecycle, rules/validations, exceptions, integrations, admin/support, audit/history, settings, and account/data lifecycle where relevant.
+   - In compact self-check mode, permissions/ownership, communication/collaboration, and search/reporting/analytics may be covered by the surrounding categories unless the feature specifically touches them.
+   - Ask at most 3 blocking clarification questions at a time. For non-blocking ambiguity, document a safe default assumption in the spec instead of pausing.
+   - Derive APIs, state, and data contracts from workflows, resources, operations, and rules; do not start by inventing endpoints or tables.
+6. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
 
    Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
 
-6. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
-7. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
-8. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
-9. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
-10. When Python is available and the active provider is Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_path>`. Do not hand off until it exits successfully.
-11. Once the provider-defined readiness artifact fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
+7. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
+8. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
+9. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
+10. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
+11. When Python is available and the active provider is Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_path>`. Do not hand off until it exits successfully.
+12. Once the provider-defined readiness artifact fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
 
 ## Output Format
 - Spec package path
