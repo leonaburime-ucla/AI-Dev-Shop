@@ -1,13 +1,15 @@
 # Project Knowledge
 
-Committed template of the external `ADS-project-knowledge/` workspace.
+`ADS-project-knowledge/` is the project-owned workspace for AI Dev Shop. It is where retained project artifacts, memory, reports, decisions, workflow notes, and handoff context should live when the toolkit is used in a real repo.
+
+A project needs this shared workspace so multiple people or agents can see the durable work that has already happened: approved specs, architecture decisions, review findings, benchmark results, session notes, and other context that should survive beyond one chat or one local run.
 
 ## How To Use This Template
 
 - Keep `project-knowledge-template/` pristine and committed. Treat it as the shipped template and example surface for downstream users.
-- Create a writable `ADS-project-knowledge/` workspace from this template when using the toolkit in a real repo. The normal layout is a sibling directory next to `AI-Dev-Shop-speckit/`.
+- Create a writable `ADS-project-knowledge/` workspace from this template when using the toolkit in a real repo. `ADS-project-knowledge/` will then be a sibling directory of `AI-Dev-Shop-speckit/`.
 - In exceptional local setups, a repo-root `ADS-project-knowledge/` is acceptable as long as it stays ignored by git.
-- Put retained project-owned artifacts, memory, and workflow notes in `ADS-project-knowledge/`, not back into this committed template unless you are intentionally updating the template itself.
+- Use `ADS-project-knowledge/` for retained project-owned artifacts, memory, and workflow notes. Only edit this committed template when you intentionally want to change the default scaffold for future workspaces.
 
 ## Folders
 
