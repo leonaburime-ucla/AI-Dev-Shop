@@ -103,14 +103,45 @@ Other hosts do not support native slash commands. For those, open the matching f
 
 ## First-Time Project Setup
 
-- Confirm the active provider in [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md).
-- Create or allow AI Dev Shop to create a sibling `ADS-project-knowledge/` folder next to `AI-Dev-Shop-speckit/`.
-- Copy [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-project-knowledge/.gitignore` so `.local-artifacts/` stays local by default.
-- Copy the toolkit constitution template from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) to `ADS-project-knowledge/governance/constitution.md`, then customize it.
-- Fill in `ADS-project-knowledge/memory/project_memory.md`.
-- Optional for live website debugging: follow [framework/templates/bootstrap/playwright-mcp-setup.md](framework/templates/bootstrap/playwright-mcp-setup.md) to register the current browser-automation provider with your client. This is host setup, not a repo dependency.
-- Start with the Coordinator in Review Mode, or run `/spec` once slash commands are installed.
-- Expect retained pipeline artifacts under `ADS-project-knowledge/reports/`, local scratch under `ADS-project-knowledge/.local-artifacts/`, and spec packages at the user-specified location outside the toolkit.
+Ask your coding agent:
+
+```text
+Run AI Dev Shop first-time setup. Show me what you will create before writing files.
+```
+
+The mechanical setup is scriptable. Preview it first:
+
+```bash
+bash AI-Dev-Shop-speckit/framework/operations/scripts/setup-project-knowledge.sh --dry-run
+```
+
+Then, with user approval, run:
+
+```bash
+bash AI-Dev-Shop-speckit/framework/operations/scripts/setup-project-knowledge.sh
+```
+
+The setup script:
+
+- Confirms the active provider from [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md).
+- Creates `ADS-project-knowledge/` as a sibling directory of `AI-Dev-Shop-speckit/`.
+- Creates the shared workspace folders for governance, memory, reports, metadata, and local scratch.
+- Copies [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-project-knowledge/.gitignore` so `.local-artifacts/` stays local by default.
+- Creates `ADS-project-knowledge/governance/constitution.md` from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) if no constitution exists.
+- Creates starter project memory files under `ADS-project-knowledge/memory/` without overwriting existing files.
+
+After setup, customize and approve:
+
+- `ADS-project-knowledge/governance/constitution.md`
+- `ADS-project-knowledge/memory/project_memory.md`
+
+For team projects, commit `ADS-project-knowledge/` to the host repo so other programmers and agents can see the same durable project context: specs, architecture decisions, review findings, reports, workflow notes, and memory. Do not commit `ADS-project-knowledge/.local-artifacts/`; it is local scratch space.
+
+Optional for live website debugging: follow [framework/templates/bootstrap/playwright-mcp-setup.md](framework/templates/bootstrap/playwright-mcp-setup.md) to register the current browser-automation provider with your client. This is host setup, not a repo dependency.
+
+After setup, start with the Coordinator in Review Mode, or run `/spec` once slash commands are installed.
+
+Retained pipeline artifacts go under `ADS-project-knowledge/reports/`. Local scratch goes under `ADS-project-knowledge/.local-artifacts/`. Spec packages are written wherever the active provider and user request place them, outside the toolkit internals.
 
 ## Optional Live Browser Analysis
 
@@ -127,6 +158,7 @@ This keeps the framework modular. If a better browser provider replaces Playwrig
 - [AGENTS.md](AGENTS.md): runtime contract, modes, routing rules
 - [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md): active planning provider and switch rules
 - [framework/spec-providers/core/provider-contract.md](framework/spec-providers/core/provider-contract.md): provider boundary used by the pipeline
+- [framework/operations/scripts/setup-project-knowledge.sh](framework/operations/scripts/setup-project-knowledge.sh): first-time workspace setup helper
 - [framework/workflows/multi-agent-pipeline.md](framework/workflows/multi-agent-pipeline.md): detailed stage execution rules
 - [framework/workflows/conventions.md](framework/workflows/conventions.md): file placement and writable/read-only rules
 - [framework/spec-providers/speckit/provider.md](framework/spec-providers/speckit/provider.md): default provider mapping and current Speckit compatibility shims
@@ -140,7 +172,7 @@ Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current defa
 This toolkit keeps its engine files grouped while preserving a clean split between framework source and project-owned state:
 
 - **The Engine (Read-Only):** `agents/`, `skills/`, `framework/`, and `harness-engineering/` are the toolkit control surface. They stay read-only during normal host-project work so ADS can be updated independently without mixing framework logic with project state.
-- **The Workspace Template (Repo-Local):** `project-knowledge-template/` is the committed template for the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for governance, memory, reports, metadata, tmp, local artifacts, and project-owned workflow notes.
+- **The Workspace Template (Repo-Local):** `project-knowledge-template/` is the committed template for the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for governance, memory, reports, metadata, local artifacts, and project-owned workflow notes.
 - **The Project Workspace (Writable):** `ADS-project-knowledge/` is the project-owned sibling workspace. Agents write retained artifacts to `ADS-project-knowledge/reports/`, memory to `ADS-project-knowledge/memory/`, the real constitution to `ADS-project-knowledge/governance/constitution.md`, local scratch to `ADS-project-knowledge/.local-artifacts/`, and future workspace metadata to `ADS-project-knowledge/meta/`.
 
 For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop-speckit/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.

@@ -1,0 +1,240 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: setup-project-knowledge.sh [--dry-run] [--workspace PATH]
+
+Creates the sibling ADS-project-knowledge/ workspace used by AI Dev Shop.
+
+Options:
+  --dry-run          Show planned actions without writing files.
+  --workspace PATH   Use a custom ADS-project-knowledge path.
+  -h, --help         Show this help.
+
+Default workspace:
+  ../ADS-project-knowledge relative to AI-Dev-Shop-speckit/
+USAGE
+}
+
+dry_run=false
+workspace_override=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --dry-run)
+      dry_run=true
+      shift
+      ;;
+    --workspace)
+      if [ "$#" -lt 2 ]; then
+        echo "ERROR: --workspace requires a path" >&2
+        exit 2
+      fi
+      workspace_override="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "ERROR: unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ads_root="$(cd "$script_dir/../../.." && pwd)"
+host_root="$(cd "$ads_root/.." && pwd)"
+
+if [ -n "$workspace_override" ]; then
+  workspace_root="$workspace_override"
+else
+  workspace_root="$host_root/ADS-project-knowledge"
+fi
+
+provider_file="$ads_root/framework/spec-providers/active-provider.md"
+active_provider="unknown"
+if [ -f "$provider_file" ]; then
+  parsed_provider="$(sed -n 's/^- active_provider: `\([^`]*\)`/\1/p' "$provider_file" | head -n 1)"
+  if [ -n "$parsed_provider" ]; then
+    active_provider="$parsed_provider"
+  fi
+fi
+
+log() {
+  printf '%s\n' "$1"
+}
+
+ensure_dir() {
+  dir_path="$1"
+  if [ -d "$dir_path" ]; then
+    log "exists: $dir_path"
+    return
+  fi
+
+  if [ "$dry_run" = true ]; then
+    log "would create directory: $dir_path"
+  else
+    mkdir -p "$dir_path"
+    log "created directory: $dir_path"
+  fi
+}
+
+write_file_if_missing() {
+  file_path="$1"
+  content="$2"
+
+  if [ -e "$file_path" ]; then
+    log "preserved existing file: $file_path"
+    return
+  fi
+
+  if [ "$dry_run" = true ]; then
+    log "would create file: $file_path"
+  else
+    mkdir -p "$(dirname "$file_path")"
+    printf '%s\n' "$content" > "$file_path"
+    log "created file: $file_path"
+  fi
+}
+
+copy_file_if_missing() {
+  source_path="$1"
+  target_path="$2"
+
+  if [ -e "$target_path" ]; then
+    log "preserved existing file: $target_path"
+    return
+  fi
+
+  if [ ! -f "$source_path" ]; then
+    echo "ERROR: source template missing: $source_path" >&2
+    exit 1
+  fi
+
+  if [ "$dry_run" = true ]; then
+    log "would copy file: $source_path -> $target_path"
+  else
+    mkdir -p "$(dirname "$target_path")"
+    cp "$source_path" "$target_path"
+    log "copied file: $source_path -> $target_path"
+  fi
+}
+
+workspace_readme='# ADS Project Knowledge
+
+This is the project-owned AI Dev Shop workspace. Commit retained project artifacts here so teammates and future agents can see the same durable context.
+
+- `governance/`: project rules and the live constitution
+- `memory/`: stable project memory, learnings, notes, and memory-store entries
+- `reports/`: retained specs, ADRs, reviews, benchmarks, audits, and pipeline outputs
+- `meta/`: project-owned workflow notes, migration state, and workspace metadata
+- `.local-artifacts/`: local scratch output ignored by git
+
+Do not put secrets in this workspace. Keep short-lived local scratch in `.local-artifacts/`.'
+
+governance_readme='# Governance
+
+Project-owned governance files live here.
+
+The main runtime file is `constitution.md`. AI Dev Shop planning and architecture stages read it to understand project-specific constraints, principles, and exception rules.'
+
+memory_readme='# Memory
+
+Project-owned memory files live here.
+
+- `project_memory.md`: stable project conventions, constraints, and gotchas
+- `learnings.md`: lessons learned, postmortems, and repeated failure patterns
+- `project_notes.md`: temporary notes, open questions, and parking lot items
+- `memory-store.md`: structured memory entries when a workflow needs tagged retrieval'
+
+reports_readme='# Reports
+
+Retained AI Dev Shop artifacts live here.
+
+Use this folder for pipeline outputs, codebase analysis, architecture decisions, reviews, test certifications, security reports, benchmark results, and other project-owned records that should be visible to teammates.'
+
+meta_readme='# Meta
+
+Workspace metadata and project-owned operating notes live here.
+
+Use this folder for workflow notes, migration state, version markers, and other bookkeeping that should travel with the project.'
+
+project_memory='# Project Memory
+
+Use this file for stable project-specific conventions, constraints, gotchas, and patterns.
+
+## Entries
+
+- YYYY-MM-DD: <fact / convention / gotcha>'
+
+learnings='# Learnings
+
+Use this file for lessons learned, postmortem-style findings, and repeated failure patterns.
+
+## Entries
+
+- YYYY-MM-DD: <what failed or worked, why it mattered, and what to do next time>'
+
+project_notes='# Project Notes
+
+Use this file for temporary notes, open questions, and parking lot items.
+
+## Entries
+
+- YYYY-MM-DD: <open question / working note / deferred decision>'
+
+memory_store='# Memory Store
+
+Structured project memory entries can live here when a workflow needs tagged retrieval.
+
+## Entries
+
+_No entries yet._'
+
+log "AI Dev Shop first-time project setup"
+log "Toolkit root: $ads_root"
+log "Workspace: $workspace_root"
+log "Active provider: $active_provider"
+
+ensure_dir "$workspace_root"
+ensure_dir "$workspace_root/governance"
+ensure_dir "$workspace_root/memory"
+ensure_dir "$workspace_root/reports"
+ensure_dir "$workspace_root/meta"
+ensure_dir "$workspace_root/.local-artifacts"
+
+copy_file_if_missing \
+  "$ads_root/framework/templates/bootstrap/workspace-gitignore.template" \
+  "$workspace_root/.gitignore"
+
+copy_file_if_missing \
+  "$ads_root/framework/templates/bootstrap/constitution-template.md" \
+  "$workspace_root/governance/constitution.md"
+
+write_file_if_missing "$workspace_root/README.md" "$workspace_readme"
+write_file_if_missing "$workspace_root/governance/README.md" "$governance_readme"
+write_file_if_missing "$workspace_root/memory/README.md" "$memory_readme"
+write_file_if_missing "$workspace_root/reports/README.md" "$reports_readme"
+write_file_if_missing "$workspace_root/meta/README.md" "$meta_readme"
+write_file_if_missing "$workspace_root/memory/project_memory.md" "$project_memory"
+write_file_if_missing "$workspace_root/memory/learnings.md" "$learnings"
+write_file_if_missing "$workspace_root/memory/project_notes.md" "$project_notes"
+write_file_if_missing "$workspace_root/memory/memory-store.md" "$memory_store"
+
+log ""
+if [ "$dry_run" = true ]; then
+  log "Dry run complete. Re-run without --dry-run to create missing files."
+else
+  log "Setup complete."
+fi
+
+log "Next steps:"
+log "- Review and customize: $workspace_root/governance/constitution.md"
+log "- Fill in stable project facts: $workspace_root/memory/project_memory.md"
+log "- For team projects, commit ADS-project-knowledge/ so teammates share the same context."
+log "- Do not commit .local-artifacts/; $workspace_root/.gitignore keeps it local."
