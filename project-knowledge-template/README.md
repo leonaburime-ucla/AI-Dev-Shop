@@ -18,7 +18,6 @@ A project needs this shared workspace so multiple people or agents can see the d
 - `reports/`: retained writable artifacts, benchmarks, audits, continuity logs, and pipeline outputs
 - `.local-artifacts/`: ignored local-only scratch output for toolkit maintenance and local runs
 - `meta/`: workspace metadata, workflow notes, and future migration/version markers
-- `tmp/`: peer-readable temporary dispatch copies and other short-lived transport files
 
 Static toolkit-control docs no longer belong here. They live under:
 
