@@ -103,21 +103,25 @@ Other hosts do not support native slash commands. For those, open the matching f
 
 ## First-Time Project Setup
 
-Ask your coding agent:
+The easiest path is to ask your coding agent to run setup for you:
 
 ```text
 Run AI Dev Shop first-time setup. Show me what you will create before writing files.
 ```
 
-The mechanical setup is scriptable. Preview it first:
+The agent should then:
+
+1. Run the setup script in dry-run mode.
+2. Show you the planned files and folders.
+3. Wait for your approval.
+4. Run the real setup script for you.
+
+You do not need to run the Bash commands yourself unless you prefer manual setup.
+
+Manual fallback:
 
 ```bash
 bash AI-Dev-Shop-speckit/framework/operations/scripts/setup-project-knowledge.sh --dry-run
-```
-
-Then, with user approval, run:
-
-```bash
 bash AI-Dev-Shop-speckit/framework/operations/scripts/setup-project-knowledge.sh
 ```
 
