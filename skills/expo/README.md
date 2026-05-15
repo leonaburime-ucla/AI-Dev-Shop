@@ -2,6 +2,21 @@
 
 Official AI agent skills from the Expo team for building, deploying, upgrading, and debugging Expo apps.
 
+## Local Import Metadata
+
+- Source repository: `https://github.com/expo/skills`
+- Source path: `plugins/expo/`
+- Imported commit: `47f0ef64821f10e42a600758b5087bfe89c09474`
+- Imported on: 2026-05-15
+- Upstream HEAD at import time: `47f0ef64821f10e42a600758b5087bfe89c09474`
+- Local patches: fixed broken vendored reference paths, completed this README's subskill list, and corrected one SwiftUI import example.
+
+Check whether an update is available:
+
+```bash
+git ls-remote https://github.com/expo/skills HEAD
+```
+
 ## What This Plugin Does
 
 ### App Design

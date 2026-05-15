@@ -13,8 +13,18 @@ only the one or two subskills that match the task.
 
 - Official Expo plugin vendored at `<AI_DEV_SHOP_ROOT>/skills/expo/`
 - Imported from `https://github.com/expo/skills`
+- Imported path: `plugins/expo/`
 - Imported commit: `47f0ef64821f10e42a600758b5087bfe89c09474`
+- Imported on: 2026-05-15
+- Upstream HEAD at import time: `47f0ef64821f10e42a600758b5087bfe89c09474`
+- Local patches: fixed broken vendored reference paths, completed README subskill list, and corrected one SwiftUI import example.
 - Existing tactical React Native guidance: `<AI_DEV_SHOP_ROOT>/skills/vercel-react-native-skills/SKILL.md`
+
+To check for updates, compare the imported commit with:
+
+```bash
+git ls-remote https://github.com/expo/skills HEAD
+```
 
 ## Progressive Disclosure
 
