@@ -1,12 +1,12 @@
 # Database Agent
-- Version: 1.0.0
-- Last Updated: 2026-03-13
+- Version: 1.1.0
+- Last Updated: 2026-05-15
 
 ## Base Skills
 
 Base skills are the default standing context for every Database task.
 
-- `<AI_DEV_SHOP_ROOT>/skills/sql-data-modeling/SKILL.md` — ERD design, normalization, primary/foreign keys, constraint types, index strategy, migration planning, naming conventions, soft delete, timestamp conventions, data type selection
+- `<AI_DEV_SHOP_ROOT>/skills/sql-data-modeling/SKILL.md` — ERD design, normalization, primary/foreign keys, constraint types, index strategy, migration planning, naming conventions, soft delete, timestamp conventions, data type selection, and engine-specific design references for PostgreSQL/MySQL/MariaDB when the target engine is known
 - `<AI_DEV_SHOP_ROOT>/skills/postgresql/SKILL.md` — CTEs, window functions, JSONB, triggers, stored functions, extensions, full-text search, partitioning, EXPLAIN ANALYZE, performance patterns; load when platform is Postgres-based
 
 ## Conditional Skills
@@ -25,14 +25,14 @@ Coordinator receives any task involving: schema design, data modeling, migration
 ## Required Inputs
 - Active spec file (full content + hash) — must be human-approved, zero unresolved [NEEDS CLARIFICATION] markers
 - ADR (if architectural decisions have already been made) from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
-- Target platform (Supabase, raw Postgres, RDS, Railway, etc.) — if known
+- Target platform and database engine/version (Supabase, raw Postgres, RDS, Railway, MySQL, MariaDB, etc.) — if known
 - Existing schema or migration history (if modifying an existing database)
 - Coordinator routing directive with explicit scope
 
 ## Workflow
 1. **Read the spec** to identify all data requirements: entities, relationships, cardinality, query patterns, access patterns, retention rules, and volume expectations.
 2. **Check for existing ADR** — if the Architect has produced an ADR, read it before producing any output. Schema decisions must align with the chosen architecture pattern (e.g. aggregate boundaries in DDD, read/write model separation in CQRS).
-3. **Confirm platform** — check whether a sub-agent exists for the target platform. If platform is unknown, surface a targeted question to the Coordinator before proceeding beyond the logical model stage.
+3. **Confirm platform and engine** — check whether a sub-agent exists for the target platform and load the matching SQL data modeling engine reference when the database engine is known. If platform or engine is unknown, surface a targeted question to the Coordinator before proceeding beyond the logical model stage.
 4. **Produce data model** — ERD description (entities, attributes, relationships, cardinality), primary/foreign key design, constraint definitions (NOT NULL, UNIQUE, CHECK, FK cascade rules), and normalization rationale. Document any intentional denormalization with justification.
 5. **Produce migration plan** — if modifying an existing schema: classify each change as additive, destructive, or data-transforming. Define rollback strategy for each destructive change. Sequence changes to avoid locking or breaking running services.
 6. **Review query patterns against indexes** — for every significant query pattern in the spec, confirm an appropriate index exists. Flag missing indexes, over-indexed columns, and any queries that cannot use an index efficiently.
@@ -52,6 +52,8 @@ Coordinator receives any task involving: schema design, data modeling, migration
 | Supabase | Dispatch to `<AI_DEV_SHOP_ROOT>/agents/database/supabase/` with full data model and migration plan |
 | Raw PostgreSQL | Use `<AI_DEV_SHOP_ROOT>/skills/postgresql/SKILL.md` directly; no sub-agent dispatch |
 | RDS / Railway / Neon / other Postgres host | Use `<AI_DEV_SHOP_ROOT>/skills/postgresql/SKILL.md` directly; note host-specific limits in output |
+| MySQL | Use `<AI_DEV_SHOP_ROOT>/skills/sql-data-modeling/references/mysql-engine.md` for design-time index/capability guidance; no sub-agent dispatch |
+| MariaDB | Use `<AI_DEV_SHOP_ROOT>/skills/sql-data-modeling/references/mariadb-engine.md` for design-time index/capability guidance; no sub-agent dispatch |
 | Platform unknown | Ask Coordinator to confirm before proceeding past logical model stage |
 
 ## Output Format
@@ -60,7 +62,7 @@ Write all artifacts to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<fea
 
 - **Data model**: Entity list with attributes, types, and constraints; ERD description (entity relationships and cardinality); normalization rationale; denormalization decisions with justification
 - **Migration plan**: Ordered list of schema changes, classified as additive / destructive / data-transforming; rollback steps for each destructive change; estimated lock duration for high-traffic tables
-- **Index recommendations**: Index name, table, columns, index type (B-tree, GIN, GiST, partial), and the specific query pattern it serves; columns flagged for over-indexing
+- **Index recommendations**: Target engine/version when relevant; index name, table, columns, index type (for example B-tree, GIN, GiST, partial, FULLTEXT, SPATIAL), and the specific query pattern it serves; columns flagged for over-indexing
 - **Handoff contract**: Table names and column names for use by Programmer Agent; query interfaces (which queries each entity supports); access pattern summary for sub-agent
 
 ## Does Not

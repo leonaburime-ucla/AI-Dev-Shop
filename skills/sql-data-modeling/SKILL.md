@@ -1,7 +1,7 @@
 ---
 name: sql-data-modeling
-version: 1.1.2
-last_updated: 2026-04-10
+version: 1.2.0
+last_updated: 2026-05-15
 description: Use when designing relational schemas, producing ERDs, planning migrations, selecting data types, defining constraints, or reasoning about normalization and indexing strategy. Platform-agnostic — applies to any SQL database.
 ---
 
@@ -15,6 +15,7 @@ Keep this file lean. Read it for the modeling contract, then load only the refer
 
 ## Version Notes
 
+- `1.2.0` adds flat engine-specific design references for PostgreSQL, MySQL, and MariaDB index/capability caveats while keeping the core modeling contract platform-agnostic.
 - `1.1.2` makes the design-time scalability boundary explicit and adds an index-coverage hard gate for documented query patterns.
 - `1.1.1` clarifies that the lean `SKILL.md` is a routing layer, not a content reduction. The reference files now carry fuller examples for normalization, composite keys, and index design.
 - `1.1.0` converted the old monolithic skill into a map-plus-references structure so agents can load only the relevant depth for the task.
@@ -39,6 +40,11 @@ Start here, then load only the reference you need:
 - `references/keys-constraints-and-indexes.md` for PK/FK design, constraints, junction tables, and index strategy
 - `references/migrations-and-lifecycle.md` for migration classification, soft vs hard delete, and timestamp lifecycle patterns
 - `references/conventions-and-data-types.md` for naming rules and type selection guidance
+- `references/postgresql-engine.md` for PostgreSQL-specific schema/index capabilities and caveats
+- `references/mysql-engine.md` for MySQL-specific schema/index capabilities and caveats
+- `references/mariadb-engine.md` for MariaDB-specific schema/index capabilities and caveats
+
+Engine references are optional progressive-disclosure supplements. For target implementation work, load the one matching the confirmed database engine before finalizing engine-specific DDL or index recommendations. For explicit engine-comparison questions, consult only the requested engine references and keep the comparison descriptive rather than making this skill responsible for broad database selection.
 
 ## When to Use
 
@@ -66,6 +72,7 @@ Before modeling, confirm:
 - required read and write paths
 - deletion behavior
 - expected data volume and growth
+- target database engine and version, if known
 - whether the schema is greenfield or a migration of existing data
 
 ## Contract by Concern
@@ -132,3 +139,6 @@ Before modeling, confirm:
 - `references/keys-constraints-and-indexes.md`
 - `references/migrations-and-lifecycle.md`
 - `references/conventions-and-data-types.md`
+- `references/postgresql-engine.md`
+- `references/mysql-engine.md`
+- `references/mariadb-engine.md`

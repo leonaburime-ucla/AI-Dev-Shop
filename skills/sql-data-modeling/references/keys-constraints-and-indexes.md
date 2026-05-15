@@ -117,6 +117,7 @@ Remember:
 - composite index column order matters
 - covering indexes help index-only scans
 - partial indexes are often better than full indexes for hot subsets
+- engine-specific index types and caveats are not portable; load `references/postgresql-engine.md`, `references/mysql-engine.md`, or `references/mariadb-engine.md` when the target engine is known
 
 Decision examples:
 
