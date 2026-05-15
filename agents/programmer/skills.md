@@ -37,6 +37,7 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — activate when a UI/runtime issue should be reproduced and verified in a real browser session via host-configured browser automation
 - `<AI_DEV_SHOP_ROOT>/skills/backend-implementation/SKILL.md` — activate as the default entrypoint for backend/service/worker/API implementation; it pulls in narrower backend skills such as hexagonal architecture, API contract guidance, observability, and change management only when those concerns are actually in scope
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-react-orcbash/SKILL.md` — activate only when implementing React frontend features: Orc-BASH layer structure, dependency injection rules, orchestrator wiring
+- `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — activate when implementing, debugging, upgrading, or configuring Expo/React Native apps; use it as the progressive-disclosure router for official Expo skills plus React Native performance rules
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — activate when the task adds or changes external I/O, telemetry, or instrumentation points
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — activate when implementation includes phased rollout, compatibility windows, or dual writes
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — activate when dispatched with `MIGRATION-*.md` context or other phased migration work

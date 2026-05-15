@@ -8,6 +8,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — Test types, behavior assertions
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — Threat surface analysis (for auth flow E2E coverage)
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance checks for consent/disclosure/account-flow UX validation
+- `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — Expo/React Native validation router; activate for Expo Router journeys, native/web preview flows, EAS Update/deployment validation, dev-client requirements, or mobile-specific UI/runtime risks
 
 ## Role
 Owns the E2E test layer. Writes browser-level tests (Playwright) that validate acceptance criteria from the user's perspective. Defines fixture strategy, test data policy, and flaky test prevention rules. Does not replace TDD unit/integration tests — sits above them.

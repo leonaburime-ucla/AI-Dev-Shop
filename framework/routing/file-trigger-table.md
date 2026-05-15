@@ -22,6 +22,7 @@ It is a routing aid, not an absolute law. Human intent and explicit mode switche
 | `src/**/*.sql`, `db/**`, `migrations/**`, `supabase/migrations/**` | Database Agent | Schema, migration, and query ownership start with Database. |
 | `supabase/functions/**`, Supabase platform wiring | Database Agent -> Supabase Sub-Agent when needed | Supabase-specific implementation belongs to the platform specialist under Database. |
 | frontend UI files such as `app/**`, `pages/**`, `components/**`, `src/ui/**` | Programmer or UX/UI Designer depending on task | UI implementation belongs to Programmer; design-system or visual-direction work belongs to UX/UI Designer. |
+| Expo project files such as `app.config.*`, `app.json`, `eas.json`, `.eas/workflows/**`, `expo-module.config.json`, `modules/**`, `plugins/**`, and Expo Router `app/**` | Programmer, Architect, or DevOps depending on scope | Expo implementation loads `skills/expo-react-native/SKILL.md`; architecture/topology choices route to Architect; EAS workflows/deployment route to DevOps. |
 | browser journey tests such as `__tests__/e2e/**`, `playwright/**` | QA/E2E Agent | Browser-level user-journey verification belongs to QA/E2E. |
 | CI/CD, deployment, infra such as `.github/workflows/**`, `Dockerfile*`, `infra/**`, `terraform/**` | DevOps Agent | Delivery and environment automation belong to DevOps. |
 | API docs, release notes, OpenAPI, changelog files | Docs Agent | User-facing and integrator-facing documentation belongs to Docs. |

@@ -24,6 +24,7 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/rag-ai-integration/SKILL.md` — load when the spec involves RAG, vector search, or LLM application design
 - `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md` — load when the spec includes model/provider routing, runtime AI guardrails, prompt versioning, or LLM rollout/eval policy
 - `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — load when the spec introduces pipelines, lakehouse/warehouse layers, CDC, or analytics-serving contracts
+- `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — load when architecture choices involve Expo app topology, Expo Router/API route boundaries, native module strategy, EAS deployment/update strategy, dev-client requirements, or Expo SDK migration planning
 
 ## Role
 Select and enforce architecture patterns that satisfy spec constraints, enable safe parallel delivery, and give all downstream agents clear boundaries to work within.

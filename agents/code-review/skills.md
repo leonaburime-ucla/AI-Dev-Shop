@@ -14,6 +14,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — validates `@overallScore`, severity-graded findings, complexity notes, and pass/debt/block routing for new or materially changed logic-bearing functions
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy: AC format, invariants, edge cases, scope boundaries; required for Dimension 1 (Spec Alignment) — mapping each AC, invariant, and edge case to its implementation path
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA checklist (activated when diff includes frontend components)
+- `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — Expo/React Native review router; activate when diffs touch Expo Router, native UI, data fetching, API routes, native modules, Expo config, EAS workflows/deployment, SDK upgrades, or React Native performance-sensitive surfaces
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — backward compatibility and contract validation
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` — load when reviewing API surface changes that alter style choice, pagination/filtering policy, error model, lifecycle policy, webhook semantics, or SDK-facing ergonomics
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance checks for privacy/consent/claims/account-flow UX risks

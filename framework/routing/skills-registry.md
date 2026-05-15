@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.16
-last_updated: 2026-05-13
+version: 1.2.17
+last_updated: 2026-05-15
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -43,6 +43,8 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/interface-design/SKILL.md` | UX/UI Designer Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
 | `skills/vercel-web-design-guidelines/SKILL.md` | UX/UI Designer Agent, Code Review Agent, QA/E2E Agent (UI/UX guideline audits) |
 | `skills/vercel-react-native-skills/SKILL.md` | Programmer, QA/E2E Agent, Code Review Agent (React Native/Expo tactical guidance) |
+| `skills/expo-react-native/SKILL.md` | Programmer, Architect, Code Review Agent, QA/E2E Agent, DevOps Agent (progressive-disclosure router for official Expo skills and React Native tactical rules) |
+| `skills/expo/skills/*/SKILL.md` | Loaded only through `skills/expo-react-native/SKILL.md` (vendored official Expo plugin subskills for UI, data fetching, API routes, native modules, EAS, deployment, upgrades, and update insights) |
 | `skills/sql-data-modeling/SKILL.md` | Database Agent |
 | `skills/postgresql/SKILL.md` | Database Agent, Supabase Sub-Agent |
 | `skills/supabase/SKILL.md` | Supabase Sub-Agent |

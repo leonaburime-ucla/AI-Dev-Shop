@@ -16,6 +16,7 @@ Conditional skills are not standing context. Load only the subset triggered by t
 
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — load when the rollout includes breaking changes, compatibility windows, canaries, or phased migration
 - `<AI_DEV_SHOP_ROOT>/skills/incident-response/SKILL.md` — load when writing rollback/runbook artifacts, incident hardening work, or post-incident operational follow-up
+- `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — load for EAS workflows, EAS Build/Submit, Expo deployment runbooks, app-store release flow, and EAS Update health gates
 
 ## Role
 Owns everything between "code is done" and "code is in production." Writes Dockerfiles, CI/CD pipeline configs, IaC declarations, deployment runbooks, health check definitions, and environment configuration. Does not write application code.
