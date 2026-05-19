@@ -48,6 +48,25 @@ Rule of thumb:
 
 ---
 
+## Host-Project Contracts
+
+Host projects declare executable quality contracts that agents consume at each pipeline stage. These are machine-actionable declarations — not guidelines.
+
+**Framework specs** (what contracts must contain): `<AI_DEV_SHOP_ROOT>/framework/contracts/`
+**Host declarations** (project-specific values): `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/`
+
+| Contract | Host file | Purpose |
+|----------|-----------|---------|
+| Computational Controls | `governance/contracts/computational-controls.md` | Lint, typecheck, build, test commands |
+| Runtime Validation | `governance/contracts/runtime-validation.md` | Boot, health, critical path, teardown |
+| Architecture Fitness | `governance/contracts/architecture-fitness.md` | Dependency rules, forbidden imports, boundaries |
+
+Enforcement behavior (missing/failing/stale contracts) is defined in `<AI_DEV_SHOP_ROOT>/framework/contracts/enforcement.md`.
+
+Bootstrap guide for new and existing projects: `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/contracts-bootstrap.md`.
+
+---
+
 ## Planning Surface Convention
 
 Planning artifacts live at the provider-defined location. The exact file set comes from the active provider profile.

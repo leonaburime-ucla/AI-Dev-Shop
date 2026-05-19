@@ -43,6 +43,21 @@ Each stage is blocked until the Coordinator validates the previous stage's hando
 
 ---
 
+## Contract Checkpoint (Coordinator Duty)
+
+At pipeline start and before each implementation stage, the Coordinator checks host-project contract status per `<AI_DEV_SHOP_ROOT>/framework/contracts/enforcement.md`:
+
+1. **Pipeline start**: check whether `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/` exists and which contracts are declared. Report status (active/partial/missing for each). Apply greenfield vs brownfield defaults.
+2. **Before Programmer dispatch**: include declared computational controls commands in Programmer context. If runtime-changing work, include runtime-validation contract. Flag any missing required contracts per enforcement tier.
+3. **Before Programmer handoff**: verify all declared blocking computational checks pass on modified files.
+4. **Before TestRunner**: pass declared test commands from computational controls.
+5. **Before Code Review**: pass architecture-fitness rules and lint/typecheck results to reviewer context.
+6. **At Done gate**: verify no unresolved contract blockers remain. Report contract coverage in pipeline summary.
+
+If a contract is missing and enforcement requires escalation, the Coordinator asks the user before proceeding — it does not silently skip or silently block.
+
+---
+
 ## Pre-Pipeline: Existing Codebase Analysis
 
 Run this before the first Spec when working with an existing codebase.

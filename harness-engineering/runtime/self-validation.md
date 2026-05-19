@@ -41,6 +41,12 @@ Start from the closest stack template under `<AI_DEV_SHOP_ROOT>/framework/templa
 - `python-service-template.md`
 - `supabase-template.md`
 
+## Contract Integration
+
+This file defines the execution pattern and bounded retry rules for runtime validation. The **authoritative declaration contract** — what fields the host project must fill in and the formal outcome definitions — lives at `<AI_DEV_SHOP_ROOT>/framework/contracts/runtime-validation.md`.
+
+Host projects write their concrete declarations to `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/runtime-validation.md`. The outcome descriptions below (PASS/PARTIAL/BLOCKER) are kept consistent with the contract but the contract is the source of truth.
+
 ## What The Host Project Must Define
 
 Dropping this toolkit into a repo does not automatically create a runnable runtime harness. The host project still needs to fill in the concrete checks.
