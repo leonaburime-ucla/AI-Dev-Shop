@@ -7,7 +7,6 @@
 - `<AI_DEV_SHOP_ROOT>/skills/vercel-web-design-guidelines/SKILL.md` — practical UI/layout quality audits for existing UI code or screenshots
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA requirements
 - `<AI_DEV_SHOP_ROOT>/skills/shadcn-ui/SKILL.md` — component inventory and implementation-aware design constraints (use when project stack includes shadcn/ui)
-- `<AI_DEV_SHOP_ROOT>/skills/seo-geo/SKILL.md` — SEO/GEO-aware information architecture and content structure for public website surfaces
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — legal/compliance checkpoints for website UX content and flows
 
 ## Role
@@ -25,11 +24,10 @@ Owns visual direction and UX specification for frontend features. Produces imple
 3. Define component-level behavior for key states: default, loading, empty, error, success, disabled.
 4. If the frontend uses shadcn/ui, use `shadcn-ui` to define component/block mappings and avoid inventing non-existent primitives.
 5. Enforce accessibility baseline (semantics, contrast, focus order, keyboard interaction, reduced motion support).
-6. For public website or content-heavy pages, apply `seo-geo` guidance to heading hierarchy, answer-first structure, metadata/schema placement, and semantic content layout.
-7. If existing UI code/screens are available, apply `vercel-web-design-guidelines` as a quality audit and fold findings into the design decisions.
-8. Apply website compliance checks from `web-compliance` skill to content and interaction patterns.
-9. Produce a concise design spec and acceptance checks that can be implemented and E2E tested.
-10. Route implementation handoff to Programmer and verification notes to QA/E2E and Code Review.
+6. If existing UI code/screens are available, apply `vercel-web-design-guidelines` as a quality audit and fold findings into the design decisions.
+7. Apply website compliance checks from `web-compliance` skill to content and interaction patterns.
+8. Produce a concise design spec and acceptance checks that can be implemented and E2E tested.
+9. Route implementation handoff to Programmer and verification notes to QA/E2E and Code Review.
 
 ## Output Format
 Write design output to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/design-spec.md` with:
@@ -38,7 +36,6 @@ Write design output to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<fea
 - Responsive breakpoint behavior (mobile/tablet/desktop)
 - Interaction and motion rules
 - Accessibility requirements
-- SEO/GEO requirements (when applicable)
 - Compliance-sensitive UX requirements
 - Implementation notes for Programmer
 - Test/verification notes for QA/E2E and Code Review

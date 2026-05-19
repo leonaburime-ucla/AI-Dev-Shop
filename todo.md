@@ -16,6 +16,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Protocol Split: MCP + A2A: **OPEN**
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
+- Search Visibility Agent + Frontend SEO/GEO/AEO Indexability Skill: **DONE / MONITORED** (optional agent, updateable skill, source ledger, refresh policy, and research report added; keep source claims refreshed as the landscape changes)
 
 ---
 
@@ -388,6 +389,46 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **What it is:** UI testing is often skipped by LLMs. Need a strict policy enforcing React component test creation.
 **Current state:** Added to `harness-engineering/quality/react-component-testing-policy.md`.
 **What to add:** Enforce the policy across TDD and Programmer routing. Update skill definition files and evaluation checklists.
+
+### Search Visibility Agent + Frontend SEO/GEO/AEO Indexability Skill `Medium` **[DONE / MONITORED]**
+**What it is:** Research and define an optional Search Visibility Agent plus supporting skill guidance for auditing public-facing pages and content surfaces so they are easier for search engines, generative engines, answer engines, chatbots, AI browsers, and retrieval systems to understand, cite, and navigate.
+**Why it matters:** If a project expects search discovery, chatbot discovery, or AI-assisted site navigation, the frontend should expose clear semantic structure, durable content signals, and machine-readable context instead of relying only on visual layout. SEO, GEO, and AEO overlap, but they should be compared explicitly before becoming hard framework rules.
+**Scope guardrail:** This should not become a default stage for most apps. Public routes or content are not enough by themselves. Trigger only when the user explicitly asks for SEO/GEO/AEO/indexing/search visibility work or the active spec/ADR names public discoverability as a goal, NFR, acceptance criterion, or audit target.
+**Current state:** Implemented as a modular optional `Search Visibility` agent, an updateable `skills/seo-geo/SKILL.md` guidance layer used by that agent, a source ledger, a refresh policy, and a retained research report at `../ADS-project-knowledge/reports/search-visibility/2026-05-19-search-visibility-research.md`.
+**Specific note:** SEO/AEO/GEO rules are unstable and must be periodically refreshed against current official docs, live platform behavior, and dated research. The implemented skill includes `last_verified` metadata and requires the source ledger / refresh policy before platform-specific claims become hard audit findings.
+**Pipeline placement:** Optional post-implementation audit pass dispatched by Coordinator only when explicitly triggered. It is not standing context for Programmer, Code Review, Docs, UX/UI Designer, Architect, or DevOps.
+**Reports run / retained:**
+- `../ADS-project-knowledge/reports/search-visibility/2026-05-19-search-visibility-research.md`
+
+**Research coverage completed:**
+- Audit current best practices for SEO, GEO, AEO, AI crawler / chatbot retrieval behavior, semantic HTML, structured data, accessibility landmarks, metadata, and content chunking.
+- Compare where SEO, GEO, AEO, accessibility, and internal search indexing overlap, where they conflict, and which practices are durable enough for Programmer guidance.
+- Review examples of frontend patterns that help or hurt AI agents: hidden text, client-rendered content, route structure, headings, schema.org, canonical metadata, data attributes, and stable URLs.
+- Audit AI-specific indexing protocols and conventions: `llms.txt`, `ai.txt`, AI crawler directives, and any emerging machine-discovery standards distinct from traditional `robots.txt` and `sitemap.xml`.
+- Evaluate rendering strategy impact on discoverability: SSR vs CSR vs ISR/SSG tradeoffs for search crawlers, generative engines, and AI retrieval agents. This is the single biggest technical lever and needs explicit comparison.
+- Define quantitative output metrics the agent should report: indexation rate, structured data coverage %, crawl error count, rich result eligibility, semantic heading coverage, and any other measurable KPIs that prevent the agent from being opinion-only.
+- Identify tooling dependencies and MCP implications: whether the agent needs Lighthouse, schema.org validators, Search Console API access, or similar external tools versus operating as a read-code-and-advise agent with no external access.
+- Identify whether this should become a dedicated optional agent (`Search Visibility Agent`) that performs audits and routes fixes to Programmer, Docs, UX/UI Designer, or DevOps, versus remaining a shared skill used by existing agents.
+- Identify which recommendations belong in a new Search Visibility Agent, a new skill, or optional project-specific guidance instead of wiring search rules into normal delivery agents.
+**Likely files to inspect/update after research:**
+- `framework/routing/agent-index.md`
+- `framework/routing/skills-registry.md`
+- `agents/programmer/skills.md`
+- `agents/code-review/skills.md`
+- `agents/docs/skills.md`
+- `agents/ux-ui-designer/skills.md`
+- `agents/architect/skills.md` (rendering strategy decisions, CDN/redirect config)
+- `agents/devops/skills.md` (infrastructure-level redirect, caching, and crawler-access config)
+- any existing frontend, accessibility, SEO, or documentation-related skills
+- `harness-engineering/agent-evals/programmer-evals/` if an eval should prove the new skill matters
+**Eval story:** Research report and agent/skill shape are now in place. Future work should add a small eval seed set proving the agent catches real discoverability failures that Programmer/Code Review miss without the guidance, such as CSR-only public content, schema/visible-content mismatch, WAF bot blocking, and stale GEO claims incorrectly treated as Required findings.
+**Done when:**
+- DONE: A research report summarizes practical patterns and tradeoffs.
+- DONE: The repo has a dedicated optional Search Visibility Agent plus SEO/GEO/AEO guidance kept modular behind that agent and the Skills Librarian refresh path.
+- DONE: The guidance distinguishes SEO, GEO, AEO, chatbot indexability, accessibility overlap, and emerging protocols while reusing durable practices where they overlap.
+- DONE: The agent produces quantitative metrics alongside qualitative findings so results are actionable and trackable over time.
+- DONE: The guidance defines a periodic update cadence and `last_verified` / source-ledger rules so fast-changing SEO/AEO/GEO platform assumptions do not become stale framework law.
+- MONITOR: Keep source-ledger claims refreshed and add eval seeds in a later agent-eval pass.
 
 ### Debug Playbook
 **What it is:** Agents need a structured debug loop (reproduce, isolate, instrument, hypothesize, fix) to prevent thrashing.

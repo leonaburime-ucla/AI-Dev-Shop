@@ -13,6 +13,7 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | TDD | Writes certified test suite before implementation | `agents/tdd/skills.md` |
 | Programmer | Implements code to satisfy certified tests | `agents/programmer/skills.md` |
 | UX/UI Designer (optional) | Defines visual direction, UI style system, and implementation-ready design specs for frontend work | `agents/ux-ui-designer/skills.md` |
+| Search Visibility (optional) | Audits public surfaces for search, AI answer, and chatbot discoverability; produces metrics and routes fixes | `agents/search-visibility/skills.md` |
 | QA/E2E | Writes browser-level tests that validate user journeys and frontend ACs | `agents/qa-e2e/skills.md` |
 | TestRunner | Executes test suite, reports pass/fail evidence | `agents/testrunner/skills.md` |
 | Code Review | Reviews spec alignment, architecture, test quality, security surface | `agents/code-review/skills.md` |
@@ -43,6 +44,7 @@ The following names are the canonical reserved agent names for response prefixes
 - `TDD`
 - `Programmer`
 - `UX/UI Designer`
+- `Search Visibility`
 - `QA/E2E`
 - `TestRunner`
 - `Code Review`

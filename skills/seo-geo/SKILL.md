@@ -1,242 +1,205 @@
 ---
 name: seo-geo
-description: SEO & GEO (Generative Engine Optimization) for websites. Analyze keywords, generate schema markup, optimize for AI search engines (ChatGPT, Perplexity, Gemini, Copilot, Claude) and traditional search (Google, Bing). Use when user wants to improve search visibility, search optimization, search ranking, AI visibility, ChatGPT ranking, Google AI Overview, indexing, JSON-LD, meta tags, or keyword research.
+description: Search visibility and indexability for public web surfaces across traditional SEO, generative engines, answer engines, AI retrieval, and chatbot discovery. Use only for public-facing pages, docs, blogs, ecommerce/product pages, directories, marketing surfaces, public app/tool landing pages, app-store metadata, or explicit user requests.
+last_verified: 2026-05-19
+verification_required: Re-check the source ledger before using platform-specific crawler, AI-answer, ranking, or protocol claims as findings.
 ---
 
-# SEO/GEO Optimization Skill
+# Search Visibility / SEO-GEO-AEO Indexability
 
-Comprehensive SEO and GEO (Generative Engine Optimization) for websites. Optimize for both traditional search engines (Google, Bing) and AI search engines (ChatGPT, Perplexity, Gemini, Copilot, Claude).
+This skill keeps public web surfaces understandable, crawlable, citeable, and navigable by search engines, answer engines, AI search systems, chatbots, AI browsers, and retrieval tools.
 
-## Quick Reference
+Use it conservatively. For most internal apps, private admin surfaces, backend-only work, and native-only screens, this skill is out of scope unless the user explicitly asks for public discoverability.
 
-**GEO = Generative Engine Optimization** - Optimizing content to be cited by AI search engines.
+## Required Freshness Gate
 
-**Key Insight:** AI search engines don't rank pages - they **cite sources**. Being cited is the new "ranking #1".
+Before relying on platform-specific claims, read:
 
-## Workflow
+- `references/search-visibility-source-ledger.md`
+- `references/search-visibility-refresh-policy.md`
 
-### Step 1: Website Audit
+If a claim is stale, unsupported, or absent from the ledger, downgrade it to Advisory or ignore it. Do not create Required findings from stale SEO/GEO/AEO research, bot names, platform behavior, ranking factors, or emerging protocol claims.
 
-Get the target URL and analyze current SEO/GEO status.
+## Claim Tiers
 
-**Check Meta Tags:**
+| Tier | Meaning | Can Block? | Examples |
+|---|---|---|---|
+| T1 Durable | Web fundamentals that change slowly | Yes | crawlable HTML, stable URLs, canonical URLs, semantic headings, accessible names, visible structured data |
+| T2 Platform | Official platform-documented behavior | Yes only while current | Google AI feature controls, OpenAI/Anthropic/Perplexity crawler purposes, Bing AI reporting surfaces |
+| T3 Research | Peer-reviewed or vendor research, observed behavior, optimization studies | No | GEO method lift percentages, citation-pattern studies, platform preference claims |
+| T4 Emerging | Unratified or weakly adopted conventions | No | `llms.txt`, `ai.txt`, new crawler conventions not documented by major platforms |
+
+Hard audit findings must be grounded in T1 or current T2 evidence. T3 and T4 may inform recommendations, but they are Advisory by default.
+
+## When To Activate
+
+Activate for:
+
+- public websites, docs, blogs, directories, ecommerce/product pages, and marketing pages
+- public app/tool landing pages and app-store metadata
+- public help centers, changelogs, API docs, tutorials, and knowledge bases
+- explicit user requests for SEO, GEO, AEO, AI search visibility, chatbot discoverability, indexing, schema, metadata, robots, or sitemap work
+
+Do not activate for:
+
+- internal dashboards or private admin areas
+- authenticated-only product screens
+- backend-only features
+- native-only app screens with no public web discovery surface
+- generic frontend work where discoverability is not a goal
+
+## Durable Implementation Rules
+
+These rules are safe defaults for implementers and reviewers.
+
+### Rendered Content
+
+- Critical public content should be available in initial HTML through SSR, SSG, ISR, prerendering, or an equivalent server-rendered path.
+- CSR-only pages are a discoverability risk when crawlers or AI retrieval systems do not execute complex JavaScript.
+- The rendered page must expose the same primary content, links, titles, descriptions, and structured data that users see.
+- Do not use hidden text, cloaking, AI-only content, or schema for content that is not visible to users.
+
+### Crawlability And Routing
+
+- Public pages need stable, durable URLs.
+- Important pages must be reachable through crawlable links, not only client-side click handlers, search widgets, or JS-only navigation.
+- `robots.txt`, `noindex`, auth gates, redirects, canonical tags, and CDN/WAF rules must align with the discoverability goal.
+- A sitemap should include important public canonical URLs and should not include private, duplicate, redirected, or intentionally noindexed pages.
+- If a staging or production URL is available, verify crawler access with live HTTP checks as well as static source review. Edge WAF and bot-fight rules often cannot be detected from repo files.
+
+### Metadata
+
+- Each public page should have a unique `<title>`, meta description, canonical URL, and Open Graph metadata when sharing or preview quality matters.
+- Metadata should match the actual visible page purpose.
+- Public docs and content pages should expose meaningful `datePublished` and `dateModified` only when those dates are truthful and maintained.
+- Avoid keyword stuffing and misleading metadata.
+
+### Semantic HTML And Accessibility
+
+- Use one clear H1 per primary page view and a logical H2/H3 outline.
+- Use landmarks (`main`, `nav`, `header`, `footer`, `aside`) and descriptive link text.
+- Images and media that carry meaning need accessible text equivalents.
+- Accessibility and search visibility overlap: if a page is hard for assistive technology to parse, it is often hard for crawlers and retrieval agents to parse too.
+
+### Structured Data
+
+- Prefer JSON-LD where the stack supports it.
+- Structured data must match visible content, stay current, and avoid irrelevant or misleading schema.
+- Choose schema types from the page's actual purpose, such as `WebPage`, `Article`, `Product`, `Organization`, `SoftwareApplication`, `FAQPage`, `BreadcrumbList`, or `VideoObject`.
+- Validate schema when tools are available. If external validators are unavailable, at minimum check JSON syntax, schema placement, visible-content parity, and duplicate/conflicting nodes.
+
+### Content Extraction
+
+- Put a direct answer or summary near the top of explainers, docs, FAQs, and knowledge-base pages.
+- Use short, focused paragraphs, descriptive headings, lists, and tables where they improve extraction.
+- Cite authoritative sources for factual claims in public content when appropriate.
+- Separate marketing claims from factual, source-backed statements.
+
+## Platform-Specific Guidance
+
+Use current ledger entries before applying these checks.
+
+- Distinguish training crawlers, search/retrieval crawlers, and user-directed fetchers.
+- Allowing a crawler can make retrieval possible, but it does not guarantee ranking, citation, or inclusion.
+- Blocking a training crawler may be desirable for content-control reasons; blocking a search/retrieval crawler can reduce AI search visibility.
+- User-directed fetchers may behave differently from automatic crawlers and may not follow the same robots rules.
+- `llms.txt` and `ai.txt` are awareness items unless current official platform docs or project policy make them required.
+
+## Audit Workflow
+
+1. Confirm the target surface is public and discoverability is in scope.
+2. Read the source ledger and refresh policy. Mark stale T2/T3/T4 claims before auditing.
+3. Inventory public route/page types and decide whether the audit is URL-based, source-based, or both.
+4. Check rendering strategy and initial HTML for critical content.
+5. Check crawlability: robots, sitemap, canonical URLs, noindex, redirects, internal links, and live crawler-style HTTP access when URLs are available.
+6. Check metadata, structured data, semantic outline, accessibility landmarks, and content extraction.
+7. Separate findings into Required, Recommended, and Advisory.
+8. Route fixes to the right owner: Programmer, Docs, UX/UI Designer, Architect, DevOps, or Security.
+9. Report quantitative metrics alongside qualitative findings.
+
+## Live Verification Examples
+
+Use live checks only when the user has provided a staging or production URL, or when local runtime self-validation has started the app.
+
 ```bash
-curl -sL "https://example.com" | grep -E "<title>|<meta name=\"description\"|<meta property=\"og:|application/ld\+json" | head -20
+curl -sI "https://example.com/"
+curl -sL "https://example.com/robots.txt"
+curl -sL "https://example.com/sitemap.xml" | head -50
+curl -sL -A "OAI-SearchBot/1.0" "https://example.com/" | head -40
+curl -sL -A "PerplexityBot/1.0" "https://example.com/" | head -40
 ```
 
-**Use this for**: Quick check of essential meta tags and schema markup on any webpage.
+If a bot-style request returns 403/429 or substantially different content while normal requests succeed, flag it as a live crawler-access concern and route likely CDN/WAF issues to DevOps.
 
----
+## Quantitative Metrics
 
-**Check robots.txt:**
-```bash
-curl -s "https://example.com/robots.txt"
-```
+Report the metrics you can measure from available evidence:
 
-**Use this for**: Verify which bots are allowed/blocked. Critical for ensuring AI search engines can crawl your site.
+| Metric | Definition |
+|---|---|
+| Public route inventory | Count of public routes/pages audited |
+| Indexation eligibility | Percent of audited public pages not blocked by robots, auth, noindex, hard errors, or broken redirects |
+| Initial HTML coverage | Percent of audited public pages whose primary content appears before client JS execution |
+| Metadata completeness | Percent with title, description, canonical, and share metadata where applicable |
+| Structured data coverage | Percent of eligible page types with valid and visible-content-matching JSON-LD |
+| Semantic outline coverage | Percent with one H1 and logical heading order |
+| Accessibility extraction coverage | Percent with landmarks, descriptive links, and meaningful alt text for important media |
+| Sitemap coverage | Percent of canonical public pages represented correctly in sitemap |
+| Crawler access findings | Count of robots, CDN, WAF, or HTTP status issues by crawler/user-agent class |
+| Search-console evidence | Google Search Console, Bing Webmaster Tools, or AI Performance metrics when provided by the user |
 
----
+## Finding Classification
 
-**Check sitemap:**
-```bash
-curl -s "https://example.com/sitemap.xml" | head -50
-```
+- **Required:** Blocks or materially breaks discoverability for in-scope public pages. Examples: critical pages noindexed by mistake, primary content absent from initial HTML, schema contradicts visible content, public route behind accidental auth, broken canonical loops, production WAF blocks target retrieval crawlers when discoverability is required.
+- **Recommended:** Improves durable discoverability but does not block it. Examples: incomplete OG metadata, weak heading hierarchy, missing optional schema, thin summaries, missing sitemap entry for a low-priority page.
+- **Advisory:** Platform-volatile or research-based suggestions. Examples: GEO method experiments, emerging protocol suggestions, non-official platform observations, stale T2/T3 claims.
 
-**Use this for**: Verify sitemap structure and ensure all important pages are included for search engine discovery.
+## Output Template
 
-**Verify AI Bot Access:**
-```
-# These bots should be allowed in robots.txt:
-- Googlebot (Google)
-- Bingbot (Bing/Copilot)
-- PerplexityBot (Perplexity)
-- ChatGPT-User (ChatGPT with browsing)
-- ClaudeBot / anthropic-ai (Claude)
-- GPTBot (OpenAI)
-```
-
-### Step 2: Keyword Research
-
-Use **WebSearch** to research target keywords:
-
-```
-WebSearch: "{keyword} keyword difficulty site:ahrefs.com OR site:semrush.com"
-WebSearch: "{keyword} search volume 2026"
-WebSearch: "site:{competitor.com} {keyword}"
-```
-
-**Analyze:**
-- Search volume and difficulty
-- Competitor keyword strategies
-- Long-tail keyword opportunities
-- International keyword conflicts (e.g., "OPC" = industrial automation in English markets)
-
-### Step 3: GEO Optimization (AI Search Engines)
-
-Apply the **9 Princeton GEO Methods** (see [references/geo-research.md](./references/geo-research.md)):
-
-| Method | Visibility Boost | How to Apply |
-|--------|-----------------|--------------|
-| **Cite Sources** | +40% | Add authoritative citations and references |
-| **Statistics Addition** | +37% | Include specific numbers and data points |
-| **Quotation Addition** | +30% | Add expert quotes with attribution |
-| **Authoritative Tone** | +25% | Use confident, expert language |
-| **Easy-to-understand** | +20% | Simplify complex concepts |
-| **Technical Terms** | +18% | Include domain-specific terminology |
-| **Unique Words** | +15% | Increase vocabulary diversity |
-| **Fluency Optimization** | +15-30% | Improve readability and flow |
-| ~~Keyword Stuffing~~ | **-10%** | **AVOID - hurts visibility** |
-
-**Best Combination:** Fluency + Statistics = Maximum boost
-
-**Generate FAQPage Schema** (+40% AI visibility):
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [{
-    "@type": "Question",
-    "name": "What is [topic]?",
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "According to [source], [answer with statistics]."
-    }
-  }]
-}
-```
-
-**Optimize Content Structure:**
-- Use "answer-first" format (direct answer at top)
-- Clear H1 > H2 > H3 hierarchy
-- Bullet points and numbered lists
-- Tables for comparison data
-- Short paragraphs (2-3 sentences max)
-
-### Step 4: Traditional SEO Optimization
-
-**Meta Tags Template:**
-```html
-<title>{Primary Keyword} - {Brand} | {Secondary Keyword}</title>
-<meta name="description" content="{Compelling description with keyword, 150-160 chars}">
-<meta name="keywords" content="{keyword1}, {keyword2}, {keyword3}">
-
-<!-- Open Graph -->
-<meta property="og:title" content="{Title}">
-<meta property="og:description" content="{Description}">
-<meta property="og:image" content="{Image URL 1200x630}">
-<meta property="og:url" content="{Canonical URL}">
-<meta property="og:type" content="website">
-
-<!-- Twitter Cards -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{Title}">
-<meta name="twitter:description" content="{Description}">
-<meta name="twitter:image" content="{Image URL}">
-```
-
-**JSON-LD Schema** (see [references/schema-templates.md](./references/schema-templates.md)):
-- WebPage / Article for content pages
-- FAQPage for FAQ sections
-- Product for product pages
-- Organization for about pages
-- SoftwareApplication for tools/apps
-
-**Check Content:**
-- [ ] H1 contains primary keyword
-- [ ] Images have descriptive alt text
-- [ ] Internal links to related content
-- [ ] External links have `rel="noopener noreferrer"`
-- [ ] Content is mobile-friendly
-- [ ] Page loads in < 3 seconds
-
-### Step 5: Validate & Monitor
-
-**Schema Validation:**
-```bash
-# Open Google Rich Results Test
-open "https://search.google.com/test/rich-results?url={encoded_url}"
-
-# Open Schema.org Validator
-open "https://validator.schema.org/?url={encoded_url}"
-```
-
-**Check Indexing Status:**
-```bash
-# Google (use Search Console API or manual check)
-open "https://www.google.com/search?q=site:{domain}"
-
-# Bing
-open "https://www.bing.com/search?q=site:{domain}"
-```
-
-**Generate Report:**
 ```markdown
-## SEO/GEO Optimization Report
+# Search Visibility Report
 
-### Current Status
-- Meta Tags: ✅/❌
-- Schema Markup: ✅/❌
-- AI Bot Access: ✅/❌
-- Mobile Friendly: ✅/❌
-- Page Speed: X seconds
+Metadata:
+- audited_surface:
+- audit_type: url | source | mixed
+- last_verified:
+- source_ledger_status:
+- public_scope_confirmed: yes | no
 
-### Recommendations
-1. [Priority 1 action]
-2. [Priority 2 action]
-3. [Priority 3 action]
+## Metrics
+| Metric | Result | Evidence |
+|---|---|---|
 
-### GEO Optimizations Applied
-- [ ] FAQPage schema added
-- [ ] Statistics included
-- [ ] Citations added
-- [ ] Answer-first structure
+## Required Findings
+| Finding | Evidence | Route |
+|---|---|---|
+
+## Recommended Findings
+| Finding | Evidence | Route |
+|---|---|---|
+
+## Advisory Notes
+| Note | Source tier | Freshness |
+|---|---|---|
+
+## Owner Routing
+| Owner | Work |
+|---|---|
+
+## Refresh Notes
+- stale_claims:
+- claims_not_evaluated:
 ```
 
-## Platform-Specific Optimization
+## Legacy References
 
-See [references/platform-algorithms.md](./references/platform-algorithms.md) for detailed ranking factors.
+The older reference files in this folder remain useful as background, but the source ledger is the authority for audit findings:
 
-### ChatGPT
-- Focus on **branded domain authority** (cited 11% more than third-party)
-- Update content within **30 days** (3.2x more citations)
-- Build **backlinks** (>350K referring domains = 8.4 avg citations)
-- Match content style to ChatGPT's response format
-
-### Perplexity
-- Allow **PerplexityBot** in robots.txt
-- Use **FAQ Schema** (higher citation rate)
-- Host **PDF documents** (prioritized for citation)
-- Focus on **semantic relevance** over keywords
-
-### Google AI Overview (SGE)
-- Optimize for **E-E-A-T** (Experience, Expertise, Authority, Trust)
-- Use **structured data** (Schema markup)
-- Build **topical authority** (content clusters + internal linking)
-- Include **authoritative citations** (+132% visibility)
-
-### Microsoft Copilot / Bing
-- Ensure **Bing indexing** (required for citation)
-- Optimize for **Microsoft ecosystem** (LinkedIn, GitHub mentions help)
-- Page speed **< 2 seconds**
-- Clear **entity definitions**
-
-### Claude AI
-- Ensure **Brave Search indexing** (Claude uses Brave, not Google)
-- High **factual density** (data-rich content preferred)
-- Clear **structural clarity** (easy to extract)
-
-## Skill Dependencies
-
-This skill works best with:
-- **twitter skill** - Search SEO experts for latest tips
-- **reddit skill** - Search r/SEO, r/bigseo for discussions
-- **WebSearch** - Keyword research and competitor analysis
-
-## References
-
-- [references/platform-algorithms.md](./references/platform-algorithms.md) - Detailed ranking factors for each platform
-- [references/geo-research.md](./references/geo-research.md) - Princeton GEO research (9 methods)
-- [references/schema-templates.md](./references/schema-templates.md) - JSON-LD templates
-- [references/seo-checklist.md](./references/seo-checklist.md) - Complete SEO audit checklist
-- [references/tools-and-apis.md](./references/tools-and-apis.md) - Manual tools and platform reference
-- [examples/opc-skills-case-study.md](./examples/opc-skills-case-study.md) - Real-world optimization example
+- `references/search-visibility-source-ledger.md`
+- `references/search-visibility-refresh-policy.md`
+- `references/schema-templates.md`
+- `references/seo-checklist.md`
+- `references/tools-and-apis.md`
+- `references/google-docs-summary.md`
+- `references/geo-research.md` (background only unless refreshed into the ledger)
+- `references/platform-algorithms.md` (legacy/background only; do not use for hard findings without fresh ledger evidence)

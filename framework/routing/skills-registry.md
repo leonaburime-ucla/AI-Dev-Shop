@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.17
-last_updated: 2026-05-15
+version: 1.2.19
+last_updated: 2026-05-19
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -61,7 +61,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/superpowers-dispatching-parallel-agents/SKILL.md` | Coordinator |
 | `skills/superpowers-writing-plans/SKILL.md` | Coordinator |
 | `skills/shadcn-ui/SKILL.md` | Skills Librarian, Programmer, UX/UI Designer Agent (frontend component integration reference) |
-| `skills/seo-geo/SKILL.md` | Skills Librarian, Programmer, Docs Agent, UX/UI Designer Agent (SEO/GEO reference) |
+| `skills/seo-geo/SKILL.md` | Search Visibility (primary), Skills Librarian (refresh/maintenance). Do not load as standing context for delivery agents; route through the optional Search Visibility module when explicitly triggered. |
 | `skills/web-compliance/SKILL.md` | UX/UI Designer Agent, Code Review Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
 | `skills/find-skills/SKILL.md` | Skills Librarian only (external discovery) |
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
