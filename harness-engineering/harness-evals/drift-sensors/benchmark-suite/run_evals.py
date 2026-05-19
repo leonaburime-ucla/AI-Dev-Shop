@@ -155,13 +155,17 @@ def grade_response(seed_id: str, response: str) -> EvalResult:
     )
 
 
-def run_suite(model: str) -> list[EvalResult]:
+def run_suite(model: str, deadline: float) -> list[EvalResult]:
     results: list[EvalResult] = []
     eval_dirs = sorted(SUITE_DIR.glob("eval-*/"))
 
     print(f"  [{model}] Running {len(eval_dirs)} evals...")
 
     for eval_dir in eval_dirs:
+        if time.time() > deadline:
+            print(f"    TIMEOUT — run budget exceeded, skipping remaining evals")
+            break
+
         eval_num = eval_dir.name.split("-")[1]
         seed_id = f"SEED-DS-{eval_num.zfill(2)}"
 
@@ -194,16 +198,21 @@ def run_suite(model: str) -> list[EvalResult]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--models", default="gemini,codex")
+    parser.add_argument("--timeout", type=int, default=600, help="Total run budget in seconds (default: 600 = 10 min)")
     args = parser.parse_args()
 
     models = [m.strip() for m in args.models.split(",")]
     all_results: dict[str, list[EvalResult]] = {}
+    deadline = time.time() + args.timeout
 
-    print(f"Drift Sensor Eval Suite — models: {', '.join(models)}")
+    print(f"Drift Sensor Eval Suite — models: {', '.join(models)} (timeout: {args.timeout}s)")
     print()
 
     for model in models:
-        all_results[model] = run_suite(model)
+        if time.time() > deadline:
+            print(f"  [{model}] SKIPPED — total run budget exceeded")
+            continue
+        all_results[model] = run_suite(model, deadline)
         passed = sum(1 for r in all_results[model] if r.passed)
         total = len(all_results[model])
         print(f"  [{model}] Results: {passed}/{total} passed")
