@@ -11,6 +11,20 @@
 - `<AI_DEV_SHOP_ROOT>/framework/workflows/trace-schema.md` — trace entry format and storage rules
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md` — explicit cadence triggers, doc-garden workflow, benchmark refresh timing
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md` — when recurring failures must become validators, benchmarks, or instruction changes
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/README.md` — drift sensor catalog, taxonomy, and routing protocol
+
+## Sensor Ingestion
+
+The Observer reads drift sensor artifacts from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/` during each maintenance pass. For each sensor finding:
+
+1. Classify by severity (blocker/escalation/advisory)
+2. Route to the appropriate agent:
+   - Dead code → Refactor agent
+   - Dependency/security drift → Security agent (critical) or DevOps (routine)
+   - Coverage quality → TDD agent or Programmer
+3. If severity is blocker (critical vulnerability, license violation), escalate immediately — do not wait for next scheduled pass
+4. Log all findings in the maintenance report regardless of severity
+5. Update `harness-engineering/maintenance/tech-debt-tracker.md` for escalation/advisory items that are not immediately resolved
 
 ## Role
 Maintain auditability and enable system learning. The Observer does not sit in the main pipeline — it runs alongside it, watching everything. It produces no deliverables for the current feature. It produces improvements to the system itself.

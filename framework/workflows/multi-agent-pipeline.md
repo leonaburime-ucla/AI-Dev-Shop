@@ -58,6 +58,19 @@ If a contract is missing and enforcement requires escalation, the Coordinator as
 
 ---
 
+## Drift Sensor Checkpoint (Observer Duty)
+
+The Observer reads drift sensor artifacts from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/` during maintenance passes per `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/README.md`.
+
+Sensor findings route into the pipeline as follows:
+- **Blocker findings** (critical vulnerability, license violation): Observer escalates immediately regardless of pipeline stage. Coordinator pauses pipeline until resolved.
+- **Escalation findings** (coverage decay, major outdated deps, dead-code threshold breach): Observer includes in next maintenance report. Coordinator considers before next feature dispatch.
+- **Advisory findings** (minor outdated deps, small coverage dips, new dead code): Logged in maintenance report. No pipeline impact unless sustained over 3+ passes.
+
+The Coordinator does not run sensors directly. Sensors run on their declared schedule. The Observer is the sole consumer and router.
+
+---
+
 ## Pre-Pipeline: Existing Codebase Analysis
 
 Run this before the first Spec when working with an existing codebase.

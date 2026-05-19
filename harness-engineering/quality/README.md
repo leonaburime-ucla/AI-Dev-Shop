@@ -23,3 +23,12 @@ Committed seeded eval suites live in `../agent-evals/`. This directory keeps the
 - `testability-antipatterns.md` — catalog of coding anti-patterns that reduce testability, with required human reporting rule
 - `react-component-testing-policy.md` - mandatory component-test expectations when React surfaces are present
 - `debug-playbook.md` - debugging workflow support for quality and testability work
+
+## Drift Sensors
+
+Recurring codebase-health signals that feed into Observer maintenance passes. See `harness-engineering/sensors/README.md` for the full catalog.
+
+Phase 1 sensors:
+- `../sensors/dead-code.md` — unused exports, unreachable code, orphaned files
+- `../sensors/dependency-drift.md` — outdated deps, vulnerabilities, license issues
+- `../sensors/coverage-quality.md` — test coverage trends and critical-path gaps
