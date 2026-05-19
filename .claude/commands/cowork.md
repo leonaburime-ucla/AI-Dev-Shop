@@ -13,8 +13,9 @@ Provide a bounded task and either explicit files or enough detail for the Coordi
   - `peers=<claude,gemini,codex>`: peer CLIs to include; default is available external peer CLIs, preferring different model families from the current host
   - `risk=<auto|low|medium|high>`: risk tier; default `auto`; when `auto`, the Coordinator resolves the tier from participant recommendations and change characteristics, using the highest justified tier
   - `approval=<plan|auto>`: default `plan`; `auto` is allowed only when the user explicitly provided it in this invocation
-  - `audit=<auto|skip|require>`: default `auto`; `skip` is honored only when the audit-skip policy is satisfied
+  - `audit=<auto|skip|require>`: default `auto`; `require` means audit must run and skip is not available regardless of conditions; `skip` is honored only when the audit-skip policy is satisfied
   - `max_retry_cycles=<1|2>`: default `1`; applies independently to peer-verification retries and test-gate retries, not as one shared total budget
+  - `max_correction_rounds=<1|2>`: default `1`; number of post-audit correction rounds; independent from peer-verification and test-gate retry budgets
   - `test_command=<command>`: explicit verification command; if omitted, infer a safe project test command or report that no automated test gate was found
   - `claude_model=<exact-id>`, `gemini_model=<exact-id>`, `codex_model=<exact-id>`: optional per-run model pins
 - `task`: the concrete change to make
@@ -104,18 +105,39 @@ This is a collaborative implementation workflow, not Swarm Consensus debate and 
    - If tests fail, classify failures by likely owner file or lease.
    - Give the cowork run at most `max_retry_cycles` test-gate retry cycles for test failures. This budget is separate from peer-verification retries. If failures persist, restore the cowork baseline for in-scope files, present failure clusters and the disagreement ledger, and stop.
 
-10. Apply the audit-skip policy.
-   - `/audit-work` may be skipped only when all conditions are true:
+10. Run `/audit-work` on the implementation.
+   - After tests pass, run `/audit-work` inline as a built-in cowork guardrail. This is not optional by default.
+   - Use the diff from the saved cowork baseline hashes to current in-scope files as the audit input. Exclude unrelated dirty worktree changes.
+   - Use `suggest_changes=patches`.
+   - Prefer a different model family from the writer for the auditor. If no external auditor is available, invoke the primary model in a fresh context/session so it does not rubber-stamp its own prior output.
+   - When same-family audit is used, disclose it in the final output. For medium/high risk, require user confirmation before proceeding with a same-family auditor.
+   - The audit examines the actual implemented diff, not the plan. It catches mistakes that only surface in written code.
+   - The Coordinator normalizes audit findings into `blocker`, `should-fix`, or `optional` while preserving the auditor's original wording and severity rationale.
+   - Present the full normalized audit findings to the user and the writer before correction rounds begin.
+   - Audit-skip policy: `/audit-work` may be skipped only when `audit=skip` is explicitly provided AND all of these hold:
      - risk tier is `low`
+     - the change does not involve security, authentication, authorization, data integrity, schema migration, payment, public API contract, dependency/infra, concurrency, or architecture-sensitive areas
      - no unresolved or material resolved disagreement remains in the ledger
      - all peer verifiers approved their non-owned diffs
      - no out-of-lease writes occurred
      - automated tests/checks passed
-   - `/audit-work` is required for security, authentication, authorization, data integrity, schema migration, payment, public API contract, dependency/infra, concurrency, or architecture-sensitive changes.
-   - If `audit=skip` conflicts with the policy, do not silently skip. Report that the requested skip is blocked and why.
-   - If `audit=require`, recommend or run `/audit-work` after cowork completion according to the user's instruction.
+   - If `audit=skip` conflicts with the policy, do not silently skip. Report that the requested skip is blocked, explain why, and proceed with running the audit.
 
-11. Final output.
+11. Correction rounds.
+   - After the audit report is delivered, run up to `max_correction_rounds` correction rounds (default 1, max 2).
+   - Present audit findings (classified as `blocker`, `should-fix`, or `optional`) to the writer.
+   - The writer reviews each finding and states whether it agrees or disagrees, with reasoning.
+   - The writer applies only the corrections it agrees with — no blind acceptance.
+   - Disagreements are recorded in the disagreement ledger with the writer's reasoning.
+   - After each correction round, re-run the step 9 test gate. If tests fail, the writer gets one test-fix attempt within the same round. If the test-fix attempt also fails, restore the cowork baseline for in-scope files when safe, report the correction failure and disagreement ledger, and stop.
+   - After each correction round that produced changes, the Coordinator performs a targeted self-verification pass on the correction diff. This is a zero-external-token check using the Coordinator's existing context. It verifies:
+     1. Each accepted fix actually resolves the finding it addressed.
+     2. The correction diff does not introduce obvious contradictions with adjacent steps or the converged plan.
+   - If the self-verification spots a problem, flag it as an unresolved blocker for the user rather than triggering another correction cycle.
+   - If blockers remain unaddressed after all correction rounds, flag them prominently for user decision.
+   - If no audit findings require changes, skip correction rounds.
+
+12. Final output.
    - Include:
      - participants and resolved model identities
      - scoped files
@@ -125,7 +147,10 @@ This is a collaborative implementation workflow, not Swarm Consensus debate and 
      - disagreement ledger
      - verifier votes
      - tests/checks run and results
-     - audit policy outcome
+     - audit findings summary (auditor family, same-family disclosure if applicable)
+     - correction rounds: what was accepted, what was rejected, and why
+     - self-verification results
+     - unresolved blockers (if any) requiring user decision
      - remaining risks or manual follow-up
    - If the run reverted to baseline, state that no cowork changes remain applied and include the reason.
    - Keep the final answer decision-ready and concise.
