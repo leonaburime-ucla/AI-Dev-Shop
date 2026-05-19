@@ -9,13 +9,22 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ## Quick Status Snapshot
 
-- AGENTS.md Map Reduction: **DONE / MONITORED** (root map was slimmed to the safer range and detail moved into local quickstart/index docs; keep watching for re-expansion)
-- Observer Agent Operational Cadence: **DONE / MONITORED** (cadence is now explicit in Observer, Coordinator, and workflow docs; keep it aligned as the pipeline evolves)
-- Harness Audit Follow-Ons (Executable Controls / Runtime Validation / Drift): **PARTIAL** (Critical 1-4 done; High 5-6 done; High 7 open)
+- AGENTS.md Map Reduction: **DONE / MONITORED**
+- Observer Agent Operational Cadence: **DONE / MONITORED**
+- Harness Contracts (Critical 1-4): **DONE** (computational controls, runtime validation, architecture fitness, enforcement + bootstrap)
+- Drift Sensors (High 5): **DONE** (dead-code, dependency-drift, coverage-quality)
+- Code-Documentation Standards (High 6): **DONE**
 - Git Branching and PR Strategy: **DONE**
+- Harness Evals: **DONE** (3 suites, 20 seeds total, structured JSON grading, Gemini+Codex verified)
+- Evaluator Contract (High 7): **OPEN** — time-boxed decision on builder/judge agreement artifact
+- Model-Upgrade Eval Program (Medium 8): **OPEN** — ablation-based harness validity testing
+- Feature-State Tracker (Medium 9): **OPEN** — bounded spike, may close as "sufficient"
+- ADS-project-knowledge Terminology (Optional 10): **OPEN** — pure polish
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
-- Protocol Split: MCP + A2A: **OPEN**
+- Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy done; need to regenerate Architect/CR seeds at staff+ complexity)
+- Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
+- System Design Skill Coverage: **OPEN / PARTIAL** (root skill exists; depth topics pending)
 
 ---
 
