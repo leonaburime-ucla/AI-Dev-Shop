@@ -16,10 +16,10 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Code-Documentation Standards (High 6): **DONE**
 - Git Branching and PR Strategy: **DONE**
 - Harness Evals: **DONE** (3 suites, 20 seeds total, structured JSON grading, Gemini+Codex verified)
-- Evaluator Contract (High 7): **OPEN** — time-boxed decision on builder/judge agreement artifact
-- Model-Upgrade Eval Program (Medium 8): **OPEN** — ablation-based harness validity testing
-- Feature-State Tracker (Medium 9): **OPEN** — bounded spike, may close as "sufficient"
-- ADS-project-knowledge Terminology (Optional 10): **OPEN** — pure polish
+- Evaluator Contract (High 7): **DONE** — evaluator-contract-<slug>.md confirmed as THE artifact; added Evidence Surfaces + Fail Conditions
+- Model-Upgrade Eval Program (Medium 8): **DONE** — triggers, baselines, ablation modes, retained reports defined
+- Feature-State Tracker (Medium 9): **CLOSED** — existing trio (pipeline-state.md + progress-ledger.md + tasks.md) is sufficient; adding a 4th surface would create authority confusion
+- ADS-project-knowledge Terminology (Optional 10): **CLOSED** — terminology already correct in current docs; no confusion found
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy done; need to regenerate Architect/CR seeds at staff+ complexity)
 - Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
