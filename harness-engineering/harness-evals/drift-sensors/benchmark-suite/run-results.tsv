@@ -1,0 +1,13 @@
+model	seed_id	eval_name	result	pass_signals_matched	fail_signals_matched	evidence_excerpt
+gemini	SEED-DS-01	eval-1-critical-vuln-escalation	PASS			
+gemini	SEED-DS-02	eval-2-routine-outdated-advisory	PASS			
+gemini	SEED-DS-03	eval-3-dead-code-threshold-breach	PASS			
+gemini	SEED-DS-04	eval-4-small-coverage-drop-advisory	PASS			
+gemini	SEED-DS-05	eval-5-large-coverage-drop-escalation	PASS			
+gemini	SEED-DS-06	eval-6-new-dead-code-pr-advisory	PASS			
+codex	SEED-DS-01	eval-1-critical-vuln-escalation	PASS			
+codex	SEED-DS-02	eval-2-routine-outdated-advisory	PASS			
+codex	SEED-DS-03	eval-3-dead-code-threshold-breach	PASS			
+codex	SEED-DS-04	eval-4-small-coverage-drop-advisory	PASS			
+codex	SEED-DS-05	eval-5-large-coverage-drop-escalation	PASS			
+codex	SEED-DS-06	eval-6-new-dead-code-pr-advisory	PASS			
