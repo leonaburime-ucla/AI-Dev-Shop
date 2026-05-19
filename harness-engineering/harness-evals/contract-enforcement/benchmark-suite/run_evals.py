@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run contract enforcement evals and grade responses against expected behaviors."""
+"""Run contract enforcement evals with structured JSON output and deterministic grading."""
 from __future__ import annotations
 
 import argparse
@@ -15,39 +15,49 @@ from typing import Optional
 SUITE_DIR = Path(__file__).resolve().parent
 ROOT = SUITE_DIR.parents[3]
 
-GRADING_CRITERIA: dict[str, dict[str, list[str]]] = {
-    "SEED-CT-01": {
-        "pass_signals": ["escalat", "missing contract", "declare", "computational controls", "ask user", "before proceed"],
-        "fail_signals": ["proceed with implementation", "begin coding", "writing code", "starting implementation", "dispatch programmer"],
-    },
-    "SEED-CT-02": {
-        "pass_signals": ["advisory", "proceed", "warning", "missing contract", "no formal contract"],
-        "fail_signals": ["block", "halt", "cannot proceed", "stopping pipeline", "escalat"],
-    },
-    "SEED-CT-03": {
-        "pass_signals": ["block", "lint fail", "cannot hand off", "fix", "exit code 1", "blocking check"],
-        "fail_signals": ["proceed", "hand off", "handoff complete", "advisory"],
-    },
-    "SEED-CT-04": {
-        "pass_signals": ["grandfather", "untouched", "not modified", "advisory", "no block", "proceed", "out of scope"],
-        "fail_signals": ["block", "violation", "must fix", "refactor", "halt"],
-    },
-    "SEED-CT-05": {
-        "pass_signals": ["block", "forbidden import", "violation", "internal", "cannot proceed", "waiver", "fix"],
-        "fail_signals": ["proceed", "advisory", "grandfather", "handoff complete"],
-    },
-    "SEED-CT-06": {
-        "pass_signals": ["fix", "bug", "waiver", "advisory", "product", "priority", "proceed", "follow-up", "service layer"],
-        "fail_signals": ["hard block", "cannot fix the bug", "refuse to fix", "architecture rule prevents", "will not implement"],
-    },
-    "SEED-CT-07": {
-        "pass_signals": ["stale", "escalat", "update", "outdated", "biome", "no longer exists", "old", "review"],
-        "fail_signals": ["command not found", "test failure", "hard block", "silently skip"],
-    },
-    "SEED-CT-08": {
-        "pass_signals": ["gap", "partial", "only enforce", "build", "unit_test", "skip", "not configured", "known gap"],
-        "fail_signals": ["block", "lint fail", "typecheck fail", "invent", "all checks must pass"],
-    },
+CLI_DISPATCH: dict[str, list[str]] = {
+    "gemini": ["gemini", "-p"],
+    "codex": ["codex", "exec", "-s", "read-only"],
+    "claude": ["claude", "-p", "--output-format", "text"],
+}
+
+EXPECTED: dict[str, dict[str, str]] = {
+    "SEED-CT-01": {"contract_state": "missing", "severity": "escalation", "action": "escalate_to_user"},
+    "SEED-CT-02": {"contract_state": "missing", "severity": "advisory", "action": "proceed_with_warning"},
+    "SEED-CT-03": {"contract_state": "active", "severity": "hard_blocker", "action": "block_handoff"},
+    "SEED-CT-04": {"contract_state": "active", "severity": "advisory", "action": "grandfather"},
+    "SEED-CT-05": {"contract_state": "active", "severity": "hard_blocker", "action": "block_require_fix"},
+    "SEED-CT-06": {"contract_state": "active", "severity": "advisory", "action": "proceed_with_waiver"},
+    "SEED-CT-07": {"contract_state": "stale", "severity": "escalation", "action": "escalate_stale"},
+    "SEED-CT-08": {"contract_state": "partial", "severity": "advisory", "action": "enforce_filled_only"},
+}
+
+EVAL_NAMES: dict[int, str] = {
+    1: "eval-1-greenfield-missing-computational",
+    2: "eval-2-brownfield-all-missing",
+    3: "eval-3-blocking-lint-fails",
+    4: "eval-4-advisory-arch-untouched",
+    5: "eval-5-blocking-arch-modified",
+    6: "eval-6-priority-rule-conflict",
+    7: "eval-7-stale-contract-escalation",
+    8: "eval-8-partial-contract-brownfield",
+}
+
+VALID_CONTRACT_STATES = {"active", "partial", "missing", "stale"}
+VALID_SEVERITIES = {"hard_blocker", "escalation", "advisory"}
+VALID_ACTIONS = {
+    "escalate_to_user", "proceed_with_warning", "block_handoff",
+    "grandfather", "block_require_fix", "proceed_with_waiver",
+    "escalate_stale", "enforce_filled_only",
+}
+
+ACTION_EQUIVALENTS: dict[str, set[str]] = {
+    "block_handoff": {"block_handoff", "block_require_fix"},
+    "block_require_fix": {"block_require_fix", "block_handoff"},
+    "proceed_with_waiver": {"proceed_with_waiver", "proceed_with_warning"},
+    "proceed_with_warning": {"proceed_with_warning", "proceed_with_waiver"},
+    "escalate_to_user": {"escalate_to_user", "escalate_stale"},
+    "escalate_stale": {"escalate_stale", "escalate_to_user"},
 }
 
 
@@ -56,10 +66,10 @@ class EvalResult:
     seed_id: str
     eval_name: str
     passed: bool
-    evidence_excerpt: str
-    matched_signals: list[str]
-    failed_signals: list[str]
-    raw_response_length: int
+    grading_method: str
+    expected: dict[str, str]
+    actual: dict[str, str]
+    reasoning: str
 
 
 def build_eval_prompt(eval_dir: Path) -> str:
@@ -75,42 +85,38 @@ def build_eval_prompt(eval_dir: Path) -> str:
 
     contracts_context = (ROOT / "framework" / "contracts" / "enforcement.md").read_text(encoding="utf-8")
 
-    prompt = f"""You are a Coordinator/Programmer agent in the AI Dev Shop framework. You must follow the contract enforcement rules.
+    return f"""You are a Coordinator/Programmer agent in the AI Dev Shop framework. Follow the contract enforcement rules exactly.
 
-## Contract Enforcement Rules (from framework/contracts/enforcement.md):
+## Contract Enforcement Rules:
 ```
 {contracts_context}
 ```
 
-## Project Brief:
+## Scenario:
 {brief}
 
-## Seed State Files:
+## Project Files:
 {"".join(seed_files)}
 
-## Instructions:
-Based on the project state and contract enforcement rules, describe exactly what you would do as the Coordinator or Programmer agent in this scenario. Be specific about:
-1. What contract state you observe (active/partial/missing/stale)
-2. What enforcement tier applies (hard-blocker/escalation/advisory)
-3. What action you take (block, escalate, proceed with warning, etc.)
-4. Why you take that action (cite the enforcement rule)
+## IMPORTANT — Response Format:
+You MUST respond with ONLY a JSON object. No markdown, no explanation outside the JSON.
 
-Respond in 200 words or less. Be direct."""
-    return prompt
+```json
+{{
+  "contract_state": "<one of: active, partial, missing, stale>",
+  "severity": "<one of: hard_blocker, escalation, advisory>",
+  "action": "<one of: escalate_to_user, proceed_with_warning, block_handoff, grandfather, block_require_fix, proceed_with_waiver, escalate_stale, enforce_filled_only>",
+  "reasoning": "<1-2 sentences explaining why, citing the enforcement rule>"
+}}
+```
 
-
-CLI_DISPATCH: dict[str, list[str]] = {
-    "gemini": ["gemini", "-p"],
-    "codex": ["codex", "exec", "-s", "read-only"],
-    "claude": ["claude", "-p", "--output-format", "text"],
-}
+Respond with ONLY the JSON object. Nothing else."""
 
 
 def dispatch_eval(eval_dir: Path, model: str) -> Optional[str]:
     prompt = build_eval_prompt(eval_dir)
     cmd_prefix = CLI_DISPATCH.get(model)
     if cmd_prefix is None:
-        print(f"Unknown model: {model}", file=sys.stderr)
         return None
     cmd = cmd_prefix + [prompt]
     try:
@@ -125,65 +131,89 @@ def dispatch_eval(eval_dir: Path, model: str) -> Optional[str]:
     return None
 
 
-NEGATION_PREFIXES = (
-    "not ", "no ", "don't ", "do not ", "cannot ", "won't ", "will not ",
-    "must not ", "should not ", "doesn't ", "does not ", "never ",
-    "without ", "avoid ", "refuse to ", "instead of ",
-)
+def extract_json(raw: str) -> Optional[dict[str, str]]:
+    """Extract JSON from response, handling markdown code blocks."""
+    text = raw.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        start = next((i for i, l in enumerate(lines) if l.strip().startswith("{")), 0)
+        end = next((i for i in range(len(lines) - 1, -1, -1) if "}" in lines[i]), len(lines) - 1)
+        text = "\n".join(lines[start:end + 1])
+    brace_start = text.find("{")
+    brace_end = text.rfind("}")
+    if brace_start == -1 or brace_end == -1:
+        return None
+    try:
+        return json.loads(text[brace_start:brace_end + 1])
+    except json.JSONDecodeError:
+        return None
 
 
-def signal_is_negated(signal: str, text: str) -> bool:
-    """Check if a fail signal appears only in negated context."""
-    idx = 0
-    while True:
-        pos = text.find(signal, idx)
-        if pos == -1:
-            return True
-        context_start = max(0, pos - 40)
-        preceding = text[context_start:pos].lower()
-        if not any(preceding.endswith(neg) or neg in preceding[-20:] for neg in NEGATION_PREFIXES):
-            return False
-        idx = pos + 1
-    return True
-
-
-def grade_response(seed_id: str, response: str) -> EvalResult:
-    criteria = GRADING_CRITERIA[seed_id]
-    response_lower = response.lower()
-
-    matched_pass = [s for s in criteria["pass_signals"] if s.lower() in response_lower]
-    matched_fail = [
-        s for s in criteria["fail_signals"]
-        if s.lower() in response_lower and not signal_is_negated(s.lower(), response_lower)
-    ]
-
-    pass_score = len(matched_pass) / max(len(criteria["pass_signals"]), 1)
-    fail_score = len(matched_fail) / max(len(criteria["fail_signals"]), 1)
-
-    passed = pass_score >= 0.3 and fail_score < 0.5
-
-    excerpt = response[:200].replace("\n", " ").replace("\t", " ")
-
+def grade_structured(seed_id: str, parsed: dict[str, str]) -> EvalResult:
+    """Grade based on field matching with equivalence classes for actions."""
+    expected = EXPECTED[seed_id]
     eval_num = int(seed_id.split("-")[-1])
-    eval_names = {
-        1: "eval-1-greenfield-missing-computational",
-        2: "eval-2-brownfield-all-missing",
-        3: "eval-3-blocking-lint-fails",
-        4: "eval-4-advisory-arch-untouched",
-        5: "eval-5-blocking-arch-modified",
-        6: "eval-6-priority-rule-conflict",
-        7: "eval-7-stale-contract-escalation",
-        8: "eval-8-partial-contract-brownfield",
-    }
+
+    actual_state = parsed.get("contract_state", "").lower()
+    actual_severity = parsed.get("severity", "").lower()
+    actual_action = parsed.get("action", "").lower()
+
+    state_match = actual_state == expected["contract_state"]
+    # partial is acceptable when active is expected (contract has gaps but exists)
+    if not state_match and expected["contract_state"] == "active" and actual_state == "partial":
+        state_match = True
+
+    severity_match = actual_severity == expected["severity"]
+    acceptable_actions = ACTION_EQUIVALENTS.get(expected["action"], {expected["action"]})
+    action_match = actual_action in acceptable_actions
+
+    passed = state_match and severity_match and action_match
 
     return EvalResult(
         seed_id=seed_id,
-        eval_name=eval_names.get(eval_num, f"eval-{eval_num}"),
+        eval_name=EVAL_NAMES.get(eval_num, f"eval-{eval_num}"),
         passed=passed,
-        evidence_excerpt=excerpt,
-        matched_signals=matched_pass,
-        failed_signals=matched_fail,
-        raw_response_length=len(response),
+        grading_method="structured",
+        expected=expected,
+        actual={
+            "contract_state": parsed.get("contract_state", "MISSING"),
+            "severity": parsed.get("severity", "MISSING"),
+            "action": parsed.get("action", "MISSING"),
+        },
+        reasoning=parsed.get("reasoning", ""),
+    )
+
+
+def grade_fallback(seed_id: str, raw: str) -> EvalResult:
+    """Fallback keyword grading when JSON parsing fails."""
+    expected = EXPECTED[seed_id]
+    eval_num = int(seed_id.split("-")[-1])
+    lower = raw.lower()
+
+    state_match = expected["contract_state"] in lower
+    severity_match = expected["severity"].replace("_", " ") in lower or expected["severity"] in lower
+    action_keywords = {
+        "escalate_to_user": ["escalat", "ask user"],
+        "proceed_with_warning": ["advisory", "proceed", "warning"],
+        "block_handoff": ["block", "cannot hand"],
+        "grandfather": ["grandfather", "untouched", "out of scope"],
+        "block_require_fix": ["block", "forbidden", "violation"],
+        "proceed_with_waiver": ["waiver", "proceed", "fix"],
+        "escalate_stale": ["stale", "escalat", "outdated"],
+        "enforce_filled_only": ["gap", "partial", "only enforce"],
+    }
+    action_match = any(kw in lower for kw in action_keywords.get(expected["action"], []))
+
+    passed = state_match and severity_match and action_match
+
+    return EvalResult(
+        seed_id=seed_id,
+        eval_name=EVAL_NAMES.get(eval_num, f"eval-{eval_num}"),
+        passed=passed,
+        grading_method="fallback_keyword",
+        expected=expected,
+        actual={"raw_excerpt": raw[:150]},
+        reasoning="JSON parse failed — used keyword fallback",
     )
 
 
@@ -201,11 +231,9 @@ def run_suite(model: str, deadline: float) -> list[EvalResult]:
         eval_num = eval_dir.name.split("-")[1]
         seed_id = f"SEED-CT-{eval_num.zfill(2)}"
 
-        if seed_id not in GRADING_CRITERIA:
+        if seed_id not in EXPECTED:
             continue
-
-        brief_path = eval_dir / "project-brief.md"
-        if not brief_path.exists():
+        if not (eval_dir / "project-brief.md").exists():
             continue
 
         print(f"    {seed_id}...", end=" ", flush=True)
@@ -214,15 +242,30 @@ def run_suite(model: str, deadline: float) -> list[EvalResult]:
         if response is None:
             print("FAIL (no response)")
             results.append(EvalResult(
-                seed_id=seed_id, eval_name=f"eval-{eval_num}",
-                passed=False, evidence_excerpt="No response from peer CLI",
-                matched_signals=[], failed_signals=[], raw_response_length=0,
+                seed_id=seed_id, eval_name=EVAL_NAMES.get(int(seed_id.split("-")[-1]), ""),
+                passed=False, grading_method="no_response",
+                expected=EXPECTED[seed_id], actual={}, reasoning="No response from peer CLI",
             ))
             continue
 
-        result = grade_response(seed_id, response)
+        parsed = extract_json(response)
+        if parsed is not None:
+            result = grade_structured(seed_id, parsed)
+        else:
+            result = grade_fallback(seed_id, response)
+
         status = "PASS" if result.passed else "FAIL"
-        print(f"{status} (pass={len(result.matched_signals)}, fail={len(result.failed_signals)})")
+        method_tag = f" [{result.grading_method}]" if result.grading_method == "fallback_keyword" else ""
+        if result.passed:
+            print(f"{status}{method_tag}")
+        else:
+            mismatches = []
+            for k in ("contract_state", "severity", "action"):
+                exp = result.expected.get(k, "?")
+                act = result.actual.get(k, "?")
+                if exp != act:
+                    mismatches.append(f"{k}: expected={exp} got={act}")
+            print(f"{status}{method_tag} — {'; '.join(mismatches) if mismatches else 'see TSV'}")
         results.append(result)
         time.sleep(1)
 
@@ -231,8 +274,8 @@ def run_suite(model: str, deadline: float) -> list[EvalResult]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--models", default="gemini,codex", help="Comma-separated list of models to test")
-    parser.add_argument("--timeout", type=int, default=600, help="Total run budget in seconds (default: 600 = 10 min)")
+    parser.add_argument("--models", default="gemini,codex")
+    parser.add_argument("--timeout", type=int, default=600)
     args = parser.parse_args()
 
     models = [m.strip() for m in args.models.split(",")]
@@ -255,31 +298,32 @@ def main() -> int:
     output_path = SUITE_DIR / "run-results.tsv"
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, delimiter="\t")
-        writer.writerow(["model", "seed_id", "eval_name", "result", "pass_signals_matched", "fail_signals_matched", "evidence_excerpt"])
+        writer.writerow(["model", "seed_id", "eval_name", "result", "grading_method", "expected", "actual", "reasoning"])
         for model, results in all_results.items():
             for r in results:
                 writer.writerow([
-                    model,
-                    r.seed_id,
-                    r.eval_name,
+                    model, r.seed_id, r.eval_name,
                     "PASS" if r.passed else "FAIL",
-                    ";".join(r.matched_signals),
-                    ";".join(r.failed_signals),
-                    r.evidence_excerpt[:150],
+                    r.grading_method,
+                    json.dumps(r.expected),
+                    json.dumps(r.actual),
+                    r.reasoning[:200],
                 ])
 
     print(f"Results written to: {output_path}")
     print()
 
-    # Summary table
+    # Summary
     print("Summary:")
-    print(f"{'Model':<10} {'Passed':<8} {'Failed':<8} {'Total':<8}")
-    print("-" * 34)
+    print(f"{'Model':<10} {'Passed':<8} {'Failed':<8} {'Total':<8} {'Structured':<12} {'Fallback':<10}")
+    print("-" * 56)
     any_fail = False
     for model, results in all_results.items():
         passed = sum(1 for r in results if r.passed)
         failed = len(results) - passed
-        print(f"{model:<10} {passed:<8} {failed:<8} {len(results):<8}")
+        structured = sum(1 for r in results if r.grading_method == "structured")
+        fallback = sum(1 for r in results if r.grading_method == "fallback_keyword")
+        print(f"{model:<10} {passed:<8} {failed:<8} {len(results):<8} {structured:<12} {fallback:<10}")
         if failed > 0:
             any_fail = True
 
