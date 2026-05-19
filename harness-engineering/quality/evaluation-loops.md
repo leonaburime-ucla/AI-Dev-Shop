@@ -65,7 +65,9 @@ That gives the validator a concrete, file-backed signal that evaluator mode is i
 
 ## Contract Before Coding
 
-Before the generator writes code, require a file-backed contract between generator and evaluator.
+**`evaluator-contract-<slug>.md` is THE canonical pre-build builder/judge agreement artifact.** There is no alternative format. If a requirement or criterion is not written into this file, it is not part of the agreement and cannot be graded against. Ledgers, evaluator reports, handoffs, PR descriptions, and chat summaries may reference it, but they do not replace it.
+
+Before the generator writes code, require a file-backed contract between generator and evaluator using `framework/templates/evaluator-contract-template.md`.
 
 Minimum contract contents:
 
@@ -73,8 +75,10 @@ Minimum contract contents:
 - slice name and scope
 - explicit non-goals for the slice
 - testable completion criteria
+- evidence surfaces the evaluator must inspect (code diffs, test results, coverage, handoff docs, runtime)
 - runtime surfaces the evaluator must exercise
-- blocking thresholds or fail conditions
+- blocking thresholds
+- explicit fail conditions (process failures that mean automatic fail regardless of rubric)
 - artifacts the generator must hand to evaluation
 
 The purpose of the contract is to close the gap between a high-level spec and a testable slice of work. Do not wait until after coding to decide what "done" means.

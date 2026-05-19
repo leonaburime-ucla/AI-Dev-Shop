@@ -10,6 +10,7 @@ Committed seeded eval suites live in `../agent-evals/`. This directory keeps the
 - `eval-coverage-model.md` - shared coverage matrix model for seeded evals: bug nature taxonomy, seed structure taxonomy, difficulty calibration, and control requirements
 - `failure-promotion-policy.md` - when recurring failures must become durable harness improvements
 - `load-bearing-harness-audit.md` - when to re-test and simplify older harness assumptions
+- `model-upgrade-program.md` - formal program for evaluating new models/hosts: triggers, baselines, benchmark packs, ablation modes, retained report fields
 - `quality-score.md` - current repo-level harness quality snapshot
 - `function-quality-seeded-evals.md` - seeded eval protocol for testing Programmer, Code Review, and Refactor against function-quality traps
 - `agent-isolation-eval-framework.md` - repeatable harness for testing any agent in isolation with seeded defects, hidden ledgers, and post-hoc scoring; includes agent-specific eval designs for Spec, Security, Refactor, Architect, TDD, and Red Team agents

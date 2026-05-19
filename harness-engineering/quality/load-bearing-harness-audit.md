@@ -39,6 +39,10 @@ Do not treat an intentionally empty reserved reports folder as evidence that a h
 
 Some report locations exist so downstream projects have a canonical place to keep artifacts later. Judge the default rule and benchmark behavior, not whether this toolkit repo already happens to contain retained examples.
 
+## Relationship to Model-Upgrade Program
+
+This audit defines the general method (ablate, benchmark, classify). The **Model-Upgrade Eval Program** at `harness-engineering/quality/model-upgrade-program.md` defines the formal triggers, pinned baselines, benchmark packs, and retained report structure specifically for model/host upgrades. Use that program when the trigger is a model or host change. Use this audit for general harness simplification work.
+
 ## Components Worth Stress-Testing
 
 Common components to audit:

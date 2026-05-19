@@ -31,11 +31,37 @@
 - <UI path, API path, state path, or service path>
 - <UI path, API path, state path, or service path>
 
+## Evidence Surfaces
+
+The evaluator must base its judgment on these surfaces. If required evidence is missing, the evaluator must fail the evaluation — not guess.
+
+| Surface | Required | How To Inspect |
+|---|---|---|
+| Live runtime (UI paths, API requests, state) | Yes / No | <method: browser, curl, DB query> |
+| Code diffs | Yes / No | <git diff scope> |
+| Test execution results | Yes / No | <command or report path> |
+| Coverage reports | Yes / No | <tool and threshold> |
+| Generator handoff documentation | Yes / No | <expected path> |
+| PR description / commit ledger | Yes / No | <where to find it> |
+
+If a surface is not applicable, mark it `N/A` with a one-line rationale.
+
 ## Blocking Thresholds
 
 | Dimension | Threshold | Why Blocking |
 |---|---|---|
 | <dimension> | <minimum acceptable score or pass condition> | <why failure here blocks the slice> |
+
+## Fail Conditions
+
+The slice explicitly FAILS if any of these occur, regardless of rubric scores:
+
+- **Ignored Feedback**: Generator skipped or dismissed previous evaluator feedback without stated rationale
+- **Missing Evidence**: Generator claimed pass without providing required test results, diffs, or handoff docs
+- **Evaluation Lapse**: Evaluator failed to inspect a mandated evidence surface or runtime surface
+- **Threshold Breach**: Any dimension falls below its defined hard blocking threshold
+- **Artifact Gap**: Required artifacts (progress-ledger, evaluator report, offloads) are missing or malformed
+- **Evidence Contradiction**: Handoff or PR claims contradict what the evaluator observed in evidence surfaces
 
 ## Required Artifacts
 
