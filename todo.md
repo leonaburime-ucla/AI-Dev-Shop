@@ -11,12 +11,11 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 - AGENTS.md Map Reduction: **DONE / MONITORED** (root map was slimmed to the safer range and detail moved into local quickstart/index docs; keep watching for re-expansion)
 - Observer Agent Operational Cadence: **DONE / MONITORED** (cadence is now explicit in Observer, Coordinator, and workflow docs; keep it aligned as the pipeline evolves)
-- Harness Audit Follow-Ons (Executable Controls / Runtime Validation / Drift): **OPEN**
+- Harness Audit Follow-Ons (Executable Controls / Runtime Validation / Drift): **PARTIAL** (Critical items 1-4 done; High items 5-7 open)
 - Git Branching and PR Strategy: **OPEN**
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Protocol Split: MCP + A2A: **OPEN**
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
-- Search Visibility Agent + Frontend SEO/GEO/AEO Indexability Skill: **DONE / MONITORED** (optional agent, updateable skill, source ledger, refresh policy, and research report added; keep source claims refreshed as the landscape changes)
 
 ---
 
@@ -121,106 +120,16 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - **Topology-level harness templates are still thin.** Current templates are mostly stack-specific runtime validation templates. The articles point toward reusable harness bundles for common application shapes or topologies (for example CRUD API, async worker, event-driven service, full-stack web app), not just per-language smoke-check templates.
 - **Do not reopen already-captured gaps as if they were new.** Computational controls, runtime validation, architecture-fitness checks, continuous drift sensing, and machine-readable state questions are already covered in the numbered workstreams below. Reusable templates / CI gating and default retry / escalation behavior are also mostly present and should not be reclassified as greenfield design gaps unless a concrete failure shows the current implementation is insufficient.
 
-#### 1. `Critical` — Add a first-class computational controls contract
-**Why:** The review was consistent that the framework is currently better at validating workflow and artifact hygiene than validating the software being produced. Deterministic executable checks need to become a first-class harness surface instead of downstream tribal knowledge.
-**What this workstream must define:**
-- One canonical host-project declaration point for executable quality checks.
-- Named command slots for:
-  - lint
-  - typecheck
-  - build / compile
-  - unit tests
-  - integration tests
-  - stack-specific static analysis
-- Which stages must read and use this contract (`Programmer`, `TestRunner`, `Code Review`, closeout flows, and any future CI / merge-gate guidance).
-- What the framework should do when the contract is missing, incomplete, or failing.
-**Likely files to inspect/update first:**
-- `harness-engineering/runtime/self-validation.md`
-- `framework/workflows/conventions.md`
-- `framework/workflows/multi-agent-pipeline.md`
-- `agents/programmer/skills.md`
-- `agents/code-review/skills.md`
-- `agents/testrunner/skills.md` (or equivalent test-runner surface if renamed / relocated)
-- `framework/templates/` for any new reusable contract template
-**Open design questions to resolve during implementation:**
-- Should this contract live under `ADS-project-knowledge/meta/`, `ADS-project-knowledge/governance/`, or a new canonical project-level file?
-- Which checks are globally required vs optional by stack?
-- How should brownfield repos declare partial coverage when some checks do not exist yet?
-**Done when:**
-- The framework has a documented computational-controls contract.
-- Host projects have one unambiguous place to declare executable quality checks.
-- Implementation and verification stages can rely on the same contract instead of guessing.
-
-#### 2. `Critical` — Turn runtime self-validation into an enforceable harness requirement
-**Why:** The current runtime harness is conceptually solid but too template-level. For runtime-changing work, the framework needs executable proof of behavior, not just guidance about what a host project should eventually supply.
-**What this workstream must define:**
-- A required runtime-validation contract for runtime-changing work with fields for:
-  - boot / start command
-  - healthy signal
-  - critical-path check
-  - negative / edge-path check
-  - artifact capture location
-  - stack-specific runtime/static checks
-- When runtime validation is mandatory.
-- When `PASS`, `PARTIAL`, and `BLOCKER` are valid outcomes.
-- What counts as an acceptable documented exception when runtime validation cannot run.
-**Likely files to inspect/update first:**
-- `harness-engineering/runtime/self-validation.md`
-- `framework/templates/self-validation/`
-- `agents/programmer/skills.md`
-- `agents/qa-e2e/skills.md`
-- `framework/workflows/multi-agent-pipeline.md`
-- `framework/templates/handoff-template.md`
-**Important constraint:** Do not let "runtime validation" silently degrade into "the agent said it clicked around." The result must be tied to named commands, signals, or captured evidence.
-**Done when:**
-- Runtime-changing work cannot be treated as fully complete without executable runtime validation or an explicit documented exception.
-- Host-project validation expectations are operational, not just advisory.
-
-#### 3. `Critical` — Add architecture-fitness checks and explicitly rebalance validator work toward product-facing validation
-**Why:** The framework has ADRs and architectural reasoning, but not enough executable structure for dependency direction, boundary enforcement, or architecture drift detection. This item also absorbs the earlier validator-rebalancing work: future validator effort should bias toward software/product quality, not more framework self-policing.
-**What this workstream must define:**
-- A formal way for host projects to declare architecture-fitness rules such as:
-  - allowed dependency directions
-  - forbidden cross-layer imports
-  - ownership boundaries
-  - framework-specific structural constraints
-- Which of those rules are blocking vs advisory.
-- How those checks flow into implementation and verification.
-- A written priority rule for future validator work: prefer product-facing / architecture-facing checks before more harness-internal hygiene checks.
-**Likely files to inspect/update first:**
-- `harness-engineering/validators/README.md`
-- `framework/workflows/multi-agent-pipeline.md`
-- `framework/workflows/conventions.md`
-- `agents/architect/skills.md`
-- `agents/code-review/skills.md`
-- `skills/architecture-decisions/SKILL.md`
-- any future architecture-fitness template or policy file added under `framework/` or `harness-engineering/`
-**Important implementation note:** This should not stay purely prose-driven. The deliverable is not "better ADR language"; it is a framework surface that can eventually power executable checks.
-**Done when:**
-- Architecture verification is partially executable instead of only narrative.
-- Validator strategy explicitly favors product/code validation expansion before more framework-internal hygiene work.
-
-#### 4. `Critical` — Add a contract bootstrap and enforcement story for host projects
-**Why:** Items 1-3 introduce new contracts. The review correctly pointed out that the backlog needs an explicit adoption story for new and existing host projects, plus clear enforcement behavior when contracts are absent or violated.
-**What this workstream must define:**
-- How a new host project creates the required contracts for the first time.
-- How a brownfield repo adopts them incrementally without blocking all work immediately.
-- Which templates / bootstrap commands / onboarding steps exist.
-- Enforcement consequences when:
-  - a required contract is missing
-  - a declared check fails
-  - a contract is stale or obviously incomplete
-- Which failures are hard blockers, which are escalations, and which are temporary waivers.
-**Likely files to inspect/update first:**
-- `framework/templates/bootstrap/`
-- `framework/workflows/conventions.md`
-- `framework/operations/pipeline-quickstart.md`
-- `agents/coordinator/skills.md`
-- `framework/workflows/multi-agent-pipeline.md`
-- any new onboarding / contract-template docs added under `framework/templates/`
-**Done when:**
-- A fresh or brownfield host project can adopt the new contract surfaces without guesswork.
-- The framework has explicit behavior for missing or failing contracts instead of vague "should" language.
+#### 1-4. `Critical` — DONE
+**Completed 2026-05-18/19.** All four critical items shipped:
+- Computational controls contract → `framework/contracts/computational-controls.md`
+- Runtime validation contract → `framework/contracts/runtime-validation.md`
+- Architecture fitness contract → `framework/contracts/architecture-fitness.md`
+- Enforcement + bootstrap → `framework/contracts/enforcement.md` + `framework/templates/bootstrap/contracts-bootstrap.md`
+- Pipeline integration → contract checkpoint added to `multi-agent-pipeline.md`
+- Validator → `harness-engineering/validators/validate_contracts.py`
+- Harness evals → `harness-engineering/harness-evals/contract-enforcement/` (8 seeds, 16/16 passed against Gemini 3.1 + Codex 5.5)
+- Audited by Gemini + Codex with corrections applied
 
 #### 5. `High` — Add continuous drift sensors, but keep phase 1 intentionally narrow
 **Why:** The original drift-sensor idea was too broad. The harness needs recurring codebase-health sensing, but the first phase should focus on a small set of actionable signals rather than turning into a full platform-engineering observability roadmap.
@@ -389,46 +298,6 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **What it is:** UI testing is often skipped by LLMs. Need a strict policy enforcing React component test creation.
 **Current state:** Added to `harness-engineering/quality/react-component-testing-policy.md`.
 **What to add:** Enforce the policy across TDD and Programmer routing. Update skill definition files and evaluation checklists.
-
-### Search Visibility Agent + Frontend SEO/GEO/AEO Indexability Skill `Medium` **[DONE / MONITORED]**
-**What it is:** Research and define an optional Search Visibility Agent plus supporting skill guidance for auditing public-facing pages and content surfaces so they are easier for search engines, generative engines, answer engines, chatbots, AI browsers, and retrieval systems to understand, cite, and navigate.
-**Why it matters:** If a project expects search discovery, chatbot discovery, or AI-assisted site navigation, the frontend should expose clear semantic structure, durable content signals, and machine-readable context instead of relying only on visual layout. SEO, GEO, and AEO overlap, but they should be compared explicitly before becoming hard framework rules.
-**Scope guardrail:** This should not become a default stage for most apps. Public routes or content are not enough by themselves. Trigger only when the user explicitly asks for SEO/GEO/AEO/indexing/search visibility work or the active spec/ADR names public discoverability as a goal, NFR, acceptance criterion, or audit target.
-**Current state:** Implemented as a modular optional `Search Visibility` agent, an updateable `skills/seo-geo/SKILL.md` guidance layer used by that agent, a source ledger, a refresh policy, and a retained research report at `../ADS-project-knowledge/reports/search-visibility/2026-05-19-search-visibility-research.md`.
-**Specific note:** SEO/AEO/GEO rules are unstable and must be periodically refreshed against current official docs, live platform behavior, and dated research. The implemented skill includes `last_verified` metadata and requires the source ledger / refresh policy before platform-specific claims become hard audit findings.
-**Pipeline placement:** Optional post-implementation audit pass dispatched by Coordinator only when explicitly triggered. It is not standing context for Programmer, Code Review, Docs, UX/UI Designer, Architect, or DevOps.
-**Reports run / retained:**
-- `../ADS-project-knowledge/reports/search-visibility/2026-05-19-search-visibility-research.md`
-
-**Research coverage completed:**
-- Audit current best practices for SEO, GEO, AEO, AI crawler / chatbot retrieval behavior, semantic HTML, structured data, accessibility landmarks, metadata, and content chunking.
-- Compare where SEO, GEO, AEO, accessibility, and internal search indexing overlap, where they conflict, and which practices are durable enough for Programmer guidance.
-- Review examples of frontend patterns that help or hurt AI agents: hidden text, client-rendered content, route structure, headings, schema.org, canonical metadata, data attributes, and stable URLs.
-- Audit AI-specific indexing protocols and conventions: `llms.txt`, `ai.txt`, AI crawler directives, and any emerging machine-discovery standards distinct from traditional `robots.txt` and `sitemap.xml`.
-- Evaluate rendering strategy impact on discoverability: SSR vs CSR vs ISR/SSG tradeoffs for search crawlers, generative engines, and AI retrieval agents. This is the single biggest technical lever and needs explicit comparison.
-- Define quantitative output metrics the agent should report: indexation rate, structured data coverage %, crawl error count, rich result eligibility, semantic heading coverage, and any other measurable KPIs that prevent the agent from being opinion-only.
-- Identify tooling dependencies and MCP implications: whether the agent needs Lighthouse, schema.org validators, Search Console API access, or similar external tools versus operating as a read-code-and-advise agent with no external access.
-- Identify whether this should become a dedicated optional agent (`Search Visibility Agent`) that performs audits and routes fixes to Programmer, Docs, UX/UI Designer, or DevOps, versus remaining a shared skill used by existing agents.
-- Identify which recommendations belong in a new Search Visibility Agent, a new skill, or optional project-specific guidance instead of wiring search rules into normal delivery agents.
-**Likely files to inspect/update after research:**
-- `framework/routing/agent-index.md`
-- `framework/routing/skills-registry.md`
-- `agents/programmer/skills.md`
-- `agents/code-review/skills.md`
-- `agents/docs/skills.md`
-- `agents/ux-ui-designer/skills.md`
-- `agents/architect/skills.md` (rendering strategy decisions, CDN/redirect config)
-- `agents/devops/skills.md` (infrastructure-level redirect, caching, and crawler-access config)
-- any existing frontend, accessibility, SEO, or documentation-related skills
-- `harness-engineering/agent-evals/programmer-evals/` if an eval should prove the new skill matters
-**Eval story:** Research report and agent/skill shape are now in place. Future work should add a small eval seed set proving the agent catches real discoverability failures that Programmer/Code Review miss without the guidance, such as CSR-only public content, schema/visible-content mismatch, WAF bot blocking, and stale GEO claims incorrectly treated as Required findings.
-**Done when:**
-- DONE: A research report summarizes practical patterns and tradeoffs.
-- DONE: The repo has a dedicated optional Search Visibility Agent plus SEO/GEO/AEO guidance kept modular behind that agent and the Skills Librarian refresh path.
-- DONE: The guidance distinguishes SEO, GEO, AEO, chatbot indexability, accessibility overlap, and emerging protocols while reusing durable practices where they overlap.
-- DONE: The agent produces quantitative metrics alongside qualitative findings so results are actionable and trackable over time.
-- DONE: The guidance defines a periodic update cadence and `last_verified` / source-ledger rules so fast-changing SEO/AEO/GEO platform assumptions do not become stale framework law.
-- MONITOR: Keep source-ledger claims refreshed and add eval seeds in a later agent-eval pass.
 
 ### Debug Playbook
 **What it is:** Agents need a structured debug loop (reproduce, isolate, instrument, hypothesize, fix) to prevent thrashing.
