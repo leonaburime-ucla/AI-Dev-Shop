@@ -15,6 +15,7 @@ Base skills are the default standing context for every Programmer task.
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — load the specific pattern reference file(s) matching the architecture chosen in the ADR; provides TypeScript implementation examples, correct layer structure, file placement rules, and boundary enforcement; without this the Programmer cannot reliably implement the chosen pattern correctly
 - `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` — mandatory style-alignment step before production code for a new task or layer
 - `<AI_DEV_SHOP_ROOT>/skills/inline-code-documentation/SKILL.md` — inline documentation contract for all new or materially changed code
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/code-documentation-standards.md` — what must and must not be documented; constrains inline docs to avoid both missing interface docs and comment bloat; requires documentation classification in handoff
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-verification-before-completion/SKILL.md` — fresh evidence gate before claiming a fix or completion
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/context-firewalls.md` — isolate broad discovery work from implementation context when exploration would otherwise crowd the active fix loop
 

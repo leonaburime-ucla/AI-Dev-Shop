@@ -13,6 +13,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — coverage-friendly design rules and anti-pattern bans; required for Dimension 3 (Test Quality) — identifying coverage-killing structural violations in any module containing decision logic, data transformation, or side effects
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — validates `@overallScore`, severity-graded findings, complexity notes, and pass/debt/block routing for new or materially changed logic-bearing functions
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy: AC format, invariants, edge cases, scope boundaries; required for Dimension 1 (Spec Alignment) — mapping each AC, invariant, and edge case to its implementation path
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/code-documentation-standards.md` — review source for required interface/orchestration/invariant/side-effect docs and forbidden noise comments; defines severity classification for documentation findings
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA checklist (activated when diff includes frontend components)
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — Expo/React Native review router; activate when diffs touch Expo Router, native UI, data fetching, API routes, native modules, Expo config, EAS workflows/deployment, SDK upgrades, or React Native performance-sensitive surfaces
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — backward compatibility and contract validation

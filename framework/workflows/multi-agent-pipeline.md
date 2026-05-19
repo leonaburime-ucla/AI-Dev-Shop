@@ -71,6 +71,15 @@ The Coordinator does not run sensors directly. Sensors run on their declared sch
 
 ---
 
+## Git Strategy Checkpoint (Coordinator Duty)
+
+At TDD dispatch and Done gate, the Coordinator follows `<AI_DEV_SHOP_ROOT>/framework/workflows/git-strategy.md`:
+
+1. **Before TDD dispatch**: create feature branch `feature/<NNN>-<feature-slug>` from current main. Record branch in `pipeline-state.md`. All implementation work happens on this branch.
+2. **At Done gate**: verify all quality gates passed, prepare PR description from template, signal PR-ready to user. Do not push or merge automatically.
+
+---
+
 ## Pre-Pipeline: Existing Codebase Analysis
 
 Run this before the first Spec when working with an existing codebase.
