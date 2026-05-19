@@ -11,8 +11,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 - AGENTS.md Map Reduction: **DONE / MONITORED** (root map was slimmed to the safer range and detail moved into local quickstart/index docs; keep watching for re-expansion)
 - Observer Agent Operational Cadence: **DONE / MONITORED** (cadence is now explicit in Observer, Coordinator, and workflow docs; keep it aligned as the pipeline evolves)
-- Harness Audit Follow-Ons (Executable Controls / Runtime Validation / Drift): **PARTIAL** (Critical items 1-4 done; High items 5-7 open)
-- Git Branching and PR Strategy: **OPEN**
+- Harness Audit Follow-Ons (Executable Controls / Runtime Validation / Drift): **PARTIAL** (Critical 1-4 done; High 5-6 done; High 7 open)
+- Git Branching and PR Strategy: **DONE**
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Protocol Split: MCP + A2A: **OPEN**
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
