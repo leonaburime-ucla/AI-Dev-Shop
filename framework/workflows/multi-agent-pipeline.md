@@ -48,7 +48,7 @@ Each stage is blocked until the Coordinator validates the previous stage's hando
 At pipeline start and before each implementation stage, the Coordinator checks host-project contract status per `<AI_DEV_SHOP_ROOT>/framework/contracts/enforcement.md`:
 
 1. **Pipeline start**: check whether `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/` exists and which contracts are declared. Report status (active/partial/missing for each). Apply greenfield vs brownfield defaults.
-2. **Before Programmer dispatch**: include declared computational controls commands in Programmer context. If runtime-changing work, include runtime-validation contract. Flag any missing required contracts per enforcement tier.
+2. **Before Programmer dispatch**: include declared computational controls commands in Programmer context. If runtime-changing work, include runtime-validation contract. If required contracts are missing, escalate to user per enforcement tier (greenfield: ask user to declare; brownfield: note absence and proceed in advisory mode).
 3. **Before Programmer handoff**: verify all declared blocking computational checks pass on modified files.
 4. **Before TestRunner**: pass declared test commands from computational controls.
 5. **Before Code Review**: pass architecture-fitness rules and lint/typecheck results to reviewer context.

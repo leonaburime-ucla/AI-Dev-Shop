@@ -90,10 +90,29 @@ See [enforcement.md](enforcement.md) for the full enforcement model. Summary:
 
 A slot declared as required but with no command means the host acknowledges the gap. The Coordinator treats this as a known gap and reports it at pipeline start. It does not block unless enforcement is set to strict.
 
+## Working Directory Resolution
+
+Commands run from the host project root by default — not the toolkit root.
+
+- `<HOST_PROJECT_ROOT>` is the root of the host repository (where `.git/` lives)
+- If `<AI_DEV_SHOP_ROOT>` is a subfolder install, commands still resolve against `<HOST_PROJECT_ROOT>`
+- Per-slot working directory overrides are relative to `<HOST_PROJECT_ROOT>`
+
+## Touched-Scope Enforcement for Project-Wide Commands
+
+Many tools (linters, type checkers) check the entire project and return a single exit code. In brownfield projects with baseline failures, agents must distinguish new violations from pre-existing ones.
+
+Resolution order:
+1. **Scoped command variant** (preferred): if the tool supports file arguments, declare a `scoped_command` alongside `command`. Example: `command: npm run lint` / `scoped_command: npx eslint {files}`. Agents use the scoped variant and pass only modified files.
+2. **Diff-based attribution**: if no scoped variant exists, run the command, capture output, and attribute failures to modified files only. Pre-existing failures in untouched files are ignored for enforcement purposes.
+3. **Baseline fingerprint**: if output attribution is impractical, run the command once at contract creation to capture a baseline failure set. New failures beyond baseline are violations; baseline failures are grandfathered.
+
+If none of these methods can distinguish new from baseline failures, treat the slot as **advisory** (not blocking) until a scoped command is available.
+
 ## Monorepo Support
 
 For monorepos with multiple packages, declare slots per package scope:
 
 - Use a separate command slot entry per package, or
 - Use a root-level command that handles routing internally (e.g., `turbo run lint`)
-- Specify the working directory for each slot when it differs from project root
+- Specify the working directory for each slot when it differs from `<HOST_PROJECT_ROOT>`

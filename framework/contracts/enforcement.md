@@ -11,15 +11,25 @@ How the framework behaves when contracts are present, missing, partial, or faili
 | **Missing** | No contract file exists at the expected host location. |
 | **Stale** | Contract exists but has not been reviewed in 90+ days or references commands/paths that no longer exist. |
 
+## Greenfield vs Brownfield Detection
+
+A project is **greenfield** if any of these are true:
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>` was created during the current bootstrap (no prior pipeline reports exist)
+- The project metadata explicitly declares `adoption_mode: greenfield`
+- The user states the project is new when asked
+
+Otherwise the project is **brownfield** by default. When in doubt, treat as brownfield — advisory mode is always safer than blocking a productive team.
+
 ## Greenfield vs Brownfield Defaults
 
 ### Greenfield Projects
 
 A project bootstrapped with AI Dev Shop from the start.
 
-- Missing **computational controls**: Coordinator blocks at Programmer dispatch. At minimum, `build` and one test slot must be declared before implementation begins.
+- Missing **computational controls**: Coordinator escalates to user at Programmer dispatch — asks the user to declare at minimum `build` and one test slot before implementation begins. Does not silently block.
 - Missing **runtime validation**: runtime-changing work cannot achieve better than PARTIAL outcome.
 - Missing **architecture fitness**: no enforcement. Agents use general best practices. Not a blocker.
+- Required greenfield slots must contain actual executable commands, not gap placeholders. If a greenfield project cannot fill a required slot, it needs an explicit human waiver.
 
 ### Brownfield Projects
 
@@ -47,9 +57,9 @@ Triggered by:
 Coordinator warns and requires human decision before proceeding.
 
 Triggered by:
-- Required contract is missing (greenfield)
+- Required contract is missing (greenfield) — Coordinator asks user to resolve before proceeding
 - Contract is stale (90+ days without review)
-- Non-blocking check fails but pattern suggests systemic issue
+- Non-blocking check fails repeatedly (3+ consecutive pipeline runs on same slot)
 - Architecture rule waiver requested for blocking rule
 
 ### Advisory
@@ -74,7 +84,7 @@ When a blocking rule needs to be bypassed for a justified reason:
 
 Waivers are recorded in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/waivers.md`.
 
-Agents cannot self-grant waivers for blocking rules. Only human approval or Coordinator escalation can create a waiver.
+Agents cannot self-grant waivers for blocking rules. Only explicit human approval can create a waiver. The Coordinator may propose and record a waiver, but it is not valid until the user confirms.
 
 ## Stale Contract Detection
 

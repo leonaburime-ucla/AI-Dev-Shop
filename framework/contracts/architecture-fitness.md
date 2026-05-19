@@ -19,6 +19,21 @@ Each rule is a structured entry:
 - **Severity**: `blocking` or `advisory`
 - **Rationale**: why this boundary exists (helps agents make judgment calls at edges)
 
+Type-specific fields:
+
+**dependency_direction** rules also declare:
+- **Source**: the module/layer that should NOT import from target (glob)
+- **Forbidden target**: the module/layer that must not be imported (glob)
+- **Allowed alternative**: what the source should use instead (e.g., "service layer at src/services/")
+
+**forbidden_import** rules also declare:
+- **Forbidden pattern**: the import path or module that must not appear (glob or regex)
+- **Applies to**: which files are checked (glob, defaults to Scope)
+
+**boundary_ownership** rules also declare:
+- **Owner**: team or role responsible for approving changes
+- **Approval required**: what constitutes approval (e.g., "security review sign-off in PR", "architect ACK in handoff")
+
 ### Example Rules
 
 **Dependency direction:**
