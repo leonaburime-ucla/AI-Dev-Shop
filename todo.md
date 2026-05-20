@@ -13,11 +13,13 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Observer Agent Operational Cadence: **DONE / MONITORED**
 - Harness Audit Follow-Ons (all 10 items): **DONE**
 - Git Branching and PR Strategy: **DONE**
+- React Component Testing Policy: **DONE** (enforced via TDD routing)
+- Execution Topology Default: **REMOVED** (toolkit already implements justified exception pattern)
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
 - Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy done; need to regenerate Architect/CR seeds at staff+ complexity)
 - Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
-- System Design Skill Coverage: **OPEN / PARTIAL** (root skill exists; depth topics pending)
+- System Design Skill Coverage: **DONE** (all 14 depth topics in `operational-depth-patterns.md`)
 
 ---
 
@@ -117,18 +119,16 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **What it is:** Follow-up ideas from a harness-engineering video focused on specialized multi-stage business workflows, deterministic rails, subagents, observability, and checkpointed execution.
 **Why it matters:** Most repo-level harness work is now in place, but these items push the framework further toward specialized downstream harnesses for compliance, legal, financial, and other long-running business processes.
 **What to add:**
-- Stage-output schema enforcement: add stricter machine-validated output contracts for multi-stage handoffs instead of relying only on markdown structure and prose rules.
-- Model-tier routing policy: document when to use stronger orchestrator models versus cheaper narrower subagents, including cost/quality tradeoff guidance.
-- Phase-checkpoint template for downstream harnesses: require each major phase to write resumable checkpoint artifacts so long-running workflows can restart from phase `N` instead of from scratch.
+- ~~Stage-output schema enforcement:~~ **DONE** — `harness-engineering/quality/stage-output-schema.md` (machine-validated output contracts with required fields, validation modes, failure behavior, schema versioning, trace integration).
+- ~~Model-tier routing policy:~~ **DONE** — `framework/routing/model-routing.md` (tier recommendations per agent role with cost/quality guidance).
+- ~~Phase-checkpoint template for downstream harnesses:~~ **DONE** — `harness-engineering/quality/phase-checkpoint-template.md` (resumable checkpoint artifacts with staleness, invalidation, sensitive-state handling).
 - Specialized non-code validation-loop templates: add downstream templates for things like clause-vs-playbook checks, fact-check loops, and rule-based business validation beyond software testing.
 - Fixed-plan vs dynamic-plan design guidance: document when a workflow should stay on deterministic fixed rails versus when dynamic replanning is acceptable.
 - Tool-approval patterns for risky actions: add stronger downstream guidance for actions that should always require explicit human approval before write/push/send/publish behavior.
-- Observability and trace design for specialized harnesses: define what a downstream harness should log about phase timing, retries, subagent activity, and validation outcomes without bloating the main context.
+- ~~Observability and trace design for specialized harnesses:~~ **DONE** — `framework/workflows/trace-schema.md` + `skills/observability-implementation/SKILL.md`.
 
-### React Component Testing Policy
-**What it is:** UI testing is often skipped by LLMs. Need a strict policy enforcing React component test creation.
-**Current state:** Added to `harness-engineering/quality/react-component-testing-policy.md`.
-**What to add:** Enforce the policy across TDD and Programmer routing. Update skill definition files and evaluation checklists.
+### React Component Testing Policy **[DONE]**
+**Completed.** Policy at `harness-engineering/quality/react-component-testing-policy.md` is enforced through TDD agent routing (`agents/tdd/skills.md` loads it directly).
 
 ### Debug Playbook
 **What it is:** Agents need a structured debug loop (reproduce, isolate, instrument, hypothesize, fix) to prevent thrashing.
@@ -160,45 +160,13 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Require anti-pattern findings to be reported in handoff summaries with location, impact, and remediation route.
 - Treat repeated unresolved anti-patterns as escalation candidates instead of silently continuing.
 
-### Programmer Ambient Fast-Feedback Testing
-**What it is:** Give Programmer immediate test breakage feedback during implementation without turning TestRunner into a continuous heavy agent.
-**Current state:** Concept agreed in review discussions; not implemented.
-**What to add (policy/docs only for now):**
-- Require Programmer to run a fast local watcher during implementation (unit tests, plus optional small changed-file integration subset).
-- Do not stream raw watcher logs into agent context; use signal-based summaries only.
-- Define stable-failure alert criteria explicitly: only alert after debounce (10-20s) and 2 consecutive failing runs.
-- Add anti-noise rules: alert budget (max N per interval), changed-file scope filtering, and compact payloads only (test id, short error, first failing frame).
-- Define recovery-state behavior explicitly: after first alert, suppress repeat alerts for that same failure until it returns green; alert again only on future green -> failing regression.
-- Preserve TestRunner as the formal gate for full suites, coverage profile checks, spec-hash validation, and certification artifact generation.
-- Document this split in `agents/programmer/skills.md` and coordination docs; defer any scripting/automation until a later phase.
+### Programmer Ambient Fast-Feedback Testing **[DONE]**
+**Completed.** Policy at `harness-engineering/quality/programmer-fast-feedback.md`. Defines watcher scope, signal-only payloads (40-line max, 120-char errors), debounce (10s), stable-failure alerts (2 consecutive), alert budget (3/15min), suppression state machine, stale-watcher resets, and clear TestRunner boundary.
+**Remaining:** Wire into `agents/programmer/skills.md` as conditional awareness and update coordination docs.
 
 ---
 
 ## Consensus Orchestration
-
-### Execution Topology Default: Strong Single-Agent Baseline First
-**What it is:** Default the framework toward a strong single-agent baseline for most implementation work, and treat delegated specialist agents as an exception that must justify their added coordination cost.
-**Why it matters:** Current research does **not** support assuming that same-model multi-agent workflows are better by default. In many comparisons, a strong single-agent baseline matches or beats homogeneous multi-agent setups once compute is normalized.
-**Current state:** The toolkit supports delegated specialist routing, but the docs should reflect that this is not automatically the better path for quality, cost, or long-horizon work.
-**Research-backed default to document:**
-- Prefer one active agent/session with compact offloads, explicit review passes, and structured handoffs as the baseline.
-- Do **not** treat role labels inside one shared context as true adversarial independence.
-- Use delegated specialist agents only when there is a concrete reason:
-  - true isolated context windows are available
-  - model heterogeneity is available and useful
-  - the task is long-horizon enough that keeping implementation traces out of the main context is materially helpful
-  - independent review pressure is important enough to justify extra token and orchestration cost
-**What to add:**
-- Update routing docs so Coordinator defaults to the single-agent baseline unless an exception condition is met.
-- Add explicit language that same-model multi-agent comparisons must beat the single-agent baseline, not just a weak one-pass baseline.
-- Keep any future topology eval bounded to exception-testing, not as an open question about the default path.
-**Likely files to inspect/update first:**
-- `agents/coordinator/skills.md`
-- `harness-engineering/runtime/subagent-usage-policy.md`
-- `harness-engineering/runtime/context-offloading.md`
-- `harness-engineering/quality/evaluation-loops.md`
-**Done when:**
-- The docs state a clear default: start single-agent, escalate to delegated specialists only when isolation, heterogeneity, or review independence is expected to add value.
 
 ### Multi-LLM Consensus Modes and Guardrails **[PARTIAL]**
 **What it is:** `/consensus` and `skills/swarm-consensus/SKILL.md` exist, but they need stronger orchestration rules for architecture/data-modeling debates and reproducible runs with explicit mode control.
@@ -238,24 +206,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ---
 
-### System Design Skill Coverage Hardening **[PARTIAL]**
-**What it is:** The new `skills/system-design/` package exists, but it is still stronger on high-level topology and generic distributed-systems framing than on correctness, operational sharp edges, and security-depth topics.
-**Current state:** **[PARTIAL]** Root skill plus references are in place; coverage is good enough to start, but not yet comprehensive against the full recurring system-design checklist.
-**What to add:**
-- Add reference coverage for hot keys / hot rows
-- Add reference coverage for precomputation
-- Add reference coverage for batching
-- Deepen async processing guidance
-- Add explicit idempotency guidance
-- Add explicit deduplication guidance
-- Add transaction tradeoff guidance
-- Add concurrency issue patterns and failure modes
-- Add health check guidance
-- Add graceful degradation patterns
-- Deepen authn/authz treatment
-- Deepen secrets-management treatment
-- Deepen rate-limiting treatment
-- Add abuse-detection coverage
+### System Design Skill Coverage Hardening **[DONE]**
+**Completed.** All 14 depth topics added in `skills/system-design/references/operational-depth-patterns.md`: hot keys/rows, precomputation, batching, async depth (backpressure/DLQ/ordering/exactly-once), idempotency, deduplication, transaction tradeoffs (saga/outbox/compensation), concurrency failure modes (7 patterns), health checks (liveness/readiness/cascading), graceful degradation (circuit breaker/load shedding/bulkhead), authn/authz depth (token lifecycle/RBAC vs ABAC/zero-trust), secrets management (rotation/envelope encryption/injection), rate limiting depth (4 algorithms/distributed/per-tenant), abuse detection (anomaly signals/progressive enforcement/reputation). SKILL.md load strategy updated to reference the new file.
 
 ---
 
@@ -294,6 +246,44 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Per-complexity-category catch rates are reported in eval summaries
 - Category-level misses directly inform which skills to build next
 - The eval creation protocol structurally prevents future suites from being all-textbook
+
+---
+
+## Reverse-Spec Eval Suite **[OPEN]**
+
+### What it is
+An agent eval suite for the reverse-spec skill — verifying that the extraction pipeline produces correct, complete, and consistent specifications from existing codebases.
+
+### Why it matters
+The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 bounded passes, confidence hierarchies, characterization tests, data migration profiling, and adversarial verification. Without evals, there's no way to measure whether agents executing this pipeline actually follow the methodology or produce correct output.
+
+### What to build
+- Seed catalog targeting staff+ complexity (real brownfield extraction challenges, not toy examples)
+- Seeds should cover the known failure modes the skill was designed to prevent:
+  - Confidence inflation (marking `inferred` as `confirmed`)
+  - Hallucinating absence (`verified_none` without proof)
+  - Missing failure matrices for state-changing endpoints
+  - Zombie feature flags extracted as live requirements
+  - Polymorphic column data mapped 1:1 without implicit schema extraction
+  - Silent drops extracted as live webhook contracts
+  - Soft-delete leakage (unfiltered reads)
+  - Tenant scoping assumed from helper existence without query verification
+  - Async job wire-format confusion (domain objects vs primitive IDs)
+  - Convention-based requirements without batch-approval grouping
+  - Characterization tests with unmasked nondeterministic fields
+  - Data migration target mapping produced before Architect (premature Stage 2)
+  - Normalization stripping rewrite-critical metadata fields
+  - Missing `[CONTRACT VS IMPLEMENTATION]` marker when observed ≠ normative
+- Grading rubric should check structural compliance (correct REQ format, risk tags, confidence labels, criticality assignment) and behavioral correctness (right confidence level for evidence type, right criticality for domain)
+- Minimum 24 seeds across all 5 passes + synthesis
+
+### Likely location
+- `harness-engineering/agent-evals/reverse-spec-evals/benchmark-suite/`
+
+### Done when
+- Seeds exist at staff+ complexity covering the major failure modes
+- Scorer can evaluate pass artifacts against the SKILL.md methodology
+- Running the suite reveals which extraction phases agents struggle with most
 
 ---
 
