@@ -84,16 +84,38 @@ Promote a seed to `Hard` only when at least one of these is true:
 - the happy path works and the failure only appears under context
 - the handoff, naming, or surrounding comments actively mislead the agent
 
+## Difficulty Distribution Policy
+
+Easy seeds exist only as smoke-test positive controls — they verify the agent
+is running, reading the right inputs, and producing output in the expected
+shape. They do not measure capability.
+
+**Hard rules:**
+- Easy seeds must be ≤ 5% of total suite size (rounded up)
+- Easy seeds must be classified as `positive_control` — no Easy standard seeds
+- If a positive control fails, it indicates a broken agent setup, not a skill gap
+- Medium + Hard should comprise ≥ 95% of the suite
+- Prefer Hard over Medium — Medium seeds that don't require genuine deception or
+  cross-boundary reasoning should be promoted to Hard with added camouflage or
+  interference, or downgraded to positive controls if they're truly trivial
+
+**Rationale:** Easy standard seeds inflate catch rates and obscure real gaps. An
+agent that scores 90% on a suite with 30% Easy seeds may actually be failing
+half of the genuinely hard scenarios. Suites must measure what agents struggle
+with, not confirm what they can trivially do.
+
 ## Matrix Rules
 
 Every benchmark-grade suite should satisfy these minimum rules:
 
-1. **Dimension baseline**: each target dimension gets at least one `Easy` +
-   `single` cell so basic competency is measured.
+1. **Smoke-test baseline**: the suite includes 2-3 Easy positive controls that
+   verify the agent is loaded and producing structured output. These are not
+   capability measurements.
 2. **Structure pressure**: each target dimension gets at least one non-`single`
    cell from `combined`, `layered`, `distributed`, `camouflaged`, or
    `interference`.
-3. **Difficulty spread**: the suite covers all three difficulty tiers.
+3. **Difficulty weight**: ≥ 95% of seeds are Medium or Hard. Hard seeds should
+   outnumber Medium seeds in benchmark-grade suites.
 4. **High-risk repetition**: high-risk natures such as `omission`,
    `boundary_error`, `hidden_dependency`, `state_leak`, and
    `invariant_violation` should not appear only once across the whole suite

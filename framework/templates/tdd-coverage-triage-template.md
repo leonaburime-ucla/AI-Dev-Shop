@@ -3,7 +3,9 @@
 - Feature: FEAT-<NNN> — <feature name>
 - Spec ID: <SPEC-id>
 - Spec Hash: <sha256 — must match active spec>
+- Spec Hash Verification: <command/tool output used before triage>
 - TestRunner Report: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`
+- Test Certification: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 - Triaged At: <ISO-8601 UTC>
 - Triaged By: TDD Agent
 
@@ -53,9 +55,17 @@ After gap fill tests are written, update the certification record at:
 `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 
 - Do not change the original certified spec hash
+- Refuse gap fill if the active spec hash no longer matches the certification
+  record; full recertification is required instead
 - Add new tests to the Covered Requirements table
+- Add or update the Test File Inventory with sha256 hashes and expected runnable
+  test counts for every new or changed test file, and remove inventory rows for
+  deleted test files so the inventory exactly matches disk
 - Revise the Known Gaps section
 - Update the certified timestamp
+- If multiple gap-fill workers are active, workers must not write the
+  certification record concurrently; return structured inventory-delta entries
+  to the Coordinator or a Coordinator-designated single writer
 
 ---
 

@@ -7,8 +7,10 @@ This suite is the canonical benchmark root for Code Review evals.
 ## Control Status
 
 - per-eval seeded fixtures exist for all 3 evals (easy, medium, hard)
-- `coverage-matrix.tsv` and `seed-catalog.tsv` are backfilled (19 seeds,
-  9 coverage cells)
+- `coverage-matrix.tsv` and `seed-catalog.tsv` are normalized to the current
+  validator taxonomy (`21` seeds, `21` coverage cells)
+- suite-level controls now include `1` positive control, `2` negative
+  controls, and a retained regression pack
 - per-eval `seed-ledger.md` files remain the detailed seed narrative source
 
 ## Current Rule
@@ -20,8 +22,7 @@ This suite is the canonical benchmark root for Code Review evals.
 
 ## Target Rule
 
-Once backfill is complete, this suite should carry the full benchmark control
-definition directly in:
+This suite now carries the benchmark control definition directly in:
 
 - `coverage-matrix.tsv`
 - `seed-catalog.tsv`

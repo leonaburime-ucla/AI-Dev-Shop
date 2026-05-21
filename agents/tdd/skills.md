@@ -22,7 +22,13 @@ Encode the spec into executable tests before implementation. Certify each test s
 - Coordinator directive and target scope
 
 ## Workflow
-1. Verify active spec metadata is current and human-approved. Refuse to proceed against unapproved specs.
+1. Verify active spec metadata is current and human-approved. Recompute or read
+   the provider-local hash using deterministic tooling; do not visually compare
+   hash strings. Prefer the provider-local validator when available. Otherwise
+   use the platform hash binary (`sha256sum <file>` on GNU systems,
+   `shasum -a 256 <file>` on macOS/BSD) and compare only the hex digest after
+   trimming command-output whitespace. Refuse to proceed against unapproved or
+   stale specs.
 2. Build requirement-to-test matrix (see `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`):
    - Each acceptance criterion → one or more tests
    - Each invariant → dedicated assertion set
@@ -42,13 +48,14 @@ Encode the spec into executable tests before implementation. Certify each test s
    - Enforce naming convention from test-design skill: `.unit.test.ts`, `.integration.test.ts`, `.e2e.test.ts` (if writing browser tests).
 3a. **Property-based tests:** For each AC or invariant involving ranges, collections, validation logic, or round-trip guarantees, generate at least one property-based test. See `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` Property-Based Testing section. List property tests separately in the certification record.
 3b. **Contract tests:** For each API or event contract defined in the ADR's API/Event Contract Summary section, generate at least one contract test verifying the implementation honors the contract. Use the testing approach flagged by the Architect (consumer-driven / schema validation / integration). See `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` Contract Testing section.
-4. Create test certification record using `<AI_DEV_SHOP_ROOT>/framework/templates/test-certification-template.md`. Write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`. Include spec ID, version, and hash.
+4. Create test certification record using `<AI_DEV_SHOP_ROOT>/framework/templates/test-certification-template.md`. Write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`. Include spec ID, version, hash, hash verification command/output, Outcome Matrix, property tests, contract tests, expected test count, and a sha256 for every test file currently certified for the feature. The Coordinator records the certification file hash externally in `pipeline-state.md`; do not embed a hash of this file inside itself.
 5. List uncovered requirements explicitly as gaps with risk level.
 6. Hand off certified test suite to Programmer via Coordinator.
 
 ## Output Format
 - Test files created/changed
 - Requirement-to-test mapping table
+- Outcome Matrix per module
 - Certification record (spec ID / version / hash)
 - Coverage gaps and risk level per gap
 - Recommended next routing
@@ -78,6 +85,9 @@ When dispatched with a TestRunner coverage report rather than at initial spec-en
 - Active test certification record (to update, not replace)
 
 ### Workflow
+0. Verify the active spec hash matches the test certification record's spec hash.
+   If they differ, refuse gap fill; the certification is stale and requires
+   full TDD recertification, not a gap-fill patch.
 1. Read the Coverage Gap List (High-priority files first).
 2. For each uncovered file or module: read the implementation to understand which code paths are not exercised.
 3. Map each uncovered path back to a spec requirement, invariant, or edge case:
@@ -85,10 +95,17 @@ When dispatched with a TestRunner coverage report rather than at initial spec-en
    - If it maps to no spec item → flag to Coordinator as a Refactor candidate (dead code or out-of-scope implementation). Do not write a test for behavior not in the spec.
    - If both types exist in the same module, do both in the same cycle: write tests immediately for spec-traceable paths and separately flag no-spec-mapping paths for Refactor. Do not pause spec-traceable coverage work while waiting for Refactor routing.
 4. Write tests following the same naming and directory conventions as the original suite.
-5. Update the test certification record: add newly-written tests to the requirement-to-test mapping, revise the Coverage Gaps section, update the timestamp. Do not change the original certified spec hash — this is a gap fill, not a recertification.
+5. Update the test certification record: add newly-written tests to the requirement-to-test mapping, revise the Coverage Gaps section, update the timestamp, and add, update, or remove sha256 hashes and expected runnable test counts for every created, changed, or deleted test file so the inventory exactly matches disk. Do not change the original certified spec hash — this is a gap fill, not a recertification.
 6. Report to Coordinator: tests written, remaining uncovered paths that have no spec mapping (Refactor candidates), updated certification record location. Write a structured triage report using `<AI_DEV_SHOP_ROOT>/framework/templates/tdd-coverage-triage-template.md` only when: (a) any gap is being routed to Refactor Agent and a structured handoff is needed, or (b) the Coordinator explicitly requests a written artifact. In conversational or Agent Direct Mode use, prose output is sufficient.
 7. Do not dispatch Programmer or Refactor Agent directly — hand off to Coordinator.
 
 ### What does not belong here
 - Code paths that cannot be traced to any spec requirement → route to Coordinator as Refactor candidates
 - Code that is genuinely hard to test due to tight coupling → route to Coordinator as Refactor candidates; do not write implementation-internal tests to inflate coverage numbers
+
+### Parallel Gap Fill Rule
+
+Parallel gap-fill workers must not write `test-certification.md`. Each worker
+returns structured mapping, inventory-delta, expected-count, and test-file hash
+entries in its handoff. The Coordinator is responsible for serializing those
+updates into the certification record or delegating a single writer explicitly.

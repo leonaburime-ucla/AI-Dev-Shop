@@ -14,7 +14,7 @@ The following conditions halt the pipeline immediately. The Coordinator must sur
 |---------|-------|--------------------------|
 | Spec hash mismatch between dispatch and agent output | Any | The two hashes, which file changed, when it changed |
 | 3+ BLOCKING findings from Red-Team Agent | post-spec | All BLOCKING findings with exact spec refs; recommended spec changes |
-| CONSTITUTION-FLAG from Red-Team Agent | post-spec | The flag, the relevant constitution article, the spec text in question |
+| CONSTITUTION_FLAG from Red-Team Agent | post-spec | The flag, the relevant constitution article, the spec text in question |
 | Constitution violation without documented exception | architect | The article violated, the ADR section, what the unjustified decision was |
 | Security finding classified Critical or High | security | Full finding, exploit scenario, proposed mitigation |
 | Same failure cluster persists after hitting retry budget (see below) | programmer, tdd | Cluster ID, all failing tests, retry count, spec ACs involved, hypothesis |

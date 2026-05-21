@@ -13,7 +13,10 @@ Reports are saved to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/` �
 
 ## Token Budget Before You Start
 
-Estimate codebase size before any reads. Check file count with a single directory listing.
+Estimate codebase size before any reads. Count files with a bounded file list
+that excludes generated/vendor folders before sampling. Prefer:
+`rg --files -g '!node_modules/**' -g '!vendor/**' -g '!dist/**' -g '!build/**' -g '!.git/**'`.
+Use the host's closest equivalent if `rg` is unavailable.
 
 | Codebase Size | File Count | Approach |
 |---|---|---|
@@ -64,7 +67,15 @@ Goal: quality indicators, naming, missing abstractions, security surface.
 
 Rules:
 - One representative file per module/layer, maximum 100 lines each
-- For test coverage: check file existence only — do not read test files
+- For test coverage: check test-file existence and declared test commands only
+  — do not read test files during Phase 3. Label this as a coverage signal, not
+  a coverage measurement. A declared test command is not coverage evidence by
+  itself; flag placeholder commands such as `echo "Error: no test specified"`
+  as no usable test command. Do not claim module coverage exists unless a test
+  command actually targets that module or an existing coverage artifact shows
+  nonzero coverage for it. Do not claim "zero coverage" unless both no matching
+  test files and no usable configured test command/coverage artifact are found
+  for the module.
 - For security: grep for risk patterns rather than reading full files
 
 Security grep patterns (flag, do not diagnose):
@@ -142,6 +153,23 @@ Each part is self-contained. `architecture-migration` can load individual parts 
 - Severity Counts: Critical: 2 | High: 5 | Medium: 8 | Low: 4
 - Current State Classification: Layered (degraded)
 
+## Sampling Notice
+
+Files sampled: <list or description of files read>
+Files excluded: <list or description of skipped files and why>
+
+Confidence levels by finding category:
+- Architecture structure: High / Medium / Low
+- Dependency direction: High / Medium / Low
+- Test coverage signal: High / Medium / Low
+- Security surface: High / Medium / Low
+- Code quality indicators: High / Medium / Low
+
+Note: Confidence reflects sample coverage, not model certainty. A
+High-confidence finding means the sample was broad enough to support the
+conclusion. A Low-confidence finding is a hypothesis requiring human
+verification.
+
 ## Findings
 
 ### FLAW-001
@@ -170,7 +198,10 @@ Due to token budget, the following were sampled but not fully read:
 ## Recommended Next Step
 
 State which option applies:
-- If zero coverage in critical modules and full migration is premature: generate a Testability Remediation Plan using Phase 4 of `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md`
+- If a Critical/High module has no detected test files and no configured test
+  command/coverage artifact, and full migration is premature: generate a
+  Testability Remediation Plan using Phase 4 of
+  `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md`
 - If architecture overhaul is warranted: load this report into `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` to generate a migration plan
 - If structural issues are minor: route findings to Refactor Agent via Coordinator
 ```

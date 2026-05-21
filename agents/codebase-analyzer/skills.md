@@ -80,7 +80,7 @@ Tests must be written before any structural migration begins.
 
 ## Escalation Rules
 - Codebase too large for phased analysis without user scope guidance — stop and ask
-- Zero test coverage across the entire codebase, or zero coverage in any Critical-severity module — offer Testability Remediation Plan (Phase 4) before migration; do not skip directly to migration planning
+- No detected test files plus no usable configured test command/coverage artifact across the entire codebase, or the same signal in any Critical-severity module — offer Testability Remediation Plan (Phase 4) before migration; do not skip directly to migration planning. Placeholder commands such as `echo "Error: no test specified"` do not count as usable test commands.
 - Critical security findings (hardcoded credentials, exposed secrets) — escalate immediately to human before any pipeline work begins
 - Circular dependencies that span more than 3 modules — flag as requiring Architect Agent review before migration planning
 

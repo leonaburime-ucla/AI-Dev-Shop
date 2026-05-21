@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.19
-last_updated: 2026-05-19
+version: 1.2.21
+last_updated: 2026-05-20
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -25,6 +25,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/agent-evaluation/SKILL.md` | Observer |
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
 | `skills/architecture-migration/SKILL.md` | CodeBase Analyzer |
+| `skills/reverse-spec/SKILL.md` | Coordinator, Spec Agent, CodeBase Analyzer, Architect (brownfield and rewrite workflows) |
 | `skills/design-patterns/SKILL.md` | Architect, CodeBase Analyzer, System Blueprint Agent (secondary) |
 | `skills/backend-implementation/SKILL.md` | Programmer (default backend/service/worker implementation entrypoint) |
 | `skills/adversarial-test-design/SKILL.md` | Programmer (conditional for aggregate-risk workflows such as rule, validation, batch, reducer, reconciliation, transfer, and other cross-record logic) |
@@ -92,4 +93,5 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `framework/governance/data-classification.md` | All agents (PII and secret handling) |
 | `framework/routing/model-routing.md` | Coordinator (dispatch tier selection) |
 | `framework/governance/escalation-policy.md` | Coordinator (retry budgets and escalation triggers) |
+| `framework/workflows/status-confidence-taxonomy.md` | Coordinator, System Blueprint Agent, Spec Agent, Red-Team Agent, Architect, CodeBase Analyzer (label boundary reference) |
 | `harness-engineering/quality/agent-performance-scorecard.md` | Observer (quality tracking) |

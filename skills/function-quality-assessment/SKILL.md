@@ -175,13 +175,18 @@ Use `references/scoring-rubric.md` as the canonical scoring rubric.
 - `< 80`: hard block.
 - `80-89`: Programmer must attempt one local fix cycle. If still `80-89`, handoff
   may proceed only with documented tech debt, smallest compliant refactor, and
-  Coordinator notification.
+  Coordinator notification. The fix cycle must include concrete evidence:
+  changed structure in the diff, a progress-ledger entry, or a handoff-table note
+  naming the attempted extraction/restructuring/decomposition. Comments-only,
+  formatting-only, or rename-only changes do not satisfy this requirement.
 - `90-99`: pass with findings.
 - `100`: clean pass.
 
 Code Review may upgrade any unresolved `High` finding to Required when it is
 likely to cause production failure, security exposure, scale failure, or
 coverage-hostile design.
+Code Review must upgrade an `80-89` debt-band handoff to Required when the
+Programmer claims a local fix cycle but provides no structural evidence for it.
 
 ## Report Shape
 
@@ -217,7 +222,7 @@ Code Review report must include:
 - Missing adversarial aggregate/cross-item evidence: <yes/no/n/a>
 - Required fixes: <summary or none>
 - Recommended refactors: <summary or none>
-- Suggested next route: Programmer | Refactor | Security | Architect | None
+- Suggested Coordinator classification: IMPLEMENTATION_FIX_REQUIRED | TDD_RECERTIFICATION_REQUIRED | TEST_EVIDENCE_INVALID | COVERAGE_TRIAGE_REQUIRED | SPEC_REVISION_REVIEW_REQUIRED | REFACTOR_RECOMMENDED | SECURITY_REVIEW_REQUIRED | ARCHITECTURE_REVIEW_REQUIRED | HUMAN_REVIEW_REQUIRED | NONE
 ```
 
 ## References

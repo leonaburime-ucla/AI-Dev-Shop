@@ -11,6 +11,27 @@ The Coordinator is the only agent with a view of the entire pipeline. Every othe
 
 By default, inter-agent communication flows through the Coordinator with bounded cross-agent consultation enabled. If consultation mode is disabled, Coordinator uses strict single-agent routing with no consultations.
 
+## Coordinator-Owned Dependency Guard
+
+Specialist agents must not depend on, wait for, dispatch, or directly gate on
+other specialist agents. They consume only the scoped artifacts and evidence the
+Coordinator supplies, validate those inputs for freshness and completeness, and
+return findings to the Coordinator.
+
+When a workflow needs output from another specialist stage, phrase and implement
+it as a Coordinator responsibility:
+
+- Correct: "Coordinator dispatches Code Review with the verification packet."
+- Correct: "If the verification packet is stale, Code Review reports an invalid
+  input finding to Coordinator."
+- Incorrect: "Code Review waits for TestRunner" or "Refactor proceeds after TDD
+  confirms coverage."
+
+The Coordinator is the only owner of stage ordering, readiness gates, retry
+routing, inter-agent dependencies, and human checkpoints. Any doc, prompt, or
+agent output that gives a specialist agent ownership of another specialist's
+lifecycle is a routing bug and must be corrected before use.
+
 ## Core Responsibilities
 
 1. **Routing**: Receive agent outputs, classify findings, dispatch to the correct next agent
@@ -65,6 +86,22 @@ Before first TestRunner dispatch for a feature, confirm coverage minimums with t
 - E2E default: `80/80/80/80`
 
 If the human does not provide custom values, apply defaults and persist the active profile into `tasks.md` constraints so TestRunner and TDD use the same numbers.
+
+The same constraints section must also record required suites, coverage tool and
+machine-readable artifact paths, cleanup paths, E2E requirement status, and the
+convergence threshold. Default convergence before Code Review is `100%` of P1
+acceptance tests and invariants passing. A lower value is valid only when a
+human-approved threshold and reason are recorded in `tasks.md`.
+
+## Known-Flaky Registry Initialization
+
+When TestRunner reports a flaky test and
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/known-flaky-tests.md` does not exist, the
+Coordinator creates it from
+`<AI_DEV_SHOP_ROOT>/framework/templates/known-flaky-tests-template.md` and
+escalates to the human. The human must either approve a temporary exclusion with
+the required fields and a stabilization plan, or require the test to be fixed
+before advancement. Specialist agents may not self-approve registry entries.
 
 ## Artifact Retention Prompt
 
@@ -224,10 +261,11 @@ Agent output received
 ├─ Red-Team findings?
 │   ├─ 3+ BLOCKING → Route to: Spec Agent
 │   │   Context: all BLOCKING findings with exact spec refs
-│   ├─ CONSTITUTION-FLAG → Escalate to human before proceeding
+│   ├─ CONSTITUTION_FLAG → Escalate to human before proceeding
 │   │   Context: flag details, relevant constitution article
-│   └─ ADVISORY only (or no findings) → Route to: Architect
-│       Context: approved spec, full ADVISORY list
+│   └─ ADVISORY only (or no findings) → Run Coordinator Planning Preflight
+│       Context: approved spec, full ADVISORY list, provider gate, blueprint/reverse-spec/brownfield evidence
+│       Next: Architect only if preflight PASS for the current spec hash
 │
 ├─ ADR missing __specs__/__tests__ placement decision?
 │   └─ Route back to: Architect
@@ -254,12 +292,19 @@ Agent output received
 │                          Coverage Gap List, specific uncovered files and line ranges, ADR constraints
 │                 After Refactor proposes seam extraction and human approves: dispatch Programmer,
 │                 then dispatch TDD to cover the newly testable units, then re-run TestRunner
+│       Finding classification: `COVERAGE_TRIAGE_REQUIRED`
 │
 ├─ Touched-file coverage regression (from TestRunner coverage report)?
 │   └─ Route to: Coordinator routing triage — use TestRunner/TDD evidence plus diff metadata to determine owner:
 │       - Tests were deleted → TDD Agent to restore coverage
 │       - Implementation change removed a previously covered path → Programmer to restore coverage
 │       Context: which files regressed, previous vs current %, what changed in the diff
+│
+├─ Required test-quality/certification/hash/coverage-evidence finding from Code Review?
+│   └─ Route to: TDD Agent
+│       Context: CR finding IDs, active spec hash, test certification, Coordinator verification packet,
+│                affected test files/spec refs, and why the test evidence is invalid
+│       Finding classification: `TDD_RECERTIFICATION_REQUIRED` or `TEST_EVIDENCE_INVALID`
 │
 ├─ Test failures?
 │   └─ Route to: Programmer Agent
@@ -367,7 +412,12 @@ If any field is missing, return the output to the agent with a request to comple
 
 The convergence threshold prevents the system from advancing on a broken foundation, and prevents the system from looping forever on unfixable problems.
 
-**Threshold**: ~90-95% of acceptance tests passing on a first Programmer cycle is the signal to advance to Code Review. This is not a hard rule — calibrate to project risk. A payment processor may require 100%. A prototype dashboard may accept 85%.
+**Threshold**: default `100%` of P1 acceptance tests and invariants passing,
+with every hard coverage gate in `tasks.md` constraints passing, before Code
+Review. A lower threshold requires a human-approved value and reason recorded in
+`tasks.md`. Failing P1 tests, failing invariant tests, stale spec hashes,
+test-file hash mismatches, zero-test or skipped-only runs, missing required
+coverage artifacts, and unapproved flaky tests always block Code Review.
 
 **Iteration budget**: 5 total retries across all clusters; escalate any single failing cluster after 3 retries, even if total budget is not exhausted. If the same cluster is failing after 3 rounds of Programmer → TestRunner → Programmer, this is no longer a code problem. It is either a spec problem, an architecture problem, or a genuinely hard edge case. Escalate to human.
 
@@ -395,7 +445,10 @@ These are not optional. Humans must review and approve at:
 
 | Checkpoint | When | Why |
 |---|---|---|
+| System blueprint approval | Before Spec approval when Blueprint was produced | Wrong macro boundaries make downstream specs and ADRs drift |
 | Spec approval | Before Architect receives the spec | Specs are ground truth; everything downstream depends on them |
+| Reverse-spec review digest approval | Before Architect receives reverse-spec-derived specs | Extracted specs become rewrite contracts; review-digest errors propagate into the target system |
+| Red-Team clearance | Before Architect receives the spec | Adversarial findings must be resolved before architecture decisions depend on the spec |
 | Architecture sign-off | Before TDD receives the architecture | Pattern choices shape the entire codebase |
 | Convergence escalation | When iteration budget is exhausted | Stubborn failures signal a deeper problem humans must resolve |
 | Security sign-off | Before anything ships | No Critical/High finding ships without human approval |
@@ -413,6 +466,16 @@ Rules for parallel dispatch:
 - Each Programmer instance works against a separate, non-overlapping set of tests
 - TestRunner aggregates all parallel outputs before routing to Code Review
 - Code Review must see the full combined diff, not individual slices
+- The Coordinator owns `tasks.md` checkboxes and `pipeline-state.md` parallel
+  task rows. Specialist agents report progress; they do not mutate task status
+  unless explicitly delegated.
+- Shared artifacts such as `test-certification.md`, coverage outputs, and
+  pipeline state are single-writer surfaces. Parallel workers return structured
+  updates to the Coordinator or a designated owner, which serializes writes.
+- Parallel TestRunner workers are not supported for the same feature cycle.
+  Coordinator dispatches one TestRunner aggregation job after parallel
+  Programmer/TDD work completes. That job owns coverage cleanup, isolated
+  per-suite coverage output paths, and merged coverage evaluation for the cycle.
 
 The Coordinator tracks all parallel instances and waits for all to complete before routing forward.
 

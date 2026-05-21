@@ -4,6 +4,7 @@
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — macro-level system planning and decomposition
+- `<AI_DEV_SHOP_ROOT>/skills/system-design/SKILL.md` — shared macro-topology and architecture-spec vocabulary for blueprint structure
 - `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — run the light pass during blueprint; trigger targeted deepening only when risk signals are found
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — secondary reference for macro architecture shape options and tradeoff vocabulary
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — secondary reference for system drivers and tradeoff framing (do not produce ADR decisions in this stage)
@@ -22,19 +23,25 @@ Create a macro-level system blueprint that defines what is being built and how i
 - Product/feature intent and business outcome
 - Constraints and known non-functional requirements
 - Existing project context (if not greenfield)
+- CodeBase Analyzer reports for existing-codebase extensions when available:
+  `ANALYSIS-*`, `MIGRATION-*`, and `TESTABILITY-*`
 - Coordinator directive
 
 ## Workflow
 1. Normalize intent into system scope and non-goals.
+   - If `Scope: Existing codebase extension`, read the relevant CodeBase
+     Analyzer reports before domain decomposition.
+   - Treat CodeBase Analyzer findings as sampled evidence with caveats. Do not
+     claim exhaustive certainty from sampled reports.
 2. Run the generic functional discovery pass from `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` before choosing domains, APIs, or data topology:
    - Identify actors/user types, goals/capabilities, core workflows, resources/operations, lifecycle/state, business rules, exceptions, integrations, admin/support needs, audit/history, settings, and account/data lifecycle where relevant.
    - Mark each category `Applicable`, `N/A`, or `Unknown`; classify unknowns as `BLOCKING`, `SAFE DEFAULT`, or `DEFERRED`.
    - Propose likely main flows and ask the human to correct them.
-   - Ask at most 5 blocking clarification questions per blueprint pass; document safe default assumptions for non-blocking ambiguity.
+   - Ask at most 5 blocking clarification questions per blueprint pass; document safe default assumptions for non-blocking ambiguity. If more blockers remain after the cap, record them and leave Functional model status `BLOCKED`. Unknowns involving a new dependency, domain ownership boundary, external integration, durable data schema, migration boundary, auth/trust boundary, or source-of-truth decision must stay `BLOCKING`; do not use `SAFE DEFAULT` to bypass the question cap for structural architecture boundaries.
 3. Run `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` light pass before finalizing topology:
    - Mark each NFR category `Applicable`, `N/A`, or `Unknown`; classify unknowns as `BLOCKING`, `SAFE DEFAULT`, or `DEFERRED`.
    - Trigger targeted deepening only when risk signals are present or the user/Coordinator asks for depth.
-   - Ask at most 5 blocking NFR questions per blueprint pass; document safe defaults and downstream owners for non-blocking ambiguity.
+   - Ask at most 5 blocking NFR questions per blueprint pass; document safe defaults and downstream owners for non-blocking ambiguity. If more blockers remain after the cap, record them and leave NFR model status `BLOCKED`. Unknowns involving a new dependency, domain ownership boundary, external integration, durable data schema, migration boundary, auth/trust boundary, or source-of-truth decision must stay `BLOCKING`; do not use `SAFE DEFAULT` to bypass the question cap for structural architecture boundaries.
    - Derive dominant quality-attribute candidates from the NFR records; do not score them in Blueprint.
 4. Identify candidate domains/components and ownership boundaries from the functional and NFR models.
 5. Explore macro technology direction with the user before committing it:
@@ -52,7 +59,9 @@ Create a macro-level system blueprint that defines what is being built and how i
    - Any package requiring a foreign key to another domain-owned table must be sequenced after the owner domain.
 13. Keep `P0` thin: no feature-specific business logic or feature-owned schema in Core/Foundation.
 14. Write `system-blueprint.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md`.
-15. Hand off to Coordinator for human review and Spec dispatch.
+15. Hand off to Coordinator for human review. Spec dispatch requires
+    `Status: APPROVED`, no unresolved `[OWNERSHIP UNCLEAR]`, and no
+    `Functional model status: BLOCKED` or `NFR model status: BLOCKED`.
 
 ## Output Format
 - Blueprint artifact path

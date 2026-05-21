@@ -52,7 +52,7 @@ Deliberately small and realistic — small enough to understand end-to-end, larg
 
 **When writing a spec:** compare against `feature.spec.md` and `spec-manifest.md`. Every requirement should be observable and testable. Zero `[NEEDS CLARIFICATION]` markers at dispatch. Constitution Compliance table filled in.
 
-**When reading Red-Team output:** compare against `red-team-findings.md`. Findings are BLOCKING, ADVISORY, or CONSTITUTION-FLAG. Only BLOCKING findings halt Architect dispatch.
+**When reading Red-Team output:** compare against `red-team-findings.md`. Findings are BLOCKING, ADVISORY, or CONSTITUTION_FLAG. Only BLOCKING findings halt Architect dispatch.
 
 **When writing an ADR:** compare against `adr.md`. Constitution Check table must come first, before any architecture content. Complexity Justification table must be present even if empty. Research summary is required when technology choices exist.
 

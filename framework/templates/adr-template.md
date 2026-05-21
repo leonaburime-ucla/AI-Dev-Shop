@@ -27,6 +27,16 @@ Any EXCEPTION must have a row in the Complexity Justification table below.
 - Research artifact: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` / N/A (no library or technology choices in spec)
 - Key decision: <one-sentence summary of what was selected and why, or N/A>
 
+## Planning Preflight Evidence
+
+- Coordinator Planning Preflight: PASS / FAIL
+- Spec hash verified at:
+- Red-Team status and artifact:
+- System Blueprint status and artifact:
+- CodeBase Analyzer reports consumed:
+- Reverse-spec artifacts consumed:
+- Validator result or waiver:
+
 ## Context
 
 What problem are we solving? What forces are acting on this decision?
@@ -63,14 +73,18 @@ Map the decision to the system drivers:
 
 ## Pattern Evaluation
 
-All candidate patterns evaluated before selection. Adaptability score reflects how easily this choice can be replaced or extended as requirements and technology evolve. When two patterns score within 10 points, the higher-adaptability pattern is preferred per the Adaptability First principle.
+All candidate patterns evaluated before selection. Fit Band is qualitative, not
+a fake precision score. Adaptability reflects how easily this choice can be
+replaced or extended as requirements and technology evolve. When two patterns
+land in the same Fit Band, the higher-adaptability pattern is preferred per the
+Adaptability First principle unless a hard requirement rules it out.
 
-| Pattern | Match % | Adaptability | Pros | Cons | Key Tradeoffs | Verdict |
-|---------|---------|--------------|------|------|---------------|---------|
-| Clean Architecture + CQRS | 88% | High | Business logic isolated from deps; read/write concerns separated; highly testable | Higher initial structure; CQRS projection lag requires UI handling | Eventual consistency in read models; justified by long-term swap flexibility | **SELECTED** |
-| Layered Architecture | 60% | Low | Familiar pattern; low upfront effort | Business logic coupled to layers; framework lock-in | Costly migration when stack changes; poor long-term adaptability | Not selected — low adaptability despite lower initial cost |
-| Vertical Slice | 72% | Medium | Feature-focused; clean feature addition and deletion | Overhead not justified for team size | Cross-slice duplication expected; shared logic extraction required at scale | Not selected — team size doesn't justify feature ownership model |
-| Microservices | 45% | Medium | Independent deployment per service | Distributed systems complexity pre-PMF | Operational overhead slows delivery; complexity not justified at current stage | Not selected — pre-PMF; 43 points below selected pattern |
+| Pattern | Fit Band | Adaptability | Evidence Basis | Pros | Cons | Key Tradeoffs | Verdict |
+|---------|----------|--------------|----------------|------|------|---------------|---------|
+| Clean Architecture + CQRS | Strong fit | High | analogical | Business logic isolated from deps; read/write concerns separated; highly testable | Higher initial structure; CQRS projection lag requires UI handling | Eventual consistency in read models; justified by long-term swap flexibility | **SELECTED** |
+| Layered Architecture | Weak fit | Low | prior_art | Familiar pattern; low upfront effort | Business logic coupled to layers; framework lock-in | Costly migration when stack changes; poor long-term adaptability | Not selected — low adaptability despite lower initial cost |
+| Vertical Slice | Viable fit | Medium | analogical | Feature-focused; clean feature addition and deletion | Overhead not justified for team size | Cross-slice duplication expected; shared logic extraction required at scale | Not selected — team size does not justify feature ownership model |
+| Microservices | Rejected | Medium | analogical | Independent deployment per service | Distributed systems complexity pre-PMF | Operational overhead slows delivery; complexity not justified at current stage | Not selected — violates current operations constraint |
 
 ## Quality Attribute Scorecard
 
@@ -143,6 +157,23 @@ List mitigations for any axis scored `1` or `2`.
 - Owner:
 - Enforcement:
 - Deadline or trigger:
+
+## Migration Safety (required for brownfield, reverse-spec, or migration work)
+
+| Safety Item | Decision / Evidence | Owner |
+|---|---|---|
+| Expand/contract shape | | |
+| Dual-write or read-routing plan | | |
+| Backfill plan | | |
+| Reconciliation checks | | |
+| Observability proving phase health | | |
+| Rollback test | | |
+| Cutover approval and timing | | |
+| Point of no return | | |
+| Post-cutover verification | | |
+
+If not applicable, state why. Do not leave this section blank for brownfield,
+reverse-spec, or migration-driven architecture.
 
 ## Re-evaluation Triggers
 

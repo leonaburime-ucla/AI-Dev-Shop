@@ -25,6 +25,11 @@ Before resuming, verify the checkpoint is trustworthy:
 |-------|-----|-------------|
 | Spec provider is recorded | Read `spec_provider` from `pipeline-state.md` or fall back to default provider if the run predates provider recording | If unknown, stop and ask human whether to resume under Speckit compatibility mode or update the run |
 | Spec hash matches | Re-hash the file at `spec_entrypoint_path` (or Speckit `feature.spec.md` via `spec_path` compatibility), compare to state file's `spec_hash` | Stop — spec may have changed. Escalate to human before resuming. |
+| Provider validator passed | Read `validator_result`; if not `PASS`, rerun the provider-local validator. If `python3` is unavailable, try `python` or `py`; if runtime is still unavailable, require a human-approved single-line `validator_manual_waiver` | Stop — route back to Spec or human review before resuming at Architect or later. |
+| Planning preflight valid | If resuming at or after `architect`, rerun Coordinator Planning Preflight from `multi-agent-pipeline.md` | Stop — route to the owning failed stage; do not resume downstream. |
+| Red-Team clearance recorded | Defense-in-depth check covered by Planning Preflight: if resuming at or after `architect`, verify Red-Team completed against the same `spec_hash` and has no unresolved BLOCKING or CONSTITUTION_FLAG state | Stop — run Red-Team or resolve findings before resuming. |
+| Reverse-spec checkpoint recorded | If `reverse_spec_artifacts` is not `N/A`, verify `reverse_spec_review_status: APPROVED` and the referenced `review-digest.md` exists | Stop — present the review digest to the human before resuming. |
+| Blueprint approval recorded | If `system_blueprint_path` is set, verify `system_blueprint_status: APPROVED` | Stop — route back to System Blueprint or human review. |
 | Completed stage artifacts exist | Check that every file listed in Completed Stages actually exists on disk | If missing, treat that stage as incomplete and re-run it |
 | Current stage output is partial | Check whether the in-progress stage produced any artifact | If artifact exists and looks complete, treat stage as done and advance |
 | Constitution Check not bypassed | If resuming at or after `architect`, verify adr.md has a completed Constitution Check table | If missing, re-run architect stage |

@@ -27,6 +27,9 @@
 - `NA` — the item genuinely does not apply to this feature. Requires written justification in the Notes column. "Not applicable" alone is not a valid justification.
 - **Every item must have a status.** A blank status is treated as FAIL.
 - **The spec is NOT ready for Architect dispatch until all items are PASS or NA.**
+- **The Sign-Off Block is mandatory.** Blank Spec Agent sign-off blocks Spec
+  handoff. Blank Coordinator sign-off blocks Coordinator Planning Preflight and
+  `/plan`.
 - If an item cannot be brought to PASS after two revision attempts, escalate to human with the specific blocking item and the reason it cannot pass.
 
 ---
@@ -59,7 +62,7 @@
 | B-01 | `spec_id` is assigned and unique (verified against existing `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` folders) | | |
 | B-02 | `version` is set to correct semver (1.0.0 for new specs) | | |
 | B-03 | `status` is APPROVED (not DRAFT or REVIEW) | | |
-| B-04 | `content_hash` is computed and recorded — matches sha256 of content below the header block | | |
+| B-04 | `content_hash` is computed and recorded — matches the Speckit canonical hash rule | | |
 | B-05 | `feature_name` matches the FEAT folder name exactly (case-sensitive) | | |
 | B-06 | `last_edited` is a valid ISO-8601 UTC timestamp | | |
 | B-07 | `owner` is set to a named human or team (not blank, not "TBD") | | |
@@ -231,6 +234,8 @@
 
 ## Sign-Off Block
 
+The Spec Agent fills only the Spec Agent row before handoff. The Coordinator
+fills or replaces the Coordinator row during Coordinator Planning Preflight.
 Both sign-offs are required before the spec can advance to Architect dispatch.
 
 | Role | Name / Agent ID | Date (ISO-8601 UTC) | Signature |

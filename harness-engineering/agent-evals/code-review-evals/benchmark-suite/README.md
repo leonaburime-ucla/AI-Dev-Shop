@@ -8,3 +8,9 @@ Canonical benchmark suite for Code Review evals.
 
 Suite-scoped TSVs and seed-ledgers are the source of truth.
 
+- `coverage-matrix.tsv`
+- `seed-catalog.tsv`
+- `seed-ledger.md`
+- `controls.md`
+- `run-manifest.tsv`
+- `run-results.tsv`

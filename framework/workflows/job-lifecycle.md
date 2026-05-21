@@ -59,6 +59,9 @@ Reject the handoff if:
 - the claimed completion does not map back to the active task/spec
 - runtime-changing work required self-validation evidence and the handoff lacks either a self-validation report path or an explicit reason it was not run
 - runtime-changing work claims `Self-Validation = PARTIAL` but does not record the failing step, attempts used, current hypothesis, and offload/report evidence
+- verification handoffs omit current spec-hash verification, certified test-file
+  hash status, executed vs expected test count, required-suite status, coverage
+  status, or flaky-test status when those fields are required by the stage
 
 ## Loop-Detection Tripwires
 
@@ -82,10 +85,19 @@ When a loop trigger fires:
 A job output is rejected (triggers `RETRYING`) if any of the following are true:
 
 - Output does not reference the active spec version and hash
+- Output references a stale spec hash or lacks mechanical hash verification when
+  the stage is at or after TDD
 - Handoff contract is missing or incomplete (no input refs, output summary, risks, or suggested next)
 - Agent operated outside its assigned scope (e.g., Programmer refactored untouched code)
 - Output contains a known failure marker (e.g., "[NEEDS CLARIFICATION]" left unresolved by Spec Agent)
 - ADR is missing Constitution Check table or has unjustified EXCEPTION entries
+- TDD certification lacks a test-file hash inventory or expected runnable test
+  count
+- TestRunner reports zero executed tests, skipped-only success, stale test-file
+  hashes, missing required coverage artifacts, or unapproved flaky tests as a
+  pass
+- A specialist mutates `tasks.md` task status, `pipeline-state.md`, or another
+  shared stage artifact without Coordinator delegation
 
 ---
 
@@ -99,6 +111,10 @@ Escalate to human (set state to `ESCALATED`) when:
 - Self-validation ends in `BLOCKER` because runtime evidence shows a confirmed critical-path, auth/security, data-loss, or migration-stop problem
 - Security: any Critical or High finding
 - Spec hash changes mid-run
+- Certified test-file hashes change without TDD recertification or Coordinator
+  waiver
+- Required coverage evidence is unavailable for a required suite
+- Unapproved flaky tests remain in the advancement path
 - Two agents produce directly conflicting guidance
 - Constitution violation in ADR without a corresponding Complexity Justification row (same severity as spec hash mismatch)
 

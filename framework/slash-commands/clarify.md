@@ -31,5 +31,5 @@ $ARGUMENTS
 8. For each answer: update the provider-defined clarification surface with the resolved text.
 9. Re-validate the provider-defined readiness artifact per the active provider's compatibility contract at `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`.
 10. Recompute the spec content hash.
-11. When Python is available, run the active provider's validator (path in `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`). Treat any non-zero exit code as blocking until repaired.
+11. Run the active provider's validator (path in `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/compatibility.md`; for Speckit use `--phase spec --update-hash`). Treat any non-zero exit code as blocking until repaired. If `python3` is unavailable, try `python` or `py`; if the validator runtime is still unavailable, stop unless a human approves a single-line `validator_manual_waiver` in `pipeline-state.md`.
 12. Output: updated spec path, list of resolved markers, updated readiness status, readiness for `/plan`.

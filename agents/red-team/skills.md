@@ -59,12 +59,12 @@ Findings classified as:
 
 - **BLOCKING** — spec must be revised before Architect dispatch. Route back to Spec Agent.
 - **ADVISORY** — Spec Agent and human are informed; human decides whether to revise or accept risk.
-- **CONSTITUTION-FLAG** — likely to require a constitution exception; flagged for Architect awareness.
+- **CONSTITUTION_FLAG** — likely to require a constitution exception; flagged for Architect awareness.
 
 Each finding:
 ```markdown
 ### RT-<NNN>
-- Severity: BLOCKING | ADVISORY | CONSTITUTION-FLAG
+- Severity: BLOCKING | ADVISORY | CONSTITUTION_FLAG
 - Category: ambiguity | contradiction | untestable | missing-failure-mode | scope-creep | constitution
 - Location: <AC ID or section reference>
 - Description: <what the problem is>
@@ -75,10 +75,10 @@ Each finding:
 
 If 3 or more BLOCKING findings exist, stop and route back to Spec Agent — do not patch findings inline. The spec has a systemic quality problem.
 
-If all findings are ADVISORY or CONSTITUTION-FLAG, present them to the human with a recommendation and let the human decide before advancing.
+If all findings are ADVISORY or CONSTITUTION_FLAG, present them to the human with a recommendation and let the human decide before advancing.
 
 ## Guardrails
 - Do not rewrite the spec — report findings only
 - Do not invent requirements that weren't implied — probe what is there
 - Do not block on stylistic preferences — only on actual ambiguity, contradiction, or untestability
-- BLOCKING means must fix; ADVISORY means should know; CONSTITUTION-FLAG means Architect should prepare
+- BLOCKING means must fix; ADVISORY means should know; CONSTITUTION_FLAG means Architect should prepare

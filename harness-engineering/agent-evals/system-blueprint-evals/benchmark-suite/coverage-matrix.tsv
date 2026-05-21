@@ -1,0 +1,31 @@
+cell_id	agent	agent_dimension	bug_nature	seed_structure	difficulty	requirement	rationale	seed_ids
+SBP-COV-BOUNDARY-01	system-blueprint	1. Scope, Domain Boundaries & Ownership	contradiction	interference	Hard	required	Contradictory constraints must block stable decomposition.	SBP-SEED-01
+SBP-COV-BOUNDARY-02	system-blueprint	1. Scope, Domain Boundaries & Ownership	omission	single	Easy	required	Blueprint must include scope and non-goals.	SBP-SEED-02
+SBP-COV-BOUNDARY-03	system-blueprint	1. Scope, Domain Boundaries & Ownership	boundary_error	combined	Medium	required	Deferred features must not enter MVP scope.	SBP-SEED-03
+SBP-COV-BOUNDARY-04	system-blueprint	1. Scope, Domain Boundaries & Ownership	semantic_mismatch	layered	Medium	required	Ownership conflict must be resolved or marked.	SBP-SEED-04
+SBP-COV-BOUNDARY-05	system-blueprint	1. Scope, Domain Boundaries & Ownership	hidden_dependency	distributed	Medium	required	Required integration must appear in map.	SBP-SEED-05
+SBP-COV-BOUNDARY-06	system-blueprint	1. Scope, Domain Boundaries & Ownership	anti_pattern	single	Easy	required	Blueprint must not write feature specs.	SBP-SEED-06
+SBP-COV-BOUNDARY-07	system-blueprint	1. Scope, Domain Boundaries & Ownership	contradiction	interference	Hard	required	Impossible offline/sync requirements require escalation.	SBP-SEED-07
+SBP-COV-BOUNDARY-08	system-blueprint	1. Scope, Domain Boundaries & Ownership	state_leak	camouflaged	Medium	required	Blueprint must not leak prior-project context.	SBP-SEED-08
+SBP-COV-BOUNDARY-09	system-blueprint	1. Scope, Domain Boundaries & Ownership	cosmetic_fix	single	Easy	required	Monolith mandate should not be over-decomposed.	SBP-SEED-09
+SBP-COV-BOUNDARY-10	system-blueprint	1. Scope, Domain Boundaries & Ownership	dead_code	single	Medium	required	Deferred domains should stay out of MVP.	SBP-SEED-10
+SBP-COV-TOPO-11	system-blueprint	2. Topology, Constraints & Quality Attributes	omission	single	Easy	required	Tradeoff checkpoint is mandatory before final blueprint.	SBP-SEED-11
+SBP-COV-TOPO-12	system-blueprint	2. Topology, Constraints & Quality Attributes	semantic_mismatch	single	Easy	required	Dominant quality attributes must be max three and unscored.	SBP-SEED-12
+SBP-COV-TOPO-13	system-blueprint	2. Topology, Constraints & Quality Attributes	omission	distributed	Medium	required	Runtime topology must include worker when required.	SBP-SEED-13
+SBP-COV-TOPO-14	system-blueprint	2. Topology, Constraints & Quality Attributes	hidden_dependency	distributed	Medium	required	Data ownership unknowns must be visible.	SBP-SEED-14
+SBP-COV-TOPO-15	system-blueprint	2. Topology, Constraints & Quality Attributes	boundary_error	combined	Medium	required	Boundary contract type must be mapped.	SBP-SEED-15
+SBP-COV-TOPO-16	system-blueprint	2. Topology, Constraints & Quality Attributes	anti_pattern	single	Medium	required	Blueprint must not produce binding ADR decision.	SBP-SEED-16
+SBP-COV-TOPO-17	system-blueprint	2. Topology, Constraints & Quality Attributes	contradiction	camouflaged	Hard	required	Hard constraints must be respected or escalated.	SBP-SEED-17
+SBP-COV-TOPO-18	system-blueprint	2. Topology, Constraints & Quality Attributes	anti_pattern	single	Medium	required	Regression guard against scoring quality attributes.	SBP-SEED-18
+SBP-COV-TOPO-19	system-blueprint	2. Topology, Constraints & Quality Attributes	cosmetic_fix	single	Easy	required	Exactly three quality attributes are not required.	SBP-SEED-19
+SBP-COV-TOPO-20	system-blueprint	2. Topology, Constraints & Quality Attributes	dead_code	single	Medium	required	Clear ownership should not get invented uncertainty.	SBP-SEED-20
+SBP-COV-HANDOFF-21	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	omission	single	Easy	required	P0 Core/Foundation is required.	SBP-SEED-21
+SBP-COV-HANDOFF-22	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	invariant_violation	combined	Medium	required	P0 must stay thin and not own feature schema.	SBP-SEED-22
+SBP-COV-HANDOFF-23	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	hidden_dependency	distributed	Hard	required	Foreign-key owner dependency must control sequencing.	SBP-SEED-23
+SBP-COV-HANDOFF-24	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	semantic_mismatch	layered	Medium	required	Depends on must record API/event/schema dependencies.	SBP-SEED-24
+SBP-COV-HANDOFF-25	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	missing_test	combined	Medium	required	Critical cross-domain journeys are required for QA/E2E handoff.	SBP-SEED-25
+SBP-COV-HANDOFF-26	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	boundary_error	single	Medium	required	Horizontal slicing needs explicit justification.	SBP-SEED-26
+SBP-COV-HANDOFF-27	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	omission	distributed	Hard	required	Spec handoff must include boundaries and open decisions.	SBP-SEED-27
+SBP-COV-HANDOFF-28	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	anti_pattern	single	Medium	required	Regression guard against writing feature specs.	SBP-SEED-28
+SBP-COV-HANDOFF-29	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	cosmetic_fix	single	Easy	required	Justified foundation slice should not be rejected.	SBP-SEED-29
+SBP-COV-HANDOFF-30	system-blueprint	3. P0 Foundation, Dependency Sequencing & Handoff	dead_code	single	Medium	required	Valid thin P0 should not trigger invented findings.	SBP-SEED-30

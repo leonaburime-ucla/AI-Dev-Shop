@@ -36,6 +36,8 @@ Run before Spec when one or more are true:
 - Product vision / vibe output / discovery notes.
 - Constraints: compliance, latency, reliability, budget, timeline.
 - Existing architecture context (if extending an existing system).
+- CodeBase Analyzer reports (`ANALYSIS-*`, `MIGRATION-*`, `TESTABILITY-*`) when
+  extending an existing system.
 
 ## Skill Loading Priority
 
@@ -109,8 +111,15 @@ Elicitation rules:
 - Propose the likely main flows from the user's intent, then ask the human to
   correct or confirm them.
 - Ask at most 5 blocking clarification questions per blueprint pass.
+- The question cap controls how many questions are asked in one pass; it does
+  not make additional blockers safe. If more blockers remain after the cap,
+  record them in the blueprint and leave the relevant model status `BLOCKED`.
 - Classify unknowns as `BLOCKING`, `SAFE DEFAULT`, or `DEFERRED`.
 - For non-blocking ambiguity, record a safe default assumption and continue.
+- Any unknown involving a new dependency, domain ownership boundary, external
+  integration, durable data schema, migration boundary, auth/trust boundary, or
+  source-of-truth decision must be `BLOCKING`. Do not use `SAFE DEFAULT` to
+  bypass the question cap for structural architecture boundaries.
 - Derive API/contracts and data model candidates from workflows, resources,
   operations, and rules; do not start by guessing tables/endpoints.
 - If a missing functional decision would force Programmer to invent product
@@ -131,8 +140,15 @@ Discovery rules:
 - Trigger targeted deepening only when risk signals are present or the
   user/Coordinator asks for depth.
 - Ask at most 5 blocking NFR questions per blueprint pass.
+- The question cap controls user load, not readiness. Overflow blocking NFR
+  unknowns remain `BLOCKING` and keep the blueprint from approval until resolved
+  or explicitly scoped out by the human.
 - For non-blocking ambiguity, record safe default assumptions and downstream
   owners instead of pausing.
+- Any unknown involving a new dependency, domain ownership boundary, external
+  integration, durable data schema, migration boundary, auth/trust boundary, or
+  source-of-truth decision must be `BLOCKING`. Do not use `SAFE DEFAULT` to
+  bypass the question cap for structural architecture boundaries.
 - Keep requirement discovery separate from candidate solutions.
 - Derive dominant quality-attribute candidates from material NFR records; do
   not score them in Blueprint.
@@ -151,15 +167,19 @@ The output must include:
    and blocking unknowns.
 2. NFR discovery summary with category applicability, safe assumptions, blocking
    unknowns, risk signals, and downstream owners.
-3. Macro components/domains and responsibilities.
-4. Ownership boundaries and integration map.
-5. High-level runtime/data topology.
-6. Dominant quality attributes (max 3, no scores) that are derived from material NFR records and likely to govern the downstream ADR.
-7. Explicit risks and unknowns.
-8. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
-9. Critical cross-domain user journeys for QA/E2E handoff.
-10. Spec decomposition plan (what spec packages to write next).
-11. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
+3. Existing-codebase evidence summary when applicable: CodeBase Analyzer report
+   paths consumed, sampled-coverage caveats, Critical/High findings that affect
+   boundaries, migration/testability constraints, and reports that still need
+   human review.
+4. Macro components/domains and responsibilities.
+5. Ownership boundaries and integration map.
+6. High-level runtime/data topology.
+7. Dominant quality attributes (max 3, no scores) that are derived from material NFR records and likely to govern the downstream ADR.
+8. Explicit risks and unknowns.
+9. A required `Core/Foundation` spec package at `P0` (shared shell/primitives that block parallel slices).
+10. Critical cross-domain user journeys for QA/E2E handoff.
+11. Spec decomposition plan (what spec packages to write next).
+12. Dependency-aware sequencing plan so parallel slices are only used where dependencies permit.
 
 ## Spec Decomposition Policy
 
@@ -186,6 +206,10 @@ Default to **vertical/domain slicing** for decomposition.
   lifecycle, rule, or integration decisions. Only `BLOCKING` functional unknowns
   block Spec dispatch; `SAFE DEFAULT` and `DEFERRED` unknowns must have an
   explicit assumption or follow-up owner.
+- For existing-codebase extensions, do not approve the blueprint until
+  CodeBase Analyzer evidence has either been consumed or a `no_analysis_reason`
+  is recorded. Critical/High migration or testability findings that affect the
+  requested feature must be surfaced in the handoff to Spec and Architect.
 - Include `Critical User Journeys (Cross-Domain)` so QA/E2E can validate slice convergence end to end.
 - Do not turn functional discovery into a questionnaire dump. Keep the artifact
   proportional to the system size and risk.

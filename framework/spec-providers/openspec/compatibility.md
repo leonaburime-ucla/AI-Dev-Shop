@@ -11,6 +11,7 @@ It is not upstream OpenSpec documentation.
 - Compatibility root: `<AI_DEV_SHOP_ROOT>/framework/spec-providers/openspec/`
 - Change folder templates: `<AI_DEV_SHOP_ROOT>/framework/spec-providers/openspec/templates/`
 - Mechanical validator: `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/openspec/validators/validate_openspec_package.py <change_folder>`
+  (`python` or `py` may be used only when `python3` is not available)
 
 ## Change Folder Files
 
@@ -37,7 +38,11 @@ When `openspec` is the active provider:
 7. For each capability listed in the proposal, create a delta spec at `specs/<domain>/spec.md`. Use ADDED, MODIFIED, or REMOVED sections. Each requirement must use RFC 2119 keywords (SHALL, MUST, SHOULD, MAY) and have at least one Scenario with WHEN/THEN format.
 8. Write `design.md` from the template if the feature involves technical decisions. Fill: Context, Goals/Non-Goals, Decisions, Risks/Trade-offs.
 9. Write `tasks.md` from the template. Group tasks under numbered headings. Use checkbox format (`- [ ]`) for each task. Order by dependency.
-10. When Python is available, run the provider-local validator. Repair any failures before declaring readiness.
+10. Run the provider-local validator. Repair any failures before declaring readiness.
+    If `python3` is unavailable, try `python` or `py`; if the validator runtime
+    is still unavailable, stop unless a human approves a single-line
+    `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp,
+    reason, and manual checks performed.
 
 ## Clarification Rules
 
@@ -76,7 +81,8 @@ The OpenSpec compatibility gate is satisfied only when all of the following are 
 - `design.md` exists (required by default `spec-driven` schema; omit only with explicit justification in proposal.md)
 - `tasks.md` exists with at least one checkbox item
 - no template placeholders remain in any artifact
-- the provider-local validator exits successfully when Python is available
+- the provider-local validator exits successfully, or a human-approved
+  single-line `validator_manual_waiver` exists because the runtime was unavailable
 
 ## Maintainer Rule
 

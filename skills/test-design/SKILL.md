@@ -128,6 +128,11 @@ Coverage gaps: EC-03 (currency conversion failure) — deferred, awaiting produc
 
 The spec hash in the certification must match the hash in the spec file. CI enforces this. If the spec changes and the hash changes, all tests certified against the old hash are flagged as stale and require recertification before the next merge.
 
+The certification must also include a sha256 hash for every created or changed
+test file plus the expected runnable test count. TestRunner uses this inventory
+to detect deleted assertions, modified tests, stale files, and empty-suite
+success before it executes the suite.
+
 ## Coverage Targets
 
 ### Coverage Terminology
@@ -144,6 +149,10 @@ The following suite-level gates are mandatory and evaluated per metric, not as a
 - **E2E test coverage:** `lines >= 80%`, `branches >= 80%`, `functions >= 80%`, `statements >= 80%`
 
 If any one metric is below its gate, coverage is considered failing.
+
+If a suite is marked required in `tasks.md`, a missing coverage artifact for
+that suite is a hard failure. If a suite is marked not applicable with a reason,
+do not apply that suite's gate.
 
 ### Coverage Profile Initialization (configurable with safe defaults)
 
@@ -164,6 +173,14 @@ If no custom profile is provided, defaults apply automatically. Persist the acti
 
 Coverage targets are risk-weighted by module class. Apply the correct threshold based on what the file does, not where it lives in the directory tree.
 
+**Relationship between suite gates and module-class thresholds:** The hard suite
+gates above are aggregate minimums across all files in that suite's scope. The
+module-class table below defines per-file priority targets for gap triage and
+risk classification. Module-class thresholds do not lower the suite gate. If the
+default suite gate is impractical for a project, the Coordinator must record a
+human-approved coverage profile override in `tasks.md` before TestRunner uses
+it.
+
 | Module Class | Examples | Line Coverage | Branch Coverage |
 |---|---|---|---|
 | Core business logic | Domain services, calculation engines, validators, state machines | 95%+ | 90%+ |
@@ -173,7 +190,7 @@ Coverage targets are risk-weighted by module class. Apply the correct threshold 
 | View / UI components | React components, templates, presentational-only code | 70%+ OR documented E2E coverage | — |
 | Configuration / type definitions | Constants, enums, pure type files, interface-only files | Exempt | Exempt |
 
-**Touched-file non-regression rule:** Once a file reaches its threshold, a subsequent change to that file cannot drop coverage below that threshold. A PR that regresses a file must either add tests (route to TDD) or explicitly document the regression justification in the certification record.
+**Touched-file non-regression rule:** Once a file reaches its threshold, a subsequent change to that file cannot drop coverage below that threshold. A PR that regresses a file must either add tests through Coordinator-owned routing or explicitly document the regression justification in the certification record.
 
 **Project-level override:** If the risk profile of a project justifies globally higher or lower thresholds (e.g., a payment processor requiring 100% branch coverage on business logic, or a prototype where 70% is acceptable across the board), document the override in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` and reference it in the test certification record. Without a documented override, the table above governs.
 
@@ -211,7 +228,8 @@ describe('REQ-02: Invalid customer ID', () => {
 CI must run the following check on every pull request:
 1. Read the spec hash from the current spec file
 2. Read the certified hash from the test certification record
-3. If they differ: block merge, flag tests as stale, route to TDD Agent for recertification
+3. If they differ: block merge, flag tests as stale, and report
+   `TDD_RECERTIFICATION_REQUIRED` to Coordinator
 
 This is the connective tissue that keeps specs, tests, and code in provable alignment.
 
@@ -224,6 +242,16 @@ This is the connective tissue that keeps specs, tests, and code in provable alig
 **Missing negative paths**: Every requirement that defines error behavior needs a test for that error. Untested error paths are where production failures live.
 
 **Flaky tests**: A test that sometimes passes and sometimes fails is worse than no test — it erodes trust in the entire suite. Investigate immediately; do not leave flaky tests in the suite.
+
+Flaky tests block advancement. A known-flaky exclusion may remove a test from
+pass-rate math only when it is recorded in
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/known-flaky-tests.md` with `test_id`,
+`approved_by`, `approved_at`, `reason`, `stabilization_owner`,
+`stabilization_ticket`, and `expires_at` fields. The TestRunner report must
+reject malformed or expired registry entries, list every accepted exclusion, and
+report the stabilization need to Coordinator.
+Use `<AI_DEV_SHOP_ROOT>/framework/templates/known-flaky-tests-template.md` when
+initializing the registry.
 
 **Copying spec hash manually**: Automate hash generation and certification. Manual copy-paste is how hashes go stale silently.
 

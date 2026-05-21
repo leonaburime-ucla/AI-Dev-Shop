@@ -63,6 +63,9 @@ Structure as ordered phases. Each phase must:
 - Leave the system running and deployable at its end
 - Have a specific verification criterion (ideally a test)
 - Be scoped to 1–3 days of work maximum — if it's larger, split it
+- For production-facing systems, define expand/contract, backfill,
+  reconciliation, observability, rollback, and cutover safety before the phase
+  can be executed
 
 ```markdown
 ### Phase 1: Extract Domain Layer
@@ -134,6 +137,49 @@ Save to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<analy
 | Phase 1 | Missed logic in routes | Revert domain/ addition, logic unchanged in routes |
 | Phase 2 | ORM queries broken by interface | Keep ORM adapter, swap implementation incrementally |
 
+## Production Migration Safety
+
+Required when the migration touches production data, public APIs, auth,
+payments, jobs, external integrations, or runtime topology.
+
+| Safety Item | Required Decision / Evidence |
+|---|---|
+| Expand/contract shape | <additive step, compatibility window, contract removal step> |
+| Dual-write or read-routing plan | <needed/not needed with reason; owner if needed> |
+| Backfill plan | <source, target, batching, idempotency, retry behavior> |
+| Reconciliation | <counts/checksums/domain checks; acceptable variance> |
+| Observability | <metrics/logs/alerts/dashboard proving phase health> |
+| Rollback test | <exact rollback command/procedure and evidence it was tested> |
+| Cutover point | <who approves, when traffic/data authority moves, freeze window if any> |
+| Point of no return | <irreversible step or "none"; mitigation if irreversible> |
+| Post-cutover verification | <checks that must pass before the phase is complete> |
+
+If any row is unknown for a production-facing phase, mark the phase BLOCKED for
+execution and route back to Architect or human review.
+
+## Operational Workflow
+
+Required for production-facing migration plans.
+
+| Step | Owner | Required Evidence |
+|---|---|---|
+| Preflight | <owner> | source/target schema versions, feature flags, environment, backup/snapshot, validator commands |
+| Dry run | <owner> | dry-run command, sampled output, expected duration, known warnings |
+| Execution window | <owner> | start criteria, communication channel, freeze window if needed |
+| Monitoring | <owner> | dashboard/log query/metric names, alert thresholds, who watches them |
+| Decision checkpoints | <owner> | continue/rollback criteria after each irreversible or high-risk step |
+| Completion | <owner> | post-cutover verification, cleanup criteria, follow-up issue list |
+
+## Human Review / Waiver Record
+
+Any production-facing migration with a blocked safety row, irreversible step, or
+missing characterization coverage requires explicit human approval before
+execution.
+
+| Waiver / Review Item | Decision | Reviewer | Date | Expiration / Revisit Trigger |
+|---|---|---|---|---|
+| <item> | APPROVED / REVISE / REJECTED | <name/role> | <ISO-8601 UTC> | <trigger> |
+
 ## Recommended Pipeline Entry Point
 
 After completing Phase [N], the codebase is ready to run new features through the
@@ -143,6 +189,12 @@ full AI Dev Shop pipeline starting at the Spec Agent. Suggested first feature: [
 ## Principles
 
 **Phase 0 if no tests**: Never migrate structure without tests covering current behavior. If coverage is absent, Phase 0 is: write characterization tests for the module as-is, then proceed.
+
+**Critical/High modules with no detected tests block migration execution**:
+When CodeBase Analyzer reports no detected test files and no configured test
+command/coverage artifact for a Critical or High module in scope, add Phase 0
+characterization tests and do not execute structural migration for that module
+until the tests exist.
 
 **Fix root causes, not symptoms**: FLAW-001 (business logic in routes) often causes FLAW-003 (untestable logic) and FLAW-007 (duplication). Fixing the root resolves the symptoms.
 

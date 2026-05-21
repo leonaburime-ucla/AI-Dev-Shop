@@ -9,6 +9,23 @@
 
 ---
 
+## Constraints
+
+- Task status is Coordinator-owned. Specialist agents report progress in
+  handoffs; they do not edit these checkboxes unless explicitly delegated.
+- Unit minimums: `98/98/98/98` lines/branches/functions/statements
+- Integration minimums: `90/90/90/90` lines/branches/functions/statements
+- E2E minimums: N/A — no browser journey is required for this sample feature
+- Required suites: unit, integration
+- Coverage tool: project default (`coverage-summary.json`)
+- Cleanup paths before run: `coverage/`, `.nyc_output/`
+- Per-suite output paths: unit `coverage/unit/`, integration
+  `coverage/integration/`, e2e N/A
+- Convergence threshold before Code Review: `100%` of P1 acceptance tests and
+  invariants passing; no lower human-approved threshold recorded
+
+---
+
 ## Phase 0 — Setup
 
 No setup required. No new dependencies, no schema migrations, no environment changes.
@@ -71,7 +88,9 @@ Agent: Programmer
 Blocked by: TASK-2.1, TASK-2.2, TASK-2.3
 Notes: Wire button click to `formatCsv` → `triggerDownload` sequence. Emit analytics event `invoice_list.export_csv` with `{ row_count, filter_active }`. Do not modify data fetching or filtering logic.
 
-> **CHECKPOINT after Phase 2:** Human reviews test results (target: 90–95% P1 ACs passing) before Code Review dispatch.
+> **CHECKPOINT after Phase 2:** Human reviews TestRunner evidence. Code Review
+> dispatch is allowed only after the Coordinator verifies the convergence gate in
+> the Constraints section.
 
 ---
 

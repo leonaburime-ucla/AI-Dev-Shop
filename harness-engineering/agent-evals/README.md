@@ -5,12 +5,26 @@ Committed seeded eval suites live here.
 ## Layout
 
 - `architect-evals/`
+- `codebase-analyzer-evals/` — benchmark suite generated; no saved runs yet
 - `code-review-evals/`
+- `database-evals/` — design-only; benchmark suite not generated yet
+- `devops-evals/` — design-only; benchmark suite not generated yet
+- `docs-evals/` — benchmark suite generated; no saved runs yet
 - `programmer-evals/`
+- `qa-e2e-evals/` — design-only; benchmark suite not generated yet
+- `red-team-evals/` — v1 benchmark suite generated; v2 depth design pending regeneration
+- `refactor-evals/` — design-only; benchmark suite not generated yet
+- `spec-evals/` — benchmark suite generated for Speckit + OpenSpec; no saved runs yet
+- `security-evals/` — design-only; benchmark suite not generated yet
+- `supabase-evals/` — design-only; benchmark suite not generated yet
+- `system-blueprint-evals/` — benchmark suite generated; no saved runs yet
+- `tdd-evals/` — benchmark suite generated; first targeted run retained
+- `testrunner-evals/` — benchmark suite generated; first targeted run retained
 
 Keep suite-local artifacts together:
 
-- `run-results.tsv` — single file for both run metadata and per-seed scoring
+- `run-manifest.tsv` — run-level execution proof, artifact paths, hashes, and scope-confirmation status
+- `run-results.tsv` — per-seed grading rows with evidence excerpts
 
 The canonical suite definition and its retained run history should stay
 colocalized under the owning agent bucket.
@@ -37,8 +51,7 @@ Rules:
    Cross-eval context bleed invalidates results.
 2. **Agent persona bootstrap required.** The subagent must be bootstrapped
    with the correct agent persona per `AGENTS.md` Delegated Agent Bootstrap.
-   For programmer evals, load the Programmer persona. For code-review evals,
-   load the Code Review persona.
+   Load the persona that matches the owning eval bucket.
 3. **No shared state between evals.** Each subagent starts from the clean
    `runs/<run-id>/` directory created by `prepare_eval_run.py`. Do not
    carry findings, context, or corrections from one eval into another.
@@ -55,15 +68,32 @@ context window saturation, and produce results that cannot be scored per-eval.
 
 The subagent writes its results to `eval-results/eval-results-run.md` inside
 its run directory. The coordinator (whoever dispatches the run) is responsible
-for updating the suite-level `run-results.tsv` — append one row per seed with:
+for updating the suite-level `run-manifest.tsv` first, then `run-results.tsv`.
+
+Manifest row fields:
+
+`run_id`, `eval_name`, `run_scope` (benchmark_full / targeted_regression),
+`execution_mode` (repo_persona_subagent / repo_persona_host /
+external_peer_cli), `agent`, `model_id`, `model_label`, `execution_status`,
+`scope_confirmation` (confirmed / not_required), `scope_confirmation_notes`,
+`started_at`, `completed_at`, `artifact_path`, `artifact_sha256`,
+`transcript_path`, `transcript_sha256`.
+
+Seed grading row fields:
 
 `run_id`, `eval_name`, `run_scope` (benchmark_full / targeted_regression),
 `execution_mode` (repo_persona_subagent / repo_persona_host /
 external_peer_cli), `agent`, `model_id`, `model_label`, `seed_id`,
-`result` (CAUGHT / PARTIAL / MISSED / FALSE_POSITIVE), `severity_correct`,
-`reviewer_notes`, `executed_at`.
+`result` (CAUGHT / PARTIAL / MISSED / FALSE_POSITIVE / CORRECT_SKIP),
+`severity_correct`, `evidence_path`, `evidence_excerpt`, `reviewer_notes`,
+`executed_at`.
 
 The subagent must include its model name and version in the eval-results
-file. The coordinator copies that into the TSV. Do not rely on the subagent
-to write TSVs directly — it only has access to its own run directory.
+file. The coordinator copies that into the manifest/results TSVs. Do not rely
+on the subagent to write suite TSVs directly — it only has access to its own
+run directory.
 
+For large runs, pause before dispatch. If the plan spans more than 10 seeds,
+more than one eval, or obvious manual grading, ask the user to confirm the
+scope and record that approval as `scope_confirmation = confirmed` in
+`run-manifest.tsv`.

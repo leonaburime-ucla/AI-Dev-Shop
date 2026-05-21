@@ -80,3 +80,36 @@ The slice explicitly FAILS if any of these occur, regardless of rubric scores:
 ## Generator Response Rule
 
 Describe when the generator should refine the current direction, when it should pivot, and what evidence the next round must include.
+
+## Calibration Gate (Eval Suites Only)
+
+When this contract governs an eval suite (seed-catalog, seed-ledger, coverage-matrix), apply this gate before the suite is marked complete.
+
+### Trigger Condition
+
+The calibration gate fires when **external peer CLI mode is active** — i.e., the work session has access to at least one external LLM CLI (`gemini`, `codex`, or equivalent) beyond the primary model. This occurs naturally during `/cowork`, `/debate`, or `/audit-work` sessions but is not coupled to those commands. If no external peer is available, the gate is deferred (not skipped) and must be satisfied before the suite reaches `benchmark` status.
+
+### Calibration Protocol
+
+1. Dispatch one external peer CLI with the seed-ledger and complexity tier definitions.
+2. The peer independently rates each seed's `domain_complexity` using only the seed description and expected signal (not the assigned label).
+3. Collect disagreements: any seed where the peer's independent rating differs from the assigned rating.
+4. **Threshold:** If disagreements exceed **20%** of depth-eligible seeds, the suite cannot advance to `benchmark` status until disagreements are resolved (accepted, contested with rationale, or seeds revised).
+5. **Resolution options per disagreement:**
+   - Accept the peer rating and update the seed
+   - Contest with written rationale (must explain why the assigned complexity requires cross-boundary reasoning that the peer's lower rating misses)
+   - Revise the seed to genuinely match the target complexity tier
+   - Add compensating seeds if downgrades push the suite below the 80% staff+ floor
+
+### Recording
+
+Save calibration results in the run folder:
+```
+<suite>/calibration/<timestamp>-<peer-model>.md
+```
+
+Include: peer model identity, per-seed ratings, disagreement count, resolution decisions, and final complexity distribution after resolution.
+
+### Relationship to Coverage Gates
+
+The calibration gate is independent of seed-count floors, dimension density, and negative-control ratios. It validates that complexity *labels* are defensible, not that the *structure* is complete. Both must pass for benchmark certification.

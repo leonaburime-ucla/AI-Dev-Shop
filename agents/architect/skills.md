@@ -5,6 +5,7 @@
 ## Base Skills
 
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — system drivers analysis, research trigger, ADR workflow, tradeoff framework, quality-attribute scorecard, DDD vocabulary, Adaptability First principle, Pattern Evaluation Format, and directory structure decision
+- `<AI_DEV_SHOP_ROOT>/skills/system-design/SKILL.md` — macro-topology and architecture-spec reference when translating Blueprint constraints into ADR-level decisions
 - `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` — article-by-article constitution gate, exception handling, blocking escalation rules
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern selection decision guide, 19+ pattern reference files (TypeScript examples, tradeoffs, failure modes), common pattern combinations; load specific pattern files from references/ as needed
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
@@ -38,19 +39,24 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 - Non-functional constraints (scale, reliability, latency, cost)
 - Existing system boundaries and dependencies (existing ADRs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`)
 - Coordinator directive
+- Coordinator Planning Preflight result: `PASS` for the current spec hash
 - Research artifact (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md`) if produced in Step 0
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (if produced — read all BLOCKING, ADVISORY, and CONSTITUTION-FLAG findings before Step 1; BLOCKING findings must be resolved before ADR work begins; ADVISORY findings must be acknowledged in the ADR)
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (if produced — read all BLOCKING, ADVISORY, and CONSTITUTION_FLAG findings before Step 1; BLOCKING findings must be resolved before ADR work begins; ADVISORY findings must be acknowledged in the ADR)
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md` (if produced by CodeBase Analyzer — consume before pattern selection; treat findings as informed estimates, not guarantees)
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as a draft architectural recommendation; validate or refine the proposed target pattern in the ADR rather than accepting it uncritically)
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets and seam candidates before planning migrated modules)
+- Reverse-spec artifacts when produced: `extraction-manifest.md`, `coverage-map.md`, `consumer-inventory.md`, `intentional-changes.md`, and characterization-test references
 
 ## Workflow
-0. Read the active provider profile. For Speckit, apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`. Produce `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
-1. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
-2. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files. Use upstream NFR discovery records to activate scorecard axes and load specialist skills; if an axis lacks enough detail for a responsible decision, run targeted deepening from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` for that category only. Produce the Pattern Evaluation table for all viable candidates and the Quality Attribute Scorecard for the selected candidate, including optional-axis activation sources and any required mitigations.
-3. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.
-4. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
-5. Write `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
-6. Publish the architecture decision as a downstream constraint.
+0. Confirm the Coordinator Planning Preflight is `PASS` for the current spec hash. If not, stop and route back to Coordinator; do not start ADR work.
+1. Read the active provider profile. For Speckit, apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`. Produce `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
+2. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
+3. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files. Use upstream NFR discovery records to activate scorecard axes and load specialist skills; if an axis lacks enough detail for a responsible decision, run targeted deepening from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` for that category only. Produce the Pattern Evaluation table for all viable candidates and the Quality Attribute Scorecard for the selected candidate, including optional-axis activation sources and any required mitigations.
+4. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.
+5. For reverse-spec rewrites or migrations, explicitly account for source manifest, coverage gaps, consumer inventory, intentional changes, characterization tests, and migration safety constraints before selecting target architecture.
+6. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
+7. Write `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Planning Preflight Evidence, Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Migration Safety (required for brownfield/reverse-spec/migration; mark N/A with reason for greenfield), Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
+8. Publish the architecture decision as a downstream constraint.
 
 ## Pattern Catalog
 
@@ -60,7 +66,7 @@ Use `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` and `references/README.
 - Research artifact path (if produced), or "No research required — no technology choices in spec"
 - Constitution Check result: all articles COMPLIES / EXCEPTION / N/A, with justified exceptions listed
 - ADR file path and metadata
-- Pattern evaluation table (all candidates with Match %, Adaptability rating, Pros, Cons, Key Tradeoffs, and Verdict)
+- Pattern evaluation table (all candidates with Fit Band, Adaptability rating, Evidence Basis, Pros, Cons, Key Tradeoffs, and Verdict)
 - Quality Attribute Scorecard (all core axes plus any triggered optional axes, with confidence, strengths, weaknesses, rationale, mitigations, and review triggers)
 - Chosen pattern(s) and rationale against system drivers
 - Tradeoff tension, why this candidate won, and runner-up comparison

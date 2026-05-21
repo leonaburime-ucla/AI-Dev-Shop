@@ -14,6 +14,39 @@
 - **[P]**: Task can run in parallel — touches different files, no shared mutable state with other [P] tasks in the same phase
 - **[Story ref]**: Maps to an acceptance criterion or invariant (e.g., AC-01, INV-01)
 - Every task references exact file paths
+- Task checkboxes are Coordinator-owned state. Implementation, TDD, TestRunner,
+  and Code Review agents must treat `tasks.md` as read-only unless the
+  Coordinator explicitly delegates a task-list update.
+
+---
+
+## Constraints
+
+### Coverage Profile
+
+- Unit minimums: defaults `98/98/98/98` for lines/branches/functions/statements unless human-approved override: <values or N/A>
+- Integration minimums: defaults `90/90/90/90` for lines/branches/functions/statements unless human-approved override: <values or N/A>
+- E2E minimums: defaults `80/80/80/80` for lines/branches/functions/statements when E2E is required unless human-approved override: <values or N/A>
+- Convergence threshold before Code Review: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason: <value/reason or N/A>
+
+### Required Suites
+
+- Unit: required / not applicable with reason
+- Integration: required / not applicable with reason
+- E2E: required / not applicable with reason
+
+### Coverage Tool
+
+- Tool: <c8 / istanbul / coverage.py / go test -cover / project default>
+- Machine-readable output path: <coverage-summary.json / lcov.info / coverage.xml / equivalent>
+- Cleanup paths before run: <coverage/, .nyc_output/, .coverage, or project-specific>
+- Per-suite output paths: unit <path>, integration <path>, e2e <path or N/A>
+
+### Performance (optional)
+
+- Tool: <k6 / artillery / custom / N/A>
+- Targets: <p99 latency, throughput, error rate / N/A>
+- Pass criteria: <thresholds / N/A>
 
 ---
 
@@ -108,6 +141,7 @@ Use this instead of the full template when the feature has one implementation ta
 - ADR: ADR-<id>
 - Date: <ISO-8601 UTC>
 - Author: Coordinator
+- Convergence threshold before Code Review: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason
 
 ## Tasks
 

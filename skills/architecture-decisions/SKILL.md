@@ -11,7 +11,10 @@ Architecture is the set of constraints that governs how the system is built. The
 
 Technology moves fast. The patterns, libraries, and frameworks considered best practice today will be replaced. An architecture that locks you into today's tech stack is a liability. An architecture that makes it easy to swap a dependency, extract a service, or adopt a new approach is an asset.
 
-**Adaptability First**: When two candidate patterns score within 10 points of each other, always choose the more adaptable one. The cost of flexibility is paid once at design time. The cost of inflexibility is paid on every future change.
+**Adaptability First**: When two candidate patterns are in the same fit band,
+choose the more adaptable one unless a hard requirement clearly rules it out.
+The cost of flexibility is paid once at design time. The cost of inflexibility
+is paid on every future change.
 
 There is no "best" architecture. There are only tradeoffs — and adaptability is the most important one.
 
@@ -47,7 +50,9 @@ Before selecting a pattern, classify the system's primary drivers:
 
 - Produce `research.md` when the spec forces a choice between libraries, frameworks, services, persistence mechanisms, messaging, or infrastructure components, or when multiple viable approaches remain open.
 - Run `constitution-compliance` before final pattern selection. Unjustified `EXCEPTION` entries block the ADR.
-- Score every viable candidate with the Pattern Evaluation Format. Adaptability weights at minimum 30% of total match.
+- Evaluate every viable candidate with the Pattern Evaluation Format. Use fit
+  bands instead of numeric percentages; cite the driver evidence that determines
+  the band.
 - Score the selected candidate with the Architecture Scorecard below. Activate optional axes only through the trigger rules and cite the activation source.
 - Define module or service boundaries and explicit contracts before locking the pattern.
 - For each API or event contract, assign one test approach: consumer-driven, schema validation, or integration test.
@@ -180,8 +185,9 @@ Examples:
 
 Keep the existing Pattern Evaluation table for cross-candidate comparison:
 
-- `Match %`
+- `Fit Band`
 - `Adaptability`
+- `Evidence Basis`
 - `Pros`
 - `Cons`
 - `Key Tradeoffs`
@@ -346,20 +352,29 @@ Cache-aside (lazy load on miss), write-through (populate on write), write-behind
 
 When evaluating candidate patterns, produce this table for every viable candidate before selecting one. **Do not skip patterns because they seem unlikely — score them and let the table justify the decision.**
 
-| Pattern | Match % | Adaptability | Pros | Cons | Key Tradeoffs | Verdict |
-|---------|---------|--------------|------|------|---------------|---------|
-| Pattern A | 88% | High | ... | ... | ... | **SELECTED** |
-| Pattern B | 76% | Medium | ... | ... | ... | Not selected — reason |
-| Pattern C | 55% | Low | ... | ... | ... | Not selected — reason |
+| Pattern | Fit Band | Adaptability | Evidence Basis | Pros | Cons | Key Tradeoffs | Verdict |
+|---------|----------|--------------|----------------|------|------|---------------|---------|
+| Pattern A | Strong fit | High | measured / prior_art / analogical / assumed | ... | ... | ... | **SELECTED** |
+| Pattern B | Viable fit | Medium | measured / prior_art / analogical / assumed | ... | ... | ... | Not selected — reason |
+| Pattern C | Weak fit | Low | measured / prior_art / analogical / assumed | ... | ... | ... | Not selected — reason |
 
-**Match %** — Holistic score against all active system drivers. Adaptability is a primary driver; weight it at minimum 30% of the total score.
+**Fit Band** — Qualitative fit against active system drivers. Use only these
+values:
+- `Strong fit`: satisfies the dominant drivers with manageable tradeoffs.
+- `Viable fit`: satisfies the main drivers but requires meaningful mitigation.
+- `Weak fit`: misses at least one important driver or creates heavy operational
+  cost.
+- `Rejected`: violates a hard requirement, constitution rule, or non-negotiable
+  constraint.
 
 **Adaptability** rating:
 - **High**: External dependencies isolated behind interfaces; swapping a library, framework, or service touches only the adapter/infrastructure layer.
 - **Medium**: Partial decoupling; migration requires changes across multiple layers but core logic is mostly protected.
 - **Low**: Business logic coupled to framework, ORM, or external service; migration requires significant rework throughout the codebase.
 
-**Tiebreaker rule**: When two patterns score within 10 points of each other, the higher adaptability rating wins. Document this in the Verdict column.
+**Tiebreaker rule**: When two patterns are in the same Fit Band, the higher
+adaptability rating wins unless a hard requirement clearly rules it out.
+Document this in the Verdict column.
 
 ---
 
@@ -402,7 +417,7 @@ If the ADR omits this decision, route back to Architect before TDD.
 
 ## Principles That Always Apply
 
-1. **Adaptability First.** Choose the architecture that makes future change cheapest, not the one that best fits today's requirements. Technology moves fast — patterns, libraries, and frameworks considered best practice today will be replaced. An architecture that locks you into today's choices is a liability. When two candidates score within 10 points, always prefer the more adaptable one.
+1. **Adaptability First.** Choose the architecture that makes future change cheapest, not the one that best fits today's requirements. Technology moves fast — patterns, libraries, and frameworks considered best practice today will be replaced. An architecture that locks you into today's choices is a liability. When two candidates are in the same fit band, prefer the more adaptable one unless a hard requirement clearly rules it out.
 2. **Dependencies point inward.** Core business logic must not depend on databases, frameworks, or external services.
 3. **Depend on interfaces, not implementations.** Every external dependency should be behind an interface so it can be swapped, mocked in tests, or replaced without touching core code.
 4. **Start simple, extract when needed.** Modular monolith before microservices. CRUD before CQRS. Add complexity only when the problem actually demands it.

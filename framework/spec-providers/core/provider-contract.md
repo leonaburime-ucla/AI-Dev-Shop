@@ -123,6 +123,14 @@ When a run uses a provider, `pipeline-state.md` should record at least:
 - `provider_native_root`
 - `spec_entrypoint_path`
 - `spec_readiness_artifact`
+- `spec_hash`
+- `spec_hash_verified_at` after Coordinator mechanically verifies the provider
+  hash anchor with validator output or a deterministic shell command
+- `planning_preflight_status`
+- `planning_preflight_checked_at`
+- `validator_result` or `validator_manual_waiver`
+- `red_team_status`
+- `red_team_spec_hash`
 
 Optional but strongly recommended:
 
@@ -131,6 +139,11 @@ Optional but strongly recommended:
 - `provider_change_id`
 - `provider_output_root`
 - `provider_install_notes`
+- `system_blueprint_path`
+- `system_blueprint_status`
+- `codebase_analysis_reports`
+- `reverse_spec_artifacts`
+- `reverse_spec_review_status`
 
 Existing Speckit-oriented compatibility fields such as `spec_path` remain valid for legacy runs, but new provider specs must not rely on legacy names alone.
 
@@ -139,9 +152,12 @@ Existing Speckit-oriented compatibility fields such as `spec_path` remain valid 
 ## Consumer Rules
 
 Coordinator:
-- resolve the active provider before `/spec`, `/clarify`, `/plan`, resume validation, or artifact gate checks
+- resolve the active provider before `/spec`, `/clarify`, `/plan`, resume validation, manual Architect dispatch, or artifact gate checks
 - do not assume `feature.spec.md`, `PRD.md`, `proposal.md`, or any other filename unless the active provider says so
 - refuse activation claims that are stronger than the provider file's `repo_validation`
+- run the Coordinator Planning Preflight before Architect dispatch; do not treat provider readiness as a substitute for Red-Team, human approval, blueprint approval, or brownfield evidence checks
+- do not visually or manually compute cryptographic hashes; use provider-local
+  validator output or deterministic shell commands
 
 Spec Agent:
 - produce or validate the provider-defined planning surface
@@ -159,3 +175,7 @@ TDD and Programmer:
 
 Validation rule:
 - if a provider file is missing a workflow rule, artifact rule, or path rule that materially affects downstream behavior, stop and escalate instead of inventing the answer
+- if a provider-local validator cannot run because its runtime is unavailable,
+  try documented binary fallbacks first; then stop unless a human-approved
+  single-line `validator_manual_waiver` records reviewer, timestamp, reason, and
+  the manual checks performed

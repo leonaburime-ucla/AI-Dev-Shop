@@ -32,6 +32,7 @@ Read this file for the runtime contract. Open references only when needed:
 
 - `references/requirements-and-capacity.md` for requirements framing, estimates, and high-level component shaping
 - `references/distributed-systems-patterns.md` for storage, cache, queue, reliability, scaling, and tradeoff patterns
+- `references/operational-depth-patterns.md` for production-depth operational patterns: hot keys, idempotency, deduplication, concurrency failures, graceful degradation, rate limiting, secrets, auth, abuse detection, and more
 - `references/architecture-spec-template.md` for a generic architecture-document structure
 - `references/apple-platform-architecture.md` only when the target is iOS/macOS or the source material needs Apple-platform translation
 - `ORIGINAL.md` for source provenance and adaptation notes

@@ -215,7 +215,7 @@ Example of compliant usage: "The system must return HTTP 422 with body `{ error:
 
 **Reference**: `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/spec-definition-of-done.md` is the authoritative checklist template for strict-mode spec packages.
 
-**Mechanical validation**: when Python is available, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec-folder>` before handoff. Treat any non-zero exit code as a blocking failure.
+**Mechanical validation**: run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec-folder> --phase spec --update-hash` before handoff. Treat any non-zero exit code as a blocking failure. Use the spec package directory, not the `feature.spec.md` file path. If `python3` is unavailable, try `python` or `py`; if the validator runtime is still unavailable, stop unless a human approves a single-line `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp, reason, and manual checks performed.
 
 ## Brownfield / Legacy Code Rule
 
@@ -232,6 +232,19 @@ If the new feature has a boundary with legacy code, name the existing file, func
 
 **Rule 4 — Explicitly list legacy areas that are out of scope.**
 The Out of Scope section must name adjacent legacy modules that are not being changed, even if they are related. This prevents agents from expanding work into unrelated parts of the codebase under the assumption that "while we're here" improvements are in scope.
+
+**Rule 5 — Preserve evidence instead of normalizing it away.**
+If the spec is derived from CodeBase Analyzer or reverse-spec artifacts, cite the
+report paths and preserve evidence/confidence metadata needed by downstream
+agents. A normalized provider spec may rewrite requirement text, but it must not
+drop source evidence, confidence labels, preservation decisions, coverage
+status, consumer compatibility notes, or intentional-change approvals.
+
+**Reverse-spec checkpoint**: Do not recommend `/plan` for a reverse-spec-derived
+spec until the human has reviewed `review-digest.md`, approved or revised
+`intentional-changes.md`, and resolved blocking items in `coverage-map.md` or
+the review digest. Record the result in `pipeline-state.md` as
+`reverse_spec_review_status`.
 
 **Failure mode to avoid**: A spec that starts with "The existing system currently does X, Y, and Z..." is already in SpecFall. Stop. Delete everything before the first REQ line and start with the new feature's requirements only.
 

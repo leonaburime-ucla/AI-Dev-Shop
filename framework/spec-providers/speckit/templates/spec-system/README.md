@@ -34,13 +34,25 @@ Do not hand off a spec package to `/plan` until:
 2. Zero `[NEEDS CLARIFICATION]` markers remain.
 3. `traceability.spec.md` contains all REQ/AC/INV/EC ids from `feature.spec.md`.
 4. `spec-manifest.md` accurately lists present and omitted files.
+5. `feature.spec.md` has a valid canonical content hash.
+6. `spec-dod.md` has a completed Spec Agent sign-off row. The Coordinator
+   sign-off row is completed or replaced during Coordinator Planning Preflight
+   before `/plan`.
 
 ## Validator
 
-When Python is available, validate a package with:
+Validate a package with:
 
 ```bash
-python3 framework/spec-providers/speckit/validators/validate_spec_package.py <spec-folder>
+python3 framework/spec-providers/speckit/validators/validate_spec_package.py <spec-folder> --phase spec --update-hash
 ```
 
-Treat any non-zero exit code as a blocking handoff failure.
+Use the spec package directory, not the `feature.spec.md` file path. During
+Coordinator Planning Preflight, rerun the validator with `--phase preflight`
+and without `--update-hash`.
+
+Treat any non-zero exit code as a blocking handoff failure. If `python3` is not
+available in the host environment, try `python` or `py`; if the validator
+runtime is still unavailable, stop unless a human approves a single-line
+`validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp,
+reason, and manual checks performed.

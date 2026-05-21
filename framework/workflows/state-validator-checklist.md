@@ -14,6 +14,14 @@ Located at the active feature's canonical pipeline folder, usually: `<ADS_PROJEC
 - [ ] `spec_hash` is present — re-hash `spec_entrypoint_path` and confirm it matches
 - [ ] `spec_entrypoint_path` is present and readable
 - [ ] `spec_readiness_artifact` is present and readable
+- [ ] `validator_result` is `PASS`, or single-line `validator_manual_waiver` includes reviewer, timestamp, reason, and manual checks because the validator runtime was unavailable after documented binary fallbacks were tried
+- [ ] `planning_preflight_status` is `PASS` before any resume at or after `architect`
+- [ ] `planning_preflight_spec_hash` matches current `spec_hash`
+- [ ] `red_team_status` is `PASS` or `ADVISORY_ONLY` before Architect dispatch/resume
+- [ ] `red_team_spec_hash` matches current `spec_hash`
+- [ ] If `system_blueprint_path` is set, `system_blueprint_status` is `APPROVED`
+- [ ] If `reverse_spec_artifacts` is set, `reverse_spec_review_status` is `APPROVED` and `review-digest.md` exists
+- [ ] If `codebase_analysis_reports` is set, every referenced ANALYSIS/MIGRATION/TESTABILITY file exists
 - [ ] `current_stage` is a valid stage name (see `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md`)
 - [ ] `status` is one of: `IN_PROGRESS` | `WAITING_FOR_HUMAN` | `COMPLETE` | `FAILED` | `CANCELLED` | `ABORTED`
 - [ ] `last_updated_at` timestamp is recent (if stale by days, the run may have been abandoned)
@@ -26,6 +34,9 @@ Located at the active feature's canonical pipeline folder, usually: `<ADS_PROJEC
 
 ### Human checkpoints
 - [ ] Checkboxes reflect what was actually approved — no unchecked box for a stage that's already past
+- [ ] If reverse-spec artifacts fed the spec, the review digest approval checkbox is marked before Architect
+- [ ] If a system blueprint was produced, its approval checkbox is marked before Spec approval
+- [ ] Red-Team clearance is marked before Architect
 - [ ] If `architect` stage is complete, the Constitution Check sign-off checkbox is marked
 
 ### Current stage detail
@@ -82,6 +93,9 @@ After running the above checks:
 |-----------|--------|
 | All checks pass, status `IN_PROGRESS` | Resume from `current_stage` per recovery playbook |
 | Spec hash mismatch | Stop — escalate to human before resuming |
+| Planning preflight is missing or failed at/after Architect | Stop — rerun Coordinator Planning Preflight and route to the owning failed stage |
+| Red-Team missing before Architect | Stop — run Red-Team against the current spec hash |
+| Reverse-spec review not approved before Architect | Stop — present `review-digest.md` to the human |
 | Missing artifact for completed stage | Re-run that stage, then continue |
 | Constitution Check missing on completed `architect` stage | Re-run architect stage |
 | `job_status` is `ABORTED` | Resume per recovery playbook |

@@ -695,6 +695,15 @@ def compute_status_label(
     difficulties = {s.get("difficulty") for s in capability_seeds}
     has_all_tiers = {"Easy", "Medium", "Hard"}.issubset(difficulties)
 
+    # Easy seeds must be ≤ 5% of total and must all be positive controls
+    easy_seeds = [s for s in catalog if s.get("difficulty") == "Easy"]
+    easy_ratio_ok = len(easy_seeds) <= math.ceil(total_seeds * 0.05)
+    easy_all_controls = all(
+        s.get("control_type") in ("positive_control", "negative_control")
+        for s in easy_seeds
+    )
+    easy_policy_ok = easy_ratio_ok and easy_all_controls
+
     # Check negative control ratio
     nc_count = sum(1 for s in catalog if s.get("control_type") == "negative_control")
     nc_ratio_ok = nc_count >= math.ceil(total_standard * NEGATIVE_CONTROL_RATIO) if total_standard > 0 else False
@@ -729,11 +738,12 @@ def compute_status_label(
         and has_advanced_structures
         and nc_ratio_ok
         and depth_ok
+        and easy_policy_ok
         and run_count >= 3
     ):
         if total_seeds >= 54 and nc_ratio_ok and all_dims_above_benchmark:
             label = "stable benchmark"
-            reasons.append("54+ seeds, all controls, all tiers, 3+ runs, NC ratio met, dimension density met")
+            reasons.append("54+ seeds, all controls, all tiers, 3+ runs, NC ratio met, dimension density met, easy ≤5%")
         else:
             label = "benchmark"
             reasons.append("36+ seeds, all controls, all tiers, 3+ runs, NC ratio met")
@@ -757,6 +767,11 @@ def compute_status_label(
             reasons.append(f"missing capability difficulty tiers: {', '.join({'Easy', 'Medium', 'Hard'} - difficulties)}")
         if not nc_ratio_ok:
             reasons.append(f"negative-control ratio below 15% ({nc_count} NCs for {total_standard} standard seeds)")
+        if not easy_policy_ok:
+            if not easy_ratio_ok:
+                reasons.append(f"Easy seeds exceed 5% cap ({len(easy_seeds)}/{total_seeds})")
+            if not easy_all_controls:
+                reasons.append("Easy standard seeds exist — Easy seeds must all be positive/negative controls")
         if run_count < 3:
             reasons.append(f"only {run_count} benchmark_full runs (need 3+ for benchmark)")
 
@@ -866,6 +881,29 @@ def generate_report(
         lines.append(f"| {group_key} | Seeds | Mean Catch Rate |")
         lines.append("|---|---|---|")
         for key, data in grouped.items():
+            lines.append(f"| {key} | {data['seed_count']} | {format_pct(data['mean_catch_rate'])} |")
+        lines.append("")
+
+    skill_source_breakdown = group_catch_rates(seed_rates, seed_index, "skill_source")
+    lines.append("## Skill Source Catch Rates")
+    lines.append("")
+    lines.append("| skill_source | Seeds | Mean Catch Rate |")
+    lines.append("|---|---:|---:|")
+    for key, data in skill_source_breakdown.items():
+        lines.append(f"| {key} | {data['seed_count']} | {format_pct(data['mean_catch_rate'])} |")
+    lines.append("")
+
+    skill_source_gaps = [
+        (key, data)
+        for key, data in skill_source_breakdown.items()
+        if data["mean_catch_rate"] < 0.5
+    ]
+    if skill_source_gaps:
+        lines.append("## Confirmed Skill Gaps")
+        lines.append("")
+        lines.append("| skill_source | Seeds | Mean Catch Rate |")
+        lines.append("|---|---:|---:|")
+        for key, data in sorted(skill_source_gaps, key=lambda item: item[1]["mean_catch_rate"]):
             lines.append(f"| {key} | {data['seed_count']} | {format_pct(data['mean_catch_rate'])} |")
         lines.append("")
 

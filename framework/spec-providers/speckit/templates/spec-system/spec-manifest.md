@@ -59,21 +59,32 @@ List the actual files each downstream stage must read.
 
 | Stage | Must Read |
 |---|---|
-| `architect` | `<actual feature spec>`, `<actual traceability spec>`, `<actual spec-dod>`, plus every other `PRESENT` contract file relevant to architecture decisions |
+| `architect` | `<actual feature spec>`, `<actual traceability spec>`, `<actual spec-dod>`, plus every other file marked `PRESENT` |
 | `tdd` | `<actual feature spec>`, `<actual traceability spec>`, `<actual spec-dod>`, ADR, tasks |
 | `programmer` | `<actual feature spec>`, `<actual traceability spec>`, all relevant `PRESENT` contract files, ADR, certified tests |
 
 ---
 
-## Brownfield References (optional but recommended)
+## Brownfield / Reverse-Spec References
 
-If this feature extends an existing system, cite the exact files, functions, APIs, or tables it must integrate with.
-Do not restate the legacy behavior here; cite it.
+If this feature extends an existing system, is migration-related, or was derived
+from reverse-spec extraction, this section is required before `/plan`.
 
-| Existing Touchpoint | Why It Matters |
-|---|---|
-| `<path or symbol>` | <constraint or integration boundary> |
-| `<path or symbol>` | <constraint or integration boundary> |
+Rules:
+- Cite exact files, functions, APIs, tables, or report artifacts.
+- Do not restate legacy behavior here; cite it.
+- For CodeBase Analyzer input, include the relevant `ANALYSIS-*`,
+  `MIGRATION-*`, and `TESTABILITY-*` report paths.
+- For reverse-spec input, include `merged-requirements.md`,
+  `review-digest.md`, `extraction-manifest.md`, `coverage-map.md`,
+  `consumer-inventory.md`, `intentional-changes.md`, and
+  characterization-test references.
+- If the feature is greenfield, write `N/A — greenfield` in the first row.
+
+| Evidence / Touchpoint | Type | Why It Matters |
+|---|---|---|
+| `<path, report, or symbol>` | codebase-analysis / migration / testability / reverse-spec / source touchpoint / N/A | <constraint, integration boundary, or preservation evidence> |
+| `<path, report, or symbol>` | codebase-analysis / migration / testability / reverse-spec / source touchpoint / N/A | <constraint, integration boundary, or preservation evidence> |
 
 ---
 
@@ -81,4 +92,6 @@ Do not restate the legacy behavior here; cite it.
 
 - Validator last run: <ISO-8601 UTC or `not-run`>
 - Validator result: PASS \| FAIL
+- Validator manual waiver: reviewer=<name>; timestamp=<ISO-8601 UTC>; reason=<why runtime unavailable>; manual_checks=<checks performed> OR `N/A`
+- Canonical hash verified at: <ISO-8601 UTC or `not-run`>
 - Notes: <brief summary of what was corrected or any remaining human-reviewed exceptions>

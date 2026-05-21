@@ -15,7 +15,9 @@ Convert product intent into precise, versioned, testable specifications that bec
 - Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
 - Problem statement and business outcome
 - Constraints (regulatory, performance, platform)
-- Approved or draft `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Blueprint was run
+- Approved `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Blueprint was run. Draft or `REVISE` blueprints are inputs for revision only, not approval for `/plan`.
+- Relevant CodeBase Analyzer reports for brownfield features: `ANALYSIS-*`, `MIGRATION-*`, and `TESTABILITY-*`
+- Reverse-spec artifacts when normalizing extracted behavior: `merged-requirements.md`, `review-digest.md`, `extraction-manifest.md`, `coverage-map.md`, `consumer-inventory.md`, `intentional-changes.md`, and characterization-test references
 - Existing spec metadata (if updating — include current hash)
 - Coordinator directive and scope boundaries
 
@@ -26,28 +28,36 @@ Convert product intent into precise, versioned, testable specifications that bec
 4. Assign FEAT number by scanning existing feature folders in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
 5. Run the functional model completeness gate before writing detailed specs:
    - If System Blueprint was run, read its Functional Discovery Model and Handoff to Spec sections.
+   - If System Blueprint was run and its status is not `APPROVED`, stop and route back to Coordinator for human blueprint review.
    - Preserve approved actors/user types, goals/capabilities, workflows, resources/operations, lifecycle/state, rules, integrations, assumptions, and boundaries.
    - If the blueprint marks `Functional model status: BLOCKED` or includes `BLOCKING` functional unknowns, convert those into `[NEEDS CLARIFICATION]` markers and do not advance to Architect until resolved.
+   - If the blueprint includes unresolved `[OWNERSHIP UNCLEAR]`, stop; ownership uncertainty must be resolved before spec approval.
    - If no blueprint exists for a small/no-blueprint change, perform a compact functional-model self-check directly from the user's intent: actors, goals, workflows, resources/operations, state/lifecycle, rules/validations, exceptions, integrations, admin/support, audit/history, settings, and account/data lifecycle where relevant.
    - In compact self-check mode, permissions/ownership, communication/collaboration, and search/reporting/analytics may be covered by the surrounding categories unless the feature specifically touches them.
-   - Ask at most 3 blocking clarification questions at a time. For non-blocking ambiguity, document a safe default assumption in the spec instead of pausing.
+   - Ask at most 3 blocking clarification questions at a time. The cap limits one interaction, not the number of blockers allowed. If more blockers remain, keep `[NEEDS CLARIFICATION]` markers and do not recommend `/plan`.
    - Derive APIs, state, and data contracts from workflows, resources, operations, and rules; do not start by inventing endpoints or tables.
 6. Run the NFR completeness gate:
    - If System Blueprint was run, preserve and refine its NFR discovery table, safe assumptions, blocking unknowns, and dominant quality-attribute candidates.
-   - If no blueprint exists, run the compact light pass from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md`; ask at most 3 blocking NFR questions.
+   - If no blueprint exists, run the compact light pass from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md`; ask at most 3 blocking NFR questions at a time. Overflow blockers remain unresolved and block `/plan`.
    - Spec Agent must not run a full deep pass by itself. It may deepen only the categories required to make acceptance criteria observable/testable, capped at 2 categories per spec pass unless the user or Coordinator explicitly asks for more.
    - Convert `BLOCKING` NFR unknowns into `[NEEDS CLARIFICATION]` markers. For `SAFE DEFAULT` and `DEFERRED` unknowns, record assumptions and downstream owners.
    - Express accepted NFRs as observable, measurable constraints where practical; do not prescribe architecture or infrastructure solutions.
-7. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
+7. If this is a brownfield, migration, or reverse-spec-derived spec, run the evidence preservation gate before writing final provider artifacts:
+   - Record `spec_mode` as `brownfield`, `migration`, or `reverse_spec`.
+   - Cite CodeBase Analyzer `ANALYSIS-*`, `MIGRATION-*`, and `TESTABILITY-*` reports in the provider planning surface when they exist.
+   - For reverse-spec normalization, preserve source evidence, confidence labels, preservation decisions, consumer compatibility notes, coverage status, and intentional-change approvals. Do not collapse them into plain requirements with no provenance.
+   - Carry every `[NEEDS CLARIFICATION]`, `[HUMAN DATA REQUEST]` marked blocking, `[CONTRACT VS IMPLEMENTATION]`, `[DISTRIBUTED TRANSACTION RISK]`, and blocking review-digest item forward as a blocker until human review resolves it.
+   - Require `reverse_spec_review_status: APPROVED` in `pipeline-state.md` before recommending `/plan`.
+8. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
 
    Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
 
-8. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
-9. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
-10. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
-11. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
-12. When Python is available and the active provider is Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_path>`. Do not hand off until it exits successfully.
-13. Once the provider-defined readiness artifact fully passes: recompute hash, publish spec delta summary (what changed and why), hand off to Architect via Coordinator.
+9. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
+10. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
+11. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
+12. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
+13. Run the active provider's validator. For Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_folder_dir> --phase spec --update-hash`. Use the spec package directory, not the `feature.spec.md` file path. Do not hand off until it exits successfully. If `python3` is unavailable, try `python` or `py`; if the validator runtime is still unavailable, stop unless a human approves a single-line `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp, reason, and manual checks performed.
+14. Once the provider-defined readiness artifact fully passes: publish spec delta summary (what changed and why), hand off to Red-Team via Coordinator. Architect dispatch happens only after Red-Team and Coordinator Planning Preflight pass.
 
 ## Output Format
 - Spec package path
@@ -77,7 +87,7 @@ When producing spec artifacts, follow the active provider's compatibility contra
 Before signaling handoff readiness:
 1. The provider's planning surface gate (defined in its compatibility contract) must pass.
 2. Zero unresolved clarification markers remain (provider-specific marker format is defined in the compatibility contract).
-3. When Python is available, the provider's validator (path in compatibility contract) exits successfully.
+3. The provider's validator (path in compatibility contract) exits successfully, or a human-approved single-line `validator_manual_waiver` exists because the runtime was unavailable after documented binary fallbacks were tried.
 4. Implementation-readiness self-check: "Can a new developer implement this feature from these specs alone?" If no, continue working.
 
 ## Spec Placement

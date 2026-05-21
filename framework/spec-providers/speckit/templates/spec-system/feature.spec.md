@@ -12,11 +12,12 @@
 | spec_id | SPEC-<NNN> |
 | version | <semver — e.g., 1.0.0; major for scope changes, minor for clarifications, patch for typo fixes> |
 | status | DRAFT \| REVIEW \| APPROVED \| SUPERSEDED |
-| content_hash | <sha256 of all content below this metadata block — recompute on every edit> |
+| content_hash | <sha256 from Speckit canonical hash rule — recompute on every edit> |
 | feature_name | FEAT-<NNN>-<short-feature-name> |
 | last_edited | <ISO-8601 UTC — e.g., 2026-02-23T14:00:00Z> |
 | owner | <human name or team> |
 | spec_agent | <agent ID or "Spec Agent"> |
+| spec_mode | greenfield \| brownfield \| reverse_spec \| migration |
 
 > **[NEEDS CLARIFICATION] vs Open Questions — use the right one:**
 >
@@ -167,7 +168,7 @@ The Spec Agent completes this. The Coordinator verifies before routing.
 - [ ] spec_id assigned and unique (verified against existing `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` folders)
 - [ ] version set to correct semver
 - [ ] status set to APPROVED (not DRAFT or REVIEW)
-- [ ] content_hash computed and matches content below header block
+- [ ] content_hash computed using the Speckit canonical hash rule and verified by the provider-local validator
 - [ ] feature_name matches the FEAT folder name exactly
 - [ ] Zero `[NEEDS CLARIFICATION]` markers remain in this file
 - [ ] All Open Questions have an owner and a resolution target date
@@ -185,7 +186,9 @@ The Spec Agent completes this. The Coordinator verifies before routing.
 - [ ] behavior.spec.md complete (if feature has non-trivial ordering or precedence rules)
 - [ ] traceability.spec.md complete (after implementation — or marked "pending implementation")
 - [ ] spec-manifest.md complete — all 10 logical files listed with `PRESENT` or `OMITTED` and concrete reasons
-- [ ] spec-dod.md filled and all items PASS
+- [ ] spec-dod.md filled and all items PASS or NA with concrete justification
+- [ ] spec-dod.md Spec Agent sign-off row completed; Coordinator row is reserved for Coordinator Planning Preflight before `/plan`
+- [ ] If `spec_mode` is `brownfield`, `reverse_spec`, or `migration`, brownfield/reverse-spec evidence paths are recorded in `spec-manifest.md`
 
 **Gate result:** PASS / FAIL — <summary if FAIL>
 

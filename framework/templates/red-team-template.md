@@ -4,7 +4,7 @@
 - Spec version: <version>
 - Spec hash: sha256:<hash>
 - Red-Team completed: <ISO-8601 UTC>
-- Finding count: <N> BLOCKING · <N> ADVISORY · <N> CONSTITUTION-FLAG
+- Finding count: <N> BLOCKING · <N> ADVISORY · <N> CONSTITUTION_FLAG
 
 ---
 
@@ -34,12 +34,12 @@ Spec Agent and human are informed. Human decides whether to revise or accept ris
 
 ---
 
-## CONSTITUTION-FLAG Findings
+## CONSTITUTION_FLAG Findings
 
 Likely to require a constitution exception. Flagged for Architect awareness so Complexity Justification entries can be prepared proactively. Does not block Architect dispatch unless accompanied by BLOCKING findings.
 
 ### RT-003
-- Severity: CONSTITUTION-FLAG
+- Severity: CONSTITUTION_FLAG
 - Category: constitution
 - Article: <Article number and name>
 - Location: <requirement or AC reference>
@@ -52,4 +52,4 @@ Likely to require a constitution exception. Flagged for Architect awareness so C
 
 `<N>` BLOCKING findings. `<decision: spec cleared for Architect dispatch / route back to Spec Agent>`
 
-ADVISORY and CONSTITUTION-FLAG findings are included in Architect context. `<specific notes if any>`
+ADVISORY and CONSTITUTION_FLAG findings are included in Architect context. `<specific notes if any>`

@@ -50,7 +50,7 @@ Canonical stage order and detailed dispatch behavior live in `<AI_DEV_SHOP_ROOT>
 High-level flow:
 1. Use System Blueprint when macro boundaries are unclear or the scope spans multiple domains.
 2. Spec Agent creates the provider-defined planning surface. With the default `speckit` provider, this is the strict-mode spec package. Zero unresolved clarification blockers before architecture work.
-3. Human approves the planning surface, then Red-Team and Architect produce the ADR.
+3. Human approves the planning surface, then Red-Team runs. Coordinator Planning Preflight must pass before Architect produces the ADR.
 4. Human approves ADR, then Coordinator generates `tasks.md` and dispatches TDD.
 5. Programmer implements to convergence, then review and security gates run before shipping.
 
@@ -70,7 +70,7 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 | `/blueprint` | System Blueprint Agent | system-blueprint.md with macro boundaries and spec decomposition plan |
 | `/spec` | Spec Agent | spec package, [NEEDS CLARIFICATION] resolved |
 | `/clarify` | Spec Agent | structured questions for unresolved markers |
-| `/plan` | Architect Agent | research.md + ADR |
+| `/plan` | Coordinator Planning Preflight → Architect Agent | preflight result + research.md + ADR |
 | `/tasks` | Coordinator | tasks.md with [P] parallelization markers |
 | `/implement` | TDD → Programmer | test-certification.md → implementation to convergence |
 | `/code-review` | Code Review + Security | Required/Recommended findings + security report |
@@ -86,7 +86,10 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 
 | Checkpoint | Before |
 |---|---|
+| System blueprint approval (if produced) | Spec approval |
 | Spec approval | Architect dispatch |
+| Reverse-spec review digest approval (if applicable) | Architect dispatch |
+| Red-Team clearance | Architect dispatch |
 | Architecture sign-off | TDD dispatch |
 | Convergence escalation | Burning more cycles |
 | Security sign-off | Shipping |

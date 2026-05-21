@@ -1,36 +1,87 @@
 # Test Certification: FEAT-001 CSV Export for Invoice List
 
-- Feature: FEAT-001
-- Spec version: 1.1.0
-- Spec hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
-- Certification hash: sha256:c1d4e7f2a9b5083f74ce05a3b216d9f4e8a3072c6d9f4183b7e0a2d5f8c1b4e
-- TDD Agent completed: 2026-02-22T04:00:00Z
-- Spec hash verified: ✅ Match confirmed
+- Test Suite: FEAT-001 CSV export tests
+- Spec ID: FEAT-001
+- Spec Version: 1.1.0
+- Spec Hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
+- Spec Hash Verification: `sha256sum specs/001-csv-export/feature.spec.md` matched pipeline-state hash
+- ADR: `ADS-project-knowledge/reports/pipeline/001-csv-export/adr.md` (sha256:b9e2d4f7a1c8053e67bd94f2a105c8e3d7f2093a5b8e4162c9d7f3b0e2a5c8f)
+- Tasks: `ADS-project-knowledge/reports/pipeline/001-csv-export/tasks.md`
+- Certified At: 2026-02-22T04:00:00Z
+- Certified By: TDD Agent
 
 ---
 
-## Certification Summary
+## Test File Inventory
 
-| AC / Invariant | Priority | Test File | Test Name | Status |
-|---------------|----------|-----------|-----------|--------|
-| AC-01 | P1 | InvoiceList.integration.test.tsx | `triggers download when Export CSV clicked with visible rows` | ✅ Certified |
-| AC-02 | P1 | InvoiceList.integration.test.tsx | `exports only filtered rows when date filter is active` | ✅ Certified |
-| AC-03 | P1 | InvoiceList.integration.test.tsx | `filename contains today date and "all" when no filters active` | ✅ Certified |
-| AC-04 | P2 | InvoiceList.integration.test.tsx | `filename contains today date and "filtered" when filters active` | ✅ Certified |
-| AC-05 | P1 | formatCsv.test.ts | `header row matches column labels in display order` | ✅ Certified |
-| AC-06 | P1 | formatCsv.test.ts | `field with comma is wrapped in double quotes` | ✅ Certified |
-| AC-07 | P1 | formatCsv.test.ts | `field with double quote character is escaped as two double quotes` | ✅ Certified |
-| AC-08 | P1 | InvoiceList.integration.test.tsx | `exports header-only CSV when all rows are filtered out` | ✅ Certified |
-| INV-01 | — | formatCsv.test.ts | `output is valid UTF-8 for non-ASCII field values` | ✅ Certified |
-| INV-02 | — | InvoiceList.integration.test.tsx | `exported row count matches visible row count` | ✅ Certified |
-| INV-03 | — | InvoiceList.integration.test.tsx | `export does not mutate component state` | ✅ Certified |
-| EC-01 | — | formatCsv.test.ts | `field with newline is wrapped in double quotes with newline preserved` | ✅ Certified |
-| EC-02 | — | formatCsv.test.ts | `column header with comma is wrapped in double quotes` | ✅ Certified |
+| Test File | Type | Spec Refs | sha256 | Expected Test Count | Red Evidence |
+|---|---|---|---|---:|---|
+| `src/features/invoice-list/utils/formatCsv.test.ts` | unit | AC-05, AC-06, AC-07, INV-01, INV-02, EC-01, EC-02 | sha256:4f6c9a6eexampleformatcsv | 7 | failed before implementation: `npm test -- formatCsv.test.ts` |
+| `src/features/invoice-list/utils/triggerDownload.test.ts` | unit | AC-01, INV-03 | sha256:8a8d1f2eexampledownload | 4 | failed before implementation: `npm test -- triggerDownload.test.ts` |
+| `src/features/invoice-list/components/InvoiceList.integration.test.tsx` | integration | AC-01, AC-02, AC-03, AC-04, AC-08, INV-02, INV-03 | sha256:7b9e3c4dexampleinvoicelist | 7 | failed before implementation: `npm test -- InvoiceList.integration.test.tsx` |
+
+## Covered Requirements
+
+| Spec Ref | Priority | Test File | Test Name | Type | Assertion Summary | Status |
+|---------------|----------|-----------|-----------|------|-------------------|--------|
+| AC-01 | P1 | InvoiceList.integration.test.tsx | `triggers download when Export CSV clicked with visible rows` | Acceptance | Proves the export action invokes browser download for visible rows | Certified |
+| AC-02 | P1 | InvoiceList.integration.test.tsx | `exports only filtered rows when date filter is active` | Acceptance | Proves exported CSV rows match active filtered rows | Certified |
+| AC-03 | P1 | InvoiceList.integration.test.tsx | `filename contains today date and "all" when no filters active` | Acceptance | Proves unfiltered export filename uses local date and `all` suffix | Certified |
+| AC-04 | P2 | InvoiceList.integration.test.tsx | `filename contains today date and "filtered" when filters active` | Acceptance | Proves filtered export filename uses local date and `filtered` suffix | Certified |
+| AC-05 | P1 | formatCsv.test.ts | `header row matches column labels in display order` | Acceptance | Proves headers use display labels in declared order | Certified |
+| AC-06 | P1 | formatCsv.test.ts | `field with comma is wrapped in double quotes` | Acceptance | Proves comma-containing cells are quoted | Certified |
+| AC-07 | P1 | formatCsv.test.ts | `field with double quote character is escaped as two double quotes` | Acceptance | Proves embedded quotes are escaped per CSV rules | Certified |
+| AC-08 | P1 | InvoiceList.integration.test.tsx | `exports header-only CSV when all rows are filtered out` | Acceptance | Proves empty visible data exports headers only | Certified |
+| INV-01 | — | formatCsv.test.ts | `output is valid UTF-8 for non-ASCII field values` | Invariant | Proves non-ASCII CSV round-trips through UTF-8 encoding | Certified |
+| INV-02 | — | InvoiceList.integration.test.tsx | `exported row count matches visible row count` | Invariant | Proves exported row count equals visible row count | Certified |
+| INV-03 | — | InvoiceList.integration.test.tsx | `export does not mutate component state` | Invariant | Proves export action leaves rendered row state unchanged | Certified |
+| EC-01 | — | formatCsv.test.ts | `field with newline is wrapped in double quotes with newline preserved` | Edge Case | Proves newline-containing cells are quoted and preserved | Certified |
+| EC-02 | — | formatCsv.test.ts | `column header with comma is wrapped in double quotes` | Edge Case | Proves comma-containing headers are quoted | Certified |
 
 All P1 acceptance criteria: **8 / 8 certified** ✅
 All P2 acceptance criteria: **1 / 1 certified** ✅
 All invariants: **3 / 3 certified** ✅
 All edge cases: **2 / 2 certified** ✅
+
+---
+
+## Outcome Matrix
+
+| Module | State | Input | Expected Outcome | Spec Ref |
+|---|---|---|---|---|
+| `formatCsv` | empty rows | display columns | header-only CSV | AC-08 |
+| `formatCsv` | rows with comma/quote/newline | display columns + rows | RFC-style quoted and escaped CSV cells | AC-06 / AC-07 / EC-01 |
+| `InvoiceList` | unfiltered visible rows | export click | download starts with `all` filename and all rows | AC-01 / AC-03 |
+| `InvoiceList` | filtered visible rows | export click | download starts with `filtered` filename and filtered rows only | AC-02 / AC-04 |
+
+## Property-Based Tests
+
+| Spec Ref | Property / Invariant | Generator Domain | Test Name | Status |
+|---|---|---|---|---|
+| INV-01 | CSV output remains valid UTF-8 for arbitrary display strings | N/A for sample; covered with direct UTF-8 round trip | `output is valid UTF-8 for non-ASCII field values` | Certified |
+
+## Contract Tests
+
+| Contract Source | Testing Approach | Test Name | Status | Gap / Waiver |
+|---|---|---|---|---|
+| ADR CSV export utility boundary | Unit contract via public `formatCsv` API | `header row matches column labels in display order` | Certified | N/A |
+| ADR browser download boundary | DOM mock integration through public `triggerDownload` API | `triggers an anchor click with the correct filename` | Certified | N/A |
+
+## Known Gaps
+
+| Spec Ref | Reason Not Covered | Risk | Resolution |
+|---|---|---|---|
+| N/A | No uncovered spec refs remain | N/A | N/A |
+
+## Drift Status
+
+- [x] Current spec hash matches certified hash above
+- [x] Current spec hash was verified mechanically, not by visual comparison
+- [x] Current test file hashes match the Test File Inventory
+- [x] Expected test count is greater than zero and matches the runnable suite inventory
+- [x] All High-risk gaps have been reviewed by Coordinator
+- [x] No test asserts implementation internals (only observable behavior)
+- [x] All P1 acceptance criteria have semantic assertion coverage, not only structural test-name mapping
 
 ---
 
@@ -265,4 +316,5 @@ describe('InvoiceList CSV export', () => {
 All acceptance criteria, invariants, and edge cases from spec FEAT-001 v1.1.0 have corresponding failing tests. Tests are verified to fail against a no-op implementation and are ready for Programmer dispatch.
 
 Spec hash at certification: `sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9`
-Certification hash: `sha256:c1d4e7f2a9b5083f74ce05a3b216d9f4e8a3072c6d9f4183b7e0a2d5f8c1b4e`
+Certification record hash is stored externally in `pipeline-state.md` as
+`test_certification_hash`; it is not embedded in this file.

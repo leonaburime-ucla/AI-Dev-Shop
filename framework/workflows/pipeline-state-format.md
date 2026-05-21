@@ -4,6 +4,11 @@ Every pipeline run writes a `pipeline-state.md` file to the active feature's can
 
 **Location:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
 
+Status and confidence labels follow
+`<AI_DEV_SHOP_ROOT>/framework/workflows/status-confidence-taxonomy.md`. Pipeline
+state records routing consequences; it does not translate source evidence labels
+into different confidence systems.
+
 Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the previous filename and migrate it to `pipeline-state.md` when the run is next resumed or updated.
 
 ---
@@ -23,6 +28,39 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - spec_entrypoint_path: <provider-defined planning entrypoint path>
 - spec_readiness_artifact: <provider-defined readiness artifact path>
 - spec_support_paths: <comma-separated list or N/A>
+- spec_mode: greenfield | brownfield | migration | reverse_spec
+- provider_mode: <provider-specific mode or compatibility/native track, or N/A>
+- validator_result: PASS | FAIL | NOT_RUN
+- validator_manual_waiver: <single-line reviewer/timestamp/reason/manual checks string, or N/A>
+- spec_hash_verified_at: <ISO-8601 UTC or N/A>
+- planning_preflight_status: NOT_RUN | PASS | FAIL
+- planning_preflight_checked_at: <ISO-8601 UTC or N/A>
+- planning_preflight_spec_hash: <sha256 or N/A>
+- planning_preflight_failures: <summary or N/A>
+- red_team_status: NOT_RUN | PASS | ADVISORY_ONLY | BLOCKING | CONSTITUTION_FLAG
+- red_team_spec_hash: <sha256 or N/A>
+- red_team_artifact: <path or N/A>
+- red_team_completed_at: <ISO-8601 UTC or N/A>
+- red_team_human_decision: APPROVED | REVISE | N/A
+- system_blueprint_path: <path or N/A>
+- system_blueprint_status: NOT_RUN | DRAFT | APPROVED | REVISE | N/A
+- codebase_analysis_reports: <comma-separated ANALYSIS/MIGRATION/TESTABILITY paths or N/A>
+- reverse_spec_artifacts: <comma-separated reverse-spec artifact paths or N/A>
+- reverse_spec_review_status: NOT_APPLICABLE | PENDING | APPROVED | REVISE
+- tasks_artifact: <path or N/A>
+- test_certification_artifact: <path or N/A>
+- test_certification_hash: <sha256 or N/A>
+- verification_packet_artifact: <path or N/A>
+- verification_packet_hash: <sha256 or N/A>
+- test_file_hash_status: NOT_RUN | PASS | FAIL | N/A
+- latest_testrunner_report: <path or N/A>
+- testrunner_status: NOT_RUN | PASS | FAIL | UNAVAILABLE | BLOCKED
+- executed_test_count: <integer or N/A>
+- expected_test_count: <integer or N/A>
+- required_suite_status: PASS | FAIL | PARTIAL | N/A
+- coverage_status: NOT_RUN | PASS | FAIL | UNAVAILABLE | N/A
+- flaky_test_status: NONE | KNOWN_APPROVED | UNAPPROVED | N/A
+- code_review_gate_status: NOT_READY | READY | WAIVED
 - started_at: <ISO-8601 UTC>
 - last_updated_at: <ISO-8601 UTC>
 - progress_ledger_path: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/.../progress-ledger.md or <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/.../progress-ledger.md
@@ -46,6 +84,19 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - current_hypothesis: <one sentence or N/A>
 - last_output_summary: <one sentence>
 
+## Parallel Task Tracking
+
+| Task ID | Owner Agent | Scope / Files | Status | Started At | Completed At | Blocks |
+|---------|-------------|---------------|--------|------------|--------------|--------|
+| T008 | TDD | `tests/...` | QUEUED | N/A | N/A | T010 |
+
+Only the Coordinator updates task status and checkboxes in `tasks.md`.
+Specialist agents may report task progress in handoffs, but do not mutate this
+table unless explicitly delegated. Parallel tasks must have non-overlapping
+write scopes; if a shared utility, test-certification record, coverage artifact,
+or state file needs updates, serialize that update through the Coordinator or a
+single owner.
+
 ## Iteration Counts
 
 | Stage | Cycle Count | Budget | Status |
@@ -62,6 +113,9 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 ## Human Checkpoints Cleared
 
 - [ ] Spec approval
+- [ ] Reverse-spec review digest approval (if applicable)
+- [ ] System blueprint approval (if produced)
+- [ ] Red-Team clearance
 - [ ] Architecture sign-off (includes Constitution Check)
 - [ ] Convergence escalation (if triggered)
 - [ ] Security sign-off
@@ -126,6 +180,79 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 - `spec_entrypoint_path` is the file used for drift detection and resume hashing
 - `spec_readiness_artifact` is the file or artifact used to prove the planning surface is ready for architecture work
 - for the default Speckit provider, these typically map to `feature.spec.md` and `spec-dod.md`
+
+### Planning preflight fields (required before Architect dispatch)
+
+```markdown
+planning_preflight_status: NOT_RUN | PASS | FAIL
+planning_preflight_checked_at: <ISO-8601 UTC or N/A>
+planning_preflight_spec_hash: <sha256 or N/A>
+planning_preflight_failures: <summary or N/A>
+```
+
+The Coordinator writes these fields when `/plan`, manual Architect dispatch, or
+resume validation reaches the architecture boundary. `PASS` means provider
+readiness, hash verification, human approval, Red-Team clearance, blueprint
+status, reverse-spec review, and brownfield evidence wiring have all passed for
+the same spec hash.
+
+Preflight relies on the primary provider validator and Red-Team fields for
+validator and adversarial-review status. Do not duplicate those values into
+separate preflight-specific status fields.
+
+### Validator waiver fields (allowed only when the validator runtime is unavailable)
+
+```markdown
+validator_result: PASS | FAIL | NOT_RUN
+validator_manual_waiver: reviewer=<name>; timestamp=<ISO-8601 UTC>; reason=<why runtime unavailable>; manual_checks=<checks performed>
+```
+
+Provider-local validators are mandatory before Architect dispatch. A manual
+waiver is not a substitute for fixing a failing validator; it exists only when
+the required runtime cannot be executed in the host environment. The waiver must
+stay on one line using semicolon-separated fields so state parsers do not split
+or drop waiver evidence.
+
+### Brownfield and reverse-spec fields
+
+```markdown
+system_blueprint_path: <path or N/A>
+system_blueprint_status: NOT_RUN | DRAFT | APPROVED | REVISE | N/A
+codebase_analysis_reports: <ANALYSIS/MIGRATION/TESTABILITY paths or N/A>
+reverse_spec_artifacts: <merged requirements, review digest, manifest, coverage map, consumer inventory, intentional changes, characterization tests, or N/A>
+reverse_spec_review_status: NOT_APPLICABLE | PENDING | APPROVED | REVISE
+```
+
+Existing-codebase features and rewrites use these fields so Coordinator can
+prove the Architect saw the sampled codebase evidence and any reverse-spec
+human checkpoint before architecture decisions are made.
+
+### Verification and review gate fields
+
+```markdown
+tasks_artifact: <path or N/A>
+test_certification_artifact: <path or N/A>
+test_certification_hash: <sha256 or N/A>
+verification_packet_artifact: <path or N/A>
+verification_packet_hash: <sha256 or N/A>
+test_file_hash_status: NOT_RUN | PASS | FAIL | N/A
+latest_testrunner_report: <path or N/A>
+testrunner_status: NOT_RUN | PASS | FAIL | UNAVAILABLE | BLOCKED
+executed_test_count: <integer or N/A>
+expected_test_count: <integer or N/A>
+required_suite_status: PASS | FAIL | PARTIAL | N/A
+coverage_status: NOT_RUN | PASS | FAIL | UNAVAILABLE | N/A
+flaky_test_status: NONE | KNOWN_APPROVED | UNAPPROVED | N/A
+code_review_gate_status: NOT_READY | READY | WAIVED
+```
+
+The Coordinator updates these fields after accepting TDD and TestRunner outputs.
+`code_review_gate_status` may be `READY` only when the Coordinator verification
+packet is PASS for the active spec hash, certified test-file hashes match,
+executed tests are greater than zero and meet/exceed the certified expected
+count, required suites and coverage gates pass or are explicitly N/A, and no
+unapproved flaky tests remain. A waiver must name the human reviewer, timestamp,
+scope, reason, and remaining risk in Notes.
 
 ---
 
@@ -193,6 +320,39 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 - spec_entrypoint_path: specs/003-csv-invoice-export/feature.spec.md
 - spec_readiness_artifact: specs/003-csv-invoice-export/spec-dod.md
 - spec_support_paths: specs/003-csv-invoice-export/api.spec.md, specs/003-csv-invoice-export/state.spec.md, specs/003-csv-invoice-export/orchestrator.spec.md, specs/003-csv-invoice-export/ui.spec.md, specs/003-csv-invoice-export/errors.spec.md, specs/003-csv-invoice-export/behavior.spec.md, specs/003-csv-invoice-export/traceability.spec.md, specs/003-csv-invoice-export/spec-manifest.md
+- spec_mode: greenfield
+- provider_mode: compatibility
+- validator_result: PASS
+- validator_manual_waiver: N/A
+- spec_hash_verified_at: 2026-02-22T14:54:00Z
+- planning_preflight_status: PASS
+- planning_preflight_checked_at: 2026-02-22T14:56:00Z
+- planning_preflight_spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
+- planning_preflight_failures: N/A
+- red_team_status: PASS
+- red_team_spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
+- red_team_artifact: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/red-team-findings.md
+- red_team_completed_at: 2026-02-22T14:55:00Z
+- red_team_human_decision: N/A
+- system_blueprint_path: N/A
+- system_blueprint_status: N/A
+- codebase_analysis_reports: N/A
+- reverse_spec_artifacts: N/A
+- reverse_spec_review_status: NOT_APPLICABLE
+- tasks_artifact: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/tasks.md
+- test_certification_artifact: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/test-certification.md
+- test_certification_hash: sha256:c1d4e7f2a9b5083f74ce05a3b216d9f4e8a3072c6d9f4183b7e0a2d5f8c1b4e
+- verification_packet_artifact: N/A
+- verification_packet_hash: N/A
+- test_file_hash_status: NOT_RUN
+- latest_testrunner_report: N/A
+- testrunner_status: NOT_RUN
+- executed_test_count: N/A
+- expected_test_count: 18
+- required_suite_status: N/A
+- coverage_status: NOT_RUN
+- flaky_test_status: N/A
+- code_review_gate_status: NOT_READY
 
 ## Completed Stages
 
@@ -229,6 +389,7 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 ## Human Checkpoints Cleared
 
 - [x] Spec approval
+- [x] Red-Team clearance
 - [x] Architecture sign-off (includes Constitution Check)
 - [ ] Convergence escalation (if triggered)
 - [ ] Security sign-off

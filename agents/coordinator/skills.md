@@ -18,6 +18,7 @@ Use these files as the source of truth instead of re-stating them here:
 - Startup copy, mode semantics, direct-mode rules, and shared agent rules: `<AI_DEV_SHOP_ROOT>/AGENTS.md`
 - Routing decision tree, convergence behavior, and cycle summary format: `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`
 - Full pipeline stages and stage-by-stage context injection: `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`
+- Status/confidence label boundaries: `<AI_DEV_SHOP_ROOT>/framework/workflows/status-confidence-taxonomy.md`
 - Artifact locations and path rules: `<AI_DEV_SHOP_ROOT>/framework/workflows/conventions.md`
 - State file, recovery, and retry lifecycle: `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/recovery-playbook.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/job-lifecycle.md`
 - Memory write routing: `<AI_DEV_SHOP_ROOT>/framework/governance/knowledge-routing.md`
@@ -53,6 +54,10 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
 10. Explain current work and routing decisions to users in plain language instead of assuming internal framework fluency.
 11. Use the file-trigger table and context-firewall rules to keep discovery and implementation routing clean.
 12. Resolve subagent mode at startup, use helper agents automatically only when the host verifies support, and explain the cost tradeoff plainly.
+13. Enforce the Coordinator-owned dependency guard: specialist agents consume
+    Coordinator-supplied artifacts and evidence, but only Coordinator owns stage
+    ordering, readiness gates, retry routing, inter-agent dependencies, and
+    human checkpoints.
 
 ## Conditional Skill Activation
 
@@ -83,20 +88,21 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 1. On session start, check for an active `pipeline-state.md` and resume via the recovery playbook when needed.
 2. Resolve current-host subagent mode before promising helper-agent behavior; default to `subagent-assisted` only when verified, otherwise stay in `single-agent`.
 3. Validate the active spec version/hash on every downstream artifact.
-4. Reject outputs that are missing the handoff contract, including the required Architecture Audit evidence on Programmer handoffs.
-5. Pull only the relevant memory and context required for the next dispatch.
-6. Route using `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`, including Review Mode intake, delegated-agent resolution, file-trigger guidance, and conditional-skill activation.
-7. After human ADR approval, generate `tasks.md`, then dispatch TDD.
-8. Update `pipeline-state.md` and job status after each stage transition.
-9. Apply retry limits and escalation policy; do not burn cycles on the same failing cluster.
-10. Trigger Observer and doc-garden passes on the cadence defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md`, and promote repeated failures per `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`.
-11. For long-running or resumable work, maintain a `progress-ledger.md` and use it as the resume surface before re-dispatch.
-12. Use read-only discovery passes as context firewalls when broad exploration would otherwise pollute the implementation loop.
-13. When an artifact is not pipeline-required, decide whether it should be retained, local-only, or inline-only before writing it to disk.
-14. Keep large raw outputs in durable offload files instead of allowing handoffs or retries to flood the active context, and default those raw captures to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` unless they are explicitly retained evidence.
-15. Enforce pre-completion, self-validation, and loop-detection tripwires before accepting `DONE` on implementation-heavy stages.
-16. In every user-facing explanation, translate the current internal step into concrete plain language: what we are doing, why it exists, what is needed, and what comes next.
-17. Check host capability limits before describing task spawning, parallel work, or isolated sub-agents as active behavior, and prefer the local capability probe when it exists.
+4. Run Coordinator Planning Preflight before `/plan`, manual Architect dispatch, and resumes at or after Architect. Do not dispatch Architect until provider readiness, validator/hash verification, human approval, Red-Team clearance, blueprint status, reverse-spec review, and brownfield evidence wiring pass for the same spec hash.
+5. Reject outputs that are missing the handoff contract, including the required Architecture Audit evidence on Programmer handoffs.
+6. Pull only the relevant memory and context required for the next dispatch.
+7. Route using `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`, including Review Mode intake, delegated-agent resolution, file-trigger guidance, and conditional-skill activation.
+8. After human ADR approval, generate `tasks.md`, then dispatch TDD.
+9. Update `pipeline-state.md` and job status after each stage transition.
+10. Apply retry limits and escalation policy; do not burn cycles on the same failing cluster.
+11. Trigger Observer and doc-garden passes on the cadence defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md`, and promote repeated failures per `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`.
+12. For long-running or resumable work, maintain a `progress-ledger.md` and use it as the resume surface before re-dispatch.
+13. Use read-only discovery passes as context firewalls when broad exploration would otherwise pollute the implementation loop.
+14. When an artifact is not pipeline-required, decide whether it should be retained, local-only, or inline-only before writing it to disk.
+15. Keep large raw outputs in durable offload files instead of allowing handoffs or retries to flood the active context, and default those raw captures to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` unless they are explicitly retained evidence.
+16. Enforce pre-completion, self-validation, and loop-detection tripwires before accepting `DONE` on implementation-heavy stages.
+17. In every user-facing explanation, translate the current internal step into concrete plain language: what we are doing, why it exists, what is needed, and what comes next.
+18. Check host capability limits before describing task spawning, parallel work, or isolated sub-agents as active behavior, and prefer the local capability probe when it exists.
 
 ## State, Memory, and Write Rules
 
@@ -109,6 +115,9 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 ## Special Coordinator Cases
 
 - If a downstream agent emits `[ARCHITECTURE_REVISION_REQUEST]`, pause affected work and route to System Blueprint or Architect based on whether the issue is system-level or feature-level.
+- If `/plan`, manual Architect dispatch, or resume reaches Architect with missing or failed Coordinator Planning Preflight, stop and route to the failed owner stage instead of dispatching Architect.
+- If Red-Team has not completed against the current spec hash, run Red-Team before Architect dispatch.
+- If reverse-spec artifacts exist but `review-digest.md` has not been human-approved, present that checkpoint before Architect dispatch.
 - If Programmer handoff reports `Architecture Audit = WARNING`, surface the violations to the user and ask whether to route back to Programmer for remediation or continue downstream with the warning recorded.
 - If Programmer handoff reports `Architecture Audit = BLOCKER`, pause routing and escalate to human or Architect based on whether the issue is ADR ambiguity or implementation drift against a hard constraint.
 - Search Visibility is an optional module, not a default stage. Dispatch it only when the user asks for SEO, GEO, AEO, indexing, AI answerability, chatbot retrieval, crawler access, or search discoverability, or when the active spec/ADR explicitly names public discoverability as a goal or NFR. Do not dispatch it solely because a feature has public routes or content.

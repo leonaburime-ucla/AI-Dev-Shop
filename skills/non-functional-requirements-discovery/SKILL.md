@@ -89,6 +89,17 @@ Do not ask one question per category. Ask only questions that block responsible
 downstream work. For non-blocking ambiguity, record a safe default assumption and
 continue.
 
+Unknowns involving a new dependency, domain ownership boundary, external
+integration, durable data schema, migration boundary, auth/trust boundary, or
+source-of-truth decision are `BLOCKING`. Do not classify those structural
+architecture boundaries as `SAFE DEFAULT` or `DEFERRED` just to advance the
+stage.
+
+Question caps limit one interaction, not readiness. If there are more blocking
+unknowns than the cap allows, ask the highest-risk questions first and record
+the rest as `BLOCKING` with an owner. Do not relabel overflow blockers as
+`SAFE DEFAULT` or `DEFERRED` just to advance the stage.
+
 Light table schema:
 
 | Category | Status | Summary / Assumption | Unknown Class | Downstream Owner |

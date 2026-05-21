@@ -11,6 +11,7 @@ It is not upstream BMAD-METHOD documentation.
 - Compatibility root: `<AI_DEV_SHOP_ROOT>/framework/spec-providers/bmad/`
 - Planning templates: `<AI_DEV_SHOP_ROOT>/framework/spec-providers/bmad/templates/`
 - Mechanical validator: `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/bmad/validators/validate_bmad_package.py <output_folder>`
+  (`python` or `py` may be used only when `python3` is not available)
 
 ## Track Selection
 
@@ -51,7 +52,11 @@ When `bmad` is the active provider and the standard track is selected:
 6. Write `architecture.md` from the template if technical design decisions are needed.
 7. Write epics with stories from the template. Use BDD format: "As a [role], I want [action], so that [benefit]." Acceptance criteria must follow Given/When/Then format.
 8. Optionally write `product-brief.md` if strategic framing was part of the analysis phase.
-9. When Python is available, run the provider-local validator. Repair any failures before declaring readiness.
+9. Run the provider-local validator. Repair any failures before declaring readiness.
+   If `python3` is unavailable, try `python` or `py`; if the validator runtime
+   is still unavailable, stop unless a human approves a single-line
+   `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp,
+   reason, and manual checks performed.
 
 ## Spec Package Flow — Quick Dev Track
 
@@ -62,7 +67,11 @@ When `bmad` is the active provider and the quick dev track is selected:
 3. Ask the user for the output location.
 4. Record `spec_provider: bmad`, `provider_mode: quick_dev`, `spec_entrypoint_path` (pointing to `spec-<feature-name>.md`), `spec_readiness_artifact: spec with Intent + Boundaries + Tasks + Verification + GWT + validator pass`, and `spec_support_paths` in `pipeline-state.md`.
 5. Write `spec-<feature-name>.md` from the quick-dev template. Fill: Intent (Problem/Approach), Boundaries (Always/Ask First/Never), I/O & Edge-Case Matrix, Code Map, Tasks & Acceptance (with Given/When/Then), Verification commands.
-6. When Python is available, run the provider-local validator. Repair any failures before declaring readiness.
+6. Run the provider-local validator. Repair any failures before declaring readiness.
+   If `python3` is unavailable, try `python` or `py`; if the validator runtime
+   is still unavailable, stop unless a human approves a single-line
+   `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp,
+   reason, and manual checks performed.
 
 ## Clarification Rules
 
@@ -98,7 +107,8 @@ The BMAD standard-track compatibility gate is satisfied only when all of the fol
 - at least one epic file exists under `planning-artifacts/epics/` with stories
 - all stories have acceptance criteria in Given/When/Then format
 - no template placeholders remain in any artifact
-- the provider-local validator exits successfully when Python is available
+- the provider-local validator exits successfully, or a human-approved
+  single-line `validator_manual_waiver` exists because the runtime was unavailable
 
 ## Planning Surface Gate — Quick Dev Track
 
@@ -107,7 +117,8 @@ The BMAD quick-dev compatibility gate is satisfied only when all of the followin
 - `spec-*.md` exists with filled Intent, Boundaries, Tasks & Acceptance, and Verification sections
 - acceptance criteria follow Given/When/Then format
 - no template placeholders remain
-- the provider-local validator exits successfully when Python is available
+- the provider-local validator exits successfully, or a human-approved
+  single-line `validator_manual_waiver` exists because the runtime was unavailable
 
 ## Maintainer Rule
 

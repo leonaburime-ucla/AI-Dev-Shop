@@ -31,6 +31,53 @@ Treat this as guidance, not a hard constraint:
 - If the packet already names the relevant files, prefer a bounded prompt and a constrained read-only tool surface over a broad open-ended repo-audit prompt.
 - Do not assume a failure on an open-ended repo audit means the peer cannot handle repo work in general; first test whether the bounded version succeeds.
 
+## Session Reuse
+
+Some peer CLIs perform expensive startup work (reading project docs, running bootstrap sequences) on the first turn. To avoid paying this cost repeatedly within a single workflow (e.g., a `/cowork` run with diagnosis → verification → correction phases), reuse the same peer session across phases.
+
+### Codex Session Reuse
+
+Codex reads `AGENTS.md` and performs mandatory startup on the first turn of every new session. This is acceptable as a one-time cost, but subsequent dispatches in the same workflow must reuse the session to avoid repeating it.
+
+**Pattern:**
+
+```bash
+# Phase 1 — first dispatch, boots once, captures session ID
+codex exec --json -C "$REPO" "Your task..." \
+  > "$RUN_DIR/codex-phase1.json" 2>"$RUN_DIR/codex-phase1.stderr"
+
+# Extract session ID from JSON stream
+SESSION_ID=$(python3 -c "
+import json, sys
+for line in open('$RUN_DIR/codex-phase1.json'):
+    try:
+        obj = json.loads(line.strip())
+        if obj.get('type') == 'thread.started':
+            print(obj['thread_id']); break
+    except: pass
+")
+
+# Phase 2+ — resume existing session, no reboot
+codex exec resume "$SESSION_ID" --json "Next task..." \
+  > "$RUN_DIR/codex-phase2.json" 2>"$RUN_DIR/codex-phase2.stderr"
+```
+
+**Rules:**
+- Capture `thread_id` from the `thread.started` JSON event on the first dispatch.
+- Store the session ID in the run folder for the duration of the workflow.
+- All subsequent dispatches to the same Codex peer use `codex exec resume <SESSION_ID>`.
+- The resumed session retains full context from prior turns — no need to re-send the context packet.
+- If `resume` fails (e.g., session expired or corrupted), classify as `malformed_or_no_output` and start a fresh session.
+- Session reuse is scoped to one workflow run. Do not reuse Codex sessions across different `/cowork`, `/consensus`, or `/audit-work` runs.
+
+### Gemini Session Reuse
+
+Gemini CLI in headless mode (`-p`) does not perform expensive startup (it prioritizes the prompt over project docs). Session reuse is not required for Gemini but is available via `--resume latest` or `--resume <index>` if multi-turn dispatch is needed.
+
+### Claude CLI Session Reuse
+
+Claude Code CLI sessions are managed by the host process. When Claude is the primary (not a peer), session continuity is automatic. When Claude is dispatched as a peer via `claude -p`, each invocation is stateless — reuse is not currently supported in headless mode.
+
 ## Transport Rules
 
 - Prefer structured output modes when the peer CLI supports them.

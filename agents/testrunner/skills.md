@@ -15,15 +15,36 @@ Execute the full verification suite after implementation and report trustworthy 
 ## Required Inputs
 - Test commands and environment assumptions
 - Active spec metadata (to verify test certification hash alignment before running)
-- Test certification record from TDD Agent
+- Coordinator-supplied test certification record produced by TDD
+- `tasks.md` constraints: required suites, coverage profile, convergence threshold, coverage tool, cleanup paths, and expected coverage artifact paths
 
 ## Workflow
-1. Verify test certification hash matches active spec hash before running. Flag any mismatch to Coordinator before proceeding.
+1. Verify test certification hash matches active spec hash before running. Use
+   provider-local validator output when available; visual comparison is not
+   enough. Otherwise use the platform hash binary (`sha256sum <file>` on GNU
+   systems, `shasum -a 256 <file>` on macOS/BSD) and compare only the hex digest
+   after trimming command-output whitespace. Then verify every test file hash and
+   expected test count from `test-certification.md` against files on disk. Any
+   mismatch, missing file, or expected count of zero blocks the run and is
+   reported to Coordinator with a suggested TDD recertification route.
 2. Run unit suite. Keep passing output concise; capture full failure output when something breaks.
 2a. If `tasks.md` contains a `## Constraints — Performance` section: execute load tests per the benchmark targets using the tool specified in the constraints. Capture results as artifacts. Apply pass/fail criteria from `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md`. A hard failure blocks the same as a failing test.
-3. Run integration/E2E suite. Keep passing output concise; capture full failure output when something breaks.
-3a. Run coverage reporter for unit, integration, and E2E suites using the tool specified in `tasks.md` constraints; if none is specified, use the project's default (e.g., c8/istanbul for Node.js, coverage.py for Python, go test -cover for Go).
-3b. Merge coverage artifacts across suite runs before evaluation (do not overwrite per-suite artifacts). Evaluate gates from the merged report plus per-suite summaries.
+3. Run every suite marked required in `tasks.md`. Run E2E only when E2E is marked
+   required, E2E tests exist, or the Coordinator directive requests it; otherwise
+   record `E2E: N/A` with the reason from `tasks.md`. Keep passing output
+   concise; capture full failure output when something breaks.
+3a. Before test execution, purge the current run's configured coverage artifact
+   paths (for example `coverage/`, `.nyc_output/`, `.coverage`) so stale retry
+   artifacts cannot inflate the merged report. Then run the coverage reporter
+   for required suites using the tool specified in `tasks.md` constraints. When
+   multiple required suites run, configure each suite to write coverage into an
+   isolated per-suite output path (for example `coverage/unit/`,
+   `coverage/integration/`, `coverage/e2e/`) before merging; do not allow a later
+   suite to overwrite an earlier suite's default `coverage/` output. If no tool
+   is specified, use the project's default (e.g., c8/istanbul for Node.js,
+   coverage.py for Python, go test -cover for Go) and still isolate per-suite
+   outputs.
+3b. Merge coverage artifacts across suite runs before evaluation (do not overwrite per-suite artifacts). Evaluate gates from the merged report plus per-suite summaries. Prefer machine-readable coverage outputs (`coverage-summary.json`, `lcov.info`, `coverage.xml`, or equivalent) and cite the parser/tool used. If any required suite fails to produce coverage output, mark that suite `UNAVAILABLE — escalated`; do not report coverage pass.
 3c. Evaluate hard coverage gates from `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` using the active coverage profile in `tasks.md` (or defaults if absent) with no averaging across categories:
    - Unit suite: lines/branches/functions/statements must each be >= 98% by default.
    - Integration suite: lines/branches/functions/statements must each be >= 90% by default.
@@ -31,9 +52,12 @@ Execute the full verification suite after implementation and report trustworthy 
    If any metric fails, mark coverage as failing.
 3d. Build the Coverage Gap List: all Below Threshold files with their current %, target %, and uncovered line/branch/function/statement counts. Assign priority: High (core business logic or API adapters), Medium (orchestrators, infrastructure adapters), Low (view/UI components). If a per-file coverage baseline exists in `tasks.md`, flag any touched file whose coverage decreased vs. that baseline as a regression, regardless of whether it is still above threshold.
 3e. For any gate failure or remaining uncovered lines in changed/high-priority runtime paths, produce explicit rationale before stopping: what is uncovered, why it was not coverable in this cycle, and what route/action is required next.
-4. Run acceptance checks against spec criteria.
+4. Run acceptance checks against spec criteria. Verify total executed tests is
+   greater than zero and matches or exceeds the expected runnable test count in
+   `test-certification.md`. `0 tests found`, skipped-only runs, or empty suites
+   are BLOCKING infrastructure failures, not success.
 5. Aggregate results. Cluster failures by likely owner (spec gap, architecture issue, implementation bug).
-6. Report to Coordinator with convergence status vs threshold and coverage status.
+6. Report to Coordinator with convergence status vs threshold and coverage status. Default convergence before Code Review is `100%` of P1 acceptance tests and invariants passing; any lower threshold must be recorded in `tasks.md` with human approval.
 
 ## Output Format
 
@@ -41,14 +65,21 @@ Write run report to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/test-runs/TESTRUN-<fea
 
 Report contents:
 - Suite-by-suite results (unit / integration / E2E / acceptance)
-- Pass rate against convergence threshold
+- Executed test count vs expected test count from certification
+- Test file hash verification results
+- Pass rate against convergence threshold, including threshold source
 - Success-silent / failure-loud evidence handling:
   - passing suites should be summarized briefly
   - failing suites should include exact failure output or an offload path if large
 - Failure clusters with:
   - Test names and spec references they cover
   - Likely failure owner (Programmer, Architect, Spec)
-  - Flaky/non-deterministic test notes (do not count these in pass rate)
+  - Flaky/non-deterministic test notes. Flaky tests block advancement unless
+    already listed in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/known-flaky-tests.md`
+    with `test_id`, `approved_by`, `approved_at`, `reason`,
+    `stabilization_owner`, `stabilization_ticket`, and `expires_at` fields.
+    Malformed or expired registry entries do not count. Accepted known-flaky
+    exclusions must still be reported to Coordinator as stabilization work.
 - **Coverage Report** section:
   - Active coverage profile (source: `tasks.md` constraints or defaults)
   - Coverage artifact strategy: per-suite files + merged report path used for gate evaluation
@@ -62,15 +93,22 @@ Report contents:
   - Uncovered lines justification:
     - For every remaining uncovered line in changed/high-priority runtime code, include a concrete reason and next action
     - If no acceptable reason exists, explicitly state: "No valid justification — additional tests/refactor required"
-- Route recommendation to Coordinator:
-  - Test failures → Programmer
-  - Coverage gaps → TDD Agent for triage (TDD determines whether each uncovered path maps to a spec requirement; if it does not, TDD flags it to Coordinator for Refactor dispatch)
+- Coordinator classification summary:
+  - Test failures: classify as `IMPLEMENTATION_FIX_REQUIRED`
+  - Coverage gaps: classify as `COVERAGE_TRIAGE_REQUIRED`
   - Touched-file regression → flag to Coordinator; Coordinator determines whether Programmer or TDD is responsible
 
 ## Escalation Rules
 - Test certification hash does not match active spec hash — stop and escalate before running
+- Test file hash inventory does not match files on disk — stop and report
+  `TDD_RECERTIFICATION_REQUIRED` or `HUMAN_REVIEW_REQUIRED` to Coordinator
+  before running
 - Suite infrastructure failure (test runner crash, environment issue) — escalate, do not report partial results as meaningful
+- Empty suite / zero executed tests / skipped-only run — escalate, do not report as passing
 - Coverage tool fails to produce output — escalate; do not report pass/fail results without coverage data (partial evidence is misleading)
+- Flaky test detected — block advancement and report stabilization need to
+  Coordinator unless a non-expired known-flaky human-approved exclusion exists
+  with the required fields
 - Touched-file coverage regression detected — flag to Coordinator before advancing to Code Review
 - Any hard gate metric fails (unit 98% / integration 90% / e2e 80% by default, or active custom profile) — block advancement and include explicit failure reasons plus required next routing
 - Uncovered lines remain without acceptable justification — block advancement and route for additional tests or refactor
@@ -78,6 +116,14 @@ Report contents:
 ## Guardrails
 - Do not write new tests
 - Do not modify tests to make them pass
-- Mark non-deterministic test failures as flaky — do not count them as failures or as passes
+- Mark non-deterministic failures as flaky only after immediate targeted retry
+  evidence shows non-determinism: rerun the failing test or smallest failing
+  shard two additional times in the same environment and record pass/fail output,
+  timing, order, and relevant environment notes. Flaky tests block advancement
+  like failures unless listed in the known-flaky registry with human approval,
+  stabilization owner, stabilization ticket, and non-expired approval.
 - Report exact failure output, not a summary, when a suite fails
 - Do not flood active context with routine passing output
+- Large failure outputs over 500 lines should be written to
+  `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/test-failures/<feature-id>-<suite>-<YYYY-MM-DD-HHmm>.log`
+  and referenced from the report as `Full output: <path>`.

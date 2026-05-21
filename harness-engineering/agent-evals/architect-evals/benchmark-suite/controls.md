@@ -15,6 +15,9 @@ Negative controls:
   regulated release windows
 - `SEED-AR-31` — do not invent compliance/auditability from generic replay and observability needs
 - `SEED-AR-35` — do not invent performance requirements without explicit latency or throughput targets
+- `SEED-AR-43` — do not invent tenant isolation from role-scoped internal RAG workspaces
+- `SEED-AR-50` — do not invent data consistency from read-only API aggregation
+- `SEED-AR-59` — do not invent disaster recovery from replayable event logs alone
 
 Regression controls:
 
@@ -27,6 +30,8 @@ Why these packs exist:
   parts of the scorecard.
 - Negative controls measure false-positive behavior on optional-axis
   activation.
+- The breadth expansion also uses negative controls to measure conditional-skill
+  restraint, not just optional-axis restraint.
 - Regression control preserves the new modularity/modifiability distinction.
 - `SEED-AR-04` was reclassified from a negative control to a standard seed
   after external audit showed the fixture legitimately contains audit-trail

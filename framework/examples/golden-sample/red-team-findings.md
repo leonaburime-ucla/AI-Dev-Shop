@@ -3,7 +3,7 @@
 - Spec version: 1.1.0
 - Spec hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
 - Red-Team completed: 2026-02-22T01:00:00Z
-- Finding count: 0 BLOCKING · 2 ADVISORY · 0 CONSTITUTION-FLAG
+- Finding count: 0 BLOCKING · 2 ADVISORY · 0 CONSTITUTION_FLAG
 
 ---
 
@@ -35,7 +35,7 @@ Disposition: ADVISORY — no spec change required unless the team uses Windows E
 
 ---
 
-## CONSTITUTION-FLAG Findings
+## CONSTITUTION_FLAG Findings
 
 None.
 

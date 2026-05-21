@@ -48,7 +48,20 @@ Evaluate every change across all dimensions. Do not skip any.
 ### 3. Test Quality
 - Do tests cover the spec requirements, not just implementation details?
 - Is the test certification record present and current (spec hash matches)?
+- Is the Coordinator-supplied verification packet present and PASS for the same
+  spec hash, with the packet path and hash provided in the Coordinator handoff?
+- Does the Coordinator-supplied packet show certified test-file hash
+  verification and executed test count at or above the expected count from the
+  certification record?
+- Did required suites and coverage gates pass using machine-readable artifacts,
+  or are skipped suites explicitly marked N/A by `tasks.md` constraints?
 - Are there tests for the unhappy paths defined in the spec?
+- Do P1 acceptance criteria and invariants have inspectable assertion coverage?
+  For each P1 AC, at least one assertion should compare values that trace to the
+  AC actor/action/outcome. For each invariant, at least one assertion should
+  prove the invariant across the relevant state transition or input class. Mock
+  call counts, type presence, generic truthiness, and exception-only assertions
+  without observable result or error-content checks do not satisfy this coverage.
 - Are any tests asserting implementation internals instead of behavior?
 
 ### 4. Code Quality and Maintainability
@@ -117,14 +130,16 @@ Every retained code review report must include:
 - Missing adversarial aggregate/cross-item evidence: <yes/no/n/a>
 - Required fixes: <summary or none>
 - Recommended refactors: <summary or none>
-- Suggested next route: Programmer | Refactor | Security | Architect | None
+- Suggested Coordinator classification: IMPLEMENTATION_FIX_REQUIRED | TDD_RECERTIFICATION_REQUIRED | TEST_EVIDENCE_INVALID | COVERAGE_TRIAGE_REQUIRED | SPEC_REVISION_REVIEW_REQUIRED | REFACTOR_RECOMMENDED | SECURITY_REVIEW_REQUIRED | ARCHITECTURE_REVIEW_REQUIRED | HUMAN_REVIEW_REQUIRED | NONE
 ```
 
 Use `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` for the
 thresholds. Missing required assessments, Critical findings, and scores below 80
 are Required findings. Scores in the `80-89` debt band are Recommended only when
 the Programmer already attempted one local fix cycle and the remaining debt is
-documented.
+documented. The local fix cycle must be evidenced by the diff, progress ledger,
+or handoff table. A claim without changed structure, or a comments/rename-only
+change, is treated as missing debt-band evidence and becomes a Required finding.
 Missing function-quality handoff tables, missing score skepticism passes for
 all-100 non-trivial changes, and missing adversarial aggregate/cross-item tests
 for rule or batch workflows are Required when they hide correctness, coverage,
@@ -165,16 +180,24 @@ Programmer Agent to move logic. TestRunner to verify tests remain green.
 ## Interaction with Other Agents
 
 **Receives from**: Coordinator, after Programmer Agent completes implementation
+and the Coordinator supplies current verification evidence for the active spec
+hash. If the Coordinator explicitly requests advisory-only review without that
+evidence, state that limitation and do not present the result as ship-ready.
 
-**Calls**: Refactor Agent to analyze Recommended findings
+**Calls**: None directly. Code Review reports findings to Coordinator.
+Coordinator decides whether to dispatch Programmer, TDD, Refactor, Security,
+Architect, or Spec.
 
 **Routes to Coordinator**:
-- Required findings → Programmer Agent
-- Architecture violations → Architect Agent (for pattern clarification or ADR update)
-- Security surface changes → Security Agent
-- Spec misalignment → Spec Agent
+- Required implementation findings → Coordinator, classified as `IMPLEMENTATION_FIX_REQUIRED`
+- Required test-quality, stale certification, semantic assertion, test hash, or
+  missing required coverage evidence findings → Coordinator, classified as
+  `TDD_RECERTIFICATION_REQUIRED` or `TEST_EVIDENCE_INVALID`
+- Architecture violations → Coordinator, classified as `ARCHITECTURE_REVIEW_REQUIRED`
+- Security surface changes → Coordinator, classified as `SECURITY_REVIEW_REQUIRED`
+- Spec misalignment → Coordinator, classified as `SPEC_REVISION_REVIEW_REQUIRED`
 
-**Outputs**: Findings ordered by severity with file-level references, required vs recommended distinction, and route recommendation for each finding.
+**Outputs**: Findings ordered by severity with file-level references, required vs recommended distinction, and Coordinator classification for each finding.
 
 ## Review Anti-Patterns
 

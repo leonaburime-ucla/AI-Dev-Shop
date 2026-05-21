@@ -140,8 +140,10 @@ class RegressionFailure(AssertionError):
 
 
 def classification(index: int) -> tuple[str, str, str, str, str]:
-    if index <= 4:
+    if index <= 3:
         return "textbook", "na", "single", "Easy", "positive_control"
+    if index <= 4:
+        return "textbook", "na", "single", "Medium", "positive_control"
     if index <= 8:
         return "production", "na", "combined", "Medium", "standard"
     if index <= 22:
