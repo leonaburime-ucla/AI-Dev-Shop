@@ -1,7 +1,7 @@
 ---
 name: system-design
-version: 1.0.0
-last_updated: 2026-03-18
+version: 1.1.0
+last_updated: 2026-05-29
 description: Use when designing macro system topology, estimating scale, evaluating distributed-systems tradeoffs, or drafting a technical architecture spec. Keeps system-blueprint and ADR work grounded in explicit requirements, capacity, reliability, and operational decisions.
 ---
 
@@ -32,6 +32,7 @@ Read this file for the runtime contract. Open references only when needed:
 
 - `references/requirements-and-capacity.md` for requirements framing, estimates, and high-level component shaping
 - `references/distributed-systems-patterns.md` for storage, cache, queue, reliability, scaling, and tradeoff patterns
+- `references/distributed-systems-decision-triggers.md` when a design has replicated state, multi-region availability, distributed writes, cross-service transactions, or leader/coordinator concerns
 - `references/operational-depth-patterns.md` for production-depth operational patterns: hot keys, idempotency, deduplication, concurrency failures, graceful degradation, rate limiting, secrets, auth, abuse detection, and more
 - `references/architecture-spec-template.md` for a generic architecture-document structure
 - `references/apple-platform-architecture.md` only when the target is iOS/macOS or the source material needs Apple-platform translation
