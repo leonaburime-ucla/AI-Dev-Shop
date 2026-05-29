@@ -114,6 +114,69 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - `harness-engineering/harness-evals/` — 3 suites, 20 seeds, structured JSON grading
 - Items 9-10 closed (existing surfaces sufficient, terminology already correct)
 
+### Claude Audit Follow-Ups: `audit-work` + `specs_as_built` Patch Set **[OPEN]**
+**Source:** Claude external audit on 2026-05-25, raw result at `ADS-project-knowledge/.local-artifacts/external-audit/offloads/20260525T040204Z-needed-audit/claude/claude-audit.result.md`.
+**Audit outcome:** No blockers or high-risk fixes. Claude marked both findings as medium and non-blocking.
+**What to add:**
+- `harness-engineering/validators/validate_contracts.py`: reject angle-bracket template placeholders in live host declarations. `field_has_content()` should treat values like `<HOST_PROJECT_ROOT>` and `<ADS_PROJECT_KNOWLEDGE_ROOT>` as unfilled placeholders, matching the placeholder behavior in `validate_specs_as_built_freshness.py`.
+- `harness-engineering/validators/validate_specs_as_built_freshness.py`: validate `status` against the allowed enum: `generated`, `hybrid`, `stale`, `rewriting`. Emit a clear warning such as `INVALID_STATUS_VALUE` when metadata uses an unknown status.
+**Done when:**
+- Targeted validator tests or fixtures prove placeholder host declarations are rejected.
+- Targeted validator tests or fixtures prove invalid specs-as-built status values are reported clearly.
+- `python3 harness-engineering/validators/validate_contracts.py`, `python3 harness-engineering/validators/validate_specs_as_built_freshness.py`, and `bash harness-engineering/validators/run-all.sh` pass.
+
+### State-of-the-Art Harness Engineering Gaps From 2026 Video Review **[OPEN]**
+**Source:** User-provided transcript of "Rethinking AI Agents: The Rise of Harness Engineering"; gap list consolidated from Coordinator, Claude, and Gemini review passes.
+**What it is:** Advanced harness concepts that go beyond the current repo's strong NLH-style pipeline, contracts, state files, validators, evaluator loops, and load-bearing audit doctrine.
+**Why it matters:** The repo already matches much of the video's baseline advice. These items target the next maturity layer: trace-driven optimization, measurable pruning, cross-model transfer, programmatic safety, and cost-aware orchestration.
+**Current state:** **[PARTIAL]** Many foundations exist in `harness-engineering/`, `framework/workflows/`, `framework/contracts/`, and `skills/swarm-consensus/`, but most of these gaps are policy/manual today rather than automated, benchmark-backed harness behavior.
+**Eval requirement:** Every item below needs an explicit evaluation path before it is treated as implemented. Add seeded evals, ablation tasks, adversarial fixtures, or validator regression cases that can show quality, safety, cost, latency, or transferability deltas before and after the harness change.
+**What to add:**
+- **Meta-Harness trace-driven optimizer:** Add a workflow where failed raw traces are mined by a proposer that suggests harness edits, produces a patch branch or retained proposal, runs benchmark/eval packs, and records accept/reject evidence. Keep human or Coordinator approval before landing harness changes.
+- **Raw trace preservation for optimization:** Strengthen `harness-engineering/runtime/context-offloading.md` and trace docs so optimization runs preserve raw execution traces, tool outputs, stderr, prompts, and failure artifacts. Summaries are allowed for chat, but must not replace raw traces as optimizer input when raw evidence exists.
+- **Acceptance-gated narrowing-first attempt loop:** Add a runtime policy that starts with the narrowest plausible context/tool surface, accepts only evidence-backed progress, and broadens scope/tools/delegation only after explicit failure signals. This should upgrade flat retry budgets into "stay narrow until the evidence justifies widening."
+- **Cross-model harness transfer testing:** Extend `harness-engineering/quality/model-upgrade-program.md` so a harness improvement proven on one model is tested against other available models, including cheaper models, and reported as a transferable harness asset when it improves multiple model families.
+- **NLH representation-quality ablations:** Add guidance and evals for testing whether rewriting the same harness logic in clearer natural-language harness form improves results. Treat representation shape, wording, layer boundaries, and file structure as measurable performance drivers.
+- **Verifier and multi-candidate harm warnings:** Update load-bearing audit guidance to explicitly test whether added verifiers, broad evaluator gates, or multi-candidate search reduce quality, latency, or cost. Do not assume more verification is always better.
+- **Programmatic safety DSL / action-veto layer:** Move high-risk markdown-only rules toward machine-enforced policy where feasible: agent permission manifests, command/path validators, destructive-command deny rules, write-scope leases, secret-read blocking, and tests that prove unsafe actions are vetoed before execution.
+- **Shared harness artifact and skill vulnerability scanning:** Extend `skills-inbox` and registry validation with explicit checks for prompt-injection text, dangerous tool instructions, hidden network/write behavior, ambiguous authority claims, and vulnerable community-contributed skills before adoption.
+- **Cost/token-aware harness selection:** Add run-level budget capture and selection guidance so the Coordinator can choose between simple, evaluator, multi-agent, or consensus paths based on expected value, quality risk, latency, token cost, and user budget.
+- **NLH three-layer separation:** Formalize the current implicit split into swappable layers: backend/tools, runtime charter/policy, and task-specific agent logic. Use this to enable cleaner ablations: swap one layer while holding the others fixed.
+- **Trace mining and observability dashboard:** Build on `framework/workflows/trace-schema.md` with an aggregator that reports failure rate by stage, retry clusters, token/cost trends, slow stages, stale dispatches, and recurring harness-rule violations.
+- **Harness-model co-evolution watch item:** Track as a research frontier rather than immediate implementation: whether harness strategies should inform model fine-tuning or model selection, and whether model behavior changes should feed back into harness pruning.
+**Evaluation work to add alongside the gaps:**
+- Create a dedicated harness-gap eval suite under `harness-engineering/harness-evals/` or `harness-engineering/agent-evals/` for these state-of-the-art gaps.
+- For each new harness rule, define at least one positive seed that should pass, one negative/adversarial seed that should be blocked or caught, and one regression seed from a prior real failure when available.
+- For optimization and pruning work, require before/after ablation runs that record quality first, then token count, wall-clock latency, tool-call count, and failure recovery.
+- For cross-model transfer work, run the same seed pack across at least two model families or tiers and report whether the harness change transfers, regresses, or is model-specific.
+- For programmatic safety work, include executable validator tests that prove unsafe commands, out-of-scope writes, secret reads, and prompt-injection-shaped artifacts are rejected.
+- For trace-driven work, keep raw trace fixtures as eval inputs so the evaluator can compare raw-trace optimization against summary-only optimization.
+**Likely files to inspect/update first:**
+- `harness-engineering/runtime/context-offloading.md`
+- `harness-engineering/runtime/tripwires.md`
+- `framework/workflows/job-lifecycle.md`
+- `framework/workflows/trace-schema.md`
+- `harness-engineering/quality/load-bearing-harness-audit.md`
+- `harness-engineering/quality/model-upgrade-program.md`
+- `harness-engineering/quality/evaluation-loops.md`
+- `harness-engineering/harness-evals/`
+- `harness-engineering/agent-evals/`
+- `harness-engineering/quality/scripts/score_eval_suite.py`
+- `harness-engineering/validators/validate_eval_suite.py`
+- `harness-engineering/skills-inbox/skills-librarian-policy.md`
+- `framework/governance/tool-permission-policy.md`
+- `harness-engineering/validators/`
+**Done when:**
+- At least one retained meta-harness proposal is generated from raw failure traces and accepted or rejected with benchmark evidence.
+- Raw trace retention is a hard rule for optimization runs.
+- Retry behavior has an explicit narrowing-first gate before broadening context/tools/delegation.
+- Harness changes can be compared across at least two model families or model tiers.
+- Load-bearing audits explicitly evaluate verifier/search overhead as potentially harmful.
+- High-risk agent actions have at least one machine-enforced veto path instead of markdown-only instruction.
+- External skill ingestion includes vulnerability/prompt-injection scanning before adoption.
+- Run summaries include cost/token/latency data sufficient to compare harness variants.
+- Each added gap has at least one retained eval, ablation report, or validator regression test proving the harness change works and does not create an obvious regression.
+
 ### Specialized Harness Follow-Ons From Video **[OPEN]**
 **Source video:** `https://www.youtube.com/watch?v=I2K81s0OQto`
 **What it is:** Follow-up ideas from a harness-engineering video focused on specialized multi-stage business workflows, deterministic rails, subagents, observability, and checkpointed execution.
@@ -174,6 +237,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **Known issue:** Consensus runs can still misreport exact peer model/version identifiers in some environments; preflight/version capture needs stricter normalization and verification.
 **What to add:**
 - Normalize and verify peer model/version reporting across CLI outputs so preflight and reports always show accurate model IDs and versions.
+- i think we should have in /cowork /debate and /audit have heartbeats to make sure something is fine and maybe extend the
+  times to let the other LLMs finish.
 
 ---
 
@@ -246,6 +311,54 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Per-complexity-category catch rates are reported in eval summaries
 - Category-level misses directly inform which skills to build next
 - The eval creation protocol structurally prevents future suites from being all-textbook
+
+### Fixing Programmer Evals **[OPEN]**
+**Source:** Opus 4.6 eval run on 2026-05-29. Scored 95.9% (71/74 CAUGHT, 3 MISSED, 0 PARTIAL). Run exposed structural weaknesses in the eval design rather than meaningful agent skill gaps.
+**What it is:** The programmer eval suite has design issues that inflate scores and fail to test actual programmer skills (code production, test iteration, design decisions under ambiguity).
+**Why it matters:** A 95.9% score looks strong, but the eval is testing code review ability, not programmer ability. It also lacks negative controls, so false-positive rates are unmeasured.
+**What to fix:**
+
+1. **Reduce repetitive template seeds.** ~30 of the 74 seeds follow the same pattern across all 9 evals: "SRP violation," "non-injectable clock/dependency," "tests don't cover X," "scores overstated." Once the model recognizes the checklist template, it can mechanically hit all of them. Replace repetitive slots with domain-specific seeds unique to each fixture.
+
+2. **Add negative controls.** The CR evals have 14 NC seeds testing false-positive restraint; the programmer evals have zero. The agent can flag everything aggressively with no penalty. Add 1-2 NCs per eval (correct-but-unusual patterns that should NOT be flagged as issues).
+
+3. **Make it actually test programmer skills.** The current rubric is "did you identify the issue" — identical to the CR eval's scoring. A real programmer eval should require: producing working code, running tests, iterating when tests fail, making design tradeoff decisions. Add execution-based scoring: does the fix compile, do tests pass, is the fix correct?
+
+4. **Reduce spec-guided bug hunting.** The brief often tells you exactly where to look (e.g., "deduplicate same userId + templateId" directly points to the dedup key). Harder evals would have vaguer requirements requiring the agent to infer what's wrong from operational behavior or domain knowledge, not from AC wording.
+
+5. **Add large-noise fixtures.** All evals are 100-300 lines with 7-9 planted bugs (~1 bug per 20-40 lines). Real code has one subtle bug per thousands of lines. Add 2-3 evals with 800-1500 lines, distractor modules, harmless suspicious code, and only 3-5 real seeded issues to test signal-to-noise discrimination.
+
+6. **Resolve mixed seed ownership.** SEED-1D and SEED-1I are explicitly marked "Expected owner: Code Review" not "Programmer." Either remove them from the Programmer eval scoring or reclassify them as cross-cutting seeds with adjusted expectations.
+
+7. **Add difficulty tiering.** The CR evals have Easy/Medium/Hard with domain complexity (textbook → principal). The programmer evals are all roughly "medium" with no tiering. Add difficulty levels and ensure at least 30% of seeds are Hard (requiring deep domain reasoning, not just pattern recognition).
+
+8. **Differentiate evals 6-9 from 1-5.** Evals 6-9 use `SEED-CL-XX` (checklist) format and test function-quality checklist items rather than domain correctness. The trick seeds are the only ones with real programmer-level challenge. Either unify the format and difficulty profile, or explicitly split into "domain correctness" and "code quality checklist" sub-suites with separate scoring.
+
+**Done when:**
+- At least 10 negative control seeds exist across the suite
+- At least 3 evals include execution-based scoring (fix must pass tests)
+- Repetitive template seeds (SRP, non-injectable clock, tests-missing, scores-overstated) reduced to max 2 instances each across the full suite
+- At least 2 large-noise fixtures (800+ lines) exist
+- Difficulty tiering is applied to all seeds with min 30% Hard
+- A strong agent that scores 95%+ on the current suite scores measurably lower on the redesigned version
+
+### Code Review Hard-Mode Benchmark Extension **[OPEN]**
+**Source:** User-provided external AI run summary after the upgraded Code Review suite produced a `100%` detection rate with `0` false positives. The external reviewer judged the suite internally consistent and production-realistic, but noted that top Code Review agents may now recognize repeated fixture patterns.
+**What it is:** Add a harder extension layer for Code Review evals that tests signal-to-noise, vague requirements, and non-repetitive production traps rather than explicit-spec treasure hunting.
+**Why it matters:** The current Code Review suite is strong as a staff+ explicit-spec review benchmark, but a 100% run means it may not separate the best Code Review agents. The repeated "missing tests" and "observability dimensions missing" seeds can inflate scores once a model learns the template.
+**Current state:** Code Review benchmark metadata validates with `75` seeds and staff+ depth floors satisfied, but the suite still has `0 benchmark_full` runs and should be treated as pilot until scored repeatedly.
+**What to add:**
+- **Blind / weak-spec evals:** Add fixtures with vague business goals, operational constraints, and partial handoffs so the reviewer must infer invariants instead of matching explicit AC wording.
+- **Large-noise fixtures:** Add 2-3 Code Review evals with roughly 800-1500 lines, distractor modules, harmless suspicious code, and only 5-7 real seeded issues.
+- **Reduce repeated patterns:** Do not include one observability seed and one missing-test seed in every eval. Replace several with config rollout, compatibility, data-modeling, operational cost, incident recovery, and rollback traps.
+- **Stricter scoring for soft seeds:** For missing-test and observability seeds, require the exact missing causal case and exact fields for `CAUGHT`; otherwise score as `PARTIAL`.
+- **Embedded negative controls:** Place correct-but-suspicious patterns near real defects so agents must discriminate locally, not just avoid false positives globally.
+- **Less direct project briefs:** Keep specs realistic, but avoid AC phrasing that names the exact invariant to inspect, such as "idempotent before side effects." Prefer operational/business requirements that imply the invariant.
+**Done when:**
+- A hard-mode Code Review extension exists with weak-spec and large-noise fixtures.
+- The extension has less repetitive seed shape than the current benchmark.
+- At least one strong agent that scores near-perfect on the current suite misses or partially catches meaningful hard-mode seeds.
+- Scoring reports separate explicit-spec benchmark performance from hard-mode adversarial review performance.
 
 ---
 

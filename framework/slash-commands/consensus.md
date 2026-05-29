@@ -37,6 +37,7 @@ Act as a Swarm Consensus Coordinator.
    - Prefer serving the packet to peers as a self-contained `stdin` payload when it fits cleanly in one bounded prompt.
    - If a peer still needs file-based packet access, follow the shared transport fallback rules in `skills/llm-operations/references/peer-llm-dispatch.md`.
    - Do not promote a local-only packet into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` only to satisfy peer readability.
+   - In `debate` mode, apply the Debate Problem-Framing Guard from `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`: lead with the user's need and constraints, present candidate solutions as options rather than the expected answer, and require adversarial critique of failure modes and alternatives.
 7. Before dispatching any external peer LLM, write the exact peer-facing prompt/context packet to disk, show the user the file path and content, and wait for the user to reply `run`.
    - This preview gate is mandatory even when model resolution was already confirmed.
    - If the user flags an issue, revise the file and repeat the preview gate.

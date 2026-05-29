@@ -205,6 +205,29 @@ Write one focused prompt that contains:
 
 Keep it self-contained. The peer CLIs have no project context — everything they need must be in the prompt itself.
 
+### Debate Problem-Framing Guard (hard requirement)
+
+In `debate` mode, the Round 1 prompt must be framed around the user's need, constraints, and decision criteria before presenting any candidate solution.
+
+Rules:
+
+1. If the user has a preferred or likely solution, label it as one option, not as the proposed direction or expected answer.
+2. State the underlying need in neutral terms: what must be achieved and why it matters.
+3. Require peers to compare multiple viable designs, including at least one alternative that rejects or substantially changes the user's preferred option.
+4. Require peers to surface failure modes, hidden costs, and conditions that would make each option wrong.
+5. Do not use wording that implies the Coordinator has already selected the answer, such as "evaluate this excellent design", "confirm this approach", or "the desired direction is".
+6. If the user explicitly asks to validate a specific proposal, still ask peers to provide the strongest case against it before giving a verdict.
+7. If the packet cannot be made neutral because required context is itself a proposal, include a `Bias Risk` note in the packet and ask the user to approve that framing before dispatch.
+
+Recommended Round 1 shape:
+
+```text
+Need: <what we need>
+Constraints: <what must be preserved or avoided>
+Options to evaluate: <candidate A, B, C, including "something else">
+Adversarial task: identify the best design, reject weak options, and explain what evidence would change your answer.
+```
+
 ### Shared Context Packet Protocol
 
 Use a shared context packet when the question depends on brownfield repo knowledge, greenfield planning docs, or any project context too large or important to rely on an ad hoc prompt alone.

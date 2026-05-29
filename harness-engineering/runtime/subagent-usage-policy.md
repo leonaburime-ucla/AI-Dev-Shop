@@ -31,6 +31,10 @@ It does **not** mean:
 - sidecar review, grep-heavy analysis, or file mapping before implementation
 - independent parallel tracks with disjoint ownership
 - bounded specialist consultation where isolated context is clearly better
+- `/reverse-spec` when the current host resolves to `subagent-assisted`: spawned subagents handle CodeBase Analyzer inventory and bounded extraction passes or module chunks
+- `/code-review` when the current host resolves to `subagent-assisted`: spawned Code Review and Security subagents run in parallel after the Coordinator gate passes
+
+For command-level defaults, the Coordinator must say explicitly whether spawned subagents are being used or whether the run is downgraded to the active agent's single context. Include the downgrade phrase: `Say "single-agent mode" or "disable subagents" to run this sequentially.`
 
 ## Keep Work Local For
 

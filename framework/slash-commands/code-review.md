@@ -5,6 +5,20 @@ $ARGUMENTS
 This command is a Coordinator-owned gate. Code Review and Security receive
 scoped artifacts; they do not own upstream readiness checks.
 
+## Subagent Default
+
+Before the readiness gate dispatch, apply the Subagent Default Guard in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md`.
+
+If the current host resolves to `subagent-assisted` and the user has not requested `single-agent mode` or `disable subagents`, say:
+
+`Coordinator(Pipeline Mode): Defaulting /code-review to spawned subagents for Code Review and Security, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+
+After the readiness gate passes, spawn separate Code Review and Security subagents in parallel. Each spawned subagent must be explicitly bootstrapped with its repo persona file and must confirm that persona load before its output is treated as pipeline-valid. The Coordinator remains responsible for the readiness gate and for routing findings after both subagents report.
+
+If subagent support is unavailable, unverified, disabled, or the delegated bootstrap cannot be satisfied, say:
+
+`Coordinator(Pipeline Mode): Subagent default is not active for /code-review: <reason>. Running sequentially in this context instead.`
+
 Implementation has reached the convergence threshold only when the Coordinator
 verification packet is PASS for the active spec hash. Build or update it at
 `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
@@ -24,7 +38,7 @@ If any item fails, do not dispatch Code Review. Route stale certification,
 semantic test gaps, missing test hashes, missing required coverage artifacts, or
 test-quality defects to TDD; route valid failing tests to Programmer.
 
-When the gate passes, run Code Review and Security in parallel:
+When the gate passes, run Code Review and Security in parallel when the Subagent Default is active; otherwise run the same scoped reviews sequentially in this context:
 
 **Code Review Agent** — dispatch with:
 - Full diff of changed files

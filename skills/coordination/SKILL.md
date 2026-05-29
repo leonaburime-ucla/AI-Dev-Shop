@@ -44,7 +44,28 @@ lifecycle is a routing bug and must be corrected before use.
 8. **Discovery hygiene**: Use read-only discovery passes when broad exploration is needed so implementation context stays focused
 9. **Subagent mode resolution**: Default to helper-agent use only when the current host verifies support; otherwise stay in single-agent mode and explain why
 10. **Artifact intent classification**: Distinguish pipeline-required artifacts from optional retained reports and local scratch outputs before anything is written to disk
-11. **Debate routing guard**: Route debate requests to Swarm Consensus external peers by default and block accidental platform-subagent debates.
+11. **Command-level subagent default guard**: Default `/reverse-spec` and `/code-review` to spawned subagents when verified support is active, and announce that path before dispatch.
+12. **Debate routing guard**: Route debate requests to Swarm Consensus external peers by default and block accidental platform-subagent debates.
+
+## Command-Level Subagent Default Guard
+
+Check the Subagent Default Guard in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md` before ordinary delegated agent resolution for `/reverse-spec` and `/code-review`.
+
+When the current host resolves to `subagent-assisted` and the user has not asked for `single-agent mode` or `disable subagents`, these commands default to spawned subagents rather than only the active agent's current context:
+
+- `/reverse-spec`: use spawned subagents for CodeBase Analyzer inventory and bounded extraction passes or module chunks.
+- `/code-review`: use spawned Code Review and Security subagents in parallel after the Coordinator readiness gate passes.
+
+Before dispatch, explicitly tell the user which execution path is active:
+
+- `Coordinator(Pipeline Mode): Defaulting /reverse-spec to spawned subagents for CodeBase Analyzer inventory and bounded extraction passes, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+- `Coordinator(Pipeline Mode): Defaulting /code-review to spawned subagents for Code Review and Security, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+
+If subagent support is unavailable, unverified, disabled, or delegated bootstrap cannot be satisfied, say:
+
+`Coordinator(Pipeline Mode): Subagent default is not active for <command>: <reason>. Running sequentially in this context instead.`
+
+Any spawned subagent still must satisfy the delegated bootstrap and reserved-name validity guard below. If that guard cannot be satisfied, the command must downgrade to sequential execution instead of using a generic helper as pipeline-valid work.
 
 ## Debate Routing Guard (Blocking)
 

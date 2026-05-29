@@ -2,6 +2,30 @@
 
 This file is the source of truth for command-level routing guards that prevent similar-looking requests from being handled by the wrong workflow.
 
+## Subagent Default Guard
+
+When the user invokes `/reverse-spec` or `/code-review`, default to **spawned subagents** when all of these are true:
+
+- the current host resolves to `subagent-assisted`
+- the user has not requested `single-agent mode` or `disable subagents`
+- the delegated bootstrap and reserved-name validity guard in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` can be followed
+
+Condition 3 is a best-effort pre-check. If bootstrap fails at actual spawn time, issue the downgrade message below and continue sequentially.
+
+This must be user-visible before dispatch. Do not describe the run as only "the agent" doing the work when separate helper contexts will be used. Say which path is active and how to change it:
+
+- `/reverse-spec`: `Coordinator(Pipeline Mode): Defaulting /reverse-spec to spawned subagents for CodeBase Analyzer inventory and bounded extraction passes, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+- `/code-review`: `Coordinator(Pipeline Mode): Defaulting /code-review to spawned subagents for Code Review and Security, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+
+If subagent support is unavailable, unverified, disabled, or the delegated bootstrap cannot be satisfied, state the downgrade plainly before continuing:
+
+`Coordinator(Pipeline Mode): Subagent default is not active for <command>: <reason>. Running sequentially in this context instead.`
+
+Command-specific defaults:
+
+- `/reverse-spec`: use spawned subagents for CodeBase Analyzer inventory and each bounded extraction pass or module chunk. The Coordinator remains responsible for checkpoints, artifact routing, synthesis acceptance, and user-facing status.
+- `/code-review`: use spawned Code Review and Security subagents in parallel after the Coordinator readiness gate passes. The Coordinator remains responsible for readiness checks and routing findings after both subagents report.
+
 ## Debate Routing Guard (Blocking)
 
 When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or otherwise requests multiple agents/models to argue a question, default to **Swarm Consensus debate with external peer LLM CLIs** such as Claude, Gemini, Codex, or other configured external peers.
