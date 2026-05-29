@@ -16,5 +16,11 @@
     "repo": "supabase/agent-skills",
     "path": "skills/supabase-postgres-best-practices/SKILL.md",
     "canonical": "skills/supabase/SKILL.md"
+  },
+  {
+    "id": "handoff",
+    "repo": "mattpocock/skills",
+    "path": "skills/productivity/handoff/SKILL.md",
+    "canonical": "skills/handoff/SKILL.md"
   }
 ]

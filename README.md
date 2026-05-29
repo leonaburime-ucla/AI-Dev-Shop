@@ -101,6 +101,8 @@ cp -r AI-Dev-Shop-speckit/framework/slash-commands/ .claude/commands/
 
 Other hosts do not support native slash commands. For those, open the matching file in `framework/slash-commands/` and paste its contents manually.
 
+Built-in templates include staged delivery commands plus utility commands such as `/audit-work`, `/cowork`, and `/handoff`.
+
 ## First-Time Project Setup
 
 The easiest path is to ask your coding agent to run setup for you:

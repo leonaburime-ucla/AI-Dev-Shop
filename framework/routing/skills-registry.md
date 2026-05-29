@@ -68,12 +68,13 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
 | `skills/swarm-consensus/SKILL.md` | Coordinator (owns consensus dispatch; injects to other agents only when consensus mode is active) |
-| `skills/external-audit/SKILL.md` | Coordinator (packages current work for one external LLM auditor and synthesizes the result back to the user) |
+| `skills/external-audit/SKILL.md` | Coordinator (packages current work for one or more external LLM auditors and synthesizes cross-auditor findings back to the user) |
 | `skills/observability-implementation/SKILL.md` | Architect, Programmer, Security Agent |
 | `skills/incident-response/SKILL.md` | DevOps Agent, Coordinator (production incident routing), Observer (post-incident pattern analysis) |
 | `skills/data-engineering/SKILL.md` | Database Agent, Architect, Programmer |
 | `skills/developer-documentation/SKILL.md` | Docs Agent |
 | `skills/llm-operations/SKILL.md` | Architect, Programmer, Coordinator (via shared peer-dispatch rules used by external-audit and swarm-consensus) |
+| `skills/handoff/SKILL.md` | Coordinator, all agents when producing cross-session, cross-host, or next-agent continuation handoffs |
 | `skills/devops-delivery/SKILL.md` | DevOps Agent |
 | `skills/security-review/SKILL.md` | Security, Code Review, DevOps |
 | `skills/performance-engineering/SKILL.md` | TestRunner Agent, Architect |

@@ -76,8 +76,9 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 | `/code-review` | Code Review + Security | Required/Recommended findings + security report |
 | `/consensus` | Swarm Consensus | Multi-model consensus or debate report, depending on selected mode |
 | `/debate` | Swarm Consensus (`debate` mode shortcut) | Multi-model debate report with bounded rebuttal rounds |
-| `/audit-work` | External auditor review | Independent auditor findings plus Coordinator agree/disagree synthesis |
+| `/audit-work` | External auditor review | Independent findings from one or more external auditors plus Coordinator cross-auditor synthesis |
 | `/cowork` | Cowork Coordinator + external peer LLMs | Shared diagnosis, approved edit plan, leased file edits, peer verification, and test/audit outcome |
+| `/handoff` | Coordinator | Compact continuation document for another agent, host, or future session |
 | `/agent <name>` | Named agent (direct) | Enters Agent Direct Mode with the specified agent |
 | `/agent <name> consensus` | Named agent (direct + consensus) | Enters Agent Direct Mode and enables Swarm Consensus for debatable high-level questions |
 | `/agent vibecoder` | VibeCoder Agent (direct, optional) | Quick-and-dirty prototype output with minimal structure |
