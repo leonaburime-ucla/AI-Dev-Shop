@@ -1,309 +1,254 @@
-"""
-Inventory Tracker -- manages stock levels across multiple warehouses.
-
-Supports adjustments, bulk operations, transfers, capacity enforcement,
-aggregate reporting, and audit history.
-
-@overallScore 88/100 -- debt band, attempted local fix
-@qualityFindings
-- Medium: adjustStock could benefit from extracting validation into a
-  separate pure function. Added inline comments to clarify capacity logic.
-"""
-
+"""Distributed inventory allocation fixture for Code Review."""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Any, Optional, Protocol
-
-
-# --- Types ---
+from dataclasses import dataclass, field
 
 
 @dataclass
-class Warehouse:
-    id: str
-    name: str
-    max_capacity: int
+class ManualClock:
+    current_time: float = 0.0
+
+    def now(self) -> float:
+        return self.current_time
+
+    def advance(self, seconds: float) -> None:
+        self.current_time += seconds
+
+
+DEFAULT_CLOCK = ManualClock()
+CURRENT_TENANT = "tenant-default"
 
 
 @dataclass
-class StockLevel:
+class InventoryRecord:
+    tenant_id: str
     warehouse_id: str
-    product_id: str
+    sku: str
+    available: int
+    reserved: int = 0
+
+
+@dataclass(frozen=True)
+class Reservation:
+    reservation_id: str
+    tenant_id: str
+    warehouse_id: str
+    sku: str
     quantity: int
+    requester_id: str
+    expires_at: float
 
 
-@dataclass
-class StockAdjustment:
-    product_id: str
-    warehouse_id: str
-    quantity: int  # positive = add, negative = remove
-    adjusted_by: str  # user ID of requester
-
-
-@dataclass
-class AdminOverride:
-    admin_id: str
-    reason: str
-
-
-@dataclass
-class BulkAdjustmentResult:
-    succeeded: list[StockAdjustment]
-    failed: list[dict[str, Any]]  # [{'adjustment': StockAdjustment, 'error': str}]
-
-
-@dataclass
+@dataclass(frozen=True)
 class TransferRequest:
-    product_id: str
+    tenant_id: str
+    sku: str
     source_warehouse_id: str
     destination_warehouse_id: str
     quantity: int
     requested_by: str
 
 
-@dataclass
-class HistoryEntry:
-    timestamp: datetime
-    product_id: str
+@dataclass(frozen=True)
+class StockAdjustment:
+    tenant_id: str
+    adjustment_id: str
     warehouse_id: str
-    quantity_change: int
-    resulting_stock: int
-    adjusted_by: str
+    sku: str
+    quantity: int
+    reason_code: str
+    requested_by: str
 
 
-class Clock(Protocol):
-    def now(self) -> datetime: ...
+@dataclass(frozen=True)
+class AuditEntry:
+    timestamp: float
+    event: str
+    tenant_id: str
+    warehouse_id: str
+    sku: str
+    quantity: int
+    actor_id: str
+    metadata: dict[str, str] = field(default_factory=dict)
 
 
-class InventoryStore(Protocol):
-    async def get_stock(self, warehouse_id: str, product_id: str) -> int: ...
-    async def set_stock(self, warehouse_id: str, product_id: str, quantity: int) -> None: ...
-    async def get_warehouse(self, id: str) -> Optional[Warehouse]: ...
-    async def get_all_stock(self, product_id: str) -> list[StockLevel]: ...
-    async def add_history(self, entry: HistoryEntry) -> None: ...
-    async def get_history(
-        self, product_id: str, warehouse_id: Optional[str] = None
-    ) -> list[HistoryEntry]: ...
+class InventoryStore:
+    def __init__(self) -> None:
+        self.records: dict[tuple[str, str, str], InventoryRecord] = {}
+        self.audit_entries: list[AuditEntry] = []
+
+    def upsert(self, record: InventoryRecord) -> None:
+        self.records[(record.tenant_id, record.warehouse_id, record.sku)] = record
+
+    def get(self, tenant_id: str, warehouse_id: str, sku: str) -> InventoryRecord:
+        return self.records[(tenant_id, warehouse_id, sku)]
+
+    def adjust_available(
+        self,
+        tenant_id: str,
+        warehouse_id: str,
+        sku: str,
+        delta: int,
+    ) -> int:
+        record = self.get(tenant_id, warehouse_id, sku)
+        record.available += delta
+        return record.available
+
+    def add_audit(self, entry: AuditEntry) -> None:
+        self.audit_entries.append(entry)
 
 
-# --- Default clock ---
+class InventoryReadModel:
+    def __init__(self) -> None:
+        self.snapshots: dict[tuple[str, str, str], int] = {}
+
+    def publish(self, store: InventoryStore) -> None:
+        for key, record in store.records.items():
+            self.snapshots[key] = record.available
+
+    def available(self, tenant_id: str, warehouse_id: str, sku: str) -> int:
+        return self.snapshots.get((tenant_id, warehouse_id, sku), 0)
 
 
-class DefaultClock:
-    def now(self) -> datetime:
-        return datetime.now()
+class InventoryTracker:
+    def __init__(
+        self,
+        store: InventoryStore,
+        *,
+        clock: ManualClock | None = None,
+        tenant_id: str | None = None,
+        read_model: InventoryReadModel | None = None,
+    ) -> None:
+        self.store = store
+        self.clock = clock or DEFAULT_CLOCK
+        self.tenant_id = tenant_id or CURRENT_TENANT
+        self.read_model = read_model or InventoryReadModel()
+        self.reservations: dict[str, Reservation] = {}
+        self.applied_adjustments: set[str] = set()
 
+    def publish_snapshot(self) -> None:
+        self.read_model.publish(self.store)
 
-default_clock: Clock = DefaultClock()
+    def reserve(
+        self,
+        warehouse_id: str,
+        sku: str,
+        quantity: int,
+        requester_id: str,
+        *,
+        ttl_seconds: float = 300.0,
+    ) -> Reservation:
+        visible_available = self.read_model.available(self.tenant_id, warehouse_id, sku)
+        if visible_available < quantity:
+            raise ValueError("insufficient available stock")
 
-
-# --- Stock Adjustment ---
-
-
-async def adjust_stock(
-    adjustment: StockAdjustment,
-    deps: dict[str, Any],
-) -> int:
-    """
-    Adjusts stock for a product in a warehouse.
-
-    @complexity Time: O(1) per call (single get + set + history write).
-    @overallScore 88/100
-    @qualityFindings
-    - Medium: Validation and persistence are in the same function.
-      Added clarifying comments as local fix. Extraction deferred.
-    """
-    store: InventoryStore = deps["store"]
-    clock: Clock = deps.get("clock", default_clock)
-
-    current_stock = await store.get_stock(
-        adjustment.warehouse_id,
-        adjustment.product_id,
-    )
-
-    # Validate: no negative resulting stock
-    if adjustment.quantity < 0 and current_stock + adjustment.quantity < 0:
-        raise ValueError(
-            f"Insufficient stock: {current_stock} available, "
-            f"attempted to remove {abs(adjustment.quantity)}"
+        self.store.adjust_available(self.tenant_id, warehouse_id, sku, -quantity)
+        reservation = Reservation(
+            reservation_id=f"res-{len(self.reservations) + 1}",
+            tenant_id=self.tenant_id,
+            warehouse_id=warehouse_id,
+            sku=sku,
+            quantity=quantity,
+            requester_id=requester_id,
+            expires_at=self.clock.now() + ttl_seconds,
         )
-
-    # Validate: capacity check for additions
-    if adjustment.quantity > 0:
-        warehouse = await store.get_warehouse(adjustment.warehouse_id)
-        if warehouse:
-            # Capacity boundary: reject when new stock would reach or exceed max
-            new_stock = current_stock + adjustment.quantity
-            if new_stock >= warehouse.max_capacity:
-                raise ValueError(
-                    f"Capacity exceeded: warehouse {warehouse.id} has capacity "
-                    f"{warehouse.max_capacity}, would have {new_stock}"
-                )
-
-    new_stock = current_stock + adjustment.quantity
-    await store.set_stock(adjustment.warehouse_id, adjustment.product_id, new_stock)
-
-    # Record history
-    await store.add_history(
-        HistoryEntry(
-            timestamp=clock.now(),
-            product_id=adjustment.product_id,
-            warehouse_id=adjustment.warehouse_id,
-            quantity_change=adjustment.quantity,
-            resulting_stock=new_stock,
-            adjusted_by=adjustment.adjusted_by,
-        )
-    )
-
-    return new_stock
-
-
-# --- Bulk Adjustment ---
-
-
-async def bulk_adjust(
-    adjustments: list[StockAdjustment],
-    deps: dict[str, Any],
-    override: Optional[AdminOverride] = None,
-) -> BulkAdjustmentResult:
-    """
-    Applies multiple stock adjustments. Continues past individual failures.
-
-    @overallScore 85/100
-    @qualityFindings
-    - Medium: Error handling wraps adjust_stock in try/except.
-      Could use a Result type instead. Deferred for now.
-    """
-    result = BulkAdjustmentResult(succeeded=[], failed=[])
-
-    for adjustment in adjustments:
-        try:
-            # Apply admin override if present
-            effective_adjustment = (
-                StockAdjustment(
-                    product_id=adjustment.product_id,
-                    warehouse_id=adjustment.warehouse_id,
-                    quantity=adjustment.quantity,
-                    adjusted_by=override.admin_id,
-                )
-                if override
-                else adjustment
+        self.reservations[reservation.reservation_id] = reservation
+        self.store.add_audit(
+            AuditEntry(
+                timestamp=self.clock.now(),
+                event="reserved",
+                tenant_id=self.tenant_id,
+                warehouse_id=warehouse_id,
+                sku=sku,
+                quantity=quantity,
+                actor_id=requester_id,
             )
+        )
+        return reservation
 
-            await adjust_stock(effective_adjustment, deps)
-            result.succeeded.append(adjustment)
-        except Exception as err:
-            result.failed.append(
-                {
-                    "adjustment": adjustment,
-                    "error": str(err) if isinstance(err, Exception) else "Unknown error",
-                }
+    def transfer(self, request: TransferRequest) -> dict[str, int]:
+        source = self.store.get(
+            request.tenant_id,
+            request.source_warehouse_id,
+            request.sku,
+        )
+        if source.available < request.quantity:
+            raise ValueError("insufficient source stock")
+
+        source.available -= request.quantity
+        destination = self.store.get(
+            request.tenant_id,
+            request.destination_warehouse_id,
+            request.sku,
+        )
+        destination.available += request.quantity
+
+        self.store.add_audit(
+            AuditEntry(
+                timestamp=self.clock.now(),
+                event="transferred",
+                tenant_id=request.tenant_id,
+                warehouse_id=request.source_warehouse_id,
+                sku=request.sku,
+                quantity=-request.quantity,
+                actor_id=request.requested_by,
+                metadata={"destination": request.destination_warehouse_id},
             )
-
-    return result
-
-
-# --- Transfer ---
-
-
-async def transfer_stock(
-    request: TransferRequest,
-    deps: dict[str, Any],
-) -> dict[str, int]:
-    """
-    Transfers stock from one warehouse to another.
-
-    @overallScore 90/100
-    @qualityFindings
-    - Low: Could use a transaction wrapper for atomicity.
-    """
-    store: InventoryStore = deps["store"]
-    clock: Clock = deps.get("clock", default_clock)
-
-    # Validate source has enough stock
-    source_stock = await store.get_stock(request.source_warehouse_id, request.product_id)
-    if source_stock < request.quantity:
-        raise ValueError(
-            f"Insufficient stock for transfer: {source_stock} available "
-            f"in {request.source_warehouse_id}"
         )
+        return {
+            "source_available": source.available,
+            "destination_available": destination.available,
+        }
 
-    # Remove from source
-    new_source_stock = source_stock - request.quantity
-    await store.set_stock(
-        request.source_warehouse_id, request.product_id, new_source_stock
-    )
+    def adjustment_key(self, adjustment: StockAdjustment) -> str:
+        return f"{adjustment.tenant_id}:{adjustment.adjustment_id}:{adjustment.sku}"
 
-    # Add to destination
-    dest_stock = await store.get_stock(
-        request.destination_warehouse_id, request.product_id
-    )
-    new_dest_stock = dest_stock + request.quantity
-    await store.set_stock(
-        request.destination_warehouse_id, request.product_id, new_dest_stock
-    )
-
-    # Record history for both sides
-    now = clock.now()
-    await store.add_history(
-        HistoryEntry(
-            timestamp=now,
-            product_id=request.product_id,
-            warehouse_id=request.source_warehouse_id,
-            quantity_change=-request.quantity,
-            resulting_stock=new_source_stock,
-            adjusted_by=request.requested_by,
+    def apply_adjustment(
+        self,
+        adjustment: StockAdjustment,
+        *,
+        override_actor_id: str | None = None,
+    ) -> int:
+        key = self.adjustment_key(adjustment)
+        current = self.store.get(
+            adjustment.tenant_id,
+            adjustment.warehouse_id,
+            adjustment.sku,
         )
-    )
-    await store.add_history(
-        HistoryEntry(
-            timestamp=now,
-            product_id=request.product_id,
-            warehouse_id=request.destination_warehouse_id,
-            quantity_change=request.quantity,
-            resulting_stock=new_dest_stock,
-            adjusted_by=request.requested_by,
+        if key in self.applied_adjustments:
+            return current.available
+
+        current.available += adjustment.quantity
+        self.applied_adjustments.add(key)
+        actor_id = override_actor_id or adjustment.requested_by
+        self.store.add_audit(
+            AuditEntry(
+                timestamp=self.clock.now(),
+                event="adjusted",
+                tenant_id=adjustment.tenant_id,
+                warehouse_id=adjustment.warehouse_id,
+                sku=adjustment.sku,
+                quantity=adjustment.quantity,
+                actor_id=actor_id,
+                metadata={"reason_code": adjustment.reason_code},
+            )
         )
-    )
+        return current.available
 
-    return {"source_stock": new_source_stock, "destination_stock": new_dest_stock}
-
-
-# --- Aggregate Reporting ---
-
-
-async def get_total_stock(
-    product_id: str,
-    deps: dict[str, Any],
-) -> int:
-    """
-    Computes total stock for a product across all warehouses.
-
-    @overallScore 92/100
-    @qualityFindings
-    - Low: Simple aggregation, no complexity concerns.
-    """
-    store: InventoryStore = deps["store"]
-    all_stock = await store.get_all_stock(product_id)
-
-    return sum(level.quantity for level in all_stock)
-
-
-# --- History ---
-
-
-async def get_stock_history(
-    product_id: str,
-    deps: dict[str, Any],
-    warehouse_id: Optional[str] = None,
-) -> list[HistoryEntry]:
-    """
-    Retrieves stock history for a product, optionally filtered by warehouse.
-
-    @overallScore 95/100
-    @qualityFindings None
-    """
-    store: InventoryStore = deps["store"]
-    return await store.get_history(product_id, warehouse_id)
+    def reconcile_non_negative(self, tenant_id: str, sku: str) -> None:
+        for (record_tenant, warehouse_id, record_sku), record in self.store.records.items():
+            if record_tenant != tenant_id or record_sku != sku:
+                continue
+            if record.available < 0:
+                record.available = 0
+                self.store.add_audit(
+                    AuditEntry(
+                        timestamp=self.clock.now(),
+                        event="reconciled",
+                        tenant_id=tenant_id,
+                        warehouse_id=warehouse_id,
+                        sku=sku,
+                        quantity=0,
+                        actor_id="system",
+                    )
+                )

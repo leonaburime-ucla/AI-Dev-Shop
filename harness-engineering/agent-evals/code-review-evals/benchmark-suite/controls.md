@@ -2,15 +2,21 @@
 
 Suite kind: `benchmark`
 
-This suite is the canonical benchmark root for Code Review evals.
+This suite is the canonical root for Code Review evals. Current status is
+`pilot / depth-roadmap`; it is not yet a stable benchmark.
 
 ## Control Status
 
-- per-eval seeded fixtures exist for all 3 evals (easy, medium, hard)
+- per-eval seeded fixtures exist for 9 evals (order/payment saga,
+  notification failover/privacy, distributed inventory allocation, authz graph,
+  retry/idempotency queue, cache migration rollout, stream watermark
+  checkpoint, webhook signature rotation, and search projection depth batches)
 - `coverage-matrix.tsv` and `seed-catalog.tsv` are normalized to the current
-  validator taxonomy (`21` seeds, `21` coverage cells)
+  validator taxonomy (`75` seeds, `75` coverage cells)
 - suite-level controls now include `1` positive control, `2` negative
-  controls, and a retained regression pack
+  controls from the original suite, `12` staff+ negative controls from the
+  authz graph, retry/idempotency, cache migration, stream watermark, webhook
+  signature, and search projection batches, and a retained regression pack
 - per-eval `seed-ledger.md` files remain the detailed seed narrative source
 
 ## Current Rule

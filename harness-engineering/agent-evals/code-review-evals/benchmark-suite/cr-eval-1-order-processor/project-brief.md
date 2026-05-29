@@ -1,54 +1,49 @@
-# Order Processor — Project Brief
+# Order Processor Saga - Project Brief
 
 ## Overview
 
-A brownfield order processing module for an e-commerce platform. The module
-receives orders from an API gateway, validates them, persists them to a
-PostgreSQL database, and returns order confirmations.
+The order processor coordinates a payment capture, inventory reservation,
+promotion-credit ledger, fulfillment status machine, and tenant-scoped order
+lookup. The implementation moved from a synchronous request handler to a
+payment/order saga that must remain safe under retries, delayed gateway
+callbacks, reservation expiry, and compensation.
 
-This is an existing codebase that was "refactored and cleaned up" by the
-Programmer agent. Code Review should assess the current state of the code.
+This eval is intentionally focused on Code Review depth. The code looks like a
+reasonable saga implementation and the tests cover normal placement, duplicate
+receipt returns, and cancellation, but production failures emerge only when
+payment idempotency, inventory TTLs, compensation ledgers, tenant scoping, and
+status replay interact.
 
 ## Requirements
 
 ### Functional Requirements
 
-1. **Order creation**: Accept an order containing a customer ID, a list of line
-   items (product ID, quantity, unit price), and an optional discount code.
-2. **Validation**: Reject orders where:
-   - Customer ID is missing or empty
-   - Line items array is empty
-   - Any line item has a quantity of 0 or negative quantity
-   - Any line item has a negative unit price
-   - Total exceeds the customer's credit limit
-3. **Persistence**: Save valid orders to the `orders` table and each line item
-   to the `order_items` table.
-4. **Order total**: Computed as `SUM(quantity * unitPrice)` minus any applicable
-   discount.
-5. **Sorting**: Orders can be retrieved sorted by any column the caller
-   specifies.
-6. **Customer lookup**: When creating an order, look up the customer record to
-   verify credit limit.
-
-### Non-Functional Requirements
-
-1. Database queries should be efficient — avoid per-item queries when batch
-   operations are available.
-2. All user inputs must be validated and sanitized before use in queries.
-3. No sensitive customer data (credit card numbers, SSNs) should appear in
-   application logs.
+1. Payment capture must be idempotent before external side effects can be
+   retried.
+2. Inventory reservation TTL must outlive every payment capture and callback
+   path that can complete an order.
+3. Compensation must refund payment, release inventory, and reverse promotion
+   credits as one auditable saga step.
+4. Status events must enforce legal state transitions and reject replayed
+   callbacks for terminal states.
+5. Order lookup and status mutation must always be scoped by tenant.
+6. Saga telemetry must include order ID, tenant, payment intent, reservation
+   ID, idempotency key, and compensation ID.
+7. Tests must cover duplicate capture, reservation expiry, compensation
+   failures, tenant collisions, terminal-state replay, and telemetry fields.
 
 ### Acceptance Criteria
 
-- AC-1: Orders with valid data are persisted and a confirmation with order ID is
-  returned.
-- AC-2: Orders with 0 quantity line items are rejected with a clear error
-  message.
-- AC-3: Orders exceeding credit limit are rejected before persistence.
-- AC-4: Order listing supports caller-specified sort columns.
-- AC-5: No N+1 query patterns in the order creation path.
-- AC-6: No sensitive data in logs.
-
+- AC-1: A retried capture with the same idempotency key cannot double-charge.
+- AC-2: Payment success cannot confirm an order after its inventory reservation
+  expired and was released.
+- AC-3: Compensation failures are surfaced and do not mark the saga rolled
+  back.
+- AC-4: Replayed status callbacks cannot move terminal orders back to active
+  states.
+- AC-5: Cross-tenant order IDs cannot read or mutate another tenant's order.
+- AC-6: Saga logs and metrics expose enough fields to reconstruct failures.
+- AC-7: The test suite covers the interaction cases above.
 ## Spec Hash
 
-`spec-order-proc-v2-abc123`
+`spec-order-saga-v2-bcd890`

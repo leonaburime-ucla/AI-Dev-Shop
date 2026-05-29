@@ -1,284 +1,208 @@
-"""
-Notification Service -- sends messages via email, SMS, and push channels.
-
-Recently refactored: replaced untyped params with proper types,
-added retry logic, improved test coverage.
-"""
-
+"""Multi-channel notification dispatcher fixture for Code Review."""
 from __future__ import annotations
 
-import asyncio
-import math
-import time
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Literal, Optional, Protocol
+from typing import Literal
 
 
-# --- Types ---
-
-NotificationPriority = Literal["high", "medium", "low"]
-
-NotificationChannel = Literal["email", "sms", "push"]
-
-NotificationStatus = Literal["sent", "failed", "queued", "pending"]
+Channel = Literal["email", "sms", "push"]
+Priority = Literal["urgent", "normal", "low"]
+Status = Literal["sent", "suppressed", "failed", "duplicate"]
 
 
-@dataclass
-class NotificationRequest:
-    recipient_id: str
-    channel: NotificationChannel
-    body: str
-    priority: NotificationPriority
-    subject: Optional[str] = None
-    metadata: Optional[dict[str, str]] = None
-
-
-@dataclass
-class NotificationResult:
+@dataclass(frozen=True)
+class Notification:
+    tenant_id: str
     notification_id: str
-    status: NotificationStatus
-    channel: NotificationChannel
-    sent_at: Optional[datetime] = None
-    error: Optional[str] = None
+    user_id: str
+    channel: Channel
+    template_id: str
+    template_version: int
+    locale: str
+    priority: Priority
+    topic: str
+    payload: dict[str, str]
+    contains_sensitive_data: bool = False
 
 
-class ChannelProvider(Protocol):
-    async def send(self, recipient: str, message: str) -> dict[str, Any]:
-        """Return {'success': bool, 'error'?: str}."""
-        ...
+@dataclass(frozen=True)
+class ProviderResult:
+    accepted: bool
+    provider_message_id: str | None = None
+    error_code: str | None = None
+    retryable: bool = False
 
-    async def is_available(self) -> bool: ...
+
+@dataclass(frozen=True)
+class DispatchResult:
+    status: Status
+    channel: Channel
+    provider: str | None = None
+    provider_message_id: str | None = None
+    error_code: str | None = None
+
+
+class ProviderAdapter:
+    def __init__(
+        self,
+        name: str,
+        *,
+        hard_fail: bool = False,
+        timeout_first: bool = False,
+    ) -> None:
+        self.name = name
+        self.hard_fail = hard_fail
+        self.timeout_first = timeout_first
+        self.sent: list[tuple[str, str, str]] = []
+
+    def send(self, user_id: str, body: str, dedupe_key: str) -> ProviderResult:
+        self.sent.append((user_id, body, dedupe_key))
+        if self.timeout_first and len(self.sent) == 1:
+            return ProviderResult(
+                accepted=False,
+                provider_message_id=f"{self.name}-late-{len(self.sent)}",
+                error_code="timeout",
+                retryable=True,
+            )
+        if self.hard_fail:
+            return ProviderResult(
+                accepted=False,
+                error_code="provider-unavailable",
+                retryable=False,
+            )
+        return ProviderResult(
+            accepted=True,
+            provider_message_id=f"{self.name}-{len(self.sent)}",
+        )
+
+
+class PrivacyPolicy:
+    def __init__(self) -> None:
+        self.suppressed: set[tuple[str, str, Channel, str]] = set()
+
+    def suppress(
+        self,
+        tenant_id: str,
+        user_id: str,
+        channel: Channel,
+        topic: str,
+    ) -> None:
+        self.suppressed.add((tenant_id, user_id, channel, topic))
+
+    def is_suppressed(self, notification: Notification) -> bool:
+        return (
+            notification.tenant_id,
+            notification.user_id,
+            notification.channel,
+            notification.topic,
+        ) in self.suppressed
+
+
+class DedupeStore:
+    def __init__(self) -> None:
+        self.results: dict[str, DispatchResult] = {}
+
+    def key_for(self, notification: Notification) -> str:
+        return f"{notification.user_id}:{notification.notification_id}"
+
+    def get(self, key: str) -> DispatchResult | None:
+        return self.results.get(key)
+
+    def remember(self, key: str, result: DispatchResult) -> None:
+        self.results[key] = result
+
+
+class TemplateRenderer:
+    def __init__(self) -> None:
+        self.cache: dict[str, str] = {}
+
+    def render(self, notification: Notification) -> str:
+        if notification.template_id not in self.cache:
+            banner = (
+                "Sensitive update"
+                if notification.contains_sensitive_data
+                else "Notification"
+            )
+            self.cache[notification.template_id] = (
+                f"[{banner}] {notification.locale} v{notification.template_version}: "
+                "{body}"
+            )
+        template = self.cache[notification.template_id]
+        return template.format(**notification.payload)
+
+
+class NotificationAudit:
+    def __init__(self) -> None:
+        self.events: list[dict[str, object]] = []
+
+    def record(
+        self,
+        event: str,
+        notification: Notification,
+        result: DispatchResult,
+    ) -> None:
+        self.events.append(
+            {
+                "event": event,
+                "notification_id": notification.notification_id,
+                "status": result.status,
+            }
+        )
 
 
 @dataclass
-class NotificationRecord:
-    id: str
-    recipient_id: str
-    channel: NotificationChannel
-    body: str
-    formatted_body: str
-    priority: NotificationPriority
-    status: NotificationStatus
-    attempts: int
-    last_attempt_at: Optional[datetime] = None
-    sent_at: Optional[datetime] = None
-    error: Optional[str] = None
-
-
-class NotificationStore(Protocol):
-    async def save(self, notification: NotificationRecord) -> None: ...
-    async def find_by_id(self, id: str) -> Optional[NotificationRecord]: ...
-    async def find_pending(self, channel: NotificationChannel) -> list[NotificationRecord]: ...
-
-
-# --- Message Formatting ---
-
-
-def format_message(
-    channel: NotificationChannel,
-    subject: Optional[str],
-    body: str,
-) -> str:
-    """
-    Formats a message for the given channel. Pure function, no side effects.
-
-    @overallScore 95/100
-    @qualityFindings
-    - Low: Could accept a template registry for extensibility, but current
-      channel set is fixed and small.
-    """
-    if channel == "email":
-        return f"Subject: {subject}\n\n{body}" if subject else body
-    elif channel == "sms":
-        # SMS: truncate to 160 chars
-        return body[:157] + "..." if len(body) > 160 else body
-    elif channel == "push":
-        # Push: truncate to 100 chars, strip newlines
-        cleaned = body.replace("\n", " ")
-        return cleaned[:97] + "..." if len(cleaned) > 100 else cleaned
-    else:
-        return body
-
-
-# --- ID Generation ---
-
-notification_counter: int = 0
-
-
-def generate_notification_id() -> str:
-    global notification_counter
-    notification_counter += 1
-    return f"NOTIF-{int(time.time() * 1000)}-{notification_counter}"
-
-
-# --- Legacy code ---
-
-
-async def legacy_notify(
-    recipient: str,
-    message: str,
-    provider: ChannelProvider,
-) -> bool:
-    """
-    Legacy notification sender. Kept for backward compatibility.
-
-    .. deprecated:: Use send_notification instead.
-    """
-    try:
-        result = await provider.send(recipient, message)
-        return result["success"]
-    except Exception:
-        return False
-
-
-# --- Retry Logic ---
-
-
-def calculate_backoff(attempt: int) -> float:
-    return min(1000 * math.pow(2, attempt), 30000)
-
-
-async def _sleep(ms: float) -> None:
-    await asyncio.sleep(ms / 1000)
-
-
-# --- Rate Limiting ---
-
-# Rate limited to 100/sec
-
-
-# --- Core Send Logic ---
-
-
-async def send_notification(
-    request: NotificationRequest,
-    deps: dict[str, Any],
-) -> NotificationResult:
-    """
-    Sends a notification through the specified channel with retry support.
-
-    @overallScore 92/100
-    @qualityFindings
-    - Medium: Minor testability concern -- time.time() used in ID generation.
-      Consider injectable clock for deterministic IDs.
-    """
-    providers: dict[str, ChannelProvider] = deps["providers"]
-    store: NotificationStore = deps["store"]
-    provider = providers.get(request.channel)
-
-    if not provider:
-        raise ValueError(f"Unknown channel: {request.channel}")
-
-    # Check channel availability
-    available = await provider.is_available()
-    if not available:
-        id = generate_notification_id()
-        record = NotificationRecord(
-            id=id,
-            recipient_id=request.recipient_id,
-            channel=request.channel,
-            body=request.body,
-            formatted_body=format_message(request.channel, request.subject, request.body),
-            priority=request.priority,
-            status="queued",
-            attempts=0,
-        )
-        await store.save(record)
-        return NotificationResult(
-            notification_id=id, status="queued", channel=request.channel
-        )
-
-    # Format message
-    formatted_body = format_message(request.channel, request.subject, request.body)
-
-    # Attempt send with retries
-    id = generate_notification_id()
-    last_error: Optional[str] = None
-
-    for attempt in range(3):
-        try:
-            result = await provider.send(request.recipient_id, formatted_body)
-
-            if result["success"]:
-                record = NotificationRecord(
-                    id=id,
-                    recipient_id=request.recipient_id,
-                    channel=request.channel,
-                    body=request.body,
-                    formatted_body=formatted_body,
-                    priority=request.priority,
-                    status="sent",
-                    attempts=attempt + 1,
-                    sent_at=datetime.now(),
-                )
-                await store.save(record)
-                return NotificationResult(
-                    notification_id=id,
-                    status="sent",
-                    channel=request.channel,
-                    sent_at=record.sent_at,
-                )
-
-            last_error = result.get("error")
-        except Exception as err:
-            last_error = str(err) if isinstance(err, Exception) else "Unknown error"
-
-        if attempt < 2:
-            await _sleep(calculate_backoff(attempt))
-
-    # All retries exhausted
-    record = NotificationRecord(
-        id=id,
-        recipient_id=request.recipient_id,
-        channel=request.channel,
-        body=request.body,
-        formatted_body=formatted_body,
-        priority=request.priority,
-        status="failed",
-        attempts=3,
-        last_attempt_at=datetime.now(),
-        error=last_error,
-    )
-    await store.save(record)
-
-    return NotificationResult(
-        notification_id=id,
-        status="failed",
-        channel=request.channel,
-        error=last_error,
+class NotificationDispatcher:
+    providers: dict[Channel, ProviderAdapter]
+    policy: PrivacyPolicy = field(default_factory=PrivacyPolicy)
+    dedupe: DedupeStore = field(default_factory=DedupeStore)
+    renderer: TemplateRenderer = field(default_factory=TemplateRenderer)
+    audit: NotificationAudit = field(default_factory=NotificationAudit)
+    fallback_channels: dict[Channel, list[Channel]] = field(
+        default_factory=lambda: {"email": ["sms"], "push": ["sms"], "sms": []}
     )
 
+    def dispatch(self, notification: Notification) -> DispatchResult:
+        dedupe_key = self.dedupe.key_for(notification)
+        prior_result = self.dedupe.get(dedupe_key)
+        if prior_result is not None:
+            duplicate = DispatchResult(
+                status="duplicate",
+                channel=prior_result.channel,
+                provider=prior_result.provider,
+                provider_message_id=prior_result.provider_message_id,
+            )
+            self.audit.record("dedupe_hit", notification, duplicate)
+            return duplicate
 
-# --- Batch Processing ---
+        if self.policy.is_suppressed(notification):
+            result = DispatchResult(status="suppressed", channel=notification.channel)
+            self.dedupe.remember(dedupe_key, result)
+            self.audit.record("suppressed", notification, result)
+            return result
 
+        body = self.renderer.render(notification)
+        channels = [notification.channel, *self.fallback_channels[notification.channel]]
+        last_error: str | None = None
 
-async def process_pending_notifications(
-    channel: NotificationChannel,
-    deps: dict[str, Any],
-) -> list[NotificationResult]:
-    """
-    Processes pending notifications for a given channel.
+        for channel in channels:
+            provider = self.providers[channel]
+            provider_result = provider.send(notification.user_id, body, dedupe_key)
+            if provider_result.accepted:
+                result = DispatchResult(
+                    status="sent",
+                    channel=channel,
+                    provider=provider.name,
+                    provider_message_id=provider_result.provider_message_id,
+                )
+                self.dedupe.remember(dedupe_key, result)
+                self.audit.record("sent", notification, result)
+                return result
+            last_error = provider_result.error_code
 
-    @overallScore 88/100
-    @qualityFindings
-    - Medium: Processes all pending without pagination/limit. Acceptable for
-      current scale but should be bounded if volume grows.
-    """
-    store: NotificationStore = deps["store"]
-    pending = await store.find_pending(channel)
-    results: list[NotificationResult] = []
-
-    for record in pending:
-        result = await send_notification(
-            NotificationRequest(
-                recipient_id=record.recipient_id,
-                channel=record.channel,
-                body=record.body,
-                priority=record.priority,
-            ),
-            deps,
+        result = DispatchResult(
+            status="failed",
+            channel=notification.channel,
+            error_code=last_error,
         )
-        results.append(result)
-
-    return results
+        self.audit.record("failed", notification, result)
+        return result

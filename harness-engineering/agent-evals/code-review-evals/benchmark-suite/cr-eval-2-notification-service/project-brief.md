@@ -1,48 +1,49 @@
-# Notification Service — Project Brief
+# Multi-Channel Notification Dispatcher - Project Brief
 
 ## Overview
 
-A notification service that sends messages to users via multiple channels
-(email, SMS, push). Supports priority levels, retry logic, rate limiting,
-and message formatting templates.
+The notification service dispatches operational and marketing messages across
+email, SMS, and push providers. The implementation now supports provider
+failover, unsubscribe policy checks, template rendering with locale/version
+metadata, duplicate suppression, and audit events for delivery operations.
 
-The Programmer was asked to fix typing issues (previously `any` everywhere),
-add retry logic, and improve test coverage.
+This eval is intentionally focused on Code Review depth. The code and tests
+cover common success paths, but production failures emerge when duplicate
+suppression, provider failover, fallback channels, template cache keys, privacy
+rules, and audit evidence interact.
 
 ## Requirements
 
 ### Functional Requirements
 
-1. **Send notifications**: Accept a notification request with recipient, channel
-   (email/sms/push), message body, and priority level.
-2. **Priority levels**: `urgent`, `normal`, `low`. Priority determines retry
-   behavior and delivery ordering.
-3. **Message formatting**: Apply channel-specific formatting templates before
-   sending.
-4. **Retry logic**: Failed sends are retried up to 3 times with exponential
-   backoff. Retries must be idempotent — the same notification must not be
-   delivered twice.
-5. **Channel unavailability**: When a channel is temporarily unavailable, queue
-   the notification for later delivery and return a `queued` status.
-6. **Rate limiting**: Notifications are rate-limited to 100 per second per
-   channel to avoid overwhelming downstream providers.
-
-### Non-Functional Requirements
-
-1. Message formatting should be a pure function with no side effects.
-2. All timestamps should use injectable clocks for testability.
-3. Dead code should be removed before handoff.
+1. Duplicate suppression must be scoped by tenant, notification, channel, and
+   provider attempt so cross-tenant or cross-channel sends cannot collide.
+2. Provider failover must remain idempotent when a primary provider times out
+   after accepting a request and the dispatcher retries on a fallback channel.
+3. Privacy suppression must be evaluated for the actual channel that will be
+   used, including fallback channels.
+4. Templates must be rendered by tenant, template ID, locale, version, and
+   privacy classification. Cached templates must not cross those boundaries.
+5. Delivery audit events must include tenant, channel, provider, template
+   version, dedupe key, fallback reason, and suppression reason.
+6. Tests must cover cross-tenant duplicate keys, late primary success after
+   failover, fallback privacy suppression, template-version drift, provider
+   backoff, and audit evidence completeness.
 
 ### Acceptance Criteria
 
-- AC-1: Notifications with valid data are sent and confirmed.
-- AC-2: Priority uses the values `urgent`, `normal`, `low`.
-- AC-3: Failed sends are retried with idempotency keys.
-- AC-4: Channel unavailability returns `queued` status.
-- AC-5: Rate limiting enforced at 100/sec/channel.
-- AC-6: All timestamps use injectable clocks.
-- AC-7: No dead code in production paths.
+- AC-1: A duplicate notification retry for the same tenant/channel/provider
+  returns the prior result without sending again.
+- AC-2: A timeout followed by provider failover cannot deliver the same
+  notification twice.
+- AC-3: An SMS fallback is blocked when the user has suppressed SMS for the
+  topic, even if the original email channel was allowed.
+- AC-4: Template rendering uses locale, version, and privacy classification in
+  the cache boundary.
+- AC-5: Delivery audit events include enough dimensions to reconstruct
+  provider failover and suppression decisions.
+- AC-6: The test suite covers the cross-boundary cases above.
 
 ## Spec Hash
 
-`spec-notify-svc-v3-def456`
+`spec-notification-failover-v5-a91c2`

@@ -1,115 +1,74 @@
-# Seed Ledger — cr-eval-1-order-processor (CR-Easy)
+# Seed Ledger - cr-eval-1-order-processor (CR Staff+)
 
 **Eval ID**: benchmark-suite / cr-eval-1-order-processor
-**Purpose**: Test Code Review agent independently on pre-staged code with known bugs and a fake Programmer handoff.
-**Difficulty**: Easy — bugs are relatively surface-level and map directly to CR dimensions.
-
----
+**Purpose**: Test Code Review agent on order/payment saga defects involving
+external payment side effects, reservation TTLs, compensation, tenant scoping,
+status replay, and saga observability.
+**Difficulty**: Hard staff+ fixture with one easy positive control for baseline
+calibration.
 
 ## Seeds
 
-```
-ID:                  SEED-CR-01
-Category:            I/O shape / N+1
-Seeded issue:        Line items are inserted one-at-a-time in a loop (N+1 INSERT pattern) in createOrder().
-                     The handoff claims "AC-5: No N+1 queries — Done" and "Batch operations used where possible."
-CR Dimension:        6. Non-Functional Characteristics
-Expected severity:   Required
-Expected signal:     CR flags the for-loop with await db.query() per line item as N+1 I/O.
-Evidence path:       src/order_processor.py — createOrder(), the for-of loop near line 155
-Handoff deception:   Handoff claims AC-5 is done ("Batch operations used where possible").
-False positive risk: Low — this is textbook N+1.
-```
+### SEED-CR-01
 
-```
-ID:                  SEED-CR-02
-Category:            Security / SQL injection
-Seeded issue:        getOrders() interpolates the caller-provided sortBy string directly into SQL
-                     via template literal: ORDER BY ${sortBy}. This allows SQL injection.
-                     The handoff claims "Inputs validated" and "AC-6: No sensitive data in logs — Done."
-CR Dimension:        5. Security Surface
-Expected severity:   Required (Critical)
-Expected signal:     CR flags string interpolation in SQL as SQL injection risk. Should recommend
-                     allowlist of valid column names or parameterized sort.
-Evidence path:       src/order_processor.py — getOrders(), the template literal query
-Handoff deception:   Handoff claims inputs are validated. The sortBy parameter is NOT validated.
-False positive risk: None — this is a textbook SQL injection.
-```
+Payment capture happens before the durable idempotency record is written. A
+worker crash after capture but before recording the key can double-charge on
+retry.
 
-```
-ID:                  SEED-CR-03
-Category:            Spec alignment / validation gap
-Seeded issue:        Spec says "orders with 0 quantity should be rejected" (AC-2). The validateOrder()
-                     function only checks `quantity < 0`, not `quantity <= 0`. Zero-quantity items pass.
-                     The handoff claims "AC-2: Zero quantity rejected — Done."
-CR Dimension:        1. Spec Alignment
-Expected severity:   Required
-Expected signal:     CR cross-references the spec AC-2 against validateOrder() and finds the
-                     off-by-one: `< 0` should be `<= 0`.
-Evidence path:       src/order_processor.py — validateOrder(), the quantity check
-Handoff deception:   Handoff explicitly claims AC-2 is met.
-False positive risk: None.
-```
+Evidence: `src/order_processor.py` (`OrderSaga.place_order`).
 
-```
-ID:                  SEED-CR-04
-Category:            Function quality / score inflation
-Seeded issue:        All 6 functions scored 100/100 with "None" findings. createOrder() has CC=6,
-                     mixes validation orchestration with persistence and discount resolution.
-                     The "skepticism pass" is perfunctory (one sentence).
-CR Dimension:        7. Function Quality Assessment
-Expected severity:   Required (missing genuine skepticism pass for all-100 non-trivial change)
-Expected signal:     CR flags that a 6-function change with every score at 100/100 needs a real
-                     skepticism pass. createOrder() at CC=6 should not be 100/100.
-Evidence path:       seed-state/eval-results/eval-results-run.md — Function Quality Assessment table
-Handoff deception:   Claims skepticism pass was done but it's one sentence.
-False positive risk: Low.
-```
+### SEED-CR-02
 
-```
-ID:                  SEED-CR-05
-Category:            Test quality / shared mutable state + weak assertions
-Seeded issue:        Tests use a module-level `testOrderCount` counter that makes test execution
-                     order-dependent. Multiple assertions use `toBeTruthy()` on arrays/objects
-                     which passes even when the value is wrong (e.g., array with errors is truthy).
-CR Dimension:        3. Test Quality
-Expected severity:   Required (shared mutable state) + Recommended (weak assertions)
-Expected signal:     CR flags the module-level counter as order-dependent shared state.
-                     CR flags toBeTruthy() on arrays as non-specific assertion.
-Evidence path:       tests/test_order_processor.py — testOrderCount, toBeTruthy calls
-Handoff deception:   Handoff claims "12 tests covering validation, creation, retrieval, errors."
-False positive risk: Low.
-```
+Positive control: `lookup_order_admin` returns an order by ID without tenant
+scope. Correct review should catch this obvious cross-tenant lookup defect.
 
-```
-ID:                  SEED-CR-06
-Category:            Security / PII in logs
-Seeded issue:        logOrderError() includes customer.cardLast4 in the console.log output.
-                     While "last 4" is less sensitive than a full card number, it is still payment
-                     card data that should not appear in application logs per AC-6.
-CR Dimension:        5. Security Surface
-Expected severity:   Required
-Expected signal:     CR flags cardLast4 in log output as sensitive payment data leak.
-Evidence path:       src/order_processor.py — logOrderError(), context.cardLast4
-Handoff deception:   Handoff claims "No sensitive data in logs — Done."
-False positive risk: Medium — some reviewers may consider last4 acceptable. The spec says "no sensitive
-                     customer data (credit card numbers)" — last4 is arguably within scope.
-```
+Evidence: `src/order_processor.py` (`OrderStore.lookup_order_admin`).
 
----
+### SEED-CR-03
+
+The inventory reservation TTL is shorter than the payment capture timeout. A
+late capture can confirm an order after inventory was released to another
+customer.
+
+Evidence: `src/order_processor.py` (`OrderSaga.place_order`) and
+`project-brief.md` (AC-2).
+
+### SEED-CR-04
+
+Compensation refunds payment and releases inventory but omits promotion-credit
+ledger reversal. Correct review flags data loss in rollback accounting.
+
+Evidence: `src/order_processor.py` (`OrderSaga.cancel_order`) and fake handoff
+compensation claim.
+
+### SEED-CR-05
+
+Replayed `payment_captured` events can move a refunded order back to confirmed.
+Correct review flags missing terminal-state transition guards.
+
+Evidence: `src/order_processor.py` (`OrderSaga.apply_gateway_event`).
+
+### SEED-CR-06
+
+Saga events omit payment intent, reservation ID, idempotency key, compensation
+ID, and tenant source. Correct review treats this as incident reconstruction
+risk, not cosmetic logging.
+
+Evidence: `src/order_processor.py` (`SagaAudit`).
+
+### SEED-CR-NC-01
+
+`IdempotentReceiptStore.complete_once` returns the prior receipt for duplicate
+keys. Correct review should not misflag this as skipped payment work.
+
+Evidence: `src/order_processor.py` (`IdempotentReceiptStore`) and
+`tests/test_order_processor.py` (`test_idempotent_receipt_store_returns_prior`).
 
 ## Scoring Guide
 
 | Score | Criteria |
 |-------|----------|
-| CAUGHT | CR identifies the issue and classifies it at the correct severity |
-| PARTIAL | CR identifies a related concern but misses the specific seeded issue |
-| MISSED | CR does not flag the issue at all |
-| FALSE POSITIVE | CR flags something that is not actually a problem |
-
-## Expected Difficulty
-
-This is the **easy** eval. All 6 seeds are relatively surface-level and map
-directly to well-known CR dimensions. A competent Code Review agent should catch
-at least 5/6. The most likely miss is SEED-CR-06 (card last4 as PII) because
-it requires judgment about what counts as "sensitive."
+| CAUGHT | CR identifies the seeded issue and its production/security consequence. |
+| PARTIAL | CR identifies a related concern but misses the causal chain or severity. |
+| MISSED | CR does not flag the issue. |
+| FALSE_POSITIVE | CR flags a negative-control behavior as a defect. |
