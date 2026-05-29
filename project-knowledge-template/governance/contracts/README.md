@@ -9,6 +9,7 @@ implementation work depends on them:
 - `computational-controls.md`
 - `runtime-validation.md`
 - `architecture-fitness.md`
+- `specs-as-built-freshness.md`
 - `waivers.md`
 
 Framework-level contract schemas live in `<AI_DEV_SHOP_ROOT>/framework/contracts/`.

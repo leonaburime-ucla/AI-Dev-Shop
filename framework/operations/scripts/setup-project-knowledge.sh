@@ -132,6 +132,7 @@ This is the project-owned AI Dev Shop workspace. Commit retained project artifac
 - `governance/`: project rules and the live constitution
 - `memory/`: stable project memory, learnings, notes, and memory-store entries
 - `reports/`: retained specs, ADRs, reviews, benchmarks, audits, and pipeline outputs
+- `specs_as_built/`: curated current-state implementation knowledge generated from reverse-spec and post-implementation capture
 - `meta/`: project-owned workflow notes, migration state, and workspace metadata
 - `.local-artifacts/`: local scratch output ignored by git
 
@@ -203,8 +204,13 @@ log "Active provider: $active_provider"
 
 ensure_dir "$workspace_root"
 ensure_dir "$workspace_root/governance"
+ensure_dir "$workspace_root/governance/contracts"
 ensure_dir "$workspace_root/memory"
 ensure_dir "$workspace_root/reports"
+ensure_dir "$workspace_root/specs_as_built"
+ensure_dir "$workspace_root/specs_as_built/components"
+ensure_dir "$workspace_root/specs_as_built/changelog"
+ensure_dir "$workspace_root/specs_as_built/_meta"
 ensure_dir "$workspace_root/meta"
 ensure_dir "$workspace_root/.local-artifacts"
 
@@ -216,10 +222,69 @@ copy_file_if_missing \
   "$ads_root/framework/templates/bootstrap/constitution-template.md" \
   "$workspace_root/governance/constitution.md"
 
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/contracts/specs-as-built-freshness.md" \
+  "$workspace_root/governance/contracts/specs-as-built-freshness.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/contracts/README.md" \
+  "$workspace_root/governance/contracts/README.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/contracts/computational-controls.md" \
+  "$workspace_root/governance/contracts/computational-controls.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/contracts/runtime-validation.md" \
+  "$workspace_root/governance/contracts/runtime-validation.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/contracts/architecture-fitness.md" \
+  "$workspace_root/governance/contracts/architecture-fitness.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/contracts/waivers.md" \
+  "$workspace_root/governance/contracts/waivers.md"
+
 write_file_if_missing "$workspace_root/README.md" "$workspace_readme"
 write_file_if_missing "$workspace_root/governance/README.md" "$governance_readme"
 write_file_if_missing "$workspace_root/memory/README.md" "$memory_readme"
 write_file_if_missing "$workspace_root/reports/README.md" "$reports_readme"
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/README.md" \
+  "$workspace_root/specs_as_built/README.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/system-overview.md" \
+  "$workspace_root/specs_as_built/system-overview.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/architecture.md" \
+  "$workspace_root/specs_as_built/architecture.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/dependency-graph.yaml" \
+  "$workspace_root/specs_as_built/dependency-graph.yaml"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/global-ubiquitous-language.md" \
+  "$workspace_root/specs_as_built/global-ubiquitous-language.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/components/README.md" \
+  "$workspace_root/specs_as_built/components/README.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/changelog/README.md" \
+  "$workspace_root/specs_as_built/changelog/README.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/_meta/freshness-policy.md" \
+  "$workspace_root/specs_as_built/_meta/freshness-policy.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs_as_built/_meta/generation-manifest.yaml" \
+  "$workspace_root/specs_as_built/_meta/generation-manifest.yaml"
 write_file_if_missing "$workspace_root/meta/README.md" "$meta_readme"
 write_file_if_missing "$workspace_root/memory/project_memory.md" "$project_memory"
 write_file_if_missing "$workspace_root/memory/learnings.md" "$learnings"

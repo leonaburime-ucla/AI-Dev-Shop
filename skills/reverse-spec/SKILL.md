@@ -177,6 +177,8 @@ Resolution: convention-sourced `inferred` requirements may be **batch-confirmed*
 
 This satisfies Exit Criterion 2 without requiring N separate approvals for N instances of the same convention. Non-convention `inferred` requirements (those derived from naming patterns or indirect evidence) still require individual review.
 
+Approved framework conventions are rebuild-critical implementation behavior. When reverse-spec output is curated into `specs_as_built/`, record approved conventions in `global-ubiquitous-language.md` or the owning component `README.md` so target-language implementers know which implicit framework behavior must be rebuilt explicitly.
+
 ### Failing Tests
 
 Tests that are running and **failing** (not skipped, not quarantined) are signal:
@@ -264,6 +266,27 @@ When Architect, TDD, or Programmer discovers a behavioral question the spec does
 
 The requirement format in `references/extraction-layers.md` is an intermediate extraction format. The Spec Agent transforms it into the active spec provider's canonical template. Precedence: provider template wins for final shape; extraction format wins during extraction and handoff.
 
+## Specs-As-Built Output
+
+Reverse-spec extraction produces two durable surfaces:
+
+1. Raw evidence and intermediate artifacts under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/<run-or-module>/`
+2. Curated current-state documentation under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`
+
+The `specs_as_built/` surface is the readable rebuild/migration entrypoint. It summarizes the implemented system by current component, not by historical feature folder. Use:
+
+```text
+specs_as_built/
+  dependency-graph.yaml
+  components/<component>/
+  changelog/<spec-id-or-run-id>-impact.md
+  _meta/
+```
+
+Do not put dense function contracts in provider-native feature spec folders. Feature folders may contain a thin `as-built-impact.md` bridge that links to affected components and the immutable changelog entry.
+
+Generated or hybrid specs-as-built artifacts should record stable language-agnostic IDs (`CMP-*`, `API-*`, `DATA-*`, `ERR-*`, `EFFECT-*`, `FUNC-*`) plus freshness metadata (`source_scope`, `source_fingerprint`, `last_verified_at`, `last_verified_commit`, `reverse_spec_run`) so migration traceability survives renames and `validate_specs_as_built_freshness.py` can detect stale docs after source changes.
+
 ### Normalization Safety Rule
 
 The following fields MUST survive normalization regardless of provider template:
@@ -293,6 +316,7 @@ If the active provider template has no field for any of these, preserve them in 
 - **Always apply the unknown-vs-none discipline.** Never write "none" without investigation evidence.
 - **Keep migration notes separate from contracts.**
 - **Flag framework magic explicitly.** Name the convention so target team implements it explicitly.
+- **Write approved framework magic into specs-as-built.** Batch-approved conventions belong in `global-ubiquitous-language.md` or the owning component `README.md`, not only in raw reverse-spec reports.
 - **Bound scope.** > 30 source files OR > 15 routes/jobs OR > 3 top-level packages → split by module.
 - **Do not extract dead code.** Check: static refs, route registration, runtime logs, tests, docs, owner confirmation.
 - **Contradictions are blockers.** Produce `[NEEDS CLARIFICATION]`, never choose silently.

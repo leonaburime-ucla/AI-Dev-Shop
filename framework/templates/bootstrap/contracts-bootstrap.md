@@ -118,6 +118,53 @@ Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/architecture-fitness.m
 
 This contract is optional at project start. Add it when complexity warrants boundary enforcement.
 
+### Step 4: Specs-As-Built Freshness (when enabled)
+
+Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/specs-as-built-freshness.md` when the project treats `specs_as_built/` as current-state implementation documentation:
+
+```markdown
+# Specs-As-Built Freshness
+
+- Enforcement: advisory
+- Artifact root: <ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/
+- Source root: <HOST_PROJECT_ROOT>
+- Validator: python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/validate_specs_as_built_freshness.py
+
+## Hard Blocking Change Types
+
+- public/exported function contract changes
+- route/API/job/event/CLI behavior changes
+- data model or schema changes
+- validation/error behavior changes
+- side effects, integrations, transaction behavior
+- auth/authorization/security/privacy/compliance behavior
+
+## Advisory Change Types
+
+- private helper refactors
+- cosmetic UI/CSS-only changes
+- test-only or doc-only changes
+- dependency bumps without behavior changes
+
+## Notes
+
+During a cross-language rewrite, component artifacts may temporarily use `status: rewriting` while `source_scope` moves to replacement files. Resolve rewriting status back to `generated` or `hybrid` before the rewrite is marked complete.
+```
+
+Start with `advisory` for brownfield extraction. Promote to `touched-scope` or `strict` after component metadata has reliable `source_scope` and `source_fingerprint` values.
+
+### Step 5: Waivers
+
+Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/waivers.md` for human-approved temporary exceptions:
+
+```markdown
+# Contract Waivers
+
+| Date | Reviewer | Contract | Scope | Reason | Expiration / Revisit |
+|---|---|---|---|---|---|
+| | | | | | |
+```
+
 ---
 
 ## Brownfield Path (Existing Project)

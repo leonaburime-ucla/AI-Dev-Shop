@@ -1,7 +1,7 @@
 ---
 name: conventions
-version: 1.3.0
-last_updated: 2026-03-29
+version: 1.4.0
+last_updated: 2026-05-24
 description: Output root, spec folder structure, and reports folder structure for all pipeline artifacts.
 ---
 
@@ -19,10 +19,11 @@ For runtime-changing work that needs app-level validation before handoff, use a 
 For work that requires an independent evaluator loop, use retained evaluator artifacts per `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/evaluation-loops.md`.
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` for ignored local-only scratch artifacts such as exploratory consensus runs, raw peer stdout/stderr captures, temporary prompts, and host-specific smoke-test baselines that are not meant to ship with the repo.
 Promote artifacts from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` only when the user explicitly wants them retained as reusable project evidence.
+Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/` for curated current-state implementation knowledge produced from reverse-spec or post-implementation capture. Raw extraction evidence stays under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/`; provider-native forward specs stay in the active provider's native location.
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` for durable project conventions, learnings, notes, and structured memory entries.
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` as the live constitution for the host project. Keep the toolkit's bootstrap default in `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
 
-**Project-owned writable root:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
+**Project-owned writable root:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
 **Read-only during normal feature work under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `framework/`, `harness-engineering/`, and the repo-local `project-knowledge-template/` template. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in these directories.
 
 ---
@@ -60,6 +61,7 @@ Host projects declare executable quality contracts that agents consume at each p
 | Computational Controls | `governance/contracts/computational-controls.md` | Lint, typecheck, build, test commands |
 | Runtime Validation | `governance/contracts/runtime-validation.md` | Boot, health, critical path, teardown |
 | Architecture Fitness | `governance/contracts/architecture-fitness.md` | Dependency rules, forbidden imports, boundaries |
+| Specs-As-Built Freshness | `governance/contracts/specs-as-built-freshness.md` | Source-scope freshness for generated current-state docs |
 
 Enforcement behavior (missing/failing/stale contracts) is defined in `<AI_DEV_SHOP_ROOT>/framework/contracts/enforcement.md`.
 
@@ -95,6 +97,42 @@ Optional but recommended:
   spec-manifest.md         (lists actual filenames, omitted files, and naming choice)
   spec-dod.md              (DoD checklist — must pass before Architect dispatch)
 ```
+
+## Specs-As-Built Convention
+
+Curated post-implementation and brownfield current-state documentation lives under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`. This is the rebuild/migration reading surface and should be generated from code plus reverse-spec evidence.
+
+```
+<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/
+  README.md
+  system-overview.md
+  architecture.md
+  global-ubiquitous-language.md
+  components/
+    <component>/
+      README.md
+      contracts/
+        api.yaml
+        data.yaml
+        errors.yaml
+        side-effects.yaml
+        functions.yaml
+      migration-guide.md
+      traceability.md
+      _meta.yaml
+  changelog/
+    <spec-id>-impact.md
+  _meta/
+    generation-manifest.yaml
+    freshness-policy.md
+```
+
+Rules:
+- `components/` owns current implementation truth.
+- `changelog/` owns immutable historical impact records for specs or reverse-spec slices.
+- provider-native feature folders may contain a thin `as-built-impact.md` bridge that links to `specs_as_built/`; it must not duplicate component contracts.
+- raw reverse-spec evidence stays under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/`.
+- generated and hybrid artifacts should record source-scope freshness metadata per `<AI_DEV_SHOP_ROOT>/framework/contracts/specs-as-built-freshness.md`.
 
 ## Pipeline Artifact Folder Convention
 

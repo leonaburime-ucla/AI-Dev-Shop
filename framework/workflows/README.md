@@ -6,6 +6,7 @@ This directory defines the operational rulebook, lifecycle states, and physical 
 
 - **`multi-agent-pipeline.md`**: The master sequence. Defines the stage-by-stage execution order, context injection rules, and handoff contracts for every agent in the system.
 - **`conventions.md`**: Defines the physical constraints of the workspace. It specifies exactly where generated files (specs, reports, pipeline artifacts) must be saved and enforces the read-only vs. writable directory boundaries.
+- **`specs-as-built.md`**: Defines the curated current-state documentation surface generated from reverse-spec and post-implementation capture, including freshness metadata and validation rules.
 - **`job-lifecycle.md`**: Defines the state machine for agent dispatches (QUEUED, RUNNING, RETRYING, ESCALATED). It acts as the single source of truth for retry budgets and escalation triggers.
 
 ## State Management & Debugging

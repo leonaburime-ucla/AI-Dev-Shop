@@ -9,6 +9,7 @@ Contracts are machine-actionable declarations that tell agents exactly what comm
 | [Computational Controls](computational-controls.md) | Lint, typecheck, build, test, and static analysis commands | Required for all implementation work |
 | [Runtime Validation](runtime-validation.md) | Boot command, health signal, critical path check, teardown | Required for runtime-changing work |
 | [Architecture Fitness](architecture-fitness.md) | Dependency rules, forbidden imports, ownership boundaries | Required when architecture rules exist |
+| [Specs-As-Built Freshness](specs-as-built-freshness.md) | Source-to-as-built freshness metadata and validator enforcement | Required when `specs_as_built/` is treated as current-state documentation |
 
 ## Where Contracts Live
 
@@ -28,3 +29,4 @@ See `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/contracts-bootstrap.md` fo
 - **Code Review**: architecture fitness, computational controls (lint, typecheck, static_analysis)
 - **Architect**: architecture fitness (for ADR alignment)
 - **Coordinator**: enforcement status at every stage gate
+- **Reverse-Spec / Done Gate**: specs-as-built freshness when generated current-state docs are enabled

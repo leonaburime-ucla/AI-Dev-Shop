@@ -6,6 +6,8 @@ These validators are the first mechanical enforcement layer for this repo.
 
 - `validate_path_references.py`
   - checks that repo-local markdown path references point to real files or directories
+- `validate_contracts.py`
+  - checks framework contract specs, template host declaration skeletons, and live host declarations when present for required files, headings, slots, and links
 - `validate_registry_integrity.py`
   - checks that `skills-registry.md` entries point to real files
   - fails when canonical skill files exist on disk but are not registered
@@ -21,6 +23,11 @@ These validators are the first mechanical enforcement layer for this repo.
 - `validate_swarm_model_identity_guard.py`
   - checks that Swarm Consensus preflight shows peer model identity first
   - fails when CLI version strings can be presented as model names or model versions
+- `validate_specs_as_built_freshness.py`
+  - checks `ADS-project-knowledge/specs_as_built/` metadata when present
+  - recomputes source-scope fingerprints and fails on concrete stale generated/hybrid artifacts
+  - checks the generation manifest scaffold and minimum component folder shape when components are present
+  - no-ops for projects that have not adopted specs-as-built yet
 - `validate_eval_suite.py`
   - validates seeded eval suite metadata and saved run results
   - checks coverage-matrix cells, seed-catalog taxonomy values, benchmark-vs-regression suite rules, run-manifest execution proof, scope-confirmation metadata, run-results evidence, and per-run benchmark completeness

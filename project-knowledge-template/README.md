@@ -16,6 +16,7 @@ A project needs this shared workspace so multiple people or agents can see the d
 - `governance/`: project-governance template surface, including the default constitution and future project-specific overrides
 - `memory/`: live project memory files only (`project_memory.md`, `learnings.md`, `project_notes.md`, `memory-store.md`)
 - `reports/`: retained writable artifacts, benchmarks, audits, continuity logs, and pipeline outputs
+- `specs_as_built/`: curated current-state implementation knowledge generated from reverse-spec and post-implementation capture
 - `.local-artifacts/`: ignored local-only scratch output for toolkit maintenance and local runs
 - `meta/`: workspace metadata, workflow notes, and future migration/version markers
 

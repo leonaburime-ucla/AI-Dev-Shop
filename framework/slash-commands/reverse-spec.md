@@ -8,11 +8,26 @@ Task: $ARGUMENTS
 
 Extract behavioral specifications from an existing codebase. This is the entry point for code-to-spec-to-rewrite workflows: an existing system becomes a language-agnostic spec that can be implemented in any target language.
 
+## Subagent Default
+
+Before dispatch, apply the Subagent Default Guard in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md`.
+
+If the current host resolves to `subagent-assisted` and the user has not requested `single-agent mode` or `disable subagents`, say:
+
+`Coordinator(Pipeline Mode): Defaulting /reverse-spec to spawned subagents for CodeBase Analyzer inventory and bounded extraction passes, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+
+Then use spawned subagents for CodeBase Analyzer inventory and each bounded extraction pass or module chunk. Each spawned subagent must be explicitly bootstrapped with the closest repo persona, normally `agents/codebase-analyzer/skills.md` plus the reverse-spec skill and pass-specific references. Do not call these workers `Reverse-Spec Agent`; that is not a reserved pipeline agent name. The Coordinator remains responsible for human checkpoints, artifact routing, synthesis acceptance, and final user-facing status.
+
+If subagent support is unavailable, unverified, disabled, or the delegated bootstrap cannot be satisfied, say:
+
+`Coordinator(Pipeline Mode): Subagent default is not active for /reverse-spec: <reason>. Running sequentially in this context instead.`
+
 ## Before Doing Anything
 
 1. Read `<AI_DEV_SHOP_ROOT>/skills/reverse-spec/SKILL.md` — methodology, confidence rules, guardrails, exit criteria
 2. Read `<AI_DEV_SHOP_ROOT>/agents/codebase-analyzer/skills.md`
 3. Read `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`
+4. Read `<AI_DEV_SHOP_ROOT>/framework/workflows/specs-as-built.md`
 
 The SKILL.md is authoritative for all extraction rules (confidence hierarchy, exit criteria, guardrails, scope thresholds). This coordinator defines workflow orchestration only.
 
@@ -165,7 +180,57 @@ For large codebases (above the SKILL.md scope threshold): run per-module in prio
 - Do not invent behavior — only extract what evidence supports
 - Apply unknown-vs-none discipline (never write "none" without investigation)
 
-### Step 3: Spec Agent Normalization
+### Step 3: Specs-As-Built Curation
+
+Curate the extraction output into current-state documentation under:
+
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`
+
+This curation is the readable rebuild/migration surface. It is NOT the raw evidence store and NOT the provider-native forward spec.
+
+Produce or update:
+
+```text
+<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/
+  README.md
+  system-overview.md
+  architecture.md
+  dependency-graph.yaml
+  global-ubiquitous-language.md
+  components/
+    <component>/
+      README.md
+      contracts/
+        api.yaml
+        data.yaml
+        errors.yaml
+        side-effects.yaml
+        functions.yaml
+      migration-guide.md
+      traceability.md
+      _meta.yaml
+  changelog/
+    <spec-id-or-run-id>-impact.md
+  _meta/
+    generation-manifest.yaml
+    freshness-policy.md
+```
+
+Rules:
+- `components/` owns current implementation truth.
+- `changelog/` owns immutable historical impact records for specs or reverse-spec slices.
+- `dependency-graph.yaml` owns machine-readable component topology for rebuild ordering and integration preservation.
+- Do not create `by-spec/` as living current-state documentation; it stales when later specs touch the same components.
+- Keep raw extraction evidence in `reports/reverse-spec/` and link to it.
+- Record stable language-agnostic IDs (`CMP-*`, `API-*`, `DATA-*`, `ERR-*`, `EFFECT-*`, `FUNC-*`) and freshness metadata (`source_scope`, `source_fingerprint`, `last_verified_at`, `last_verified_commit`, `reverse_spec_run`) for generated or hybrid component artifacts.
+- Record approved framework conventions in `global-ubiquitous-language.md` or the owning component `README.md` so target-language rebuilds preserve implicit framework behavior explicitly.
+- If the reverse-spec run corresponds to an active provider-native feature, write or update a thin `as-built-impact.md` bridge in that feature folder. The bridge links to the changelog entry and affected components; it must not duplicate component contracts.
+
+**Output:** Curated current-state specs-as-built package in `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`
+
+**Freshness validation:** Run `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/validate_specs_as_built_freshness.py` after curation when Bash/Python are available. Treat fingerprint mismatches on material public behavior as blockers unless explicitly waived.
+
+### Step 4: Spec Agent Normalization
 
 Dispatch the Spec Agent to normalize extracted requirements into the active spec provider's format:
 
@@ -186,7 +251,7 @@ Dispatch the Spec Agent to normalize extracted requirements into the active spec
 
 Do NOT proceed past this checkpoint without human approval. Extracted specs become the rewrite contract — errors here propagate into the entire target implementation.
 
-### Step 4: Pipeline Continues
+### Step 5: Pipeline Continues
 
 After human approval, the spec enters the normal pipeline:
 - Architect designs the target architecture (using `target_lang` hint if provided)
