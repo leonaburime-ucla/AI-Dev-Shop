@@ -6,13 +6,10 @@
 **Suggested Changes Mode:** <patches | notes | none>
 **Audit Packet:** <path>
 **Dispatch Packet:** <peer-readable path or "same as audit packet">
-**Auditor CLI:** <claude | gemini | codex>
-**Requested Model:** <requested or "n/a">
-**Resolved Model:** <exact model name/version or "not proven">
-**Selection Source:** <per_run_override | saved_preference | local_cli_proof | smoke_test_discovery | unknown>
-**CLI Version:** <version>
-**Timeout:** <seconds>
-**Audit Status:** <Responded | Failed | Timed out | Retry exhausted | Not installed>
+**Planned Auditors:** <claude, gemini, codex, or explicit subset>
+**Responded Auditors:** <auditor list or "none">
+**Failed Or Skipped Auditors:** <auditor=list with reason or "none">
+**Timeout:** <seconds per auditor or total policy>
 **Proposed Fixes Artifact:** <path or "none">
 
 ## Work Log
@@ -20,37 +17,57 @@
 - <why>
 - <verification run or not run>
 
-## Auditor Diagnostics
-| Field | Value |
-|---|---|
-| Output mode | <json | text> |
-| stdout parser | <field or end marker> |
-| stderr summary | <short summary> |
-| Attempts | <count> |
-| Final status | <Responded | Failed | Timed out | Retry exhausted | Not installed> |
+## Auditor Matrix
+| Auditor | Requested Model | Resolved Model | Selection Source | CLI Version | Output Mode | Suggest Mode Used | Attempts | Status |
+|---|---|---|---|---|---|---|---|---|
+| <claude | gemini | codex> | <requested or "n/a"> | <exact model name/version or "not proven"> | <per_run_override | saved_preference | local_cli_proof | smoke_test_discovery | unknown> | <version> | <json | text> | <patches | notes | fell-back-to-notes | none> | <count> | <Responded | Failed | Timed out | Retry exhausted | Not installed | Skipped> |
 
-## Auditor Scope Check
+## Degraded Coverage
+- <none | planned auditor(s) failed/skipped/mis-scoped; state whether `min_auditors` was met and whether failed auditors should be retried with the same packet>
+
+## Per-Auditor Scope Checks
+### <Auditor CLI>
 - **What it says it is auditing:** <the user request / focus as the auditor understood it>
 - **Scope and target it used:** <work-log | current-diff | staged | last-commit | custom> and <commit, diff, or file set>
 - **Files or artifacts it says it reviewed:** <packet, diff, commit, specific files, or "not stated">
 - **Scope ambiguity or mismatch:** <none | describe the mismatch the auditor noticed>
 
-## What The External LLM Said
+## What The External LLMs Said
 
-### Findings By Severity
-- <succinct but faithful summary of the auditor's findings>
+### <Auditor CLI> Findings By Severity
+- <succinct but faithful summary of this auditor's findings>
 
-### Blockers
+### <Auditor CLI> Blockers
 - <real blockers, or "none">
 
-### Optional Improvements
+### <Auditor CLI> Optional Improvements
 - <non-blocking improvements, or "none">
 
-### Strengths
+### <Auditor CLI> Strengths
 - <what the auditor said looked solid, or "none stated">
 
-### Suggested Changes
+### <Auditor CLI> Suggested Changes
 - <summary of file-level suggestions, or "none returned">
+
+## Cross-Auditor Synthesis
+
+### Converged Findings
+- <issues multiple auditors independently raised, or "none">
+- <if the Coordinator disagrees with a converged finding, include it again in Decision Points For User with the evidence needed to override it>
+
+### Single-Auditor Findings Worth Keeping
+- <issues only one auditor raised that the Coordinator thinks are valid, or "none">
+
+### Conflicts Or False Positives
+- <auditor disagreements, weak claims, or false positives, with evidence>
+
+### Missed-By-One Notes
+- <important issue one auditor caught and another missed, or "none">
+
+## Suggested Changes By Auditor
+| Auditor | Suggested Change | Coordinator Handling |
+|---|---|---|
+| <claude | gemini | codex> | <file-level note, snippet summary, or "none"> | <accept | adapt | reject | defer> |
 
 ## Coordinator Response
 
@@ -67,8 +84,8 @@
 <accept as-is | adapt before applying | reject | none>
 
 ## Audit Outcome
-- <keep as-is | patch now | request second auditor | stop because blocked>
+- <keep as-is | patch now | rerun failed auditors | request more auditors | stop because blocked>
 - <brief reason>
 
 ## Decision Points For User
-- <keep as-is / patch now / save retained report / request a second auditor / etc.>
+- <keep as-is / patch now / save retained report / rerun failed auditors / request more auditors / etc.>

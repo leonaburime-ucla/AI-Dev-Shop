@@ -3,12 +3,13 @@
 ## Ask
 
 - **User request:** <what the user asked for>
-- **Audit focus:** <what the external auditor should examine most closely>
+- **Audit focus:** <what the external auditors should examine most closely>
 - **Scope:** <work-log | current-diff | staged | last-commit | custom>
 - **Suggested changes mode:** <patches | notes | none>
 - **Audit target:** <commit, diff, or explicit file set>
+- **Planned auditors:** <claude, gemini, codex, or explicit subset>
 - **Authoring packet:** <where the coordinator wrote the canonical packet>
-- **Dispatch packet:** <peer-readable packet path actually handed to the external auditor>
+- **Dispatch packet:** <peer-readable packet path actually handed to each external auditor>
 
 ## Work Log
 
@@ -41,10 +42,12 @@
 
 Please review this work independently. Use the Ask section's `Audit target` and `Dispatch packet` fields as the source of truth for what to inspect and which packet path was actually handed to you.
 
+Do not assume any other auditor has seen the same issues you see. Return your own review only; the Coordinator will synthesize across auditors after all independent responses are collected.
+
 Return:
 
 1. Start with an `Auditor Scope Check` that restates what you believe you are auditing, the active scope and audit target, which files or artifacts you actually reviewed, and any ambiguity or mismatch you noticed
-2. Findings ordered by severity
+2. Findings ordered by severity using this taxonomy: `blocker` means must fix before relying on the work; `high` means real risk if ignored; `medium` means notable improvement or maintainability risk; `low` means minor inconsistency or polish
 3. File references when possible
 4. Which changes are blockers vs optional improvements
 5. What looks solid and should probably stay unchanged

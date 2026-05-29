@@ -5,11 +5,10 @@
 **Focus:** <the user's audit question>
 **Suggested Changes Mode:** <patches | notes>
 **Source Audit Report:** <path to external audit report>
-**Auditor CLI:** <claude | gemini | codex>
-**Resolved Model:** <exact model name/version>
+**Auditors With Suggestions:** <claude, gemini, codex, or subset>
 
 ## Summary
-- <what the auditor proposed changing and why>
+- <what the auditors proposed changing and why>
 
 ## Coordinator Handling Guidance
 - These are proposal artifacts only.
@@ -20,14 +19,14 @@
 
 | Path | Suggestion Type | Artifact | Notes |
 |---|---|---|---|
-| `<path>` | `<notes | diff | snippet>` | `<proposed-fixes.md or patches/...>` | <short rationale> |
+| `<path>` | `<notes | diff | snippet>` | `<proposed-fixes.md or patches/<auditor>-...>` | <auditor and short rationale> |
 
 ## Notes And Snippets
 - <raw note-style suggestion or bounded replacement snippet>
 
 ## Patch Files
-- `patches/0001-<slug>.diff`
-- `patches/0002-<slug>.diff`
+- `patches/<auditor>-0001-<slug>.diff`
+- `patches/<auditor>-0002-<slug>.diff`
 
 ## Raw Auditor Extract
 - <optional preserved block copied from the auditor output when splitting would lose context>

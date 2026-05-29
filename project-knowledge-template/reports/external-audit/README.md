@@ -19,10 +19,11 @@ project-knowledge-template/reports/external-audit/
   runs/
 ```
 
-Packets summarize the work handed to the external auditor. Run reports capture:
+Packets summarize the work handed to external auditors. Run reports capture:
 
 - what work was audited
-- what the external auditor said
+- what each external auditor said
+- where auditors agreed, disagreed, or caught different issues
 - what the Coordinator agreed with
 - what should change
 - what the Coordinator disagreed with and why
