@@ -1,96 +1,108 @@
-# Seed Ledger - cr-eval-7-stream-watermark-checkpoint (CR Staff+)
+# Seed Ledger — cr-eval-7-stream-watermark-checkpoint
 
 **Eval ID**: benchmark-suite / cr-eval-7-stream-watermark-checkpoint
-**Purpose**: Test Code Review agent on stream watermark, late-event,
-checkpoint, rebalance, cleanup, and observability defects that look locally
-reasonable but fail under partition drift and recovery timelines.
-**Difficulty**: Hard - evidence is distributed across source, tests, project
-brief, and fake Programmer handoff.
+**Purpose**: Test Code Review agent on stream processing defects involving
+watermark advancement, late-event routing, checkpoint ordering, rebalance
+state management, clock-source mixing, and window boundary precision —
+without the brief naming the invariants.
+**Difficulty**: Hard staff+ fixture. Brief describes operational context only.
 
 ## Seeds
 
 ### SEED-CR-41
 
-The global watermark advances from the maximum partition watermark instead of
-the minimum active partition watermark. Correct review flags premature window
-closure when one partition is ahead of another.
+Global watermark uses max() across partitions instead of min(). Fast
+partition advances past slow ones, causing premature window closure and
+data loss for the lagging partition.
 
-Evidence: `src/stream_watermarks.py` (`StreamProcessor.advance_watermark`) and
-`tests/test_stream_watermarks.py` (lockstep partition coverage only).
+Evidence: `src/stream_watermarks.py` (`StreamProcessor._advance_global_watermark`
+— uses `max(self._partition_watermarks.values())` instead of `min()`).
+Expected severity: Critical
 
 ### SEED-CR-42
 
-Events beyond the allowed lateness window are silently dropped instead of being
-routed to the late-event sink with metadata. Correct review distinguishes this
-from the valid within-window late-event aggregation path.
+Late events beyond allowed lateness are silently dropped — counter
+incremented but never routed to late-event sink. Data vanishes without
+trace.
 
-Evidence: `src/stream_watermarks.py` (`StreamProcessor.process_event`) and
-`project-brief.md` (AC-2).
+Evidence: `src/stream_watermarks.py` (`StreamProcessor.process_event` —
+`self._metrics.record_late_drop()` but no call to late-event router).
+Expected severity: Major
 
 ### SEED-CR-43
 
-Checkpoint state is committed before output sink emission is durably recorded.
-Correct review flags the crash window that can skip output after restart.
+Checkpoint committed BEFORE sink emission. Crash between checkpoint
+commit and output delivery loses output permanently — downstream sees
+no result but position is advanced past the window.
 
-Evidence: `src/stream_watermarks.py` (`flush_closed_windows`) and fake handoff
-checkpoint claim.
+Evidence: `src/stream_watermarks.py` (`StreamProcessor._flush_closed_windows`
+— `self._checkpoint.commit(...)` precedes `self._sink.emit(...)`).
+Expected severity: Critical
 
 ### SEED-CR-44
 
-Rebalance loads checkpoints for newly assigned partitions but does not clear
-active windows for revoked partitions. Correct review flags stale window flush
-and duplicate output after ownership changes.
+Rebalance loads new partition checkpoints but doesn't purge active
+windows for revoked partitions. Stale windows flush duplicates on
+the next flush cycle.
 
-Evidence: `src/stream_watermarks.py` (`on_rebalance`, `flush_closed_windows`).
+Evidence: `src/stream_watermarks.py` (`StreamProcessor.on_partitions_reassigned`
+— adds new partitions, does not remove old window state).
+Expected severity: Critical
 
 ### SEED-CR-45
 
-Expired window cleanup only runs when another event is processed. Correct
-review flags unbounded state growth for idle partitions and low-traffic tenants.
+One code path uses wall-clock time to advance watermark while rest
+uses event timestamps. Incorrect window closure under replay/backfill
+when wall-clock is far ahead of event time.
 
-Evidence: `src/stream_watermarks.py` (`process_event`,
-`_cleanup_expired_windows`) and `project-brief.md` (AC-5).
+Evidence: `src/stream_watermarks.py` (`StreamProcessor._maybe_advance_idle`
+— uses `self._clock()` to advance partition watermark instead of only
+using it for idle detection).
+Expected severity: Critical
 
 ### SEED-CR-46
 
-Metrics record aggregate counters but omit partition, tenant, checkpoint-age,
-and state-size dimensions. Correct review treats this as an operational
-diagnosis gap, not a logging preference.
+Window boundary off-by-one: events exactly AT window boundaries are
+excluded from aggregation. The guard `window_start < event_time < window_end`
+uses strict less-than on the lower bound, so when `event_time` is exactly
+divisible by `window_size`, `_assign_window` floors to `window_start =
+event_time`, and the guard `window_start < event_time` is false. The event
+is silently discarded.
 
-Evidence: `src/stream_watermarks.py` (`StreamMetrics`) and fake handoff
-observability claim.
+Evidence: `src/stream_watermarks.py` (`StreamProcessor._aggregate_event` and
+`_aggregate_late_within_tolerance` — strict inequality `window_start <
+event.event_time < window_end` silently returns when event_time equals
+window_start).
+Expected severity: Major
 
-### SEED-CR-47
+## Negative Controls
 
-Tests cover single-partition and lockstep happy paths but omit divergent
-watermarks, beyond-window late routing, crash ordering, rebalance stale flush,
-idle cleanup, and metric dimensions.
+### SEED-CR-NC-01
 
-Evidence: `tests/test_stream_watermarks.py` and fake handoff coverage claim.
+`PartitionWatermarkTracker` correctly uses per-partition max and global
+min — looks like the same logic as StreamProcessor's max() but is
+actually the CORRECT implementation. Correct review should not misflag
+the partition-local max update as the global max-watermark defect.
 
-### SEED-CR-NC-09
+Evidence: `src/stream_watermarks.py` (`PartitionWatermarkTracker.global_watermark`
+— correctly returns `min(active_watermarks)`).
 
-`PartitionWatermarkTracker` correctly uses max event time per partition and a
-minimum across active partitions. Correct review should not misflag the
-partition-local max update as the global max-watermark defect.
+### SEED-CR-NC-02
 
-Evidence: `src/stream_watermarks.py` (`PartitionWatermarkTracker`) and
-`tests/test_stream_watermarks.py` (`test_partition_tracker_uses_minimum_active_watermark`).
+`LateEventRouter` correctly routes beyond-window events to sink with
+metadata — looks like data loss but is correct late-event handling.
+Correct review should not misflag routing to the late sink as silent
+data discard.
 
-### SEED-CR-NC-10
-
-`LateEventRouter` intentionally removes beyond-window events from aggregation
-and publishes metadata to the late-event sink. Correct review should not
-misflag this as data loss.
-
-Evidence: `src/stream_watermarks.py` (`LateEventRouter`) and
-`tests/test_stream_watermarks.py` (`test_late_event_router_keeps_metadata`).
+Evidence: `src/stream_watermarks.py` (`LateEventRouter.route_late_event`
+— publishes full event metadata to `self._sink`).
 
 ## Scoring Guide
 
 | Score | Criteria |
 |-------|----------|
-| CAUGHT | CR identifies the seeded issue and its production consequence. |
-| PARTIAL | CR identifies a related concern but misses the causal chain or severity. |
+| CAUGHT | CR identifies the seeded issue and its production consequence with correct severity. |
+| CAUGHT_WRONG_SEVERITY | CR identifies the issue but misjudges severity by one+ level. |
+| PARTIAL | CR identifies a related concern but misses the causal chain. |
 | MISSED | CR does not flag the issue. |
 | FALSE_POSITIVE | CR flags a negative-control behavior as a defect. |

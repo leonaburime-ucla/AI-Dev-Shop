@@ -1,52 +1,48 @@
-# Stream Watermark Checkpoint - Project Brief
+# Stream Watermark Checkpoint — Project Brief
 
 ## Overview
 
-A streaming aggregation worker consumes event-time records from multiple
-partitions, maintains per-partition watermarks, aggregates into tumbling
-windows, handles late events, emits window results, stores checkpoints, and
-exposes operational metrics for lag and state growth.
+Our IoT analytics platform ingests sensor telemetry from hundreds of
+edge gateways. This change ships the stream processing layer that
+reduces raw events into sub-minute aggregation windows for the
+real-time dashboard. The goal is lower aggregation latency while
+maintaining exactly-once output delivery to the downstream warehouse.
 
-This eval is intentionally focused on Code Review depth. The worker looks like
-a normal streaming component and the tests exercise plausible happy paths, but
-production failures emerge only when partitions drift, late events arrive after
-the grace window, checkpoint durability and sink durability diverge, and
-rebalances leave stale in-memory state behind.
+## Operational Context
+
+- Sources: ~400 IoT edge gateways across 12 regional deployments,
+  publishing to a partitioned message bus (32 partitions).
+- Throughput: 50k events/sec aggregate; partitions have highly variable
+  rates — some sensors disconnect for minutes then burst-replay buffered
+  data.
+- Deploys: rolling restart 2x/day; workers are reassigned partitions via
+  consumer-group rebalance during deploys.
+- Late data: disconnected sensors reconnect after minutes or hours and
+  replay buffered readings. Late arrivals within a tolerance window
+  should still be included in aggregations. Data arriving beyond that
+  tolerance must be routed to a late-event sink for offline
+  reconciliation — it must not vanish.
+- Delivery: downstream warehouse expects exactly-once semantics. Duplicate
+  or missing window outputs break billing reconciliation.
+- Windows: tumbling 60-second aggregation windows; the team wants
+  sub-minute end-to-end latency from window close to output delivery.
 
 ## Requirements
 
-### Functional Requirements
-
-1. The global watermark advances from the minimum active partition watermark,
-   with explicit idle-partition handling.
-2. Late events inside the allowed lateness window are aggregated, while events
-   beyond that window route to a late-event sink with full metadata.
-3. Checkpoints are committed only after window output side effects are durably
-   confirmed.
-4. Partition rebalance must not let revoked partition state flush after
-   ownership changes.
-5. Window state cleanup must be bounded even when no new events arrive.
-6. Metrics must expose partition lag, late-event rate, checkpoint age, state
-   size, tenant, and partition dimensions.
-7. Tests must cover divergent partitions, late-event routing, crash ordering,
-   rebalance flush, idle cleanup, and metrics dimensions.
-
-### Acceptance Criteria
-
-- AC-1: A lagging partition prevents the global watermark from passing its
-  event-time frontier unless it is explicitly marked idle.
-- AC-2: Beyond-window late events are routed to a late-event sink, not silently
-  discarded.
-- AC-3: A crash after checkpoint but before sink emission cannot lose output.
-- AC-4: Rebalance removes in-memory windows for revoked partitions.
-- AC-5: Closed windows are cleaned up through a periodic or lifecycle hook, not
-  only when another event arrives.
-- AC-6: Metrics can identify which tenant and partition is lagging or growing
-  state.
-- AC-7: The test suite covers the interaction cases above.
-- AC-8: Correct partition-local watermark and late-event routing helpers are
-  valid and should not be flagged as defects.
+1. Aggregate sensor values into 60-second tumbling windows per partition.
+2. Multiple partitions with variable throughput must be supported; a
+   slow partition must not block other partitions indefinitely.
+3. Late events within the allowed lateness tolerance are aggregated into
+   the correct window.
+4. Late events beyond the tolerance must be sent to the late-event sink
+   with full metadata for reconciliation.
+5. Window outputs must be delivered exactly once — a crash should not
+   cause a window to be output twice or lost entirely.
+6. During worker rebalance (deploy), ownership changes must be handled
+   cleanly so that output is not duplicated or lost.
+7. Aggregation windows must close correctly at boundaries even during
+   replay and backfill from reconnected sensors.
 
 ## Spec Hash
 
-`spec-stream-watermark-checkpoint-v1-stu901`
+`spec-stream-watermark-v2-d4f81a`

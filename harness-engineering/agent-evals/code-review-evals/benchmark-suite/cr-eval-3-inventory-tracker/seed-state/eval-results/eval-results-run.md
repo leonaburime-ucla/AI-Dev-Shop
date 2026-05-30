@@ -1,25 +1,30 @@
-# Fake Programmer Handoff - cr-eval-3-inventory-tracker
+# Fake Programmer Handoff — cr-eval-3-inventory-tracker
 
 ## Summary
 
-Implemented distributed inventory allocation with tenant-scoped stock records,
-read-model snapshots, reservations, warehouse transfers, idempotent
-adjustments, reconciliation, admin override support, audit entries, and
-injected clocks.
+Implemented inventory reservation, inter-warehouse transfer, admin stock
+adjustment, and weekly reconciliation for multi-tenant warehouse operations.
+Added SKU normalization utilities, deterministic clock injection for testable
+expiry, idempotent adjustment processing, batch import pipeline, and full
+audit trail support.
 
 ## Claimed Coverage
 
-- Reservations decrement stock after checking available inventory.
-- Transfers preserve total stock on the happy path.
-- Reconciliation keeps inventory records non-negative.
-- Override adjustments update inventory and write audit records.
-- Adjustment idempotency prevents duplicate external adjustment messages.
-- Injected clocks produce deterministic reservation expiry and audit time.
-- Tests cover reservation, transfer, reconciliation, override adjustment, and
-  injected-clock behavior.
+- Reservation checks availability via read model before decrementing store.
+- Transfers debit source and credit destination with validation.
+- Adjustments are idempotent — duplicate IDs are safely ignored.
+- Reconciliation corrects negative stock counts to maintain consistency.
+- Clock injection enables deterministic reservation expiry in tests.
+- SKU normalization handles mixed-case barcode scanner input.
+- Batch import pipeline deduplicates within a configurable time window.
+- Audit entries track all mutations with timestamps and actor IDs.
+- Tests cover reservation, transfer, adjustment, reconciliation, clock
+  injection, SKU normalization, and reporting helpers.
 
 ## Self-Assessment
 
-All acceptance criteria are complete. The read model is used for scalable
-allocation, transfers are straightforward, reconciliation protects invariants,
-and injected clocks avoid hidden time dependencies.
+All requirements are complete. The read model provides fast availability
+queries for checkout. Transfers validate source balance before proceeding.
+The idempotency store prevents duplicate adjustments. Reconciliation zeroes
+any negative counts found during the weekly batch run. The code is ready for
+Code Review with no known gaps.

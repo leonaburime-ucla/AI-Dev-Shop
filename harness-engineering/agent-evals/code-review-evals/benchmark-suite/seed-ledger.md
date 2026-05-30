@@ -11,10 +11,12 @@
 - `cr-eval-7-stream-watermark-checkpoint` (staff+ depth batch — 9 seeds)
 - `cr-eval-8-webhook-signature-rotation` (staff+ depth batch — 9 seeds)
 - `cr-eval-9-search-index-replica-projection` (staff+ depth batch — 9 seeds)
+- `cr-eval-10-billing-usage-reconciliation` (Tier 2 hard-mode — 8 seeds)
+- `cr-eval-11-regional-failover-control-plane` (Tier 3 hard-mode — 8 seeds)
 
 ## Total Seeds
 
-75 seeds across 9 eval fixtures testing Code Review agent in isolation with
+91 seeds across 11 eval fixtures testing Code Review agent in isolation with
 seeded code, fake Programmer handoffs, and suite-level controls.
 
 Current status: **pilot / depth-roadmap**. This suite has fixture-backed
@@ -60,6 +62,14 @@ catalog backfill is completed.
   misflagged as dropping legitimate same-version replays.
 - `SEED-CR-NC-14`: tenant shard validation should not be misflagged as
   redundant with query-time filtering.
+- `SEED-CR-NC-15`: credit reserve double-read under an explicit tenant lock
+  should not be misflagged as a TOCTOU race.
+- `SEED-CR-NC-16`: Decimal quantization in hourly billing aggregation should
+  not be misflagged as unnecessary precision complexity.
+- `SEED-CR-NC-17`: current-epoch fencing token validation should not be
+  misflagged as too strict.
+- `SEED-CR-NC-18`: bounded stale read-cache behavior without write authority
+  should not be misflagged as unsafe activation.
 
 ## Unresolved Seeds
 
@@ -1541,3 +1551,323 @@ cr-eval-3-inventory-tracker) should be re-evaluated through
   `test_tenant_shard_validator_rejects_wrong_shard`.
 - domain_expert_note: Multi-tenant search systems need isolation at routing and
   storage layers, not only query time.
+
+### SEED-CR-62
+
+- production_trigger: High-volume tenants generate hundreds of thousands of
+  billable micro-events before monthly invoice finalization.
+- deceptive_cues: The visible hourly aggregator uses `Decimal` and explicit
+  money quantization, making the precision path look handled.
+- required_concepts: numerical-computing, invariant-preservation, data-modeling.
+- causal_chain: Usage metering converts decimal quantity and price to binary
+  float before aggregation, so later decimal quantization preserves accumulated
+  drift rather than preventing it.
+- why_local_review_passes: Small tests with simple decimal values produce
+  expected cents and the final aggregation code looks financially careful.
+- acceptable_root_cause: Monetary usage amounts must stay in integer minor
+  units or `Decimal` from ingestion through finalization.
+- unacceptable_shallow_answers: "Round the invoice total" is shallow because
+  the loss has already happened in raw usage metering.
+- minimum_evidence_chain: Cite `UsageMeter.record`, `billable_amount`, and
+  `HourlyAggregator._flush_bucket`.
+- domain_expert_note: Billing precision bugs often hide in intermediate
+  representations, not the final formatting step.
+
+### SEED-CR-63
+
+- production_trigger: A tenant changes plan mid-cycle while support previews
+  and reconciliation continue processing earlier usage windows.
+- deceptive_cues: `RatedUsage` carries a `plan_epoch`, and the plan cache has a
+  `plan_for_epoch` method.
+- required_concepts: time-handling, data-modeling, invariant-preservation.
+- causal_chain: Reconciliation uses the current plan instead of the usage
+  epoch, repricing historical usage under a later contract.
+- why_local_review_passes: Current-plan lookup works in tests where only one
+  plan exists.
+- acceptable_root_cause: Reconciliation must price usage against the contract
+  epoch attached to the usage event or bucket.
+- unacceptable_shallow_answers: "Plan cache exists" misses the wrong temporal
+  boundary.
+- minimum_evidence_chain: Cite `RatedUsage.plan_epoch`,
+  `PlanCache.plan_for_epoch`, and `ReconciliationEngine.reconcile`.
+- domain_expert_note: Contract effective dates are part of the billing data
+  model, not just cache metadata.
+
+### SEED-CR-64
+
+- production_trigger: A worker crashes after mutating a credit balance but
+  before ledger and audit records become durable.
+- deceptive_cues: `CreditEntry` and audit calls are present in the happy path.
+- required_concepts: event-sourcing, state-machines, invariant-preservation.
+- causal_chain: `apply_credit` debits the balance before recording the ledger
+  event, creating a data-loss window for financial compensation.
+- why_local_review_passes: Single-process tests observe both mutation and entry
+  append in one uninterrupted call.
+- acceptable_root_cause: Credit balance mutation and ledger event must share a
+  transactional boundary or outbox.
+- unacceptable_shallow_answers: "Add an audit record" is shallow because the
+  audit already exists but is ordered after the mutation.
+- minimum_evidence_chain: Cite `CreditLedger.apply_credit`, `_balances`, and
+  `entries.append`.
+- domain_expert_note: Financial ledgers require the event to be the durable
+  source of truth, not an after-the-fact side effect.
+
+### SEED-CR-65
+
+- production_trigger: Three active collectors reconcile the same tenant/hour
+  after a restart or lag spike.
+- deceptive_cues: `ReconciliationCursor` has explicit claim and processed
+  concepts.
+- required_concepts: concurrency-primitives, distributed-state,
+  invariant-preservation.
+- causal_chain: The cursor claim is check-then-mark with no compare-and-swap or
+  lease, so two workers can both write adjustments before either marks the
+  window processed.
+- why_local_review_passes: Sequential tests call reconcile once and then see
+  the processed marker.
+- acceptable_root_cause: Claiming a reconciliation window must be atomic with
+  worker ownership or the adjustment write.
+- unacceptable_shallow_answers: "Track processed windows" misses that tracking
+  happens too late.
+- minimum_evidence_chain: Cite `ReconciliationCursor.claim_window`,
+  `mark_processed`, and `ReconciliationEngine.reconcile`.
+- domain_expert_note: Batch reconciliation correctness depends on ownership
+  fencing as much as on arithmetic.
+
+### SEED-CR-66
+
+- production_trigger: A tenant bursts near the hard limit before the hourly
+  billing bucket has flushed.
+- deceptive_cues: Rate-limit enforcement uses the same plan cache and
+  aggregator as billing, which sounds consistent.
+- required_concepts: time-handling, caching-systems, capacity-planning.
+- causal_chain: Enforcement reads completed hourly aggregation only, so
+  current burst usage is invisible until after the enforcement decision.
+- why_local_review_passes: Tests check a tenant with no existing usage and a
+  small incoming amount.
+- acceptable_root_cause: Real-time enforcement needs a fresh counter or
+  write-through usage signal, not only completed billing buckets.
+- unacceptable_shallow_answers: "Use the same contract limits" misses that
+  the stale usage source is the problem.
+- minimum_evidence_chain: Cite `RateLimitEnforcer.check` and
+  `HourlyAggregator.tenant_usage`.
+- domain_expert_note: Billing aggregation and enforcement have different
+  freshness requirements even when they share contract limits.
+
+### SEED-CR-67
+
+- production_trigger: Two tenants in the same region/product have different tax
+  exemption status.
+- deceptive_cues: `TaxProfileStore.profile_for` filters by tenant before
+  populating the cache on a cold read.
+- required_concepts: multi-tenancy, caching-systems, trust-boundaries.
+- causal_chain: The hot cache key omits tenant, so the first tenant's tax
+  profile is reused for another tenant.
+- why_local_review_passes: Single-tenant tax tests pass and the cold-read
+  filter looks correct.
+- acceptable_root_cause: Tax cache keys must include tenant and every field
+  that changes tax treatment.
+- unacceptable_shallow_answers: "Add a tax profile store" is shallow because
+  the store exists but caches at the wrong boundary.
+- minimum_evidence_chain: Cite `TaxProfileStore._cache` and `profile_for`.
+- domain_expert_note: Multi-tenant cache keys are trust boundaries when cached
+  values affect billing or compliance.
+
+### SEED-CR-NC-15
+
+- production_trigger: Credit reservation checks happen while a tenant-level
+  lock is held.
+- deceptive_cues: Two balance reads appear in one method and resemble a
+  check-then-act race.
+- required_concepts: concurrency-primitives, invariant-preservation,
+  trust-boundaries.
+- causal_chain: Both reads occur under `TenantLockRegistry.lock_for`, so the
+  double read is a guarded validation pattern.
+- why_local_review_passes: The lock scope is visible but requires tracing the
+  method body, not just searching for repeated reads.
+- acceptable_root_cause: Correct skip; the real credit bug is the mutation and
+  ledger event ordering in `apply_credit`.
+- unacceptable_shallow_answers: "Double read is always a race" ignores the
+  tenant lock.
+- minimum_evidence_chain: Cite `reserve_under_lock` and
+  `TenantLockRegistry.lock_for`.
+- domain_expert_note: Concurrency review must distinguish an unguarded
+  check-then-act from a deliberately locked validation.
+
+### SEED-CR-NC-16
+
+- production_trigger: Hourly billing aggregation needs final bucket-level money
+  rounding.
+- deceptive_cues: The Decimal path looks more complex than surrounding code and
+  sits near the real precision defect.
+- required_concepts: numerical-computing, invariant-preservation, data-modeling.
+- causal_chain: Decimal accumulation and half-even quantization in
+  `_flush_bucket` are correct for bucket finalization.
+- why_local_review_passes: The test proves simple bucket totals and does not
+  expose the upstream float conversion.
+- acceptable_root_cause: Correct skip; precision should be preserved upstream,
+  not removed from the aggregator.
+- unacceptable_shallow_answers: "Simplify to float" would make the real bug
+  worse.
+- minimum_evidence_chain: Cite `HourlyAggregator._flush_bucket`.
+- domain_expert_note: Financial code often has one intentionally complex
+  precision boundary and one accidental lossy boundary.
+
+### SEED-CR-68
+
+- production_trigger: A partitioned stale coordinator reconnects while a newer
+  coordinator has already taken ownership for the tenant cohort.
+- deceptive_cues: `FencingTokenManager` exists and issues current-epoch tokens.
+- required_concepts: distributed-consensus, replication, ordering-guarantees.
+- causal_chain: Assignment writes accept a token parameter but do not validate
+  it, so lease fencing is not enforced at the write boundary.
+- why_local_review_passes: The runbook obtains a token and passes it along,
+  which can look sufficient in local review.
+- acceptable_root_cause: State-changing writes must validate the fencing token
+  at the storage boundary.
+- unacceptable_shallow_answers: "Add token issuing" is shallow because tokens
+  are already issued.
+- minimum_evidence_chain: Cite `FencingTokenManager.validate`,
+  `AssignmentStore.write_assignment`, and `FailoverRunbook.move_cohort`.
+- domain_expert_note: Fencing tokens only work when the resource being written
+  rejects stale epochs.
+
+### SEED-CR-69
+
+- production_trigger: One region acknowledges a policy snapshot while another
+  targeted region still serves the previous version.
+- deceptive_cues: The readiness helper accepts `required_regions` and records
+  per-region acknowledgements.
+- required_concepts: distributed-state, replication, state-machines.
+- causal_chain: Readiness uses the maximum regional acknowledgement, so one
+  caught-up region can activate the snapshot for the cohort.
+- why_local_review_passes: Tests with one caught-up region pass and the helper
+  name implies rollout safety.
+- acceptable_root_cause: Activation must require every targeted region, quorum
+  policy, or explicit cohort safety rule; max acknowledgement is insufficient.
+- unacceptable_shallow_answers: "Track acknowledgements" misses the wrong
+  aggregation rule.
+- minimum_evidence_chain: Cite `SnapshotAckTracker.ready_for_activation`.
+- domain_expert_note: Distributed rollout readiness is usually governed by the
+  slowest required participant, not the fastest.
+
+### SEED-CR-70
+
+- production_trigger: During regional failover, old-region queue workers keep
+  accepting writes after traffic starts moving.
+- deceptive_cues: The runbook requests a queue freeze in the same method that
+  shifts traffic.
+- required_concepts: time-handling, message-queues, invariant-preservation.
+- causal_chain: Traffic shifts before freeze confirmation, creating a timing
+  window where old and new regions can both process writes.
+- why_local_review_passes: The method contains all expected steps in a
+  plausible sequence.
+- acceptable_root_cause: Write freeze must be confirmed before traffic movement
+  or protected by idempotent/fenced writes.
+- unacceptable_shallow_answers: "Request freeze" is shallow because the issue
+  is waiting for confirmation.
+- minimum_evidence_chain: Cite `FailoverRunbook.move_cohort`,
+  `TrafficRouter.shift`, and `QueueFreezer`.
+- domain_expert_note: Failover runbooks fail at ordering boundaries, not just
+  missing steps.
+
+### SEED-CR-71
+
+- production_trigger: A newer control plane writes a policy with a condition
+  old regional replicas do not understand, then incident response rolls back.
+- deceptive_cues: The serializer intentionally preserves supported legacy
+  conditions and tests cover those supported fields.
+- required_concepts: serialization, api-evolution, trust-boundaries.
+- causal_chain: Unsupported conditions are dropped, and the legacy evaluator
+  treats absence as allow rather than fail closed.
+- why_local_review_passes: Compatibility tests use only supported condition
+  types.
+- acceptable_root_cause: Rollback serialization must preserve, reject, or
+  fail-closed on unsupported policy constraints.
+- unacceptable_shallow_answers: "Filter unsupported fields" is the defect when
+  unsupported fields affect access.
+- minimum_evidence_chain: Cite `RollbackSerializer.to_legacy_payload` and
+  `LegacyPolicyEvaluator.allows`.
+- domain_expert_note: Policy rollback compatibility is a security boundary
+  when new constraints can be silently removed.
+
+### SEED-CR-72
+
+- production_trigger: A large tenant is concentrated on one shard family during
+  failover.
+- deceptive_cues: `CapacityPlanner` applies a conservative headroom factor and
+  aggregate spare capacity looks sufficient.
+- required_concepts: load-balancing, capacity-planning, multi-tenancy.
+- causal_chain: `can_absorb` sums spare capacity across regions but ignores
+  hot-shard affinity, so a region can pass aggregate capacity while failing for
+  the tenant's actual shard placement.
+- why_local_review_passes: Single-region capacity tests check aggregate
+  headroom only.
+- acceptable_root_cause: Failover capacity checks must model tenant/shard
+  concentration and per-shard headroom.
+- unacceptable_shallow_answers: "Increase safety factor" does not address
+  missing affinity modeling.
+- minimum_evidence_chain: Cite `RegionCapacity.hot_shards` and
+  `CapacityPlanner.can_absorb`.
+- domain_expert_note: Multi-tenant capacity failures often happen at hot keys
+  or shard affinity, not aggregate cluster totals.
+
+### SEED-CR-73
+
+- production_trigger: Regions emit incident events under clock skew during a
+  failover.
+- deceptive_cues: The incident timeline records region, event, timestamp, and
+  details, then sorts deterministically.
+- required_concepts: observability-design, time-handling, distributed-state.
+- causal_chain: Sorting by regional wall-clock timestamp without coordinator
+  epoch, monotonic sequence, or causal parent can invert freeze and traffic
+  movement order.
+- why_local_review_passes: Single-clock tests produce a sensible timeline.
+- acceptable_root_cause: Cross-region incident records need causal ordering
+  evidence such as coordinator epoch, monotonic event IDs, or parent links.
+- unacceptable_shallow_answers: "Add logging" without causality fields is too
+  shallow.
+- minimum_evidence_chain: Cite `IncidentTimeline.add` and `describe`.
+- domain_expert_note: Incident observability must answer causality questions,
+  not only timestamp questions.
+
+### SEED-CR-NC-17
+
+- production_trigger: Stale coordinators try to act after a newer cohort epoch
+  is issued.
+- deceptive_cues: Strict current-epoch validation can look like it rejects
+  tokens that were valid moments earlier.
+- required_concepts: distributed-consensus, ordering-guarantees,
+  invariant-preservation.
+- causal_chain: Rejecting old epochs is the correct fencing behavior; the real
+  issue is that assignment writes do not enforce the validator.
+- why_local_review_passes: The token manager tests directly prove old-epoch
+  rejection.
+- acceptable_root_cause: Correct skip; keep strict validation and enforce it at
+  write boundaries.
+- unacceptable_shallow_answers: "Allow prior epoch during grace" reopens stale
+  leader writes.
+- minimum_evidence_chain: Cite `FencingTokenManager.validate` and
+  `test_fencing_token_manager_rejects_old_epoch`.
+- domain_expert_note: Lease fencing is intentionally unforgiving after epoch
+  replacement.
+
+### SEED-CR-NC-18
+
+- production_trigger: Readers may serve a bounded stale snapshot during config
+  propagation.
+- deceptive_cues: The read cache returns an older snapshot during the grace
+  period and sits near rollout activation code.
+- required_concepts: caching-systems, time-handling, state-machines.
+- causal_chain: The stale snapshot is read-only; `can_write_with` rejects it
+  for writes against the active version.
+- why_local_review_passes: The tests show stale reads and stale write
+  rejection together.
+- acceptable_root_cause: Correct skip; bounded stale reads are safe when they
+  cannot authorize writes or activation.
+- unacceptable_shallow_answers: "Never serve stale config" ignores the
+  read-only grace contract.
+- minimum_evidence_chain: Cite `ReadConfigCache.get_for_read`,
+  `can_write_with`, and its test.
+- domain_expert_note: Staleness is not always unsafe; the authority boundary
+  determines whether it can change state.

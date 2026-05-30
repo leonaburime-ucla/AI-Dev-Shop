@@ -2,6 +2,23 @@
 
 Committed seeded eval suites live here.
 
+## Eval Design Resources
+
+Load these files when creating or revising evals for any agent:
+
+- **`bug-taxonomy.md`** — Canonical pool of 200+ issue types: real bugs,
+  negative controls, traps, ambiguities, design trade-offs, severity traps.
+  All agent-neutral. This is the MENU of what to plant.
+
+- **`eval-design-playbook.md`** — Lessons learned and design rules from
+  building the CR eval suite. Covers brief design, fixture design, NC design,
+  scoring, process, cross-model testing, and anti-patterns. Load this FIRST
+  when starting eval work.
+
+Rule: the taxonomy is a menu. The per-eval `seed-ledger.md` is the oracle
+(hidden from the evaluated agent) where evidence paths, scoring criteria,
+and expected severity live.
+
 ## Layout
 
 - `architect-evals/`

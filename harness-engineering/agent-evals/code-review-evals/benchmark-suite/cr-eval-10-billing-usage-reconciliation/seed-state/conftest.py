@@ -1,4 +1,4 @@
-"""Root conftest -- ensure src/ is importable."""
+"""Ensure the seed-state package is importable."""
 import sys
 from pathlib import Path
 

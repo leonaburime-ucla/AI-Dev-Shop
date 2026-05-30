@@ -1,49 +1,36 @@
-# Multi-Channel Notification Dispatcher - Project Brief
+# Notification Service — Project Brief
 
 ## Overview
 
-The notification service dispatches operational and marketing messages across
-email, SMS, and push providers. The implementation now supports provider
-failover, unsubscribe policy checks, template rendering with locale/version
-metadata, duplicate suppression, and audit events for delivery operations.
+The notification delivery pipeline routes messages across email, SMS, and push
+channels for our multi-tenant platform. This change adds multi-provider fallback
+with tenant-specific preference resolution, replacing the previous
+single-provider-per-channel approach.
 
-This eval is intentionally focused on Code Review depth. The code and tests
-cover common success paths, but production failures emerge when duplicate
-suppression, provider failover, fallback channels, template cache keys, privacy
-rules, and audit evidence interact.
+## Operational Context
+
+- Platform: multi-tenant SaaS, ~200 tenants on shared infrastructure
+- Channels: email, SMS, push — each with a primary and fallback provider
+- Providers: occasionally timeout without confirming delivery status; responses
+  take up to 30s under load
+- Templates: cached for performance; rendered per-tenant with locale variants
+- Preferences: users configure quiet hours and channel preferences per topic
+- Delivery volume: ~50k notifications/hour across all tenants at peak
+- Compliance: GDPR and CCPA require suppression of messages to users who have
+  opted out of specific channels for specific topics
 
 ## Requirements
 
-### Functional Requirements
-
-1. Duplicate suppression must be scoped by tenant, notification, channel, and
-   provider attempt so cross-tenant or cross-channel sends cannot collide.
-2. Provider failover must remain idempotent when a primary provider times out
-   after accepting a request and the dispatcher retries on a fallback channel.
-3. Privacy suppression must be evaluated for the actual channel that will be
-   used, including fallback channels.
-4. Templates must be rendered by tenant, template ID, locale, version, and
-   privacy classification. Cached templates must not cross those boundaries.
-5. Delivery audit events must include tenant, channel, provider, template
-   version, dedupe key, fallback reason, and suppression reason.
-6. Tests must cover cross-tenant duplicate keys, late primary success after
-   failover, fallback privacy suppression, template-version drift, provider
-   backoff, and audit evidence completeness.
-
-### Acceptance Criteria
-
-- AC-1: A duplicate notification retry for the same tenant/channel/provider
-  returns the prior result without sending again.
-- AC-2: A timeout followed by provider failover cannot deliver the same
-  notification twice.
-- AC-3: An SMS fallback is blocked when the user has suppressed SMS for the
-  topic, even if the original email channel was allowed.
-- AC-4: Template rendering uses locale, version, and privacy classification in
-  the cache boundary.
-- AC-5: Delivery audit events include enough dimensions to reconstruct
-  provider failover and suppression decisions.
-- AC-6: The test suite covers the cross-boundary cases above.
+1. Route notifications through the configured primary provider, falling back to
+   an alternate provider or channel when the primary is unavailable.
+2. Suppress duplicate delivery when the same logical notification is processed
+   more than once (at-most-once semantics per channel per tenant).
+3. Respect user channel preferences and topic suppression rules before sending.
+4. Render notification content from cached templates with locale support.
+5. Enforce user-configured quiet hours so notifications are deferred rather
+   than delivered at antisocial times.
+6. Log delivery outcomes for operational debugging and compliance audit.
 
 ## Spec Hash
 
-`spec-notification-failover-v5-a91c2`
+`spec-notification-delivery-v4-b83e1`

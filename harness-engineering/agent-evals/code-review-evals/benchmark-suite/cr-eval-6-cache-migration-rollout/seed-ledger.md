@@ -1,97 +1,104 @@
-# Seed Ledger - cr-eval-6-cache-migration-rollout (CR Staff+)
+# Seed Ledger — cr-eval-6-cache-migration-rollout
 
 **Eval ID**: benchmark-suite / cr-eval-6-cache-migration-rollout
-**Purpose**: Test Code Review agent on cache migration and rollout defects that
-look safe in local read/write tests but fail under stale snapshots, schema
-compatibility, feature flags, backfill, and rollback.
-**Difficulty**: Hard - evidence is distributed across source, tests, project
-brief, and fake Programmer handoff.
+**Purpose**: Test Code Review agent on cache-migration defects involving stale
+repopulation races, schema translation data loss, consent-default violations,
+configuration validation gaps, premature promotion, and negative-cache
+invalidation failures — without the brief naming the invariants.
+**Difficulty**: Hard staff+ fixture. Brief describes operational context only.
 
 ## Seeds
 
 ### SEED-CR-34
 
-Stale legacy snapshots can repopulate the shared cache after a fresher write
-because repopulation ignores cache generation. Correct review flags distributed
-state divergence during cache invalidation and repopulation.
+Read-through cache population writes data without checking the current cache
+generation. A slow PostgreSQL query that started before a fresh write completes
+after it, overwriting the fresh value with stale generation-0 data.
 
-Evidence: `src/cache_migration.py` (`repopulate_legacy_cache`,
-`write_profile`) and `project-brief.md` (AC-6).
+Evidence: `src/cache_migration.py` (`CacheMigrationRouter.repopulate_legacy_cache`
+— sets value unconditionally without comparing generation counters).
+Expected severity: Critical
 
 ### SEED-CR-35
 
-The v2 write path can skip the legacy cache while old readers are still active,
-creating a rollback/read window where updates disappear for v1 clients. Correct
-review flags the dual-write migration data-loss window.
+The v2-to-v1 schema translator omits the `risk_flags` field when downgrading
+a profile for legacy cache storage. A rollback after promotion loses
+safety-sensitive risk-assessment data that was written during the dual-write
+period.
 
-Evidence: `src/cache_migration.py` (`write_profile`) and fake handoff rollout
-claim.
+Evidence: `src/cache_migration.py` (`SchemaTranslator.v2_to_v1` — builds v1
+dict without including `risk_flags`).
+Expected severity: Critical
 
 ### SEED-CR-36
 
-Schema translation silently defaults missing risk fields and drops v2-only
-fields on rollback. Correct review flags the serialization/type-contract escape
-instead of trusting the local dataclass shape.
+The v1-to-v2 schema translator defaults the `marketing_opt_in` field to `True`
+when the field is absent in the v1 record. A user who never consented is
+treated as opted-in after upgrade — a GDPR consent violation.
 
-Evidence: `src/cache_migration.py` (`SchemaTransformer`) and missing contract
-tests.
+Evidence: `src/cache_migration.py` (`SchemaTranslator.v1_to_v2` — defaults
+`marketing_opt_in` to `True`).
+Expected severity: Critical
 
 ### SEED-CR-37
 
-Independent read, write, dual-write, and backfill flags can combine into
-unsupported states. Correct review flags the lack of configuration validation
-for rollout flag interactions.
+Tenant migration configuration flags (`read_new`, `write_v2`, `dual_write`,
+`backfill_running`) are independent booleans with no mutual-exclusion
+validation. The combination `dual_write=True` with `write_v2=False` is
+accepted silently but results in writes only reaching legacy — the new cache
+diverges without any error signal.
 
-Evidence: `src/cache_migration.py` (`MigrationFlags`, `write_profile`,
-`read_profile`).
+Evidence: `src/cache_migration.py` (`TenantMigrationConfig` dataclass — no
+validation of flag combinations).
+Expected severity: Major
 
 ### SEED-CR-38
 
-Tenant promotion only checks a backfill flag and ignores cache generation
-convergence, allowing cutover before warm-up catches the latest writes. Correct
-review flags the migration temporal hazard.
+Tenant promotion only checks the `backfill_complete` flag. It does not verify
+that the new cache generation has converged with the latest writes. A tenant
+can be promoted while the new cache still serves data from an earlier
+generation — missing any writes that occurred after backfill started.
 
-Evidence: `src/cache_migration.py` (`mark_backfill_complete`,
-`promote_tenant`).
+Evidence: `src/cache_migration.py` (`MigrationController.promote_tenant` —
+checks `backfill_complete` but not generation convergence).
+Expected severity: Major
 
 ### SEED-CR-39
 
-Shadow-read mismatch metrics increment counters but omit user, schema version,
-source cache, generation, tenant, and flag set. Correct review treats this as a
-rollout observability defect.
+Negative cache entries (tombstones for "user not found") written to legacy
+cache are never invalidated when a user is subsequently created in the new
+system. The stale tombstone persists and serves 404s for a user who now exists.
 
-Evidence: `src/cache_migration.py` (`MigrationMetrics`) and fake handoff
-observability claim.
+Evidence: `src/cache_migration.py` (`CacheMigrationRouter.get_profile` —
+negative entry check does not verify creation timestamp against tombstone age).
+Expected severity: Major
 
-### SEED-CR-40
+## Negative Controls
 
-Tests cover static read and write modes but omit stale repopulation, rollback
-dual-read/write, unsupported flag combinations, schema-compatibility failures,
-and partial backfill promotion.
+### SEED-CR-NC-01
 
-Evidence: `tests/test_cache_migration.py` and fake handoff coverage claim.
+`versioned_cache_key` builds a compound key incorporating schema version,
+tenant ID, and user ID. This looks like redundant complexity but is necessary
+for cache isolation across schema versions during the migration. The actual
+bug is in `repopulate_legacy_cache` which bypasses this key format.
 
-### SEED-CR-NC-07
+Evidence: `src/cache_migration.py` (`versioned_cache_key` function).
 
-`versioned_cache_key` explicitly includes schema version and tenant. Correct
-review should not misflag versioned keys as redundant storage.
+### SEED-CR-NC-02
 
-Evidence: `src/cache_migration.py` (`versioned_cache_key`) and
-`tests/test_cache_migration.py` (`test_versioned_cache_key_is_schema_scoped`).
+`DualWriteCompatibilityShim.write_profile` writes the full profile to both
+legacy and new cache on every mutation. This appears to be wasteful duplicate
+work but is required to maintain rollback safety during the dual-write window.
+Both copies must stay in sync.
 
-### SEED-CR-NC-08
-
-`DualWriteCompatibilityShim` writes a lossless v1/v2 pair during the rollback
-window. Correct review should not misflag it as duplicate work.
-
-Evidence: `src/cache_migration.py` (`DualWriteCompatibilityShim`) and
-`tests/test_cache_migration.py` (`test_dual_write_compatibility_shim_is_lossless`).
+Evidence: `src/cache_migration.py` (`DualWriteCompatibilityShim.write_profile`).
 
 ## Scoring Guide
 
 | Score | Criteria |
 |-------|----------|
-| CAUGHT | CR identifies the seeded issue and its production consequence. |
-| PARTIAL | CR identifies a related concern but misses the causal chain or severity. |
+| CAUGHT | CR identifies the seeded issue and its production consequence with correct severity. |
+| CAUGHT_WRONG_SEVERITY | CR identifies the issue but misjudges severity by one+ level. |
+| PARTIAL | CR identifies a related concern but misses the causal chain. |
 | MISSED | CR does not flag the issue. |
 | FALSE_POSITIVE | CR flags a negative-control behavior as a defect. |

@@ -1,51 +1,45 @@
-# Search Index Replica Projection - Project Brief
+# Search Index Replica Projection — Project Brief
 
 ## Overview
 
-A projection worker consumes primary database change events and maintains
-tenant-scoped search indexes. It applies versioned create/update/delete events,
-handles tombstones, runs schema backfills, routes documents to shards, swaps
-read aliases during index rebuilds, and reports replication lag.
+Review changes for rolling out a new search replica and alias migration.
+Event-stream-fed search index serving ~200 tenants. Documents have versions
+from the source-of-truth service. Backfill runs weekly from a snapshot
+export. Alias cutover switches read traffic when ready. We're adding a
+second index generation for zero-downtime reindexing.
 
-This eval is intentionally focused on Code Review depth. The projection code
-looks complete and the tests cover direct create/update/delete behavior, but
-production failures emerge only when event versions, tombstone semantics,
-backfill schema drift, per-shard readiness, tenant routing, and observability
-interact.
+## Operational Context
+
+- Event stream: Kafka topics partitioned by tenant, at-least-once delivery
+- Source of truth: PostgreSQL with monotonic version column per aggregate
+- Infrastructure: 4-shard cluster, each tenant assigned to a fixed shard set
+- Scale: ~200 active tenants, 15M documents, 2000 events/second peak
+- Backfill: weekly reconciliation job reads from a snapshot export
+- Migration: second index generation being stood up for schema changes
+- Rollout: feature-flag-gated, tenant class controls gradual cutover
 
 ## Requirements
 
-### Functional Requirements
-
-1. Projection writes apply only strictly newer aggregate versions; same-version
-   replays are idempotent skips.
-2. Tombstones cannot be resurrected by late updates or backfill events unless a
-   new aggregate generation explicitly recreates the document.
-3. Alias cutover waits for every shard and replica to reach the target version
-   and backfill generation.
-4. Backfill schema mapping preserves all fields required by the current search
-   contract.
-5. Shard routing and storage-level operations maintain tenant isolation, not
-   only query-time filters.
-6. Lag and projection metrics include tenant, shard, max version, alias
-   generation, tombstones, and backfill progress.
-7. Tests must cover out-of-order versions, tombstone resurrection, partial
-   shard cutover, schema drift, tenant routing fallback, and metric dimensions.
-
-### Acceptance Criteria
-
-- AC-1: Older and same-version replayed events do not overwrite newer index
-  state.
-- AC-2: Deletes remain durable against late update and backfill events.
-- AC-3: Alias cutover fails closed until all shards reach the target version.
-- AC-4: Backfill preserves new schema fields required by current reads.
-- AC-5: Documents missing tenant context are rejected instead of falling back to
-  shared routing.
-- AC-6: Metrics can identify lag by tenant, shard, version, and generation.
-- AC-7: The test suite covers the interaction cases above.
-- AC-8: Correct strict-version idempotency and tenant shard validation helpers
-  are valid and should not be flagged as defects.
+1. Documents are versioned from the source-of-truth service. The projection
+   applies incoming events and keeps the index up to date with the latest
+   version of each document.
+2. Deleted documents stay deleted — the weekly backfill and late-arriving
+   events should not bring them back unless the source explicitly recreates
+   the document under a new generation.
+3. Alias cutover switches read traffic from the old index to the new one
+   when all shards are caught up to the target replication point.
+4. The weekly backfill reconciles the search index from a full snapshot
+   export. All fields required by the current search contract must be
+   preserved.
+5. Multi-tenant: each document belongs to exactly one tenant. Routing
+   uses the tenant context on every write.
+6. The reindex job rebuilds the full index from the source table when a
+   schema migration requires it. It must handle the table size (15M rows)
+   via pagination.
+7. Feature flag rollout: writes migrate first to the new index, then reads
+   follow per tenant class, so tenants can be moved gradually without
+   downtime.
 
 ## Spec Hash
 
-`spec-search-index-replica-projection-v1-yza567`
+`spec-search-replica-projection-v3-d82f1a`

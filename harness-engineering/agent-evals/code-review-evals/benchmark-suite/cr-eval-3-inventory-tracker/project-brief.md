@@ -1,49 +1,41 @@
-# Distributed Inventory Allocation - Project Brief
+# Inventory Tracker — Project Brief
 
 ## Overview
 
-The inventory tracker coordinates stock records across tenant-scoped
-warehouses, reservation holds, transfer operations, reconciliation snapshots,
-idempotent adjustments, and audit trails. The implementation was refactored to
-support read-model based allocation and deterministic time handling.
+Review changes to inventory reservations and inter-warehouse transfers. Two
+warehouse workers process orders for the same SKU concurrently. A weekly
+reconciliation job ensures counts stay consistent. Admin stock adjustments come
+from cycle counts, damage reports, and manual overrides.
 
-This eval is intentionally focused on Code Review depth. Happy-path tests pass,
-but production failures emerge when stale read models, concurrent reservations,
-partial transfer failures, reconciliation, idempotency keys, admin overrides,
-and shared runtime context interact.
+## Operational Context
+
+- Warehouses: 12 fulfillment centers, each running 2-4 order-picking workers
+- Read model: eventually-consistent availability projection refreshed every
+  few seconds; used by checkout and storefront display
+- Transfers: logistics team moves stock between warehouses 5-10 times per day;
+  operations expects zero-loss accounting across moves
+- Adjustments: warehouse admins submit cycle-count corrections, damage reports,
+  and manual overrides through the back-office tool; the same physical count
+  may produce adjustments for multiple warehouses and different reason codes
+- Reconciliation: weekly batch job runs during the Sunday-night low-traffic
+  window; ops reviews its output Monday morning for stock discrepancies
+- Tenancy: multi-tenant SaaS, ~40 active tenants on shared infrastructure;
+  each tenant has its own warehouse network
 
 ## Requirements
 
-### Functional Requirements
-
-1. Reservation decisions must use a consistency boundary that prevents two
-   workers from allocating the same available units.
-2. Reconciliation must surface negative stock and oversell incidents instead
-   of silently normalizing them away.
-3. Transfers must debit the source and credit the destination atomically, or
-   compensate the source if the destination write fails.
-4. Adjustment idempotency must include tenant, warehouse, SKU, adjustment ID,
-   and reason code.
-5. Admin overrides must preserve the original requester and approver in audit
-   evidence.
-6. Tenant and time context must be scoped to each tracker instance so
-   reservation expiry and tenant behavior remain deterministic.
-7. Tests must cover concurrent reservation, stale read-model allocation,
-   transfer failure compensation, reconciliation observability, idempotency
-   collisions, override audit identity, and injected-clock behavior.
-
-### Acceptance Criteria
-
-- AC-1: Concurrent reservation attempts cannot oversell a warehouse.
-- AC-2: Negative inventory reconciliation produces an explicit oversell signal.
-- AC-3: Transfer failure cannot make stock vanish from the source warehouse.
-- AC-4: Two adjustments with the same external ID but different warehouse or
-  reason code do not collide.
-- AC-5: Override audit records include both original requester and approver.
-- AC-6: Reservation expiry and audit timestamps are deterministic per tracker
-  instance.
-- AC-7: The test suite covers the interaction cases above.
+1. Warehouse workers reserve stock during checkout and release it on
+   cancellation or fulfillment.
+2. Logistics staff transfer stock between warehouses to rebalance inventory
+   ahead of demand spikes.
+3. Warehouse admins apply adjustments from cycle counts and damage reports.
+   Adjustments may arrive more than once due to retries from the back-office
+   client.
+4. The weekly reconciliation job reports stock health so operations can
+   investigate discrepancies before the next sales week.
+5. Clock injection supports deterministic testing of reservation expiry
+   without real sleeps.
 
 ## Spec Hash
 
-`spec-inventory-allocation-v6-f340e`
+`spec-inventory-reservations-v3-a7c12`

@@ -1,23 +1,30 @@
-# Fake Programmer Handoff - cr-eval-5-retry-idempotency-queue
+# Fake Programmer Handoff — cr-eval-5-retry-idempotency-queue
 
 ## Summary
 
-Implemented the partner delivery queue worker with retry scheduling,
-idempotency dedupe, DLQ handling, partition ownership, backpressure, and
-delivery event logging.
+Implemented the partner integration retry queue worker with exponential
+backoff, idempotent deduplication, dead-letter quarantine, partition
+rebalance handling, backpressure control, error classification, and
+delivery metrics.
 
 ## Claimed Coverage
 
-- Retry policy has maximum attempts, exponential backoff, cap, and jitter.
-- Idempotency store covers partner replay and queue redelivery.
-- Permanent malformed messages are isolated from tenant partitions.
-- Rebalances are safe because checkpoints are stored per partition.
-- Backpressure prevents unbounded worker memory growth.
-- Delivery events are sufficient for incident reconstruction.
-- Tests cover success, duplicate delivery, retries, DLQ behavior,
-  backpressure, and partition assignment.
+- Retry policy uses exponential backoff with configurable cap and jitter.
+- Idempotency store covers partner replay and queue redelivery windows.
+- Permanent malformed messages are quarantined to DLQ without blocking
+  partition progress.
+- Rebalances update epoch and partition assignments so stale consumers
+  cannot process revoked partitions.
+- Backpressure monitors failure ratio and inflight count to pause fetches
+  during sustained outages.
+- Error classifier distinguishes transient vs permanent downstream errors.
+- Dead-letter tracker persists failure counts per message across retries.
+- Tests cover success path, deduplication, retry scheduling, DLQ threshold,
+  backpressure signaling, rebalance, and metrics.
 
 ## Self-Assessment
 
-All acceptance criteria are complete. The code is ready for Code Review with no
-known gaps.
+All acceptance criteria are complete. The retry queue handles transient
+failures with bounded backoff, deduplicates partner replays, quarantines
+poison messages, and remains stable under backpressure. The code is ready
+for Code Review with no known gaps.

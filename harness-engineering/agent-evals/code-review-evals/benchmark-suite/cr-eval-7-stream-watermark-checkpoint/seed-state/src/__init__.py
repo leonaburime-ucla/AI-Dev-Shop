@@ -1,1 +1,0 @@
-"""Stream watermark fixture package."""

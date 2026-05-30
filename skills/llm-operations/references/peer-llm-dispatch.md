@@ -136,6 +136,39 @@ While the peer process is still running:
 - Treat process liveness and elapsed wall-clock time as the primary signal, not the current byte count of redirected stdout/stderr files.
 - Keep `audit_timeout_seconds` as the hard ceiling.
 - Use host-specific references for any peer-specific soft suspicion thresholds or buffering quirks.
+- **BLOCKING RULE: Always run the Heartbeat Monitor below.** Every peer dispatch in `/cowork`, `/consensus`, `/debate`, and `/audit-work` MUST show heartbeat output to the user. This is not optional. If you dispatch a peer without a heartbeat, you have violated this rule.
+
+### Heartbeat Monitor (Mandatory, Non-Blocking)
+
+Run a lightweight heartbeat every 30 seconds while ANY peer LLM process is running. Show the output to the user by default. This is **informational only** — it never kills, never blocks, never auto-escalates. It just reports so the user can see what's happening.
+
+**Rules:**
+
+- The heartbeat NEVER kills a peer process.
+- The heartbeat NEVER blocks workflow progress.
+- The heartbeat reports liveness and elapsed time. That's it.
+- If the user wants to kill a stalled peer, they decide — not the heartbeat.
+
+**What to check (every 30s):**
+
+1. **Process liveness:** `kill -0 $PID` — is the peer process still alive?
+2. **Elapsed time:** how long since dispatch?
+3. **Output bytes (informational):** `wc -c < $STDOUT_FILE` — note that some peers buffer until exit.
+
+**How to report:**
+
+- While alive: `[peer-heartbeat] <peer_name> | alive | <elapsed>s`
+- On exit: `[peer-heartbeat] <peer_name> | done | <elapsed>s | <bytes> bytes`
+
+Keep it to one short line. Don't add stall warnings or recommendations — the user can read elapsed time themselves.
+
+**Known buffering behavior by peer:**
+
+- **Codex CLI** (`codex exec`): Buffers ALL stdout until process exit. Zero bytes during execution is normal. GPT-5.5 at xhigh reasoning takes 3-5 minutes for complex prompts. This is expected, not a stall.
+- **Claude CLI** (`claude -p`): May buffer until exit in headless mode.
+- **Gemini CLI** (`gemini -p`): Typically streams; byte growth is a valid liveness signal.
+
+**Cost:** Zero tokens, negligible CPU (~1ms per check). The heartbeat adds no peer interaction — it only inspects local process state and file size.
 
 ### Dispatch Cleanup
 

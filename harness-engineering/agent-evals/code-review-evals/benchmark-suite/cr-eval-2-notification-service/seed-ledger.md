@@ -1,69 +1,87 @@
-# Seed Ledger - cr-eval-2-notification-service (CR Staff+)
+# Seed Ledger — cr-eval-2-notification-service (v2 rewrite)
 
 **Eval ID**: benchmark-suite / cr-eval-2-notification-service
 **Purpose**: Test Code Review agent on multi-channel notification dispatch
-defects involving provider failover, duplicate suppression, privacy policy,
-template caching, test design, and delivery observability.
-**Difficulty**: Hard staff+ fixture with one medium regression seed retained
-for calibration.
+defects involving deduplication scope, provider failover idempotency, fallback
+privacy enforcement, template cache boundaries, timezone handling, and PII
+leakage — without the brief naming the invariants.
+**Difficulty**: Hard staff+ fixture. Brief describes operational context only.
 
 ## Seeds
 
 ### SEED-CR-07
 
-The duplicate-suppression key omits tenant, channel, and provider attempt. A
-notification in one tenant or channel can suppress another tenant/channel send
-with the same user-visible notification ID.
+Dedup key uses only (user_id, notification_id) — omits tenant_id, channel,
+provider. Cross-tenant collision suppresses legitimate sends.
 
-Evidence: `src/notification_service.py` (`DedupeStore.key_for`).
+Evidence: `src/notification_service.py` (`DeduplicationStore.build_key`).
+Expected severity: Critical
 
 ### SEED-CR-08
 
-Provider failover treats timeout as a clean failure even though the primary
-provider may have accepted the send. The fallback channel can deliver a second
-message with no shared idempotency fence.
+Provider timeout treated as clean failure. Primary may have delivered, fallback
+sends again with no shared idempotency fence between providers. Duplicate
+delivery.
 
-Evidence: `src/notification_service.py` (`NotificationDispatcher.dispatch` and
-`ProviderAdapter.send`).
+Evidence: `src/notification_service.py` (`NotificationDispatcher._attempt_send`
+and `ProviderClient.deliver` timeout handling).
+Expected severity: Critical
 
 ### SEED-CR-09
 
-Tests cover happy path, simple fallback, primary-channel suppression, rendering,
-and audit existence, but omit cross-tenant dedupe, late primary success,
-fallback suppression, template-version drift, rate-limit collapse, and audit
-dimension assertions.
+Privacy suppression checked only on original channel. Fallback to SMS bypasses
+user's SMS suppression for that topic.
 
-Evidence: `tests/test_notification_service.py` and fake handoff coverage claim.
+Evidence: `src/notification_service.py` (`NotificationDispatcher.dispatch` —
+suppression check before fallback loop).
+Expected severity: Major
 
 ### SEED-CR-10
 
-Privacy suppression is checked only before failover on the original channel.
-If email fails and the dispatcher falls back to SMS, SMS suppression for the
-topic is bypassed.
+Template cache keyed only on template_id — ignores locale and
+content_sensitivity. Stale/wrong content served cross-locale.
 
-Evidence: `src/notification_service.py` (`NotificationDispatcher.dispatch`).
+Evidence: `src/notification_service.py` (`TemplateCache.get_rendered`).
+Expected severity: Major
 
 ### SEED-CR-11
 
-The template cache is keyed only by `template_id`, so locale, version, tenant,
-and privacy classification can reuse stale content across incompatible sends.
+Quiet-hours enforcement uses server timezone (UTC) instead of user's configured
+timezone. Notifications delivered at 3am user-local time.
 
-Evidence: `src/notification_service.py` (`TemplateRenderer.render`).
+Evidence: `src/notification_service.py` (`QuietHoursPolicy.is_in_quiet_hours`
+— compares against UTC hour).
+Expected severity: Major
 
 ### SEED-CR-12
 
-Delivery audit events omit tenant, channel, provider, template version, dedupe
-key, fallback reason, and suppression reason. Correct review treats this as
-incident reconstruction risk, not cosmetic logging.
+Failed notification error log includes user's full email and phone number for
+"debugging". PII leakage in logs.
 
-Evidence: `src/notification_service.py` (`NotificationAudit.record`) and fake
-handoff audit claim.
+Evidence: `src/notification_service.py` (`NotificationDispatcher._log_failure`).
+Expected severity: Critical
+
+### SEED-CR-NC-01
+
+Exponential backoff with jitter in the provider retry loop — looks aggressive
+but is correct. The real bug is the missing idempotency BETWEEN primary and
+fallback, not the retry mechanism within one provider.
+
+Evidence: `src/notification_service.py` (`RetryPolicy.next_delay`).
+
+### SEED-CR-NC-02
+
+Template cache invalidation on version bump IS correct — the bug is that LOCALE
+isn't in the cache key, not that the cache invalidation itself is broken.
+
+Evidence: `src/notification_service.py` (`TemplateCache.invalidate`).
 
 ## Scoring Guide
 
 | Score | Criteria |
 |-------|----------|
-| CAUGHT | CR identifies the seeded issue and its production/privacy consequence. |
-| PARTIAL | CR identifies a related concern but misses the cross-boundary causal chain. |
+| CAUGHT | CR identifies the seeded issue and its production consequence with correct severity. |
+| CAUGHT_WRONG_SEVERITY | CR identifies the issue but misjudges severity by one+ level. |
+| PARTIAL | CR identifies a related concern but misses the causal chain. |
 | MISSED | CR does not flag the issue. |
-| FALSE_POSITIVE | CR flags behavior outside the seeded issue as a defect without evidence. |
+| FALSE_POSITIVE | CR flags a negative-control behavior as a defect. |

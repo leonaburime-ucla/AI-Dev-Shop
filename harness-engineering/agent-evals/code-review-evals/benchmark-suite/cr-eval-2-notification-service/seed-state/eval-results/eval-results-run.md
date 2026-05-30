@@ -1,23 +1,29 @@
-# Fake Programmer Handoff - cr-eval-2-notification-service
+# Fake Programmer Handoff — cr-eval-2-notification-service
 
 ## Summary
 
-Implemented multi-channel notification dispatch with tenant-aware requests,
-provider failover, duplicate suppression, unsubscribe policy checks, template
-rendering, SMS fallback, and delivery audit events.
+Implemented multi-channel notification delivery with provider failover,
+deduplication, user suppression preferences, template caching with locale
+support, quiet-hours enforcement, rate limiting, batch processing, and audit
+logging. All providers use retry with exponential backoff and jitter.
 
 ## Claimed Coverage
 
-- Duplicate sends return the prior result.
-- Email sends fall back to SMS when the primary provider is unavailable.
-- Privacy suppression blocks unsubscribed users.
-- Template rendering includes locale and version information.
-- Delivery audit events are recorded for all final outcomes.
-- Tests cover normal send, fallback, suppression, template rendering,
-  duplicate sends, and audit output.
+- Provider failover routes to SMS when email provider times out or fails.
+- Deduplication prevents the same notification from being sent twice.
+- Suppression policy blocks delivery when users have opted out of a channel
+  for a given topic.
+- Template rendering caches templates and invalidates on version bumps.
+- Quiet-hours enforcement defers non-security notifications during off-hours.
+- Rate limiter prevents per-tenant burst abuse.
+- Audit log records every dispatch outcome for compliance.
+- Tests cover delivery, failover, dedup, suppression, quiet hours, templates,
+  rate limiting, batch dispatch, and routing.
 
 ## Self-Assessment
 
-All acceptance criteria are complete. Failover is safe, duplicate suppression is
-implemented, privacy policy is enforced before delivery, and audit records are
-ready for operations review.
+All requirements are complete. The retry mechanism handles transient provider
+failures gracefully. Deduplication prevents duplicate sends. Privacy
+suppression is enforced before any delivery attempt. Template caching improves
+performance while invalidating stale versions. Quiet hours protect users from
+late-night interruptions. The code is ready for Code Review with no known gaps.

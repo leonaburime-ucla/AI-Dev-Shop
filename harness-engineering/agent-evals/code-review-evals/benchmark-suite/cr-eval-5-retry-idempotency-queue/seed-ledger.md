@@ -1,99 +1,110 @@
-# Seed Ledger - cr-eval-5-retry-idempotency-queue (CR Staff+)
+# Seed Ledger — cr-eval-5-retry-idempotency-queue (v2 rewrite)
 
 **Eval ID**: benchmark-suite / cr-eval-5-retry-idempotency-queue
 **Purpose**: Test Code Review agent on retry, idempotency, poison-message,
-rebalance, and backpressure defects that pass local queue-worker tests but fail
-under production delivery and replay conditions.
-**Difficulty**: Hard - evidence is distributed across source, tests, project
-brief, and fake Programmer handoff.
+rebalance, and backpressure defects that pass happy-path tests but cause
+production failures under partner replay, sustained outages, and deploy
+rebalances.
+**Difficulty**: Hard staff+ fixture. Brief describes operational context only.
 
 ## Seeds
 
 ### SEED-CR-27
 
-Retry scheduling uses exponential delay but ignores the configured cap and
-jitter. Correct review flags retry amplification under shared partner outages.
+Retry delay calculation ignores max_delay_seconds cap and jitter_ratio.
+Exponential without bound causes thundering herd on shared partner outages.
 
-Evidence: `src/retry_queue.py` (`RetryPolicy.delay_for`,
-`QueueConsumer._schedule_retry`) and the handoff claim that retries are capped
-and jittered.
+Evidence: `src/retry_queue.py` (`RetryPolicy.compute_delay` — computes
+`base_delay * 2^attempt` but never applies `min(..., max_delay_seconds)` and
+never adds jitter from `jitter_ratio`).
+Expected severity: Major
 
 ### SEED-CR-28
 
-The idempotency retention window is shorter than the documented partner replay
-window, so delayed replay can execute a second side effect after the dedupe
-record expires. Correct review treats this as a data-loss/duplicate-effect
-window, not a harmless cache TTL.
+Idempotency window (900s) shorter than partner documented replay window
+(3600s). Duplicate side effects after key expires.
 
-Evidence: `src/retry_queue.py` (`IdempotencyStore`, `QueueConsumer`) and
-`project-brief.md` (AC-3).
+Evidence: `src/retry_queue.py` (`IdempotencyStore.__init__` — default
+`window_seconds=900.0`) and `project-brief.md` (partners replay up to 3600s).
+Expected severity: Critical
 
 ### SEED-CR-29
 
-Permanent message failures are put back on the retry path instead of being
-quarantined to the DLQ, blocking partition progress behind poison messages.
-Correct review distinguishes this from the max-attempt transient DLQ path.
+PermanentMessageError handler schedules retry instead of DLQ. Poison messages
+loop infinitely.
 
-Evidence: `src/retry_queue.py` (`QueueConsumer.process_batch`) and
-`tests/test_retry_queue.py` (no permanent-failure path).
+Evidence: `src/retry_queue.py` (`PartitionConsumer._process_single` —
+`except PermanentMessageError` branch calls `self._schedule_retry` instead
+of `self.dlq.quarantine`).
+Expected severity: Critical
 
 ### SEED-CR-30
 
-Side effects are executed before the consumer checkpoint is fenced by the
-current partition owner epoch. Correct review flags duplicate effects during
-rebalance or replay, even though single-consumer tests pass.
+Rebalance increments epoch but doesn't purge retry queue entries for revoked
+partitions. Old consumer executes stale retries, duplicating side effects.
 
-Evidence: `src/retry_queue.py` (`QueueConsumer.process_batch`,
-`QueueConsumer.claim_partitions`, `_ack`).
+Evidence: `src/retry_queue.py` (`PartitionConsumer.on_rebalance` — updates
+`self._epoch` and `self._assigned_partitions` but does not filter
+`self._retry_heap`).
+Expected severity: Critical
 
 ### SEED-CR-31
 
-Backpressure pauses fresh fetches but retry scheduling continues to append to an
-in-memory retry queue. Correct review flags resource exhaustion during degraded
-downstream periods.
+Backpressure pauses fetches but retry scheduling continues appending
+unbounded. OOM during sustained outage.
 
-Evidence: `src/retry_queue.py` (`BackpressureMonitor`,
-`QueueConsumer._schedule_retry`).
+Evidence: `src/retry_queue.py` (`PartitionConsumer._schedule_retry` — no
+check of `self._backpressure.should_pause_retries()` or retry queue depth
+before appending).
+Expected severity: Major
 
 ### SEED-CR-32
 
-Delivery events record success, retry, and DLQ outcomes but omit idempotency
-key, attempt ID, tenant, partition owner epoch, and replay classification.
-Correct review treats this as an operational forensic gap.
+Error classification maps 400 responses to "retryable" via substring match
+on "service" in message. Deterministic failures retry infinitely against
+healthy downstream.
 
-Evidence: `src/retry_queue.py` (`QueueConsumer.events`) and fake handoff
-observability claim.
+Evidence: `src/retry_queue.py` (`ErrorClassifier.classify` — `"service" in
+str(error).lower()` branch returns `ErrorClass.TRANSIENT` even for 400-level
+responses containing "service" in the error description).
+Expected severity: Critical
 
 ### SEED-CR-33
 
-Tests cover success, simple duplicates, and one transient retry but omit retry
-jitter/cap, delayed replay after idempotency expiry, permanent poison messages,
-rebalance duplicate effects, and backpressure retry growth.
+DLQ threshold keyed on consumer-group-id which changes on deploy. Poison
+messages get fresh retry budget every deployment.
 
-Evidence: `tests/test_retry_queue.py` and fake handoff coverage claim.
+Evidence: `src/retry_queue.py` (`DeadLetterTracker.__init__` — keys on
+`consumer_group_id`; `PartitionConsumer.__init__` — passes
+`f"{service_name}-{instance_id}"` which rotates on deploy).
+Expected severity: Major
 
-### SEED-CR-NC-05
+## Negative Controls
 
-`BackpressureMonitor` is a bounded sliding-window helper that correctly signals
-when fetches should pause. Correct review should not misflag it as message
-dropping.
+### SEED-CR-NC-01
 
-Evidence: `src/retry_queue.py` (`BackpressureMonitor`) and
-`tests/test_retry_queue.py` (`test_backpressure_monitor_signals_pause`).
+BackpressureMonitor's sliding-window pause logic correctly signals when
+fetches should pause. The bug is it doesn't gate RETRY scheduling — but
+the monitor class itself is correct.
 
-### SEED-CR-NC-06
+Evidence: `src/retry_queue.py` (`BackpressureMonitor.should_pause_fetch`
+and `should_pause_retries` — both methods are correctly implemented with
+proper sliding window math).
 
-`IdempotentReceiptCache` intentionally returns the prior receipt for duplicate
-keys. Correct review should not misflag this as skipped delivery or lost work.
+### SEED-CR-NC-02
 
-Evidence: `src/retry_queue.py` (`IdempotentReceiptCache`) and
-`tests/test_retry_queue.py` (`test_idempotent_receipt_cache_returns_prior`).
+IdempotentReceiptCache returning prior receipt for duplicate keys is correct
+dedup behavior. Do not misflag as skipped delivery or lost work.
+
+Evidence: `src/retry_queue.py` (`IdempotentReceiptCache.get_or_create` —
+returns cached receipt on second call for same key).
 
 ## Scoring Guide
 
 | Score | Criteria |
 |-------|----------|
-| CAUGHT | CR identifies the seeded issue and its production consequence. |
-| PARTIAL | CR identifies a related concern but misses the causal chain or severity. |
+| CAUGHT | CR identifies the seeded issue and its production consequence with correct severity. |
+| CAUGHT_WRONG_SEVERITY | CR identifies the issue but misjudges severity by one+ level. |
+| PARTIAL | CR identifies a related concern but misses the causal chain. |
 | MISSED | CR does not flag the issue. |
 | FALSE_POSITIVE | CR flags a negative-control behavior as a defect. |

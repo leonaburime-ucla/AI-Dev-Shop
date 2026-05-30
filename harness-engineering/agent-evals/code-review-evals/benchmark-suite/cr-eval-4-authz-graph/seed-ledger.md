@@ -1,98 +1,103 @@
-# Seed Ledger - cr-eval-4-authz-graph (CR Staff+)
+# Seed Ledger — cr-eval-4-authz-graph (v2 rewrite)
 
 **Eval ID**: benchmark-suite / cr-eval-4-authz-graph
 **Purpose**: Test Code Review agent on multi-tenant authorization graph defects
-that look locally correct but fail under delegation, cache, and policy-boundary
-composition.
-**Difficulty**: Hard - evidence is distributed across source, tests, project
-brief, and fake Programmer handoff.
+involving delegation traversal, cache coherence, policy parsing, and
+time-of-check/time-of-use gaps — without the brief naming the invariants.
+**Difficulty**: Hard staff+ fixture. Brief describes operational context only.
 
 ## Seeds
 
 ### SEED-CR-20
 
-Cross-tenant delegated role traversal grants access when a delegated assignment
-uses the same role ID as a tenant-local support role. Correct review flags that
-direct tenant checks are present but delegated traversal loses tenant context.
+`_walk_delegations` traverses across tenant boundaries — no tenant filter on
+delegation edges. Cross-tenant privilege escalation.
 
-Evidence: `src/authz_graph.py` (`_walk_delegations`, `can_access`) and
-`tests/test_authz_graph.py` (same-tenant delegation only).
+Evidence: `src/authz_graph.py` (`_walk_delegations` — frontier expansion does
+not check `assignment.tenant_id` against `resource.tenant_id`).
+Expected severity: Critical
 
 ### SEED-CR-21
 
-The authorization cache key omits tenant ID and policy version, and revocation
-does not invalidate cached positive decisions. Correct review flags stale
-positive grants as Required.
+Cache key is `(user_id, resource_id, permission)` — omits `tenant_id` and
+`policy_version`. Stale grants survive revocation and policy changes.
 
-Evidence: `src/authz_graph.py` (`_decision_cache_key`, `revoke_assignment`).
+Evidence: `src/authz_graph.py` (`_decision_cache_key` returns a 3-tuple
+missing tenant and version components).
+Expected severity: Critical
 
 ### SEED-CR-22
 
-`PolicyEnvelope.from_payload` treats missing `tenant_scope` as `*`, turning a
-rolling-deploy compatibility gap into a wildcard policy grant. Correct review
-flags runtime contract validation and deny-by-default behavior.
+`PolicyEnvelope.from_payload` defaults missing `tenant_scope` to `"*"`
+(wildcard) instead of denying. Fail-open on malformed policy.
 
-Evidence: `src/authz_graph.py` (`PolicyEnvelope.from_payload`) and fake handoff
-compatibility claim.
+Evidence: `src/authz_graph.py` (`PolicyEnvelope.from_payload` — `get` with
+default `"*"`).
+Expected severity: Critical
 
 ### SEED-CR-23
 
-Delegation traversal has no tenant prefilter, depth budget, or edge budget in
-the production access path. Correct review distinguishes this from the safe
-`bounded_role_walk` helper and flags scale collapse / DoS risk.
+`_walk_delegations` has no depth/edge limit in the production path. DoS via
+deep delegation graph.
 
-Evidence: `src/authz_graph.py` (`_walk_delegations`, `bounded_role_walk`).
+Evidence: `src/authz_graph.py` (`_walk_delegations` — unbounded `while
+frontier` loop vs. the safe `bounded_role_walk` helper).
+Expected severity: Major
 
 ### SEED-CR-24
 
-Audit logs record a decision but omit policy version, traversal path, and tenant
-boundary evidence. Correct review treats this as a security/forensics issue,
-not a logging nicety.
+`revoke_assignment` does not invalidate cached positive decisions. Revoked
+users retain access until cache expires.
 
-Evidence: `src/authz_graph.py` (`AuditLog.record`, `can_access`) and fake
-handoff audit claim.
+Evidence: `src/authz_graph.py` (`revoke_assignment` — removes from
+`self._assignments` but does not touch `self._decision_cache`).
+Expected severity: Critical
 
 ### SEED-CR-25
 
-Tests cover direct and shallow same-tenant delegation but omit cross-tenant
-delegation, revoke/cache invalidation, missing tenant scope, and deep graph
-cases. Correct review names those test gaps instead of accepting coverage
-percentage.
+Break-glass grant cached — expiry check runs inside direct evaluation but
+cache returns before it can fire. Emergency access persists past time limit.
 
-Evidence: `tests/test_authz_graph.py` and fake handoff coverage claim.
+Evidence: `src/authz_graph.py` (`can_access` returns cached `True` before
+`_has_direct_permission` re-checks `expires_at`; `grant_break_glass` sets
+30-minute expiry but cached decision outlives it).
+Expected severity: Major
 
 ### SEED-CR-26
 
-Break-glass access can be cached past expiry. Correct review notices that the
-expiry check lives inside direct permission evaluation, but `can_access` returns
-cached positive decisions before that check can run again.
+TOCTOU — `can_access` returns `True`, resource fetched in separate call.
+Revocation between the two still allows access.
 
-Evidence: `src/authz_graph.py` (`grant_break_glass`, `_decision_cache_key`,
-`can_access`) and lack of post-expiry cache tests.
+Evidence: `src/authz_graph.py` (`fetch_resource` is a standalone call;
+`can_access` result is not bound to a transaction or token that the resource
+fetch validates).
+Expected severity: Critical
 
-### SEED-CR-NC-03
+## Negative Controls
 
-The same-tenant break-glass role is time-bound, reasoned, and audited. Correct
-review should not misflag it as cross-tenant escalation.
+### NC-01
 
-Evidence: `src/authz_graph.py` (`grant_break_glass`) and
-`tests/test_authz_graph.py` (`test_break_glass_is_same_tenant_and_expiring`).
+`bounded_role_walk` has depth limits, visited tracking, and tenant filtering —
+looks like `_walk_delegations` but is the SAFE version. The real bug is that
+the production path uses the UNSAFE `_walk_delegations`.
 
-### SEED-CR-NC-04
+Evidence: `src/authz_graph.py` (`bounded_role_walk` — explicit `max_depth`,
+`max_edges`, and `tenant_id` filter on each edge).
 
-`bounded_role_walk` is a safe helper with tenant filtering, visited tracking,
-max-depth, and max-edge constraints. Correct review should not misflag it as
-the unbounded traversal defect, though it may recommend using it in the
-production access path.
+### NC-02
 
-Evidence: `src/authz_graph.py` (`bounded_role_walk`) and
-`tests/test_authz_graph.py` (`test_bounded_walk_stops_at_max_depth`).
+Break-glass grant mechanism itself is correctly time-bound and audited — the
+bug is the CACHE not respecting expiry, not the grant mechanism.
+
+Evidence: `src/authz_graph.py` (`grant_break_glass` — sets `expires_at`,
+requires `reason`, records audit entry).
 
 ## Scoring Guide
 
 | Score | Criteria |
 |-------|----------|
-| CAUGHT | CR identifies the seeded issue and its production/security consequence. |
-| PARTIAL | CR identifies a related concern but misses the causal chain or severity. |
+| CAUGHT | CR identifies the seeded issue and its production consequence with correct severity. |
+| CAUGHT_WRONG_SEVERITY | CR identifies the issue but misjudges severity by one+ level. |
+| PARTIAL | CR identifies a related concern but misses the causal chain. |
 | MISSED | CR does not flag the issue. |
 | FALSE_POSITIVE | CR flags a negative-control behavior as a defect. |
