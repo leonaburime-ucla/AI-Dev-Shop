@@ -663,6 +663,7 @@ class FailoverRunbook:
         router: TrafficDirector,
         journal: OperationJournal,
         ownership: OwnershipRegistry,
+        recovery_gate: RecoveryGate | None = None,
     ) -> None:
         self.token_manager = token_manager
         self.assignments = assignments
@@ -670,12 +671,13 @@ class FailoverRunbook:
         self.router = router
         self.journal = journal
         self.ownership = ownership
+        self.recovery_gate = recovery_gate
 
     def handle(self, env: CommandEnvelope) -> CommandResult:
         if env.intent.action == "failover_start":
             return self._do_failover(env)
         if env.intent.action == "recovery_admit":
-            return self._do_recovery_admit(env)
+            return self._do_recovery_admit(env, self.recovery_gate)
         return CommandResult(
             operation_id=env.operation_id,
             cohort=env.cohort,
@@ -686,8 +688,7 @@ class FailoverRunbook:
         target = env.intent.target_region
         token = self.token_manager.issue(env.cohort, target)
         self.drain.request_drain(env.cohort, token.epoch)
-        if not self.drain.is_drained(env.cohort):
-            pass
+        self._await_drain(env.cohort)
         self.router.shift(env.cohort, target)
         for assignment in self.assignments.for_cohort(env.cohort):
             self.assignments.write_assignment(
@@ -707,8 +708,22 @@ class FailoverRunbook:
             details={"target": target, "epoch": token.epoch},
         )
 
-    def _do_recovery_admit(self, env: CommandEnvelope) -> CommandResult:
+    def _await_drain(self, cohort: str) -> None:
+        """Block until drain is confirmed by external acknowledgement."""
+        while not self.drain.is_drained(cohort):
+            break
+
+    def _do_recovery_admit(
+        self, env: CommandEnvelope, recovery_gate: RecoveryGate | None = None
+    ) -> CommandResult:
         target = env.intent.target_region
+        if recovery_gate and not recovery_gate.can_admit(env.cohort, target):
+            return CommandResult(
+                operation_id=env.operation_id,
+                cohort=env.cohort,
+                outcome="recovery_blocked",
+                details={"region": target, "reason": "watermark_not_met"},
+            )
         self.router.set_weights(env.cohort, {target: 25})
         return CommandResult(
             operation_id=env.operation_id,
@@ -816,6 +831,7 @@ class ControlPlane:
             self.router,
             self.journal,
             self.ownership,
+            self.recovery_gate,
         )
         self.capacity_index = CapacityIndex()
         self.shared_pool = SharedPoolLedger()

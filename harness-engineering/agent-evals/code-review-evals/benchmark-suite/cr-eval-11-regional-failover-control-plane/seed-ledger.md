@@ -63,7 +63,9 @@ region replays all writes that were in-flight at the failure boundary.
 
 Evidence: `src/failover_control_plane.py` (`RecoveryGate.can_admit` uses
 `current_streams_for` instead of historical streams at the drain epoch;
-`OwnershipRegistry.streams_at_epoch` exists but is not called).
+`OwnershipRegistry.streams_at_epoch` exists but is not called;
+`FailoverRunbook._do_recovery_admit` invokes `recovery_gate.can_admit` so
+the gate IS exercised — the bug is inside the gate's stream selection).
 Expected severity: Critical
 
 ### SEED-CR-72
