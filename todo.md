@@ -312,6 +312,47 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Category-level misses directly inform which skills to build next
 - The eval creation protocol structurally prevents future suites from being all-textbook
 
+### Agent Eval Skill Coverage Mapper **[OPEN]**
+**Source:** 2026-05-31 `/debate` on whether skill-specific evals are needed in addition to `agent-evals`.
+**What it is:** Add an `agent-evals`-native mapper that shows which eval seeds test which skills, which skills should activate or stay silent, and whether agents actually used them during runs. Do not create a separate `skills-evals/` fixture hierarchy yet; keep canonical benchmark fixtures under the owning `harness-engineering/agent-evals/<agent>-evals/` suites.
+**Why it matters:** A skill can help one target behavior while harming the agent through context overload, false positives, over-activation, verbosity, scope creep, or priority inversion. Agent evals should prove target lift without collateral damage.
+**Current state:** **[PARTIAL]** `seed-catalog.tsv` already has `skill_source`; `validate_eval_suite.py` already recognizes optional `expected_conditional_skills` and `expected_non_activations`; `run-results.tsv` can carry `observed_conditional_skills`; `score_eval_suite.py` already computes activation recall and false-positive activation rate when those fields exist. This needs to be documented, generalized, and surfaced as a first-class map.
+**Design status:** **[PROPOSED]** This is not settled doctrine. Debate the schema and protocol again before implementation, canary it on one skill and one agent suite first, and expect revisions based on what the canary proves. The mapper, ablation variants, metrics, and thresholds all have room for improvement before broad rollout.
+**What to add:**
+- Add `harness-engineering/agent-evals/skill-coverage-map.tsv` as a generated or validator-checked index over all benchmark suite `seed-catalog.tsv` files.
+- Minimum map columns: `skill_slug`, `skill_path`, `agent`, `suite_path`, `eval_name`, `seed_id`, `expectation` (`required` / `forbidden` / `optional` / `neutral`), `test_role` (`target_behavior` / `negative_control` / `regression` / `harm_probe`), and `harm_probe` (`none` / `false_positive` / `overload` / `misrouting` / `verbosity` / `scope_creep` / `priority_inversion`).
+- Standardize optional seed catalog columns across suites: `expected_conditional_skills` and `expected_non_activations`.
+- Standardize optional run result columns: `observed_conditional_skills` and `skill_activation_notes`.
+- Add `harness-engineering/agent-evals/skill-ablation-runs.tsv` for with-skill / without-skill comparison runs. Minimum columns: `run_id`, `skill_slug`, `variant` (`normal` / `skill_removed` / `skill_forced` / `skill_minimized`), `agent`, `suite_path`, `eval_name`, `seed_ids`, `model_id`, `target_delta`, `false_positive_delta`, `severity_accuracy_delta`, `activation_recall`, `activation_false_positive_rate`, `context_cost_delta`, and `decision`.
+- Generalize the hardcoded conditional skill slug list in `validate_eval_suite.py` and `score_eval_suite.py` so skill slugs come from `framework/routing/skills-registry.md` or a derived agent-evals skill registry.
+- Update scoring reports to show per-skill target lift, activation recall, activation false-positive rate, false-positive delta on negative controls, severity accuracy delta, cross-dimension regression, and context-cost delta when available.
+**Targeted ablation protocol:**
+- Use one-factor-at-a-time skill ablations by default to avoid combinatorial explosion. Do not test every skill x agent x seed x skill-combination unless prior evidence shows a conflict or overlap.
+- For each candidate skill, pick one owning agent and three small seed groups: target seeds where the skill should help, forbidden/negative-control seeds where the skill should stay silent, and unrelated control seeds that detect context-window harm.
+- Run matched variants: `normal`, `skill_removed`, and, when useful, `skill_minimized`. Use `skill_forced` only to test activation logic, not as the default proof of usefulness.
+- Record context harm explicitly: prompt/context size, output length, latency, excessive checklist behavior, unrelated seed misses, false positives, and priority inversion.
+- Escalate to pairwise skill-combination tests only when single-skill ablations suggest two skills overlap, conflict, or compensate for one another.
+**Pass/fail model:**
+- A skill passes when it improves or preserves mapped target-seed performance without increasing false positives, severity mistakes, unrelated seed misses, or context cost beyond the accepted threshold.
+- A skill is redundant when `skill_removed` produces no meaningful target regression and no material collateral change.
+- A skill fails or needs revision when target lift is outweighed by collateral damage: higher false positives, forbidden activation, degraded unrelated dimensions, excessive output bloat, latency/token cost, context-window pressure, or repeated priority inversion.
+- Treat the core metric as `target lift - collateral damage`, not raw with-skill score alone.
+**Likely files to inspect/update first:**
+- `harness-engineering/agent-evals/README.md`
+- `harness-engineering/agent-evals/*/benchmark-suite/seed-catalog.tsv`
+- `harness-engineering/agent-evals/*/benchmark-suite/run-results.tsv`
+- `harness-engineering/quality/scripts/score_eval_suite.py`
+- `harness-engineering/validators/validate_eval_suite.py`
+- `framework/routing/skills-registry.md`
+**Done when:**
+- A retained design debate or review records the chosen schema, rejected alternatives, and canary scope before implementation starts.
+- A canary run on one skill and one agent suite proves the mapper and ablation workflow are practical before broader suite rollout.
+- `skill-coverage-map.tsv` can answer which seeds test each skill across agent suites.
+- Validator rejects unknown skill slugs and contradictory `required` vs `forbidden` expectations.
+- Scorer reports activation recall and false-positive activation rate per skill across real run results.
+- At least one high-risk shared skill and one conditional skill have retained normal vs removed/minimized ablation evidence.
+- The docs state that standalone `skills-evals/` fixtures are deferred unless imported/community skills, cross-agent conflicts, or noisy ablations prove they are needed.
+
 ### Fixing Programmer Evals **[OPEN]**
 **Source:** Opus 4.6 eval run on 2026-05-29. Scored 95.9% (71/74 CAUGHT, 3 MISSED, 0 PARTIAL). Run exposed structural weaknesses in the eval design rather than meaningful agent skill gaps.
 **What it is:** The programmer eval suite has design issues that inflate scores and fail to test actual programmer skills (code production, test iteration, design decisions under ambiguity).
