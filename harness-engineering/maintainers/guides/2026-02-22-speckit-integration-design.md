@@ -84,7 +84,7 @@ Add to Workflow:
 - Step 0: Read `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md`. For any requirement that conflicts with a constitution article, inline a `[NEEDS CLARIFICATION]` marker with the specific article and what decision is needed.
 - Step: Before handing off, confirm zero unresolved `[NEEDS CLARIFICATION]` markers remain (all resolved or escalated to human).
 
-### 8. `agents/architect/skills.md`
+### 8. `agents/software-architect/skills.md`
 Add to Workflow:
 - Step 0 (new): If spec involves library or technology choices, produce `research.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md` before writing the ADR.
 - Step 1 (new, before current Step 1): Run Constitution Check — for each article in `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md`, verify the proposed architecture complies. Any violation goes into the Complexity Justification table in the ADR, or triggers a revised architecture.

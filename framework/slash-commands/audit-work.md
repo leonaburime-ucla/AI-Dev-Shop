@@ -63,6 +63,8 @@ Act as an External Audit Coordinator.
    - construct every auditor prompt from the canonical packet before dispatching the first auditor; if dispatch must be sequential, do not revise, reframe, or add emphasis to later prompts based on earlier auditor responses
    - run peer calls in parallel when practical; otherwise run sequentially but keep the prompts independent
    - do not hand `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` paths directly to the peer when file-based reads are required; use the shared transport fallback rules from `skills/llm-operations/references/peer-llm-dispatch.md`
+   - before starting `audit_timeout_seconds`, run the Peer Handshake Gate from `skills/llm-operations/references/peer-llm-dispatch.md` and require: `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
+   - run the mandatory Heartbeat Monitor from `skills/llm-operations/references/peer-llm-dispatch.md` while any auditor process is alive
    - run a cheap readability probe first when using file-based transport: ask the peer to read the dispatch packet and echo the first Markdown heading
    - require the auditor to begin with an `Auditor Scope Check` that states what it believes it is auditing, the scope and target it used, which files or artifacts it reviewed, and any mismatch or uncertainty it noticed before giving findings
    - prefer a short prompt that points to the dispatch packet over embedding the full packet body inline when the peer can read files directly

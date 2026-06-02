@@ -1,8 +1,8 @@
-You are the Coordinator preparing Architect dispatch.
+You are the Coordinator preparing Software Architect dispatch.
 
 $ARGUMENTS
 
-This command is a hard Coordinator gate before the Architect Agent runs. Do not
+This command is a hard Coordinator gate before the Software Architect Agent runs. Do not
 start ADR work until the preflight below passes.
 
 ## Coordinator Planning Preflight
@@ -39,28 +39,28 @@ Follow the `Coordinator Planning Preflight` section in
 6. Verify the spec has human approval/sign-off recorded in the provider-defined
    readiness artifact or in `pipeline-state.md`.
 7. Verify Red-Team has completed for this spec hash.
-   - Any unresolved BLOCKING finding stops Architect dispatch.
+   - Any unresolved BLOCKING finding stops Software Architect dispatch.
    - Any CONSTITUTION_FLAG finding stops until a human decision is recorded.
 8. If `system-blueprint.md` exists, verify its status is `APPROVED`.
    If no blueprint exists for a multi-domain, ownership-unclear, or existing
-   codebase extension, stop and route to System Blueprint.
+   codebase extension, stop and route to System Design.
 9. If reverse-spec artifacts exist for this feature, verify the human checkpoint
    was cleared against `review-digest.md` and that `extraction-manifest.md`,
    `coverage-map.md`, `consumer-inventory.md`, `intentional-changes.md`, and
    characterization-test references are preserved in the planning surface.
 10. If CodeBase Analyzer artifacts exist, verify the relevant
     `ANALYSIS-*`, `MIGRATION-*`, and `TESTABILITY-*` reports are recorded in
-    `pipeline-state.md` and will be included in Architect context.
+    `pipeline-state.md` and will be included in Software Architect context.
 
 If any item fails, stop. Report the failed item, owning stage, and exact artifact
 that must be repaired. Do not patch downstream artifacts to make the gate pass.
 
-## Architect Dispatch
+## Software Architect Dispatch
 
-Only after the preflight passes, dispatch the Architect Agent with:
+Only after the preflight passes, dispatch the Software Architect Agent with:
 
-- `<AI_DEV_SHOP_ROOT>/agents/architect/skills.md`
-- the active provider-defined planning surface and full Architect read set from
+- `<AI_DEV_SHOP_ROOT>/agents/software-architect/skills.md`
+- the active provider-defined planning surface and full Software Architect read set from
   the compatibility contract
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`
 - approved `system-blueprint.md` if produced
@@ -69,10 +69,10 @@ Only after the preflight passes, dispatch the Architect Agent with:
 - reverse-spec preservation artifacts when present
 
 If helper-agent support is unavailable or the session is in single-agent mode,
-adopt the Architect role after preflight passes and continue with the same
+adopt the Software Architect role after preflight passes and continue with the same
 required inputs.
 
-The Architect then follows `<AI_DEV_SHOP_ROOT>/agents/architect/skills.md` to
+The Software Architect then follows `<AI_DEV_SHOP_ROOT>/agents/software-architect/skills.md` to
 produce research (if required) and `adr.md`.
 
 Output: preflight result, research path (if produced), ADR path, constitution

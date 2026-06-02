@@ -106,7 +106,7 @@ The provider does not replace the whole toolkit.
 AI Dev Shop core still owns:
 - Coordinator routing
 - Constitution enforcement at the toolkit level
-- Red-Team and Architect stages
+- Red-Team and Software Architect stages
 - TDD, Programmer, TestRunner, Code Review, Security, and Docs stages
 - pipeline state, retry policy, and recovery rules
 
@@ -152,10 +152,10 @@ Existing Speckit-oriented compatibility fields such as `spec_path` remain valid 
 ## Consumer Rules
 
 Coordinator:
-- resolve the active provider before `/spec`, `/clarify`, `/plan`, resume validation, manual Architect dispatch, or artifact gate checks
+- resolve the active provider before `/spec`, `/clarify`, `/plan`, resume validation, manual Software Architect dispatch, or artifact gate checks
 - do not assume `feature.spec.md`, `PRD.md`, `proposal.md`, or any other filename unless the active provider says so
 - refuse activation claims that are stronger than the provider file's `repo_validation`
-- run the Coordinator Planning Preflight before Architect dispatch; do not treat provider readiness as a substitute for Red-Team, human approval, blueprint approval, or brownfield evidence checks
+- run the Coordinator Planning Preflight before Software Architect dispatch; do not treat provider readiness as a substitute for Red-Team, human approval, blueprint approval, or brownfield evidence checks
 - do not visually or manually compute cryptographic hashes; use provider-local
   validator output or deterministic shell commands
 
@@ -164,7 +164,7 @@ Spec Agent:
 - record the resolved entrypoint, upstream commit, and readiness artifact in pipeline state
 - stop if the provider file leaves a required native artifact or workflow decision unspecified
 
-Architect:
+Software Architect:
 - read the provider-defined planning surface first
 - do not erase provider-native architecture artifacts when the upstream framework already has them
 - emit AI Dev Shop architecture outputs as a translation layer, not as a denial of upstream structure

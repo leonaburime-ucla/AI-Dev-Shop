@@ -38,7 +38,7 @@ Return:
 
 ---
 
-## Architect Agent Rubric
+## Software Architect Agent Rubric
 
 | Dimension | What to Score | Weight |
 |-----------|--------------|--------|
@@ -48,9 +48,9 @@ Return:
 | Constitution Compliance | Constitution Check table is complete. All EXCEPTION entries have Complexity Justification rows. | 20% |
 | Justification Quality | Rationale maps decisions to drivers. Alternatives are addressed with specific rejection reasons. | 15% |
 
-**Architect Agent Judge Prompt:**
+**Software Architect Agent Judge Prompt:**
 ```
-You are evaluating an Architect Agent ADR output for a spec-driven pipeline with a project constitution.
+You are evaluating an Software Architect Agent ADR output for a spec-driven pipeline with a project constitution.
 
 Spec: [SPEC_SUMMARY]
 Constitution articles: Library-First, Test-First, Simplicity Gate, Anti-Abstraction Gate, Integration-First Testing, Security-by-Default, Spec Integrity, Observability
@@ -102,7 +102,7 @@ Return: score per dimension, weighted overall, biggest weakness.
 | Spec Alignment | Implementation matches spec requirements. No behavior that contradicts an AC. | 35% |
 | Minimal Change | No changes outside the assigned scope. No speculative refactoring or extra features. | 25% |
 | Test Pass Rate | Percentage of certified tests passing. (0=0%, 10=100%) | 25% |
-| Architecture Compliance | Module boundaries respected. No imports that violate ADR layer rules. | 15% |
+| Software Architecture Compliance | Module boundaries respected. No imports that violate ADR layer rules. | 15% |
 
 ---
 
@@ -143,4 +143,4 @@ Return: score per dimension, weighted overall, biggest weakness.
 - Weekly: run judge passes on all agent outputs from that week's features
 - Record each pass as a `[QUALITY]` entry in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/memory-store.md`
 - Flag regressions to the Coordinator immediately
-- Track constitution compliance scores separately — a declining trend on Architect's Constitution Compliance dimension signals ADR template or constitution clarity issues
+- Track constitution compliance scores separately — a declining trend on Software Architect's Constitution Compliance dimension signals ADR template or constitution clarity issues

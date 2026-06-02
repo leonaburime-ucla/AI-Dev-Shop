@@ -5,11 +5,11 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | Agent | Role | File |
 |---|---|---|
 | VibeCoder (optional) | Fast exploratory prototyping — optional on-ramp before the structured pipeline | `agents/vibecoder/skills.md` |
-| System Blueprint (optional, pre-spec) | Macro-level system planning and spec decomposition before feature specs | `agents/system-blueprint/skills.md` |
+| System Design (optional, pre-spec) | Macro-level system planning and spec decomposition before feature specs | `agents/system-design/skills.md` |
 | Coordinator | Pipeline orchestration, routing, convergence, human escalation | `agents/coordinator/skills.md` |
 | Skills Librarian (optional) | Centralized external skill discovery, audit, and canonical merge governance | `agents/skills-librarian/skills.md` |
 | Spec | Converts intent into versioned, testable provider-defined planning artifacts | `agents/spec/skills.md` |
-| Architect | Selects patterns, defines boundaries, produces ADR | `agents/architect/skills.md` |
+| Software Architect | Selects patterns, defines boundaries, produces ADR | `agents/software-architect/skills.md` |
 | TDD | Writes certified test suite before implementation | `agents/tdd/skills.md` |
 | Programmer | Implements code to satisfy certified tests | `agents/programmer/skills.md` |
 | UX/UI Designer (optional) | Defines visual direction, UI style system, and implementation-ready design specs for frontend work | `agents/ux-ui-designer/skills.md` |
@@ -22,7 +22,7 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | DevOps | Produces Dockerfiles, CI/CD configs, IaC, and deployment runbooks | `agents/devops/skills.md` |
 | Docs | Publishes OpenAPI specs, writes user guides, and produces release notes | `agents/docs/skills.md` |
 | Observer (optional) | Watches pipeline, detects patterns, produces system improvements | `agents/observer/skills.md` |
-| Red-Team | Adversarially probes approved specs before Architect dispatch | `agents/red-team/skills.md` |
+| Red-Team | Adversarially probes approved specs before Software Architect dispatch | `agents/red-team/skills.md` |
 | CodeBase Analyzer | Analyzes existing codebase before pipeline begins | `agents/codebase-analyzer/skills.md` |
 | Database | Owns schema design, migrations, query patterns | `agents/database/skills.md` |
 | Supabase Sub-Agent | Supabase-specific implementation under Database Agent | `agents/database/supabase/skills.md` |
@@ -33,12 +33,12 @@ The following names are the canonical reserved agent names for response prefixes
 
 - `Coordinator`
 - `CodeBase Analyzer`
-- `System Blueprint`
+- `System Design`
 - `VibeCoder`
 - `Skills Librarian`
 - `Spec`
 - `Red-Team`
-- `Architect`
+- `Software Architect`
 - `Database`
 - `Supabase Sub-Agent`
 - `TDD`

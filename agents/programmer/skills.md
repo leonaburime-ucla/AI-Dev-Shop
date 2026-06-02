@@ -54,6 +54,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - Active spec metadata (ID / version / hash)
 - Certified test suite with coverage gap report
 - Architecture boundaries and contracts (from ADRs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
+- Implementation Outline (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or recorded SKIP in `tasks.md`
 - Coordinator routing directive with explicit scope and any activated conditional skills
 - `progress-ledger.md` when resuming a long-running task or when retry history matters
 - Self-validation harness template when runtime startup, API, UI, auth, migration, or integration behavior is in scope
@@ -64,7 +65,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 2. Confirm test certification hash matches active spec hash. Refuse to work against stale certifications.
 3. Complete Pattern Priming using `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` before writing any production code.
 4. Plan implementation by requirement slice — do not implement everything at once.
-4a. Extract an ADR checklist before coding. At minimum capture: allowed layers/modules, forbidden dependencies/imports, ownership boundaries, required adapter/DI/contract rules, and any file-placement constraints from the chosen pattern.
+4a. Extract an ADR checklist before coding. At minimum capture: allowed layers/modules, forbidden dependencies/imports, ownership boundaries, required adapter/DI/contract rules, any file-placement constraints from the chosen pattern, and Implementation Outline file-map, contract, wiring, and data-boundary constraints when present. Use the File Map as the canonical file creation/change checklist for in-scope files. If the outline was skipped but the task needs missing boundary, contract, or wiring detail, report `[OUTLINE_REQUESTED]` before coding.
 4b. If you do not yet know which files or modules own the behavior, do a read-only discovery pass first instead of mixing broad search noise into the implementation loop. Return only the candidate file paths, short findings, and remaining uncertainty.
 4c. If the current slice depends on live UI or browser-only behavior and the current host verifies `browser_automation = enabled`, activate `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` before coding so the failure is reproduced against the rendered app instead of inferred from static code alone.
 4d. Canonical pre-code order for each slice: after Pattern Priming and the ADR checklist, run the pre-checks in this fixed order: testability seam -> function boundary and contract -> complexity/query shape -> resource bounds -> adversarial aggregate behavior when applicable. Treat these as cumulative checks, not interchangeable alternatives.
@@ -83,7 +84,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - **5e1. Function quality documentation beat:** For every assessed unit, add or update the language-idiomatic function documentation with purpose, inputs, outputs, errors, side effects when applicable, `@complexity` or the language-equivalent time/space complexity section, optional `@tradeoffs` only when the design tradeoff is meaningful, and `@overallScore`. If the score is below 100, include severity-graded findings. Tiny private helpers may inherit the closest parent assessment only when they have no meaningful branching, I/O, error handling, scale risk, security/privacy risk, or independent reuse pressure. Refactor locally fixable findings before carrying them into handoff.
    - **5f. Loop-detection tripwire:** If the same file has now been edited 3 times for the same failure cluster, or the same test/command has been rerun 3 times with materially identical failure output, stop blind retrying. Write a `Loop Alert` note in `progress-ledger.md` or your handoff notes: current hypothesis, why the last attempt failed, and the next different approach. If you do not have a different approach, escalate instead of retrying.
    - **5g. Next slice**: Repeat from 5a.
-6. Run an Architecture Audit before handoff using the ADR checklist against every changed file. Classify the result:
+6. Run an Architecture Audit before handoff using the ADR checklist (including Implementation Outline constraints when present) against every changed file. Classify the result:
    - **PASS**: no known architectural violations found.
    - **WARNING**: one or more likely architectural violations or boundary leaks remain. Do not hide them. Record the broken rule, impacted files, and the smallest compliant fix. WARNING does not block handoff.
    - **BLOCKER**: the ADR or boundary rules are too ambiguous to assess or continue safely, or the implementation appears to breach a hard architectural constraint whose correction cannot be inferred reliably. Escalate to Coordinator immediately.
@@ -114,7 +115,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
   - ADR rules checked
   - Files audited
   - Violations found, with file references and the smallest compliant fix for each
-  - Any ADR ambiguity needing Architect clarification
+  - Any ADR ambiguity needing Software Architect clarification
 - Pre-Completion Checklist:
   - requirements re-verified
   - fresh evidence command(s)

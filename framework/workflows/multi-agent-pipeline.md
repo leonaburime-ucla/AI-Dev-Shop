@@ -7,8 +7,9 @@
 All project-owned pipeline artifacts are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>` — the sibling `ADS-project-knowledge/` folder next to the toolkit by default. `<AI_DEV_SHOP_ROOT>` remains the toolkit source tree.
 
 - Provider-native planning artifacts → user-specified location or provider-native folders (Spec Agent asks before writing when needed; active provider and entrypoint paths recorded in pipeline state)
-- Pipeline artifacts (ADR, research, tasks, red-team findings, test certification,
-  verification packet, pipeline state) → `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
+- Pipeline artifacts (ADR, research, implementation outline, tasks,
+  red-team findings, test certification, verification packet, pipeline state)
+  → `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
 - Reports (analysis, test runs, code review, security) → `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` subfolders
 - Local scratch, raw captures, exploratory prompts, and disposable session evidence → `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
 - Live project memory → `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`
@@ -25,7 +26,7 @@ Artifact-intent rule:
 ## Full Path (Existing Codebase)
 
 ```
-[CodeBase Analyzer] → [System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[CodeBase Analyzer] → [System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - CodeBase Analyzer optionally produces a Migration Plan artifact — not a separate agent step
@@ -34,10 +35,11 @@ Artifact-intent rule:
 ## Ideal Path (Greenfield)
 
 ```
-[System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
-- Coordinator generates `tasks.md` from the approved ADR before TDD dispatch — not an agent step
+- Software Architect conditionally produces `implementation-outline.md` or an explicit SKIP before task generation
+- Coordinator generates `tasks.md` from the approved ADR plus implementation-outline readiness before TDD dispatch — not an agent step
 - `[Observer]` is passive across all stages when enabled
 
 Each stage is blocked until the Coordinator validates the previous stage's
@@ -125,20 +127,20 @@ The CodeBase Analyzer writes reports to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/co
 3. Once codebase reaches target architecture, begin normal delivery pipeline for new features
 
 **Route B — Build alongside migration:**
-1. Pass `ANALYSIS-*.md` summary to Architect Agent as context for first ADR
-2. Architect selects patterns that acknowledge current state and plan toward target
+1. Pass `ANALYSIS-*.md` summary to Software Architect Agent as context for first ADR
+2. Software Architect selects patterns that acknowledge current state and plan toward target
 3. New features are built clean; migration phases run in parallel as separate pipeline runs
 
 Route B is faster to first feature delivery. Route A is safer for large legacy codebases.
 
 When analysis, migration, or testability reports exist for the active feature,
 the Coordinator records their exact paths in `pipeline-state.md` before Spec,
-System Blueprint, or Architect dispatch. Downstream agents must treat these
+System Design, or Software Architect dispatch. Downstream agents must treat these
 reports as sampled evidence with caveats, not as exhaustive proof.
 
-### Architect Agent Context When Analysis Exists
+### Software Architect Agent Context When Analysis Exists
 
-When a codebase analysis report exists, include in Architect dispatch:
+When a codebase analysis report exists, include in Software Architect dispatch:
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>.md` executive summary
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<id>.md` (if generated)
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>.md` (if generated)
@@ -158,7 +160,7 @@ After `system-blueprint.md` and the active spec package are approved, do not kee
 - Optional: a short 3-5 bullet intent summary derived from vibe output (if needed), not the full raw vibe transcript.
 - Purpose: reduce context drift and avoid conflicting stale tech hints in implementation stages.
 
-### System Blueprint Agent (conditional pre-spec stage)
+### System Design Agent (conditional pre-spec stage)
 - Product vision / idea statement (from user or VibeCoder output)
 - Known constraints and NFRs
 - Existing architecture context (if extending an existing system)
@@ -182,7 +184,7 @@ Output:
 - approved `system-blueprint.md` (if produced) for domain boundaries and decomposition guidance.
   If the blueprint is `DRAFT`, `REVISE`, contains unresolved
   `[OWNERSHIP UNCLEAR]`, `Functional model status: BLOCKED`, or
-  `NFR model status: BLOCKED`, route back to System Blueprint or human review
+  `NFR model status: BLOCKED`, route back to System Design or human review
   before final spec approval.
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` when the feature introduces or changes API style, pagination/filtering policy, error/lifecycle policy, webhook/event shape, or SDK-facing integration behavior
@@ -220,16 +222,16 @@ For the default Speckit provider, the existing `spec_path` convention remains va
 
 The Coordinator records these dependencies in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`. When all referenced features reach Done, the Coordinator may trigger an optional Integration Verification run against the combined system.
 
-### Red-Team Agent (runs after Spec approval, before Architect dispatch)
+### Red-Team Agent (runs after Spec approval, before Software Architect dispatch)
 - Active provider-defined planning surface (full content + hash) — must have zero unresolved clarification blockers
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` (for Constitution pre-flight)
 - `<AI_DEV_SHOP_ROOT>/agents/red-team/skills.md`
 
 **Routing after Red-Team output:**
-- 3+ BLOCKING findings → route to Spec Agent with findings; do not dispatch Architect
+- 3+ BLOCKING findings → route to Spec Agent with findings; do not dispatch Software Architect
 - Any CONSTITUTION_FLAG findings → escalate to human before proceeding
-- ADVISORY findings only → run Coordinator Planning Preflight; dispatch Architect only if PASS; include advisory list in context
-- No findings → run Coordinator Planning Preflight; dispatch Architect only if PASS
+- ADVISORY findings only → run Coordinator Planning Preflight; dispatch Software Architect only if PASS; include advisory list in context
+- No findings → run Coordinator Planning Preflight; dispatch Software Architect only if PASS
 
 Red-Team completion must be recorded in `pipeline-state.md` with:
 - `red_team_status: PASS | BLOCKING | CONSTITUTION_FLAG | ADVISORY_ONLY`
@@ -238,12 +240,12 @@ Red-Team completion must be recorded in `pipeline-state.md` with:
 - `red_team_artifact`
 - `red_team_human_decision` when a CONSTITUTION_FLAG or waiver is involved
 
-### Coordinator Planning Preflight (hard gate before Architect dispatch)
+### Coordinator Planning Preflight (hard gate before Software Architect dispatch)
 
-Run this preflight before `/plan`, manual Architect dispatch, and any resume
+Run this preflight before `/plan`, manual Software Architect dispatch, and any resume
 that would continue at or beyond `architect`.
 
-The Coordinator cannot dispatch or resume Architect until ALL of the following
+The Coordinator cannot dispatch or resume Software Architect until ALL of the following
 pass:
 
 - Active provider is resolved from `pipeline-state.md`, and the provider's
@@ -278,10 +280,10 @@ pass:
 - Red-Team completed against the same `spec_hash`.
 - No unresolved Red-Team BLOCKING finding remains.
 - Any Red-Team CONSTITUTION_FLAG has an explicit human decision recorded before
-  Architect dispatch.
+  Software Architect dispatch.
 - If `system-blueprint.md` exists, its status is `APPROVED`.
 - If no blueprint exists and the work is multi-domain, ownership-unclear, or an
-  existing-codebase extension, route to System Blueprint before Architect.
+  existing-codebase extension, route to System Design before Software Architect.
 - No unresolved `[OWNERSHIP UNCLEAR]`, `Functional model status: BLOCKED`, or
   `NFR model status: BLOCKED` condition remains in upstream planning artifacts.
 - If reverse-spec artifacts exist, `review-digest.md` was reviewed by a human
@@ -290,13 +292,13 @@ pass:
   `extraction-manifest.md`, `coverage-map.md`, `consumer-inventory.md`,
   `intentional-changes.md`, and characterization tests.
 - If CodeBase Analyzer reports exist, all relevant `ANALYSIS-*`, `MIGRATION-*`,
-  and `TESTABILITY-*` report paths are recorded and included in Architect
+  and `TESTABILITY-*` report paths are recorded and included in Software Architect
   context.
 
 Failure recovery:
 - Stop at the first failed gate category and report every failed item found in
   the same pass.
-- Name the owning stage: System Blueprint, Spec, Red-Team, CodeBase Analyzer, or
+- Name the owning stage: System Design, Spec, Red-Team, CodeBase Analyzer, or
   human review.
 - Route back to that owner. Do not repair downstream artifacts to make the gate
   pass.
@@ -314,7 +316,7 @@ When all checks pass, record:
 The Planning Surface Gate is not a separate dispatch gate. It is the
 provider-surface subset and first step of Coordinator Planning Preflight. If it
 passes, the Coordinator continues the same preflight with Red-Team, blueprint,
-reverse-spec, brownfield, and human-checkpoint checks. If it fails, Architect is
+reverse-spec, brownfield, and human-checkpoint checks. If it fails, Software Architect is
 not dispatched.
 
 - Active provider is resolved from `pipeline-state.md`
@@ -331,12 +333,12 @@ For the default Speckit provider, apply the compatibility gate defined in `<AI_D
 
 Reference: `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/spec-definition-of-done.md`
 
-### Architect Agent
+### Software Architect Agent
 - `framework/spec-providers/active-provider.md`
 - `framework/spec-providers/<active-provider>/provider.md`
 - Active provider-defined spec entrypoint (full content + hash) — must be human-approved, zero unresolved clarification blockers
-- For Speckit: apply the Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` before ADR work begins
-- Red-Team findings from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (all ADVISORY and CONSTITUTION_FLAG findings; BLOCKING findings mean spec is not yet ready for Architect)
+- For Speckit: apply the Software Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` before ADR work begins
+- Red-Team findings from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (all ADVISORY and CONSTITUTION_FLAG findings; BLOCKING findings mean spec is not yet ready for Software Architect)
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` (for Step 0 constitution check)
 - Current system boundaries (existing ADRs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`)
 - Non-functional constraints from spec
@@ -351,14 +353,15 @@ Reference: `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/spec-definition-of-do
   `intentional-changes.md`, and characterization-test references. Treat them as
   source-of-truth preservation constraints for rewrites and migrations.
 
-**Architect outputs (in order):**
+**Software Architect outputs (in order):**
 1. `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` (if spec has technology choices) — using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md`
 2. `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` — using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md` (includes Constitution Check, Research Summary, Complexity Justification, and API interface decision with rejected alternatives when API design is in scope)
+3. `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md` (if triggered) — using `<AI_DEV_SHOP_ROOT>/framework/templates/implementation-outline-template.md`. If not triggered, write `Implementation Outline: SKIP - <reason and triggers checked>` to the ADR and Software Architect handoff.
 
-### Database Agent (optional — dispatched alongside or immediately after Architect when spec involves data modeling)
+### Database Agent (optional — dispatched alongside or immediately after Software Architect when spec involves data modeling)
 
 When the spec involves data modeling or database operations:
-- Coordinator dispatches Database Agent alongside Architect, or immediately after ADR is approved
+- Coordinator dispatches Database Agent alongside Software Architect, or immediately after ADR is approved
 - Database Agent produces:
   - Schema design
   - Entity relationships
@@ -370,7 +373,10 @@ When the spec involves data modeling or database operations:
 ### Coordinator: tasks.md Generation (after ADR human approval, before TDD dispatch)
 
 Coordinator generates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md`:
+- Before generating `tasks.md`, verify Implementation Outline readiness using `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md`: if a trigger applied, `implementation-outline.md` exists; if no trigger applied, Software Architect recorded `Implementation Outline: SKIP - <reason and triggers checked>`. If neither is present, route back to Software Architect.
 - Phases and story order derived from the ADR's parallel delivery plan and AC priorities (P1 first)
+- If `implementation-outline.md` exists, derive phase boundaries, story order, and safe `[P]` markers from its Module Map and Wiring Map as well as the ADR.
+- If the outline was skipped, record the exact SKIP reason in `tasks.md`.
 - `[P]` markers based on independent module boundaries **and** system-blueprint dependency constraints (`Depends on`)
 - Do not mark tasks parallel when one task depends on another domain's API/event/schema contract or table ownership boundary
 - Constraints section declaring required suites, coverage profile, coverage
@@ -388,6 +394,7 @@ Coordinator generates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feat
 - Active provider-defined planning surface (full content + hash) — **must be human-approved**
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` — generated by Coordinator after ADR approval; defines scope and parallelization for this TDD run
 - ADR for the module being tested (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`)
+- Implementation Outline (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or the recorded SKIP reason from `tasks.md`
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`
 - Relevant entries from `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` for the domain
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets and seam candidates before writing tests for migrated modules)
@@ -410,6 +417,7 @@ Repeat pattern priming when the task shifts to a materially different layer or c
 - Active provider-defined planning surface (hash must match TDD certification hash)
 - Certified test names and which ACs they cover
 - ADR for the module (architecture constraints)
+- Implementation Outline (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or recorded SKIP in `tasks.md`
 - Relevant `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` entries
 - Handoff output from TDD Agent (summary only, not full session)
 - Confirmed pattern-priming reference (from Pattern Priming step above)
@@ -420,8 +428,8 @@ If broad discovery is required before implementation, use a read-only discovery 
 
 Programmer handoff must include an `Architecture Audit` section:
 - `PASS` = no known architectural violations found
-- `WARNING` = likely architectural violations remain; Coordinator surfaces them to the human and asks whether to route back to Programmer or continue downstream
-- `BLOCKER` = ADR ambiguity or a hard architectural constraint prevents safe continuation; Coordinator pauses routing and escalates
+- `WARNING` = likely architectural violations or Implementation Outline deviations remain; Coordinator surfaces them to the human and asks whether to route back to Programmer or continue downstream
+- `BLOCKER` = ADR/Outline ambiguity or a hard architectural constraint prevents safe continuation; Coordinator pauses routing and escalates
 - `Pre-Completion Checklist` = explicit proof that the claimed fix or completion was re-verified against the active task/spec
 - `Loop Alert` = required when a loop-detection tripwire fired before handoff
 - `Self-Validation` = required when runtime-changing work needed app-level validation before handoff; include status `PASS`, `PARTIAL`, or `BLOCKER`, report path, attempts used, paths checked, any bounded diagnosis pass used, and any offloaded evidence
@@ -540,24 +548,25 @@ stage readiness.
 
 | Finding | Route To | Context to Include |
 |---|---|---|
-| Multi-domain or unclear boundaries before spec exists | System Blueprint Agent | Product intent, constraints, current architecture context |
+| Multi-domain or unclear boundaries before spec exists | System Design Agent | Product intent, constraints, current architecture context |
 | Spec human-approved | Red-Team Agent | Full spec, spec hash, constitution.md |
 | Red-Team: 3+ BLOCKING | Spec Agent | All BLOCKING findings with exact spec refs |
 | Red-Team: CONSTITUTION_FLAG | Human → Spec Agent | Flag details, relevant constitution article |
-| Red-Team: ADVISORY only | Coordinator Planning Preflight, then Architect if PASS | Spec, spec hash, advisory list, provider gate, blueprint/reverse-spec/brownfield evidence |
+| Red-Team: ADVISORY only | Coordinator Planning Preflight, then Software Architect if PASS | Spec, spec hash, advisory list, provider gate, blueprint/reverse-spec/brownfield evidence |
 | Test failures | Programmer | Failing test names, spec ACs, ADR constraints |
 | `[ARCHITECTURE_REVISION_REQUEST]` from downstream agent | Coordinator escalation flow | Blocking technical constraint, failed alternatives, impacted artifacts (spec/ADR/tasks/tests), requested revision scope |
 | Coverage gaps (any type) | TDD Agent (triage first) | Coverage Gap List (High-priority first), current % vs threshold per file, spec hash, test certification record — TDD classifies each gap as spec-traceable (writes tests) or no-spec-mapping (flags to Coordinator for Refactor dispatch) |
 | Coverage gaps — no spec mapping (flagged by TDD triage) | Refactor Agent | `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`, Coverage Gap List, uncovered files with line ranges, ADR constraints |
 | Touched-file coverage regression | Coordinator routing triage first — uses TestRunner/TDD evidence plus diff metadata, then routes to TDD (tests deleted) or Programmer (implementation removed covered path) | Regressed files, previous vs current %, diff metadata, latest coverage evidence |
 | Required test-quality, stale certification, test-file hash, semantic assertion, or required coverage-evidence finding from Code Review | TDD Agent | Code Review finding IDs, active spec hash, test certification, Coordinator verification packet, affected tests/spec refs |
-| Architecture violation | Architect | Specific violation, which ADR was breached |
+| Architecture violation | Software Architect | Specific violation, which ADR was breached |
 | Spec ambiguity | Spec Agent | Exact ambiguity, what decision is blocked |
 | Security finding (Critical/High) | Programmer | Full finding, mitigation steps; Security verifies after fix |
 | Security finding (Medium/Low) | Log and continue | — |
 | Refactor findings | Refactor Agent | Specific CR finding IDs marked Recommended |
 | Refactor proposals accepted by human | Programmer (refactor scope) | Accepted proposals with file refs, ADR constraints — no new TDD, no behavior changes, tests must stay green |
 | All integration-contract dependencies Done | Integration Verification (optional) | Integration contracts from each dependent spec, combined test suite |
+| `[OUTLINE_REQUESTED]` from TDD or Programmer | Software Architect | Missing boundary, contract, or wiring decision; after outline or SKIP update, Coordinator regenerates `tasks.md` if phase order, file scope, or `[P]` markers change |
 | Spec misalignment in code | Programmer or Spec Agent | Which requirement, what code does vs what spec says |
 
 ---
@@ -578,8 +587,8 @@ stage readiness.
 
 | Checkpoint | Trigger | What Human Decides |
 |---|---|---|
-| Spec approval | Before Architect dispatch — requires zero unresolved clarification blockers | Is this planning surface complete and correct? |
-| Architecture sign-off | Before tasks.md generation and TDD dispatch — requires clean Constitution Check | Is this ADR acceptable? Are all constitution exceptions justified? |
+| Spec approval | Before Software Architect dispatch — requires zero unresolved clarification blockers | Is this planning surface complete and correct? |
+| Architecture sign-off | Before tasks.md generation and TDD dispatch — requires clean Constitution Check and Implementation Outline readiness | Is this ADR acceptable? Are all constitution exceptions justified? Is the outline/SKIP decision acceptable? |
 | Convergence escalation | When iteration budget exhausted | Is the spec wrong? Is this a fundamental constraint? |
 | Security sign-off | Before merge/deploy | Accept, mitigate, or reject Critical/High findings |
 | Refactor review | After Refactor Agent delivers proposals | Accept or reject each proposal; accepted proposals are dispatched to Programmer |
@@ -621,7 +630,7 @@ The human decides whether to merge. The pipeline does not merge automatically.
 
 ## Parallel Execution
 
-When the Architect defines independent modules (natural in Vertical Slice, Modular Monolith, Microservices):
+When the Software Architect defines independent modules (natural in Vertical Slice, Modular Monolith, Microservices):
 
 1. Coordinator identifies non-overlapping test clusters per module
 2. Dispatches separate Programmer instances per module simultaneously
@@ -651,7 +660,7 @@ For long-running projects where pipeline histories grow large:
 - **Cycle summaries only**: Pass the Coordinator's cycle summary to the next cycle, not the full agent output logs
 - **Observation masking**: Replace verbose TestRunner output (`Full test output: 2,400 lines`) with a structured summary (`47 passing, 3 failing: [AC-03, INV-01, EC-02]`)
 - **Selective memory injection**: Load only the 5 most recent learnings.md entries plus any entries matching the current module's domain terms
-- **Projection forward**: If a decision was made in cycle 1 and is still active, reference the ADR — do not re-include the original Architect reasoning in cycle 5 dispatches
+- **Projection forward**: If a decision was made in cycle 1 and is still active, reference the ADR — do not re-include the original Software Architect reasoning in cycle 5 dispatches
 
 ---
 
@@ -666,7 +675,7 @@ Human-approved: 2026-02-21T10:00:00Z
 
 Stage status:
   Spec:         DONE  (2026-02-21T10:00:00Z)
-  Architect:    DONE  (ADR-003, 2026-02-21T10:30:00Z)
+  Software Architect:    DONE  (ADR-003, 2026-02-21T10:30:00Z)
   TDD:          DONE  (47 tests certified against hash abc123)
   Programmer:   IN PROGRESS (cycle 2, 44/47 passing)
   TestRunner:   —

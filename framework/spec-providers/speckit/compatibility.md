@@ -41,7 +41,7 @@ When `speckit` is the active provider:
 5. Determine which conditional files apply and record omissions in `spec-manifest.md` with concrete reasons.
 6. Write `feature.spec.md` and every applicable contract file from the provider-local template root.
 7. Seed `traceability.spec.md` from every REQ, AC, INV, and EC in `feature.spec.md`, plus any error or behavior rows already defined.
-8. Fill `spec-manifest.md` with actual filenames, applicability, and stage read sets for Architect, TDD, and Programmer.
+8. Fill `spec-manifest.md` with actual filenames, applicability, and stage read sets for Software Architect, TDD, and Programmer.
 9. Fill `spec-dod.md`. Every item must be `PASS` or `NA` with justification.
 10. Inline at most 3 `[NEEDS CLARIFICATION: ...]` markers while drafting, then resolve all of them before handoff.
 11. Compute the canonical content hash for `feature.spec.md` with the
@@ -56,7 +56,7 @@ When `speckit` is the active provider:
     performed.
 14. The Coordinator completes or replaces the Coordinator sign-off row during
     Planning Preflight and reruns the validator with `--phase preflight` before
-    Architect dispatch.
+    Software Architect dispatch.
 
 ## Canonical Hash Rule
 
@@ -86,7 +86,7 @@ without mutation.
 - After clarification answers land, update every affected file, including `traceability.spec.md`, `spec-manifest.md`, and `spec-dod.md` when applicability or stage read sets changed.
 - Recompute the content hash and rerun the provider-local validator.
 
-## Architect Read Set
+## Software Architect Read Set
 
 Before ADR work begins:
 

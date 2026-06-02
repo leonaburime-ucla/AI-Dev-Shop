@@ -12,7 +12,7 @@ Shortcut for `/consensus debate` when the user clearly wants the debate mode of 
 Round 1 must be adversarial and solution-neutral. Frame the prompt as "what we need" and "how best to create it" before naming any candidate implementation. If a likely solution is included, present it as one option among alternatives and require peers to critique it, reject it if warranted, and surface failure modes. Do not write peer prompts that imply the Coordinator has already chosen the answer unless the user explicitly requested proposal validation.
 
 ## Usage
-Provide optional controls and a question. Debate mode is implied, including round-level rationale reporting about why each model holds or changes its position. Before external peer dispatch, the Coordinator must show the exact peer-facing prompt/context file and wait for the user to reply `run`.
+Provide optional controls and a question. Debate mode is implied, including round-level rationale reporting about why each model holds or changes its position. Before external peer dispatch, the Coordinator must show a concise Peer Dispatch Brief, link the exact peer-facing prompt/context file, and wait for the user to reply `run`.
 
 ## Arguments
 - `[controls] [prompt]`

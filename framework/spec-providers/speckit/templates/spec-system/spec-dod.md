@@ -26,7 +26,7 @@
 - `FAIL` — the item is not satisfied. The spec must be updated before handoff. Record what is missing in the Notes column.
 - `NA` — the item genuinely does not apply to this feature. Requires written justification in the Notes column. "Not applicable" alone is not a valid justification.
 - **Every item must have a status.** A blank status is treated as FAIL.
-- **The spec is NOT ready for Architect dispatch until all items are PASS or NA.**
+- **The spec is NOT ready for Software Architect dispatch until all items are PASS or NA.**
 - **The Sign-Off Block is mandatory.** Blank Spec Agent sign-off blocks Spec
   handoff. Blank Coordinator sign-off blocks Coordinator Planning Preflight and
   `/plan`.
@@ -217,7 +217,7 @@
 
 **Overall DoD Result:** PASS / FAIL
 
-> PASS — All items are PASS or NA (with written justification for each NA). Spec is ready for Architect dispatch.
+> PASS — All items are PASS or NA (with written justification for each NA). Spec is ready for Software Architect dispatch.
 > FAIL — One or more items are FAIL or blank. Spec must be revised before handoff.
 
 ---
@@ -236,7 +236,7 @@
 
 The Spec Agent fills only the Spec Agent row before handoff. The Coordinator
 fills or replaces the Coordinator row during Coordinator Planning Preflight.
-Both sign-offs are required before the spec can advance to Architect dispatch.
+Both sign-offs are required before the spec can advance to Software Architect dispatch.
 
 | Role | Name / Agent ID | Date (ISO-8601 UTC) | Signature |
 |------|-----------------|---------------------|-----------|
@@ -247,4 +247,4 @@ Both sign-offs are required before the spec can advance to Architect dispatch.
 > 1. All items in this checklist are PASS or NA with written justification.
 > 2. The spec-system package is internally consistent.
 > 3. The Implementation Readiness Gate (H-01) is PASS.
-> 4. The spec is authorized for dispatch to the Architect Agent.
+> 4. The spec is authorized for dispatch to the Software Architect Agent.

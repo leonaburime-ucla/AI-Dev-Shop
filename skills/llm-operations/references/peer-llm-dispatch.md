@@ -93,6 +93,27 @@ Claude Code CLI sessions are managed by the host process. When Claude is the pri
 - If the peer is Claude Code CLI, also use `<AI_DEV_SHOP_ROOT>/skills/llm-operations/references/claude-code-cli-audits.md` for host-specific transport quirks, timing behavior, and runner guidance.
 - The dispatch-copy pattern is intended to be cross-platform, but it is not yet verified on native Windows shells in this repo. Current shell examples assume a Bash-compatible environment.
 
+## User-Facing Dispatch Brief
+
+Before asking the user to approve a peer dispatch, show a compact brief rather
+than dumping the full packet inline by default. The packet file remains the
+exact source of truth and must be linked or named so the user can inspect it.
+
+The brief should include:
+
+1. **Planned peers** — model names first; CLI versions are diagnostics only.
+2. **Current positions** — one short line per participant when prior peer
+   positions exist.
+3. **Reasoning summary** — the strongest 2-4 reasons, disagreements, or risks.
+4. **Next ask** — the exact question this dispatch asks the peers to answer.
+5. **Run meaning** — what replying `run` will execute.
+
+For debate rebuttal rounds, the brief must make the next-round ask explicit:
+what positions are being challenged, which disagreements matter, and what
+evidence or assumption change the peers should address. Do not require the user
+to read a long terminal-rendered prompt to understand why the next dispatch is
+happening.
+
 ### Peer-Readable Packet Locations
 
 This section is the source of truth for the temporary dispatch fallback location. Do not duplicate the exact fallback path across workflow docs unless a tool-specific runner requires it.
@@ -123,22 +144,43 @@ If the packet is copied for dispatch, record both:
 
 Before the full peer review or debate call, run a cheap readability probe against the dispatch packet.
 
-- Ask the peer to read the dispatch packet and echo the first Markdown heading or another small deterministic string from it.
+- Ask the peer to read the dispatch packet and echo the first Markdown heading or another small deterministic string from it using an explicit ACK form, such as:
+  `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
 - If that probe fails because the path is ignored, unreadable, or out of workspace, classify it as `path_or_permission_failure`.
 - Tell the user briefly which path failed.
 - Fix the dispatch path, prefer `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/peer-dispatch/<workflow>/`, and retry once before spending tokens on the real task.
 - Do not treat a failed readability probe as model disagreement or reasoning failure.
+
+### Peer Handshake Gate
+
+Before starting the full peer-task timer for any long peer dispatch, run a cheap packet-bound handshake and show the result to the user.
+
+- The handshake must prove the peer received the actual packet or prompt marker, not merely a generic request.
+- For file-based packets, the readability probe is the handshake. Require the peer to return `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.` before the full task starts.
+- For self-contained `stdin` or inline prompt transport, include a packet ID or first-heading marker in the payload and require the same `ACK_PACKET_RECEIVED ...` form with no substantive reasoning.
+- Use a 60-second ACK window by default unless the user overrides it.
+- Start the full `cowork_timeout_seconds`, `swarm_timeout_seconds`, or audit timer only after the handshake succeeds.
+- If the handshake fails, returns empty output, or times out, classify it as `handshake_failed` or the more specific transport failure (`path_or_permission_failure`, `malformed_or_no_output`, capacity error) and fix transport before spending the full task budget.
+- The handshake is transport evidence only. Do not synthesize it as a peer answer.
+- Adaptive escalation order:
+  1. Try the easiest supported packet-bound ACK transport first.
+  2. If it fails, fix the packet location or prompt transport and retry once using another supported method such as stdin, file path, in-repo dispatch copy, prompt file, session resume, or a CLI/provider-specific attachment mechanism.
+  3. If the peer CLI supports streaming output, use streaming mode so ACK text can be observed as soon as the peer starts emitting tokens.
+  4. If context retention matters, use a same-run ACK + task invocation: the peer reads the packet marker, emits `ACK_PACKET_RECEIVED ...`, then continues the substantive task in that same run.
+  5. If all supported transports fail, mark that peer unavailable or ask the user whether to proceed degraded.
 
 ### Live-Run Observation
 
 While the peer process is still running:
 
 - Treat process liveness and elapsed wall-clock time as the primary signal, not the current byte count of redirected stdout/stderr files.
-- Keep `audit_timeout_seconds` as the hard ceiling.
+- Keep the workflow timeout (`audit_timeout_seconds`, `cowork_timeout_seconds`, or `swarm_timeout_seconds`) as the hard ceiling.
 - Use host-specific references for any peer-specific soft suspicion thresholds or buffering quirks.
 - **BLOCKING RULE: Always run the Heartbeat Monitor below.** Every peer dispatch in `/cowork`, `/consensus`, `/debate`, and `/audit-work` MUST show heartbeat output to the user. This is not optional. If you dispatch a peer without a heartbeat, you have violated this rule.
 
 ### Heartbeat Monitor (Mandatory, Non-Blocking)
+
+Start the heartbeat loop only after the Peer Handshake Gate succeeds. Do not run heartbeat checks during the ACK window itself.
 
 Run a lightweight heartbeat every 30 seconds while ANY peer LLM process is running. Show the output to the user by default. This is **informational only** — it never kills, never blocks, never auto-escalates. It just reports so the user can see what's happening.
 

@@ -1,6 +1,6 @@
-# System Blueprint Agent
-- Version: 1.3.0
-- Last Updated: 2026-05-13
+# System Design Agent
+- Version: 2.0.0
+- Last Updated: 2026-05-30
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — macro-level system planning and decomposition
@@ -67,7 +67,7 @@ Create a macro-level system blueprint that defines what is being built and how i
 - Blueprint artifact path
 - Domain/component summary
 - NFR discovery summary and dominant quality-attribute candidates
-- Dominant quality attributes for Architect handoff
+- Dominant quality attributes for Software Architect handoff
 - Integration/ownership risks
 - Spec decomposition plan
 - Recommended next routing

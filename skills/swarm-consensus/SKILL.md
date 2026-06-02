@@ -283,20 +283,25 @@ confirmation.
 
 1. Write the final peer-facing prompt or context packet to disk first.
 2. Show the user:
-   - the file path
-   - the planned peer models
-   - the full file content when it is reasonably short
-   - if the file is too long to display cleanly, show the section index and ask
-     whether to page through it before running
-3. Ask the user to reply `run` before dispatching external peer CLIs.
-4. If the user edits the intent or flags an issue, revise the file and repeat
+   - a short `Peer Dispatch Brief`
+   - the file path for the exact prompt or packet
+   - the planned peer models, with CLI versions only as diagnostics
+   - the full file content only when the user asks for it or when the packet is
+     tiny enough to be clearer than a summary
+3. The `Peer Dispatch Brief` must include:
+   - current position summary by participant when prior positions exist
+   - the strongest 2-4 reasoning points, disagreements, or risks
+   - what is specifically being asked in this dispatch or next round
+   - what replying `run` will execute
+4. Ask the user to reply `run` before dispatching external peer CLIs.
+5. If the user edits the intent or flags an issue, revise the file and repeat
    the preview gate.
-5. In debate mode, the Round 1 peer prompt must not include the Primary model's
+6. In debate mode, the Round 1 peer prompt must not include the Primary model's
    answer. If later rebuttal rounds use a materially different prompt or include
    summarized model deltas, preview that rebuttal prompt before dispatch too.
-6. Do not treat the model-resolution confirmation gate as a substitute for this
-   content preview. The user must be able to inspect the actual words sent to
-   other LLMs.
+7. Do not treat the model-resolution confirmation gate as a substitute for this
+   preview. The user must be able to inspect the actual words sent to other LLMs
+   through the linked packet without having to read the full packet inline.
 
 ---
 
@@ -314,11 +319,13 @@ confirmation.
 
 ### Swarm timeout budget (hard requirement)
 
-1. Start a wall-clock timer when peer dispatch begins.
-2. Default to `swarm_timeout_seconds=300` unless the user overrides it.
-3. Before every peer CLI call in any round, compute the remaining swarm budget.
-4. Use that remaining budget as the maximum wait for the next peer call.
-5. If the remaining budget is `<= 0`, stop dispatching additional peer calls, mark unfinished peers as timed out, and continue with synthesis from the responses already captured.
+1. Before starting the swarm timer, run the Peer Handshake Gate from `<AI_DEV_SHOP_ROOT>/skills/llm-operations/references/peer-llm-dispatch.md` for every external peer in the round.
+2. Require packet-bound ACK within 60 seconds by default: `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
+3. Start the wall-clock swarm timer only after required peer handshakes succeed or are explicitly classified and excluded.
+4. Default to `swarm_timeout_seconds=300` unless the user overrides it.
+5. Before every peer CLI call in any round, compute the remaining swarm budget.
+6. Use that remaining budget as the maximum wait for the next peer call.
+7. If the remaining budget is `<= 0`, stop dispatching additional peer calls, mark unfinished peers as timed out, and continue with synthesis from the responses already captured.
 
 ### Structured Output And Diagnostics Protocol
 

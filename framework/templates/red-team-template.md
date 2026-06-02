@@ -10,7 +10,7 @@
 
 ## BLOCKING Findings
 
-Spec must be revised before Architect dispatch. If 3 or more BLOCKING findings exist, stop and route back to Spec Agent.
+Spec must be revised before Software Architect dispatch. If 3 or more BLOCKING findings exist, stop and route back to Spec Agent.
 
 ### RT-001
 - Severity: BLOCKING
@@ -36,7 +36,7 @@ Spec Agent and human are informed. Human decides whether to revise or accept ris
 
 ## CONSTITUTION_FLAG Findings
 
-Likely to require a constitution exception. Flagged for Architect awareness so Complexity Justification entries can be prepared proactively. Does not block Architect dispatch unless accompanied by BLOCKING findings.
+Likely to require a constitution exception. Flagged for Architect awareness so Complexity Justification entries can be prepared proactively. Does not block Software Architect dispatch unless accompanied by BLOCKING findings.
 
 ### RT-003
 - Severity: CONSTITUTION_FLAG
@@ -44,12 +44,12 @@ Likely to require a constitution exception. Flagged for Architect awareness so C
 - Article: <Article number and name>
 - Location: <requirement or AC reference>
 - Description: <why this requirement likely creates constitution pressure>
-- Architect note: <what the Architect should prepare in the ADR Complexity Justification>
+- Architect note: <what the Software Architect should prepare in the ADR Complexity Justification>
 
 ---
 
 ## Routing Decision
 
-`<N>` BLOCKING findings. `<decision: spec cleared for Architect dispatch / route back to Spec Agent>`
+`<N>` BLOCKING findings. `<decision: spec cleared for Software Architect dispatch / route back to Spec Agent>`
 
-ADVISORY and CONSTITUTION_FLAG findings are included in Architect context. `<specific notes if any>`
+ADVISORY and CONSTITUTION_FLAG findings are included in Software Architect context. `<specific notes if any>`

@@ -38,8 +38,15 @@ Act as a Swarm Consensus Coordinator.
    - If a peer still needs file-based packet access, follow the shared transport fallback rules in `skills/llm-operations/references/peer-llm-dispatch.md`.
    - Do not promote a local-only packet into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` only to satisfy peer readability.
    - In `debate` mode, apply the Debate Problem-Framing Guard from `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`: lead with the user's need and constraints, present candidate solutions as options rather than the expected answer, and require adversarial critique of failure modes and alternatives.
-7. Before dispatching any external peer LLM, write the exact peer-facing prompt/context packet to disk, show the user the file path and content, and wait for the user to reply `run`.
+7. Before dispatching any external peer LLM, write the exact peer-facing prompt/context packet to disk, show the user a short `Peer Dispatch Brief`, show the file path, and wait for the user to reply `run`.
    - This preview gate is mandatory even when model resolution was already confirmed.
+   - Do not inline the full packet by default unless the user asks for it. The linked file is the exact source of truth for what will be sent.
+   - The `Peer Dispatch Brief` must include:
+     - planned peer models, with CLI versions only as diagnostics
+     - current position summary by participant when this is a later debate round
+     - reasoning summary, limited to the strongest 2-4 reasons or disagreements
+     - what is specifically being asked in this dispatch or next round
+     - what replying `run` will do
    - If the user flags an issue, revise the file and repeat the preview gate.
    - In debate mode, the Round 1 peer prompt must not include the Primary model's answer. Preview later rebuttal prompts too when they are materially different or include summarized model deltas.
 8. Treat the current host model as the `Primary` participant and require a substantive frozen first-pass response before any peer synthesis. If the host environment cannot surface that first-pass response cleanly, create exactly one same-family child/helper to fill the `Primary` slot before continuing. Do not count that helper as an extra voting peer. A peer-only run is invalid and must stop.
@@ -47,7 +54,9 @@ Act as a Swarm Consensus Coordinator.
    - `single-pass`: independent first pass + one synthesis.
    - `debate`: independent first pass + bounded debate rounds until `min_confidence` agreement or `max_rounds`.
    - In `debate` mode, each rebuttal round must require every responding model to explain its current position, why it holds that position, whether that position changed this round, the strongest argument against the leading opposing position, and what evidence or assumption change would move it.
-   - Apply `swarm_timeout_seconds` as the total wall-clock budget for peer dispatch across the whole run.
+   - Before starting the full peer timer, run the Peer Handshake Gate from `skills/llm-operations/references/peer-llm-dispatch.md`: require packet-bound ACK within 60 seconds by default, using `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
+   - Start `swarm_timeout_seconds` only after peer handshakes succeed or failed peers are explicitly classified and excluded.
+   - Apply `swarm_timeout_seconds` as the total wall-clock budget for substantive peer dispatch across the whole run.
 10. Prefer structured output modes for peer CLIs when available. Parse `stdout` only as the peer answer; keep `stderr` as diagnostics.
 11. Treat transient peer failures such as `429`/`503` or clear capacity/rate-limit errors as retryable within the remaining `swarm_timeout_seconds` budget.
 12. Before writing the final report, if the user has not already specified retained vs local-only vs inline-only, ask:

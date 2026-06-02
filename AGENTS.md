@@ -2,7 +2,7 @@
 ## Agent Communication Protocol
 **CRITICAL:** Whenever any agent responds to the user (including subagents reporting back to the Coordinator), the agent's name and its current mode MUST be prefixed to the message.
 Format: `AgentName(Mode): ...`
-Examples: `Coordinator(Review Mode): ...` or `Coordinator(Pipeline): ...` or `Programmer(Execution): ...` or `Spec Agent(Direct): ...` or `Architect(Consensus): ...`
+Examples: `Coordinator(Review Mode): ...` or `Coordinator(Pipeline): ...` or `Programmer(Execution): ...` or `Spec Agent(Direct): ...` or `Software Architect(Consensus): ...`
 In Agent Direct Mode, use `AgentName(Direct):`; if Direct Mode is started with consensus enabled, use `AgentName(Consensus):`.
 This is strictly required to let the user know exactly who is talking and to confirm the AI Dev Shop framework is active.
 
@@ -70,10 +70,11 @@ If this toolkit is a subfolder and the session starts at the parent project root
 Agents are specialized roles, each with a `skills.md`. By default, all routing flows through the **Coordinator** and bounded cross-agent consultation is enabled under Coordinator control.
 
 ```
-[VibeCoder] → [CodeBase Analyzer] → [System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[VibeCoder] → [CodeBase Analyzer] → [System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - `[VibeCoder]` is an optional starting point — say "switch to vibecoder" or `/agent vibecoder` to prototype fast, then promote to the full pipeline when ready
+- Software Architect conditionally produces an **Implementation Outline** or explicit SKIP before tasks.md generation
 - `[Observer]` is passive and active across all stages when enabled
 - `[...]` stages are optional; dispatched by Coordinator when spec/ADR triggers them or when you specifically ask for them
 
@@ -164,8 +165,8 @@ Apply the detailed delegated naming and validity guard in `<AI_DEV_SHOP_ROOT>/sk
 
 - **Specs are ground truth.** Downstream work must reference the active spec version and hash.
 - **Spec provider is explicit.** Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` before assuming filenames, commands, or readiness gates for the spec surface.
-- **The constitution governs architecture.** Spec, Red-Team, and Architect must use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`. The toolkit ships the default template at `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
-- **`[NEEDS CLARIFICATION]` blocks Architect dispatch.**
+- **The constitution governs architecture.** Spec, Red-Team, and Software Architect must use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`. The toolkit ships the default template at `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
+- **`[NEEDS CLARIFICATION]` blocks Software Architect dispatch.**
 - **The handoff contract is mandatory.** Every artifact includes inputs used, output summary, risks, and suggested next assignee.
 - **Framework source files are read-only during normal feature work.** Keep project-owned writes in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, and `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/` unless the user explicitly asks to keep state inside the toolkit for compatibility.
 - **Classify artifact intent before saving.** Required pipeline artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` automatically. Optional retained reports require an explicit user save choice. Scratch prompts, raw logs, temporary captures, and other session-only artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` by default.

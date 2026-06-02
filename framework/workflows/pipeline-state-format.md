@@ -181,7 +181,7 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 - `spec_readiness_artifact` is the file or artifact used to prove the planning surface is ready for architecture work
 - for the default Speckit provider, these typically map to `feature.spec.md` and `spec-dod.md`
 
-### Planning preflight fields (required before Architect dispatch)
+### Planning preflight fields (required before Software Architect dispatch)
 
 ```markdown
 planning_preflight_status: NOT_RUN | PASS | FAIL
@@ -190,7 +190,7 @@ planning_preflight_spec_hash: <sha256 or N/A>
 planning_preflight_failures: <summary or N/A>
 ```
 
-The Coordinator writes these fields when `/plan`, manual Architect dispatch, or
+The Coordinator writes these fields when `/plan`, manual Software Architect dispatch, or
 resume validation reaches the architecture boundary. `PASS` means provider
 readiness, hash verification, human approval, Red-Team clearance, blueprint
 status, reverse-spec review, and brownfield evidence wiring have all passed for
@@ -207,7 +207,7 @@ validator_result: PASS | FAIL | NOT_RUN
 validator_manual_waiver: reviewer=<name>; timestamp=<ISO-8601 UTC>; reason=<why runtime unavailable>; manual_checks=<checks performed>
 ```
 
-Provider-local validators are mandatory before Architect dispatch. A manual
+Provider-local validators are mandatory before Software Architect dispatch. A manual
 waiver is not a substitute for fixing a failing validator; it exists only when
 the required runtime cannot be executed in the host environment. The waiver must
 stay on one line using semicolon-separated fields so state parsers do not split
@@ -224,7 +224,7 @@ reverse_spec_review_status: NOT_APPLICABLE | PENDING | APPROVED | REVISE
 ```
 
 Existing-codebase features and rewrites use these fields so Coordinator can
-prove the Architect saw the sampled codebase evidence and any reverse-spec
+prove the Software Architect saw the sampled codebase evidence and any reverse-spec
 human checkpoint before architecture decisions are made.
 
 ### Verification and review gate fields
@@ -262,7 +262,7 @@ scope, reason, and remaining risk in Notes.
 |-------|-------------|
 | `spec` | Spec Agent writing or revising spec |
 | `clarify` | Spec Agent resolving [NEEDS CLARIFICATION] markers |
-| `architect` | Architect Agent producing research.md + ADR |
+| `architect` | Software Architect Agent producing research.md + ADR |
 | `tasks` | Coordinator generating tasks.md |
 | `tdd` | TDD Agent writing and certifying tests |
 | `programmer` | Programmer Agent implementing |

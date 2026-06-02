@@ -10,7 +10,7 @@ This folder contains a complete example of a feature run through the AI Dev Shop
 ## Full Pipeline (speckit)
 
 ```
-[CodeBase Analyzer] → [Migration Plan] → Spec → [Red-Team] → Architect (research → constitution check → ADR) → tasks.md → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+[CodeBase Analyzer] → [Migration Plan] → Spec → [Red-Team] → Software Architect (research → constitution check → ADR) → tasks.md → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
 ```
 
 `[...]` stages are optional. Observer runs alongside the pipeline throughout (not shown inline).
@@ -23,7 +23,7 @@ This folder contains a complete example of a feature run through the AI Dev Shop
 |---------------|-------|----------|--------------|
 | Spec | Spec Agent | `feature.spec.md` + package metadata | ✅ `feature.spec.md`, `spec-manifest.md` |
 | Red-Team | Red-Team Agent | findings report | ✅ `red-team-findings.md` |
-| Architect | Architect Agent | research summary + `adr.md` | ✅ `adr.md` (research embedded) |
+| Software Architect | Software Architect Agent | research summary + `adr.md` | ✅ `adr.md` (research embedded) |
 | Task generation | Coordinator | `tasks.md` | ✅ `tasks.md` |
 | TDD | TDD Agent | `test-certification.md` | ✅ `test-certification.md` |
 | Programmer | Programmer Agent | implementation files | ❌ codebase-specific |
@@ -52,7 +52,7 @@ Deliberately small and realistic — small enough to understand end-to-end, larg
 
 **When writing a spec:** compare against `feature.spec.md` and `spec-manifest.md`. Every requirement should be observable and testable. Zero `[NEEDS CLARIFICATION]` markers at dispatch. Constitution Compliance table filled in.
 
-**When reading Red-Team output:** compare against `red-team-findings.md`. Findings are BLOCKING, ADVISORY, or CONSTITUTION_FLAG. Only BLOCKING findings halt Architect dispatch.
+**When reading Red-Team output:** compare against `red-team-findings.md`. Findings are BLOCKING, ADVISORY, or CONSTITUTION_FLAG. Only BLOCKING findings halt Software Architect dispatch.
 
 **When writing an ADR:** compare against `adr.md`. Constitution Check table must come first, before any architecture content. Complexity Justification table must be present even if empty. Research summary is required when technology choices exist.
 

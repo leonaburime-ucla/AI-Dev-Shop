@@ -73,6 +73,8 @@ Core collaboration invariant:
    - If the user explicitly asks to retain the packet, save it under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/cowork/runs/<timestamp>/context.md`.
    - Give every participant the same context packet. Do not let one model reason from hidden extra file content unless the Coordinator adds that content to the shared packet first.
    - Before expensive peer dispatch, run a cheap readability probe if a peer is asked to read the packet by path. The probe must ask for a deterministic value such as the first Markdown heading.
+   - Treat that probe as the Peer Handshake Gate: require packet-bound ACK within 60 seconds by default, using `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
+   - Start `cowork_timeout_seconds` only after peer handshakes succeed or failed peers are explicitly classified and excluded.
    - If the probe fails, classify it as `path_or_permission_failure`, fix transport, and retry once before spending the full task prompt.
    - Prefer self-contained `stdin` transport for small and medium packets. Do not force peer CLIs to read sibling project-knowledge paths that may be outside their workspace allowlist.
    - In subfolder installs where `<ADS_PROJECT_KNOWLEDGE_ROOT>` is a sibling of `<AI_DEV_SHOP_ROOT>`, use an in-repo dispatch copy such as `<AI_DEV_SHOP_ROOT>/tmp/peer-dispatch/cowork/<timestamp>/context.md` when file transport is required.
@@ -89,6 +91,8 @@ Core collaboration invariant:
    - The primary model must produce and freeze its own whole-task proposal before reading peer proposals.
    - No participant may see another participant's proposal, summary, or conclusions until all available proposals for this phase are frozen.
    - Save each participant's raw proposal before synthesis so later convergence can be audited for anchoring or omitted dissent.
+   - Peer-dispatch packets for the independent proposal phase must contain only shared facts: task, scope, approved constraints, baseline hashes, relevant file contents, and any user-approved common synthesis from earlier workflows. They must not include the Primary proposal, another peer's proposal, proposal summaries, selected plan elements, comparison ledgers, or filenames/sections that expose them.
+   - Before independent peer dispatch, run a contamination preflight on the exact packet being sent. At minimum, fail the packet if it contains phrases such as `Primary Frozen Proposal`, `primary-proposal`, `comparison ledger`, `selected proposal elements`, `Claude position`, `Gemini position`, or any prior peer proposal heading from the same cowork phase. If contamination is found, stop dispatch, quarantine any partial outputs as invalid, regenerate an unbiased packet, and report the correction to the user.
    - Dispatch selected peers in read-only or plan mode where supported. If a peer CLI cannot enforce read-only mode, the prompt must explicitly forbid edits in this phase.
    - The default is co-design, not independent full-file drafting. Participants should design everything the task requires at the right semantic level: architecture choices, eval dimensions, traps, acceptance criteria, patch strategy, edge cases, or file structure.
    - Do not ask every participant to draft full target files or unified diffs by default; that is token-expensive and usually redundant.

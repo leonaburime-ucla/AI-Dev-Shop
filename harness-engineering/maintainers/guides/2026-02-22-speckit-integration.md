@@ -747,10 +747,10 @@ git commit -m "feat: add constitution check and [NEEDS CLARIFICATION] to Spec Ag
 
 ---
 
-## Task 8: Modify `agents/architect/skills.md`
+## Task 8: Modify `agents/software-architect/skills.md`
 
 **Files:**
-- Modify: `agents/architect/skills.md`
+- Modify: `agents/software-architect/skills.md`
 
 Add Step 0 (research.md) and Step 1 (constitution check) before the existing workflow steps.
 
@@ -832,12 +832,12 @@ Replace with:
 
 **Step 4: Verify**
 
-Read `agents/architect/skills.md` and confirm Step 0 (research) and Step 1 (constitution check) are present at the top of the workflow, and the output format includes research and constitution results.
+Read `agents/software-architect/skills.md` and confirm Step 0 (research) and Step 1 (constitution check) are present at the top of the workflow, and the output format includes research and constitution results.
 
 **Step 5: Commit**
 
 ```bash
-git add agents/architect/skills.md
+git add agents/software-architect/skills.md
 git commit -m "feat: add research artifact and constitution check to Architect Agent workflow"
 ```
 

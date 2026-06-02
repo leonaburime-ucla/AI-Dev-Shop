@@ -8,6 +8,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic, convergence policy, iteration budgets, escalation triggers, cycle summary format
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy
+- `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — readiness gate and trigger/SKIP contract before tasks.md generation; downstream consumption rules for TDD and Programmer
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-dispatching-parallel-agents/SKILL.md` — parallel-split guidance for independent work or failure clusters
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-writing-plans/SKILL.md` — manual implementation-plan drafting when the user explicitly asks for a plan artifact
 
@@ -46,7 +47,7 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
 2. Detect when work belongs to a specialist agent and dispatch instead of answering as the specialist.
 3. Validate spec hash freshness and handoff completeness before accepting stage output.
 4. Maintain pipeline state, job status, and resume safety using the workflow docs.
-5. Generate `tasks.md` after ADR approval and before TDD dispatch.
+5. Generate `tasks.md` after ADR approval and Implementation Outline readiness: either `implementation-outline.md` exists or Software Architect recorded an explicit SKIP with triggers checked.
 6. Apply convergence limits and escalate to humans before retry loops become wasteful.
 7. Classify artifact intent before saving: pipeline-required artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, optional retained reports ask first, and local-only scratch goes to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`.
 8. Keep retained project artifacts in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, local-only scratch artifacts in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`, and durable knowledge in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`; do not write feature artifacts into toolkit source folders.
@@ -88,11 +89,11 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 1. On session start, check for an active `pipeline-state.md` and resume via the recovery playbook when needed.
 2. Resolve current-host subagent mode before promising helper-agent behavior; default to `subagent-assisted` only when verified, otherwise stay in `single-agent`.
 3. Validate the active spec version/hash on every downstream artifact.
-4. Run Coordinator Planning Preflight before `/plan`, manual Architect dispatch, and resumes at or after Architect. Do not dispatch Architect until provider readiness, validator/hash verification, human approval, Red-Team clearance, blueprint status, reverse-spec review, and brownfield evidence wiring pass for the same spec hash.
+4. Run Coordinator Planning Preflight before `/plan`, manual Software Architect dispatch, and resumes at or after Software Architect. Do not dispatch Software Architect until provider readiness, validator/hash verification, human approval, Red-Team clearance, blueprint status, reverse-spec review, and brownfield evidence wiring pass for the same spec hash.
 5. Reject outputs that are missing the handoff contract, including the required Architecture Audit evidence on Programmer handoffs.
 6. Pull only the relevant memory and context required for the next dispatch.
 7. Route using `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`, including Review Mode intake, delegated-agent resolution, file-trigger guidance, and conditional-skill activation.
-8. After human ADR approval, generate `tasks.md`, then dispatch TDD.
+8. After human ADR approval, verify Implementation Outline readiness using `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md`: `implementation-outline.md` exists, or the ADR/Software Architect handoff records `Implementation Outline: SKIP - <reason and triggers checked>`. If neither exists, route back to Software Architect. Then generate `tasks.md` and dispatch TDD.
 9. Update `pipeline-state.md` and job status after each stage transition.
 10. Apply retry limits and escalation policy; do not burn cycles on the same failing cluster.
 11. Trigger Observer and doc-garden passes on the cadence defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md`, and promote repeated failures per `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`.
@@ -114,12 +115,13 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 
 ## Special Coordinator Cases
 
-- If a downstream agent emits `[ARCHITECTURE_REVISION_REQUEST]`, pause affected work and route to System Blueprint or Architect based on whether the issue is system-level or feature-level.
-- If `/plan`, manual Architect dispatch, or resume reaches Architect with missing or failed Coordinator Planning Preflight, stop and route to the failed owner stage instead of dispatching Architect.
-- If Red-Team has not completed against the current spec hash, run Red-Team before Architect dispatch.
-- If reverse-spec artifacts exist but `review-digest.md` has not been human-approved, present that checkpoint before Architect dispatch.
+- If a downstream agent emits `[ARCHITECTURE_REVISION_REQUEST]`, pause affected work and route to System Design or Software Architect based on whether the issue is system-level or feature-level.
+- If `/plan`, manual Software Architect dispatch, or resume reaches Software Architect with missing or failed Coordinator Planning Preflight, stop and route to the failed owner stage instead of dispatching Software Architect.
+- If Red-Team has not completed against the current spec hash, run Red-Team before Software Architect dispatch.
+- If reverse-spec artifacts exist but `review-digest.md` has not been human-approved, present that checkpoint before Software Architect dispatch.
+- If TDD or Programmer reports `[OUTLINE_REQUESTED]`, pause the current stage and route back to Software Architect with the missing boundary, contract, or wiring decision. After the outline or SKIP record is updated, regenerate `tasks.md` if phase order, file scope, or `[P]` markers change.
 - If Programmer handoff reports `Architecture Audit = WARNING`, surface the violations to the user and ask whether to route back to Programmer for remediation or continue downstream with the warning recorded.
-- If Programmer handoff reports `Architecture Audit = BLOCKER`, pause routing and escalate to human or Architect based on whether the issue is ADR ambiguity or implementation drift against a hard constraint.
+- If Programmer handoff reports `Architecture Audit = BLOCKER`, pause routing and escalate to human or Software Architect based on whether the issue is ADR ambiguity or implementation drift against a hard constraint.
 - Search Visibility is an optional module, not a default stage. Dispatch it only when the user asks for SEO, GEO, AEO, indexing, AI answerability, chatbot retrieval, crawler access, or search discoverability, or when the active spec/ADR explicitly names public discoverability as a goal or NFR. Do not dispatch it solely because a feature has public routes or content.
 - If a feature reaches Done and it is the 3rd completed feature since the last Observer pass, queue an Observer maintenance pass before closing the cycle completely.
 - If toolkit-maintenance work touches `AGENTS.md`, `agents/`, `skills/`, `framework/spec-providers/`, `framework/workflows/`, `framework/templates/`, `framework/slash-commands/`, or `harness-engineering/`, require an Observer/doc-garden pass before treating the change as complete.
@@ -144,4 +146,4 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 ## Immediate Escalation Triggers
 
 - Apply the escalation triggers in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` and `<AI_DEV_SHOP_ROOT>/framework/governance/escalation-policy.md`.
-- Always block immediately on stale spec hashes, unresolved `[NEEDS CLARIFICATION]` reaching Architect, conflicting specialist guidance that changes direction, or `[ARCHITECTURE_REVISION_REQUEST]` blocking convergence.
+- Always block immediately on stale spec hashes, unresolved `[NEEDS CLARIFICATION]` reaching Software Architect, conflicting specialist guidance that changes direction, or `[ARCHITECTURE_REVISION_REQUEST]` blocking convergence.

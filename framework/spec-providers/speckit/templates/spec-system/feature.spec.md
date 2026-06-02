@@ -21,10 +21,10 @@
 
 > **[NEEDS CLARIFICATION] vs Open Questions — use the right one:**
 >
-> **`[NEEDS CLARIFICATION]`** — inline marker for a requirement that is too ambiguous to be testable as written. Blocks Architect dispatch. Must be resolved before the spec advances.
+> **`[NEEDS CLARIFICATION]`** — inline marker for a requirement that is too ambiguous to be testable as written. Blocks Software Architect dispatch. Must be resolved before the spec advances.
 > Example: `The user can export results [NEEDS CLARIFICATION: CSV only, or also PDF and JSON?]`
 >
-> **Open Questions** — tracked questions that do not block Architect dispatch. Each must have an owner and a resolution target date. Questions without both are not Open Questions — convert them to `[NEEDS CLARIFICATION]` markers.
+> **Open Questions** — tracked questions that do not block Software Architect dispatch. Each must have an owner and a resolution target date. Questions without both are not Open Questions — convert them to `[NEEDS CLARIFICATION]` markers.
 
 ---
 
@@ -134,7 +134,7 @@ For each dependency: what it provides, what happens if it is unavailable, and wh
 
 ## Open Questions
 
-Questions that do not block Architect dispatch but must be resolved before TDD begins.
+Questions that do not block Software Architect dispatch but must be resolved before TDD begins.
 Every item must have an owner and a resolution target date. Items without both are `[NEEDS CLARIFICATION]` markers, not Open Questions.
 
 - OQ-01: <question> — Owner: <name/role> — Resolve by: <ISO-8601 date>
@@ -144,7 +144,7 @@ Every item must have an owner and a resolution target date. Items without both a
 
 ## Constitution Compliance
 
-Completed by the Spec Agent. Verified by the Architect Agent.
+Completed by the Spec Agent. Verified by the Software Architect Agent.
 Any EXCEPTION requires a justification row in the ADR's Complexity Justification table.
 
 | Article | Status | Notes |
@@ -162,7 +162,7 @@ Any EXCEPTION requires a justification row in the ADR's Complexity Justification
 
 ## Implementation Readiness Gate
 
-This checklist must be fully checked before the spec is handed off to the Architect Agent.
+This checklist must be fully checked before the spec is handed off to the Software Architect Agent.
 The Spec Agent completes this. The Coordinator verifies before routing.
 
 - [ ] spec_id assigned and unique (verified against existing `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` folders)

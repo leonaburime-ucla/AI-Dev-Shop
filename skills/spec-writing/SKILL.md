@@ -7,7 +7,7 @@ description: Use when writing or reviewing specifications, converting product in
 
 # Skill: Spec Writing
 
-Specs are ground truth. Every downstream agent — Architect, TDD, Programmer, Code Review, Security — builds on what the spec says. If the spec is wrong or vague, every agent executes confidently on a flawed foundation and produces passing tests for the wrong behavior. This is the most dangerous failure mode in a multi-agent system.
+Specs are ground truth. Every downstream agent — Software Architect, TDD, Programmer, Code Review, Security — builds on what the spec says. If the spec is wrong or vague, every agent executes confidently on a flawed foundation and produces passing tests for the wrong behavior. This is the most dangerous failure mode in a multi-agent system.
 
 ## What a Spec Is
 
@@ -173,14 +173,14 @@ A spec is ready when:
 | Content | Location |
 |---|---|
 | Requirements, acceptance criteria, invariants, edge cases | Spec file — at user-specified location |
-| Architecture decisions and pattern choices | ADR — see `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` |
+| Software Architecture decisions and pattern choices | ADR — see `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` |
 | Project conventions and tribal knowledge | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` |
 | Lessons learned from past mistakes | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` |
 | Open questions and parking lot items | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md` |
 
 ## Strict Mode — Spec Package
 
-In strict mode, a spec is a PACKAGE, not a single file. A feature that enters the delivery pipeline in strict mode must have all required files present and complete before any downstream agent (TDD, Architect, Programmer) is dispatched.
+In strict mode, a spec is a PACKAGE, not a single file. A feature that enters the delivery pipeline in strict mode must have all required files present and complete before any downstream agent (TDD,Software Architect, Programmer) is dispatched.
 
 When the active provider is `speckit`, the authoritative AI Dev Shop-local contract is `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`.
 
