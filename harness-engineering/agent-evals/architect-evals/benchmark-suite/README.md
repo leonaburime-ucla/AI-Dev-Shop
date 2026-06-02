@@ -1,101 +1,69 @@
-# Architect Scorecard Suite
+# Architect Eval Suite
 
 Suite kind: `benchmark`
 
-Status: `pilot`
+Status: `canary`
 
 Purpose:
 
-- test whether the Architect applies the new architecture scorecard behavior
-  consistently
-- seed traps around optional-axis activation, separate `modularity` scoring,
-  confidence discipline, mitigations, blocking rules, and tradeoff synthesis
-- verify that the Blueprint handoff and ADR scorecard changes produce visible,
-  auditable downstream behavior
+- test whether the Software Architect agent makes correct architecture
+  JUDGMENT — pattern evaluation, scorecard quality, axis activation
+  discipline, blocking rule enforcement, adaptability application,
+  confidence calibration, and migration safety reasoning
+- NOT testing system design ability — testing evaluation and decision quality
+- the agent produces structured ADRs with Pattern Evaluation tables and
+  Quality Attribute Scorecards; seeds test whether those are correct
 
-## Coverage
+## Design Principles
 
-- `59` seeds
-- `7` eval projects
-- all `Easy`, `Medium`, and `Hard` tiers
-- non-trivial seed structures included:
-  - `combined`
-  - `layered`
-  - `distributed`
-  - `camouflaged`
-  - `interference`
-- architecture-family coverage encoded explicitly in TSV metadata
-- conditional-skill activation expectations encoded explicitly in TSV metadata
+- Seeds test judgment behaviors from the agent's skills.md, not generic
+  architecture knowledge
+- Fixture documents are crafted to create scorecard traps: attractive
+  nuisance patterns, subtle axis triggers, anti-monolith bias bait,
+  confidence over/underclaiming opportunities
+- The eval asks for the ACTUAL agent output format (Pattern Evaluation +
+  Scorecard + ADR template sections)
+- Scoring compares the agent's scorecard judgments against the oracle
 
-Eval map:
+## Coverage (Canary — 1 scenario)
 
-- `eval-1-team-chat-saas`
-  - `SEED-AR-01` through `SEED-AR-07`
-  - `SEED-AR-22` through `SEED-AR-24`
-  - `SEED-AR-33`
-  - `SEED-AR-35`
-- `eval-2-analytics-export-platform`
-  - `SEED-AR-08` through `SEED-AR-14`
-  - `SEED-AR-25` through `SEED-AR-27`
-  - `SEED-AR-31`
-- `eval-3-payments-ledger-modernization`
-  - `SEED-AR-15` through `SEED-AR-21`
-  - `SEED-AR-28` through `SEED-AR-30`
-  - `SEED-AR-32`
-- `eval-4-thin-evidence-concept`
-  - `SEED-AR-34`
-- `eval-5-ai-rag-platform`
-  - `SEED-AR-36` through `SEED-AR-43`
-- `eval-6-api-integration-hub`
-  - `SEED-AR-44` through `SEED-AR-51`
-- `eval-7-event-driven-data-platform`
-  - `SEED-AR-52` through `SEED-AR-59`
+- `10` seeds in 1 scenario
+- `2` fatal (gated at 60%)
+- `1` negative control
+- `7` standard seeds
+- 8 judgment categories covered: axis activation, score calibration,
+  blocking rules, adaptability, confidence, tradeoff credibility,
+  migration safety, conditional skills
 
-## Target Behavior
+## Multi-Scenario Expansion Plan
 
-This suite is designed to verify that the Architect:
+Target: **6 scenarios × ~40 seeds each = ~240 total seeds**
 
-- scores all core axes
-- activates optional axes only when the trigger exists
-- keeps `modularity` separate from `modifiability`
-- includes `confidence`, `strengths`, `weaknesses`, `rationale`,
-  `assumptions`, `review_trigger`, and weak-axis `mitigation`
-- does not use weighted-sum theater
-- names a real `Tradeoff Tension`
-- explains `Why This Won`
-- compares against the runner-up
-- blocks unsafe winners when critical axes collapse
-- activates the right conditional skills for the project shape instead of
-  silently overloading generic scorecard behavior
-- holds up across distinct architecture families rather than only SaaS-shaped
-  request/response systems
+| Scenario | Domain | Dominant Drivers | Status |
+|----------|--------|-----------------|--------|
+| arch-eval-1 | Billing ledger migration (brownfield) | compliance, data consistency, operability, migration safety | DONE (34 seeds, validated at 94%) |
+| arch-eval-2 | Flash-sale ticketing (greenfield) | performance, scalability, data consistency, reliability | PLANNED |
+| arch-eval-3 | B2B partner integration hub (brownfield) | integration complexity, modifiability, cognitive load, operability | PLANNED |
+| arch-eval-4 | Enterprise RAG assistant (greenfield) | tenant isolation, security, compliance, cost, AI-specific | PLANNED |
+| arch-eval-5 | Real-time collaboration platform (greenfield) | reliability, scalability, deployment independence, performance | PLANNED |
+| arch-eval-6 | Fintech regulatory migration (brownfield) | compliance (heavy enough to override Simplicity Gate), migration safety, security | PLANNED |
 
-## How To Prepare A Run
+Each scenario targets distinct judgment traps: different constraint
+tensions, different over/under-blocking opportunities, different domains
+where the "obvious" answer is wrong for specific reasons.
+
+## Eval Map (Current)
+
+- `arch-eval-1-billing-ledger-migration`
+  - `SEED-ARCH-01` through `SEED-ARCH-10`
+
+## How To Run
+
+The executing LLM receives the seed-state documents, produces a full ADR,
+then the coordinator scores each seed against the seed-ledger.
 
 ```bash
-python3 harness-engineering/quality/scripts/prepare_eval_run.py \
-  harness-engineering/agent-evals/architect-evals/benchmark-suite \
-  run-001
+mkdir -p harness-engineering/agent-evals/architect-evals/benchmark-suite/arch-eval-1-billing-ledger-migration/runs/run-001
+cp -r harness-engineering/agent-evals/architect-evals/benchmark-suite/arch-eval-1-billing-ledger-migration/seed-state \
+  harness-engineering/agent-evals/architect-evals/benchmark-suite/arch-eval-1-billing-ledger-migration/runs/run-001/
 ```
-
-The executing LLM should read the fresh `runs/run-001/` copy, produce the
-normal ADR output in the eval project run directory, then persist exact
-model/CLI provenance in `run-manifest.tsv` before scoring seeds into
-`run-results.tsv`.
-
-## Notes
-
-- This suite is benchmark-shaped but not benchmark-certified yet because it has
-  not been run and persisted across 3 benchmark passes.
-- It intentionally contains traps, tricks, and false-positive bait so the new
-  scorecard behavior has to prove itself under pressure.
-- The original 30-seed pilot run was archived after external audit feedback in:
-  - `reports/history/2026-04-28-pre-revision-30-seed-pilot/`
-- The canonical `run-results.tsv` was reset after the suite changed. A fresh Architect run is required before using this revision's
-  scores. The suite now also requires a matching `run-manifest.tsv` row for
-  every scored eval before results count as benchmark evidence.
-- `seed-catalog.tsv` now includes architecture-family and conditional-skill
-  activation metadata. `run-results.tsv` may record `observed_conditional_skills`
-  so the scorer can report activation-discipline metrics once fresh runs exist.
-- Negative-control seeds that are correctly not activated must now be recorded
-  as `CORRECT_SKIP`, not `MISSED`.

@@ -1,130 +1,149 @@
-# Seed Ledger - System Blueprint Benchmark Suite
+# Seed Ledger - System Design Benchmark Suite
 
-This hidden ledger describes the expected seeded issues for post-run scoring.
-The System Blueprint agent under test does not see this file.
+This hidden ledger describes expected seeded issues for post-run scoring.
+The System Design agent under test does not see this file.
 
-## system-blueprint-eval-1-scope-boundaries
+## sd-eval-1-team-collab-saas
 
-`SBP-SEED-01`
-- Seeded issue: Scope is too contradictory to decompose safely.
-- Expected signal: System Blueprint escalates or asks clarification instead of inventing a hybrid solution.
+### SD1-SEED-01 (Easy, positive_control, functional_discovery)
 
-`SBP-SEED-02`
-- Seeded issue: Blueprint omits non-goals and explicit exclusions.
-- Expected signal: System Blueprint records MVP boundary, deferred work, and exclusions.
+- Seeded issue: Core actors and resource lifecycles scattered across 3 pages of stakeholder input.
+- Evidence: product-intent.md mentions admins, members, guests, contractors, support; decisions/approvals described as distinct from comments across product, design, and CS sections.
+- Expected signal: Agent surfaces 5+ actor types AND models decision/approval as a first-class resource with its own lifecycle.
+- CAUGHT: identifies actors, models decision state machine as distinct from comments/tasks.
+- PARTIAL: identifies actors but treats decisions as generic content type.
+- MISSED: lists only "users" and "admins" without guest/contractor/support distinction.
 
-`SBP-SEED-03`
-- Seeded issue: Deferred marketplace or AI chatbot enters MVP.
-- Expected signal: System Blueprint preserves declared non-goals.
+### SD1-SEED-02 (Easy, negative_control, scope_escalation)
 
-`SBP-SEED-04`
-- Seeded issue: Billing and Entitlements share subscription ownership without boundary decision.
-- Expected signal: System Blueprint chooses an owner or marks `[OWNERSHIP UNCLEAR]`.
+- Seeded issue: SSO, SCIM, audit export, and guest controls look enterprise-extra but are explicit launch requirements for named pilots.
+- Evidence: constraints.md "Enterprise pilots require SSO using SAML or OIDC, SCIM..." and product-intent.md naming 4 lighthouse accounts.
+- Expected signal: Agent includes enterprise identity/audit in launch scope.
+- CORRECT_SKIP: enterprise features included in launch scope.
+- FALSE_POSITIVE: defers SSO/SCIM/audit as post-launch or "enterprise add-on later."
 
-`SBP-SEED-05`
-- Seeded issue: CRM onboarding handoff exists but is missing from integration map.
-- Expected signal: System Blueprint maps required external/domain integrations.
+### SD1-SEED-03 (Medium, standard, scope_escalation)
 
-`SBP-SEED-06`
-- Seeded issue: Output turns into feature-level acceptance criteria.
-- Expected signal: System Blueprint stays macro-level and avoids writing feature specs.
+- Seeded issue: AI chatbot, whiteboards, marketplace automation, workflow automation, file-drive replacement, advanced BI appear in stakeholder language but are explicitly excluded or unapproved.
+- Evidence: product-intent.md "Initial Scope Boundaries" lists exclusions; CEO mentions AI but Legal hasn't approved; constraints.md "Automated project planning... not launch commitments."
+- Expected signal: Agent explicitly defers 4+ items in non-goals.
+- CAUGHT: names specific deferred items, does not pull them into topology.
+- PARTIAL: defers some but sneaks AI summaries or graph DB into core.
+- MISSED: includes AI/graph/event-sourcing in launch architecture without noting blockers.
 
-`SBP-SEED-07`
-- Seeded issue: Offline-only and real-time centralized sync constraints conflict.
-- Expected signal: System Blueprint surfaces the conflict as an unresolved blocker.
+### SD1-SEED-04 (Medium, standard, functional_discovery)
 
-`SBP-SEED-08`
-- Seeded issue: Regression guard for blueprint mentioning prior-project domains absent from the brief.
-- Expected signal: System Blueprint does not import unrelated session context.
+- Seeded issue: Decision/approval lifecycle fragmented across sources.
+- Evidence: product-intent.md step 5 "proposed, discussed, approved, reopened"; CS feedback "approval where the answer becomes part of the record"; Design notes "approval is overloaded."
+- Expected signal: Agent models decision as first-class resource with state machine.
+- CAUGHT: separate decision/approval model with states, evidence, audit trail, export.
+- PARTIAL: mentions decisions but conflates with comment threads.
+- MISSED: no separate decision concept in functional model.
 
-`SBP-SEED-09`
-- Seeded issue: User mandates a single-app monolith for MVP.
-- Expected signal: System Blueprint does not flag absence of microservices as a defect.
+### SD1-SEED-05 (Medium, standard, integration_boundary)
 
-`SBP-SEED-10`
-- Seeded issue: Admin/reporting domains are explicitly deferred in control variant.
-- Expected signal: System Blueprint does not force deferred domains into MVP.
+- Seeded issue: Access policy source-of-truth question is distributed across all documents.
+- Evidence: constraints.md (revocation, notification deep links, integration access); product-intent.md (client-visible vs internal, guest contributions after departure); team-context.md (Enterprise Platform owns membership but not per-object visibility).
+- Expected signal: Agent surfaces access-policy ownership as BLOCKING or explicitly unresolved.
+- CAUGHT: identifies access-policy source-of-truth as a blocking question.
+- PARTIAL: mentions permissions but assumes workspace-level ACLs.
+- MISSED: no access model discussion or assumes trivially solved.
 
-## system-blueprint-eval-2-topology-tradeoffs
+### SD1-SEED-06 (Medium, negative_control, nfr_topology)
 
-`SBP-SEED-11`
-- Seeded issue: Agent commits to one stack without presenting 2-3 directions and asking preference.
-- Expected signal: System Blueprint runs the exploratory tradeoff checkpoint before finalizing.
+- Seeded issue: Mobile offline is deliberately narrow — not full offline-first.
+- Evidence: product-intent.md "Product does not expect a full offline collaborative editor" and "people will be angry if an airport Wi-Fi drop deletes a written update"; constraints.md "Drafting a comment or note should not lose data during a short connectivity drop."
+- Expected signal: Agent treats mobile as resilient drafts + catch-up, not CRDT architecture.
+- CORRECT_SKIP: scopes mobile correctly as client-side draft persistence.
+- FALSE_POSITIVE: escalates offline as BLOCKING or proposes CRDT/offline-first engine.
 
-`SBP-SEED-12`
-- Seeded issue: Blueprint names more than three dominant quality attributes or scores them.
-- Expected signal: System Blueprint names max three dominant qualities and does not score them.
+### SD1-SEED-07 (Medium, standard, decomposition)
 
-`SBP-SEED-13`
-- Seeded issue: Background worker/runtime path is missing from topology.
-- Expected signal: System Blueprint includes high-level worker/job runtime where required.
+- Seeded issue: Feature decomposition by surface duplicates cross-cutting contracts.
+- Evidence: team-context.md "each surface will need its own version of membership checks, room lifecycle, notification routing, audit entries, export records, search indexing"; also describes beta failure from this approach.
+- Expected signal: Agent proposes shared collaboration-core or identifies duplication risk.
+- CAUGHT: identifies cross-cutting concern duplication, proposes shared layer or explicit contract.
+- PARTIAL: lists features as domains without addressing membership/audit/export duplication.
+- MISSED: proposes pure feature-per-service decomposition.
 
-`SBP-SEED-14`
-- Seeded issue: Shared subscription data model has unresolved ownership but no marker.
-- Expected signal: System Blueprint surfaces data ownership uncertainty.
+### SD1-SEED-08 (Hard, standard, tech_direction)
 
-`SBP-SEED-15`
-- Seeded issue: Order-to-fulfillment event boundary is absent or mislabeled.
-- Expected signal: System Blueprint maps API/event/batch contract type for cross-domain boundaries.
+- Seeded issue: CEO pushes event-driven and graph DB, but constraints prohibit operating them.
+- Evidence: product-intent.md CEO quotes "event-driven architecture" and "data model... as a graph"; constraints.md "no team currently staffed to operate Kafka, Flink, Cassandra, or a custom CRDT service" and "graph database proof-of-concept... not load-tested or reviewed by Security" and "1 infrastructure engineer."
+- Expected signal: Agent presents conservative managed-service stack as primary, names event-driven/graph as future exploration only.
+- CAUGHT: proposes managed/conservative primary option, explains operational risk of distributed-systems choices.
+- PARTIAL: includes event-driven as viable launch option without surfacing staffing.
+- MISSED: proposes Kafka/graph/event-sourced architecture without acknowledging constraints.
 
-`SBP-SEED-16`
-- Seeded issue: Output writes a binding ADR-style decision.
-- Expected signal: System Blueprint keeps stack direction non-binding unless hard constraint already exists.
+### SD1-SEED-09 (Hard, standard, nfr_topology)
 
-`SBP-SEED-17`
-- Seeded issue: Hard no-SaaS constraint is violated by an external SaaS stack choice.
-- Expected signal: System Blueprint respects hard constraints or escalates.
+- Seeded issue: US support console cannot access EU-resident incident reconstruction data without violating residency.
+- Evidence chain (must connect across files):
+  1. constraints.md Data Handling: "Derived customer records include... support replay data"
+  2. constraints.md Operations: "derived customer records... follows the customer content wherever compliance obligations apply"
+  3. constraints.md Data Handling: "Legal wants... derived customer records for EU workspaces to remain in the selected EU environment"
+  4. constraints.md Availability: "incident reconstruction tool that can replay workspace activity... regardless of which environment hosts the workspace"
+  5. team-context.md: "support team is based in the US office and operates from a single internal tooling deployment"
+- Expected signal: Agent traces support replay → derived record → EU-resident → US console cannot access without violating residency.
+- CAUGHT: explicitly identifies that US support accessing EU incident reconstruction data violates residency, surfaces as topology contradiction.
+- PARTIAL: mentions residency as blocking but doesn't connect support replay specifically to derived-record classification and US console location.
+- MISSED: proposes "global support console" without noting the residency conflict.
 
-`SBP-SEED-18`
-- Seeded issue: Regression guard for 1-5 quality-attribute scoring matrix.
-- Expected signal: System Blueprint does not score quality attributes at blueprint stage.
+### SD1-SEED-10 (Hard, standard, sequencing_p0)
 
-`SBP-SEED-19`
-- Seeded issue: Only two dominant quality attributes are named.
-- Expected signal: System Blueprint does not force exactly three attributes.
+- Seeded issue: Downstream specs depend on contracts that don't exist yet.
+- Evidence: team-context.md "Integrations... historically optimizes for partner demos and may build directly against whatever API exists first" plus "Engineering leadership expects [Collaboration Core] to define shared APIs/events before... build too much on top."
+- Expected signal: Agent sequences shared foundations (identity, event envelope, room model) as P0.
+- CAUGHT: explicit P0 sequencing with Collaboration Core contracts before integration/search specs.
+- PARTIAL: mentions dependencies but no enforced sequencing.
+- MISSED: allows parallel spec starts with no dependency ordering.
 
-`SBP-SEED-20`
-- Seeded issue: Control variant has clear ownership for all data.
-- Expected signal: System Blueprint does not invent `[OWNERSHIP UNCLEAR]`.
+### SD1-SEED-11 (Hard, standard, sequencing_p0)
 
-## system-blueprint-eval-3-decomposition-handoff
+- Seeded issue: Enterprise Platform is a bottleneck that blocks all feature teams.
+- Evidence: team-context.md "4 engineers, already committed to SSO, SCIM... close to capacity through Q3" plus every feature team needing access decisions.
+- Expected signal: Agent identifies EP as bottleneck, proposes minimal shared contract in P0 or marks as BLOCKING.
+- CAUGHT: identifies capacity constraint, proposes minimal policy-evaluation API contract in P0 or escalates.
+- PARTIAL: lists auth in P0 but doesn't address capacity constraint.
+- MISSED: doesn't mention Enterprise Platform bottleneck.
 
-`SBP-SEED-21`
-- Seeded issue: Spec decomposition has no P0 Core/Foundation package.
-- Expected signal: System Blueprint defines a required P0 Core/Foundation package.
+### SD1-SEED-12 (Hard, negative_control, tech_direction)
 
-`SBP-SEED-22`
-- Seeded issue: P0 includes feature-owned billing tables or business logic.
-- Expected signal: System Blueprint keeps P0 thin and free of feature-specific logic/schema.
+- Seeded issue: Horizontal P0 foundation looks like over-engineering but is justified.
+- Evidence: team-context.md describes beta failures from lack of shared contracts, 6 teams needing parallel delivery, engineering leadership asking for shared early work.
+- Expected signal: Agent accepts horizontal P0 as valid despite vertical-slice default.
+- CORRECT_SKIP: accepts justified P0 foundation.
+- FALSE_POSITIVE: rejects horizontal foundation as violating vertical-slice principle.
 
-`SBP-SEED-23`
-- Seeded issue: Reporting depends on Billing-owned invoice foreign key but is scheduled in the same phase.
-- Expected signal: System Blueprint sequences dependent package after owner domain.
+### SD1-SEED-13 (Hard, standard, nfr_topology)
 
-`SBP-SEED-24`
-- Seeded issue: Package has API/event dependency but empty Depends on field.
-- Expected signal: System Blueprint records dependencies and avoids unsafe parallelization.
+- Seeded issue: Write-latency-vs-residency-vs-staffing trilemma with no satisfying single answer.
+- Evidence chain (scattered across files):
+  1. constraints.md Realtime: "150 ms p95... includes the moment a user submits a comment or decision and sees it appear confirmed"
+  2. constraints.md Data Handling: "Durable writes for customer content should be accepted in the workspace home environment"
+  3. product-intent.md Enterprise: UK fintech "London team reported that posting decisions felt noticeably slower than what US beta testers experienced"
+  4. constraints.md Realtime: "Cross-region active-active writes for customer content are not approved for launch"
+  5. team-context.md Infra: "Any multi-region production topology beyond a single primary with read replicas requires explicit engineering leadership approval and a staffed on-call plan"
+  6. team-context.md Infra: "1 infrastructure engineer" + "Cannot responsibly add several self-managed distributed data systems"
+  7. team-context.md Skills: "Thin: multi-region data architecture"
+- Expected signal: Agent identifies that no single-region or multi-region option satisfies all constraints simultaneously. UK beta latency evidence proves single-region US won't meet 150ms p95 for write confirmation. EU home region would require multi-region topology needing approval + on-call that doesn't exist.
+- CAUGHT: explicitly surfaces the trilemma as a named tension requiring human decision. Must either flag that EU environment triggers the multi-region approval gate + on-call staffing requirement, or present options with approval/staffing as an explicit unresolved blocker.
+- PARTIAL: proposes EU environment and correctly traces latency math (may even reference UK beta), but does NOT flag that a full EU deployment IS the multi-region topology requiring approval and on-call staffing. Treats its own multi-region proposal as settled rather than a human decision checkpoint. Also PARTIAL: mentions residency or latency but doesn't connect the beta evidence to write-path.
+- MISSED: proposes topology without acknowledging the conflict exists.
 
-`SBP-SEED-25`
-- Seeded issue: Blueprint omits cross-domain critical user journeys.
-- Expected signal: System Blueprint captures journeys for QA/E2E handoff.
+### SD1-SEED-14 (Distinguished, negative_control, decomposition)
 
-`SBP-SEED-26`
-- Seeded issue: Blueprint uses frontend/api/db horizontal slices without justification.
-- Expected signal: System Blueprint defaults to vertical/domain slicing or justifies horizontal slicing.
+- Seeded issue: Realtime Infrastructure as pure utility, not a product domain.
+- Evidence: team-context.md "Does not want to own product semantics" and "Can support a managed realtime channel service if domain teams keep payload contracts stable."
+- Expected signal: Agent keeps realtime as infrastructure, not a domain with business logic.
+- CORRECT_SKIP: treats realtime as utility/infrastructure layer.
+- FALSE_POSITIVE: proposes realtime as a domain service owning product lifecycle.
 
-`SBP-SEED-27`
-- Seeded issue: Handoff lacks approved boundaries and open decisions for Spec.
-- Expected signal: System Blueprint includes handoff contract and Spec routing guidance.
+### SD1-SEED-15 (Distinguished, standard, scope_escalation)
 
-`SBP-SEED-28`
-- Seeded issue: Regression guard for writing detailed feature specs instead of decomposition packages.
-- Expected signal: System Blueprint produces spec package plan, not feature specs.
-
-`SBP-SEED-29`
-- Seeded issue: Horizontal Core/Foundation platform slice is explicitly justified.
-- Expected signal: System Blueprint accepts justified foundation/platform slice.
-
-`SBP-SEED-30`
-- Seeded issue: Control P0 contains no feature schema.
-- Expected signal: System Blueprint does not invent missing business logic in P0.
+- Seeded issue: "Client-safe collaboration" model is structurally unresolved with no clear owner.
+- Evidence: product-intent.md "Cross-Company Collaboration Model" section explicitly unresolved (shared workspace vs federated); constraints.md guest/private/internal/deletion/legal-hold/export/cross-company complexity; team-context.md Enterprise Platform owns membership but not per-object visibility, no team owns guest-contribution-after-departure.
+- Expected signal: Agent marks this as BLOCKING, asks clarifying questions, does NOT finalize blueprint around this boundary.
+- CAUGHT: marks access/lifecycle model as BLOCKING, asks 2-3 targeted questions, withholds confident decomposition for this boundary.
+- PARTIAL: mentions access complexity but proposes a model anyway without escalation.
+- MISSED: picks shared-workspace or federated model silently without noting the structural uncertainty.

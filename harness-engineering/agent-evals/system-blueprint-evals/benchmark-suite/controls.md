@@ -1,31 +1,26 @@
-# Controls - System Blueprint Benchmark Suite
+# Controls - System Design Benchmark Suite
 
-The suite uses explicit controls so scoring can separate real misses from false-positive tendency and regression drift.
+The suite uses explicit controls to separate real misses from false-positive tendency and regression drift.
 
 ## Positive Controls
 
-- `SBP-SEED-01`: contradictory product constraints block stable decomposition. Expected: agent escalates or asks clarification.
-- `SBP-SEED-11`: stack direction is finalized before the mandatory human tradeoff checkpoint. Expected: agent presents 2-3 directions and pauses.
-- `SBP-SEED-21`: spec decomposition lacks P0 Core/Foundation. Expected: agent creates a required P0 package.
+- `SD1-SEED-01`: Core functional discovery. Agent must identify actors and resource lifecycles from scattered stakeholder input. Calibration — any competent system design pass should find these.
 
 ## Negative Controls
 
-- `SBP-SEED-09`: user mandates a single-app monolith for MVP. Expected: agent does not force microservices.
-- `SBP-SEED-10`: admin/reporting domains are explicitly deferred. Expected: agent keeps them out of MVP.
-- `SBP-SEED-19`: only two dominant quality attributes are named. Expected: agent does not force exactly three.
-- `SBP-SEED-20`: ownership is clear in the control variant. Expected: agent does not invent uncertainty.
-- `SBP-SEED-29`: horizontal Core/Foundation platform slice is explicitly justified. Expected: agent accepts it.
-- `SBP-SEED-30`: P0 is validly thin. Expected: agent does not invent feature-owned schema in P0.
+- `SD1-SEED-02`: Enterprise requirements (SSO, SCIM, audit, guest controls) that look like scope creep but are explicitly required by named lighthouse pilots. Agent must NOT defer them.
+- `SD1-SEED-06`: Mobile offline described narrowly (draft preservation, catch-up reads) — not full offline-first. Agent must NOT escalate as impossible CRDT requirement.
+- `SD1-SEED-12`: Horizontal P0 foundation that looks like over-engineering but is justified by beta failure modes and 6-team parallelism. Agent must NOT reject it merely because vertical slices are the default.
+- `SD1-SEED-14`: Realtime as pure infrastructure (not a product domain). Team explicitly declines product semantics ownership. Agent must NOT propose realtime as a domain service.
 
-## Regression Controls
+## Red-Herring Bait (embedded in fixture, not scored as separate seeds)
 
-- `SBP-SEED-08`: guarded failure mode where blueprint imported prior-project domains.
-- `SBP-SEED-18`: guarded failure mode where quality attributes were scored at blueprint stage.
-- `SBP-SEED-28`: guarded failure mode where agent wrote detailed feature specs instead of decomposition packages.
+- Availability section in constraints.md describes standard SLA requirements trivially met by managed Postgres + blue/green deploys. Agent should NOT propose complex HA architecture for these.
 
 ## Scoring Notes
 
 - Negative controls are scored only as `CORRECT_SKIP` or `FALSE_POSITIVE`.
-- Non-negative controls are scored only as `CAUGHT`, `PARTIAL`, or `MISSED`.
-- This suite evaluates System Blueprint output behavior against persona and skill requirements.
-- The agent under test must not see this file, `seed-catalog.tsv`, or `seed-ledger.md`.
+- Standard/positive controls are scored as `CAUGHT`, `PARTIAL`, or `MISSED`.
+- Distinguished seeds (SD1-SEED-14, SD1-SEED-15) test judgment that requires synthesizing information across all three seed-state documents.
+- Severity traps: SD1-SEED-08 and SD1-SEED-09 are Critical because technology and topology mistakes propagate to every downstream spec. SD1-SEED-15 is Critical because encoding unsafe defaults for a trust/compliance boundary has legal consequences.
+- The agent under test must not see this file, `seed-design.md`, `seed-catalog.tsv`, `seed-ledger.md`, or `coverage-matrix.tsv`.

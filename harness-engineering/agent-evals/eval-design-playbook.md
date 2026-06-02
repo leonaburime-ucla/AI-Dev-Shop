@@ -127,6 +127,15 @@ the agent) is where scoring precision lives.
 
 ## Process
 
+0. **BLOCKING: Read the agent's skills.md first.** Before designing any
+   eval for an agent, read `agents/<name>/skills.md` in full. Map the
+   agent's workflow steps, required outputs, decision types, and
+   conditional skills. Design seeds that test THOSE specific behaviors —
+   not generic domain knowledge. A "software architect" eval that tests
+   system design ability instead of scorecard judgment is a wasted eval.
+   Also identify gaps: what SHOULD this agent do that its skills don't
+   cover? Evals surface skill gaps, then skills close them.
+
 1. **Write one eval first as a canary.** Don't write all 9 in parallel
    before validating the shape. Write one, run a test agent against it,
    score, iterate on the design, THEN replicate.

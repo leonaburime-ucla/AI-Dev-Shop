@@ -2,25 +2,26 @@
 
 Canonical Architect suites:
 
-- `benchmark-suite`
+- `benchmark-suite/`
 
 Status:
 
-- `benchmark-suite` is active and committed; use the suite-local validator/status output to determine whether it is exploratory, pilot, benchmark, or stable benchmark.
+- `benchmark-suite` is active (canary phase); tests architecture JUDGMENT
+  (scorecard quality, axis activation, blocking rules, adaptability,
+  confidence, tradeoffs, migration safety) — not system design ability.
 
 Architect-specific notes:
 
-- the benchmark suite extends the shared eval schema with architecture-family,
-  conditional-skill activation metadata, domain_complexity, complexity_category,
-  and engineering_concepts columns
-- the suite covers both **scorecard/ADR behavior** (original seeds SEED-AR-01
-  through SEED-AR-59) and **system-design skill application** (seeds
-  SEED-AR-60 through SEED-AR-116) — testing capacity reasoning, operational
-  depth patterns, tradeoff articulation, anti-pattern avoidance, design
-  checklist compliance, and conditional depth activation
-- system-design seeds test the agent's use of
-  `skills/system-design/SKILL.md` + all references including
-  `operational-depth-patterns.md` — the scorer reports per-skill_source
-  catch rates so skill gaps are directly visible
-- 9 Easy standard seeds were pruned from the original scorecard set to
-  improve overall suite complexity (Easy controls retained)
+- seeds target 8 judgment categories: axis activation discipline (FN + FP),
+  score calibration (too high + too low), blocking rule enforcement,
+  Adaptability First application, confidence calibration, tradeoff
+  credibility, migration safety reasoning, conditional skill restraint
+- fixture documents include pattern-candidates.md — the agent must evaluate
+  ALL named candidates, not just pick one
+- the eval task prompt requires the actual ADR template output: Pattern
+  Evaluation table + Quality Attribute Scorecard + all structured sections
+- gated scoring: missing a fatal invariant seed caps score at 60%
+- planned expansion: 4 scenarios (billing brownfield, ticketing greenfield,
+  integration hub, RAG assistant) × 10-12 seeds = 40-48 total
+- legacy suite (scorecard-output-only + system-design eval) deleted
+  2026-05-31 as incorrectly designed
