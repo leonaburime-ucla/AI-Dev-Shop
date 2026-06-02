@@ -160,7 +160,7 @@ This violates the Clean Architecture boundary — business logic must live in th
 service layer, not in HTTP handlers.
 
 Evidence:
-The Architect ADR-002 defines: "All business logic lives in service classes.
+The Software Architect ADR-002 defines: "All business logic lives in service classes.
 Route handlers are responsible only for parsing input, calling services,
 and formatting output."
 
@@ -186,7 +186,7 @@ evidence, state that limitation and do not present the result as ship-ready.
 
 **Calls**: None directly. Code Review reports findings to Coordinator.
 Coordinator decides whether to dispatch Programmer, TDD, Refactor, Security,
-Architect, or Spec.
+Software Architect, or Spec.
 
 **Routes to Coordinator**:
 - Required implementation findings → Coordinator, classified as `IMPLEMENTATION_FIX_REQUIRED`

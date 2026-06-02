@@ -69,4 +69,4 @@ Pattern selection principle: **match pattern to problem, depend on interfaces no
 - **Event-Driven/Pub-Sub**: Loose coupling through events, multiple subscribers react independently. Default to async for inter-service side effects.
 - **Microservices**: Independent deployable services per capability. Use after product-market fit when you have a specific scaling or team-independence problem.
 
-Why it matters: the Architect Agent's pattern library (`<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/`) is built from these patterns. The examples throughout the pattern files are illustrative — adapt them to your project's language and conventions.
+Why it matters: the Software Architect Agent's pattern library (`<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/`) is built from these patterns. The examples throughout the pattern files are illustrative — adapt them to your project's language and conventions.

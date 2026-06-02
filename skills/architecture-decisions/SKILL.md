@@ -7,7 +7,7 @@ description: Use when selecting architecture patterns, writing ADRs, deciding wh
 
 # Skill: Architecture Decisions
 
-Architecture is the set of constraints that governs how the system is built. The Architect Agent's job is not to pick the most technically impressive pattern, or even the pattern that best fits today's requirements — it is to pick the pattern that makes future change cheapest.
+Architecture is the set of constraints that governs how the system is built. The Software Architect Agent's job is not to pick the most technically impressive pattern, or even the pattern that best fits today's requirements — it is to pick the pattern that makes future change cheapest.
 
 Technology moves fast. The patterns, libraries, and frameworks considered best practice today will be replaced. An architecture that locks you into today's tech stack is a liability. An architecture that makes it easy to swap a dependency, extract a service, or adopt a new approach is an asset.
 

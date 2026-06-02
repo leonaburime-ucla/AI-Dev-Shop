@@ -151,7 +151,7 @@ When the Coordinator is in Review Mode and the user asks for work:
 
 Default owner mapping:
 - Existing codebase diagnosis or migration discovery -> CodeBase Analyzer
-- Macro architecture or boundary decomposition -> System Blueprint
+- Macro architecture or boundary decomposition -> System Design
 - Spec package authoring or clarification -> Spec
 - Adversarial preflight on approved spec -> Red-Team
 - ADR and architecture decisioning -> Architect
@@ -260,7 +260,7 @@ Agent output received
 │       Context: plain-language goal, preferred stack (if any), timebox
 │
 ├─ Scope is multi-domain OR bounded contexts are unclear OR ownership/integration boundaries are unclear?
-│   └─ Route to: System Blueprint Agent
+│   └─ Route to: System Design Agent
 │       Context: product intent, constraints, existing architecture context
 │       Output required: `system-blueprint.md` with macro component/domain map and spec decomposition plan
 │       Next: human approves blueprint boundaries, then dispatch Spec Agent using blueprint decomposition
@@ -269,7 +269,7 @@ Agent output received
 │   └─ Route to: CodeBase Analyzer
 │       Context: requested feature, likely code areas (if known), repo shape
 │       Output required: analysis of likely owner files, boundaries, dependencies, and migration risk if applicable
-│       Next: dispatch Spec or Architect with the analysis as upstream context
+│       Next: dispatch Spec or Software Architect with the analysis as upstream context
 │
 ├─ Consultation mode enabled AND owner agent needs specialist advice?
 │   └─ Route to: Bounded consultation relay (Coordinator-mediated)
@@ -286,10 +286,10 @@ Agent output received
 │   │   Context: flag details, relevant constitution article
 │   └─ ADVISORY only (or no findings) → Run Coordinator Planning Preflight
 │       Context: approved spec, full ADVISORY list, provider gate, blueprint/reverse-spec/brownfield evidence
-│       Next: Architect only if preflight PASS for the current spec hash
+│       Next: Software Architect only if preflight PASS for the current spec hash
 │
 ├─ ADR missing __specs__/__tests__ placement decision?
-│   └─ Route back to: Architect
+│   └─ Route back to: Software Architect
 │       Context: which pattern was chosen, what decision is needed
 │
 ├─ Spec involves data modeling or DB operations?
@@ -342,7 +342,7 @@ Agent output received
 │       Next:
 │         1) Pause downstream routing for the affected scope
 │         2) Escalate to human if the user must choose whether to relax or revise the constraint
-│         3) Re-dispatch Architect Agent if the ADR needs clarification or revision
+│         3) Re-dispatch Software Architect Agent if the ADR needs clarification or revision
 │
 ├─ Programmer handoff includes Architecture Audit = WARNING?
 │   └─ Route to: Human decision via Coordinator
@@ -357,12 +357,12 @@ Agent output received
 │       Context required: blocking constraint, failed alternatives, impacted specs/tasks/tests, proposed revision scope
 │       Next:
 │         1) Pause downstream implementation for affected scope
-│         2) Re-dispatch System Blueprint Agent for macro-boundary revisions if the issue is system-shape/domain-level
-│         3) Re-dispatch Architect Agent for ADR revision if the issue is feature-level technical architecture
+│         2) Re-dispatch System Design Agent for macro-boundary revisions if the issue is system-shape/domain-level
+│         3) Re-dispatch Software Architect Agent for ADR revision if the issue is feature-level technical architecture
 │         4) Require human approval for revised blueprint/ADR before resuming
 │
 ├─ Architecture violation found (by Code Review)?
-│   └─ Route to: Architect Agent
+│   └─ Route to: Software Architect Agent
 │       Context: specific violation, which ADR was breached
 │
 ├─ Spec ambiguity surfaced (blocks test design or implementation)?
@@ -405,7 +405,7 @@ Agent output received
 ## Pipeline Stages
 
 ```
-CodeBase Analyzer (brownfield default) → System Blueprint (conditional) → Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+CodeBase Analyzer (brownfield default) → System Design (conditional) → Spec → Red-Team → Software Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
 ```
 
 The Coordinator tracks which stage is active. An agent completing its stage does not automatically trigger the next — the Coordinator validates the output meets the handoff contract first.
@@ -421,7 +421,7 @@ Before accepting any agent output and routing it forward, verify the output incl
 
 Programmer handoffs also require:
 
-- **Architecture Audit**: Status (`PASS`, `WARNING`, or `BLOCKER`), ADR rules checked, files audited, violations found, and any ambiguity needing Architect clarification
+- **Architecture Audit**: Status (`PASS`, `WARNING`, or `BLOCKER`), ADR rules checked, files audited, violations found, and any ambiguity needing Software Architect clarification
 
 Delegated subagent dispatches also require:
 
@@ -467,9 +467,9 @@ These are not optional. Humans must review and approve at:
 | Checkpoint | When | Why |
 |---|---|---|
 | System blueprint approval | Before Spec approval when Blueprint was produced | Wrong macro boundaries make downstream specs and ADRs drift |
-| Spec approval | Before Architect receives the spec | Specs are ground truth; everything downstream depends on them |
-| Reverse-spec review digest approval | Before Architect receives reverse-spec-derived specs | Extracted specs become rewrite contracts; review-digest errors propagate into the target system |
-| Red-Team clearance | Before Architect receives the spec | Adversarial findings must be resolved before architecture decisions depend on the spec |
+| Spec approval | Before Software Architect receives the spec | Specs are ground truth; everything downstream depends on them |
+| Reverse-spec review digest approval | Before Software Architect receives reverse-spec-derived specs | Extracted specs become rewrite contracts; review-digest errors propagate into the target system |
+| Red-Team clearance | Before Software Architect receives the spec | Adversarial findings must be resolved before architecture decisions depend on the spec |
 | Architecture sign-off | Before TDD receives the architecture | Pattern choices shape the entire codebase |
 | Convergence escalation | When iteration budget is exhausted | Stubborn failures signal a deeper problem humans must resolve |
 | Security sign-off | Before anything ships | No Critical/High finding ships without human approval |
@@ -478,7 +478,7 @@ Human checkpoints are blocking. The pipeline stops. The Coordinator presents the
 
 ## Parallel Execution
 
-When the Architect identifies independent modules (which Vertical Slice and Modular Monolith patterns produce naturally), the Coordinator can dispatch multiple Programmer Agent instances simultaneously.
+When the Software Architect identifies independent modules (which Vertical Slice and Modular Monolith patterns produce naturally), the Coordinator can dispatch multiple Programmer Agent instances simultaneously.
 
 Rules for parallel dispatch:
 - Enforce system-blueprint dependency sequencing: any module with `Depends on` must run after its dependency; only dependency-disjoint modules may run in parallel
@@ -520,7 +520,7 @@ Routing Table:
 
 Blockers:
 - EC-02 (idempotency) has no test coverage — TDD Agent flagged missing architecture contract
-  → Routing to Architect for contract definition before TDD can certify EC-02
+  → Routing to Software Architect for contract definition before TDD can certify EC-02
 
 Risk Level: Medium (1 High-risk coverage gap, 2 active failure clusters)
 Convergence: 89% acceptance tests passing (threshold: 92%)

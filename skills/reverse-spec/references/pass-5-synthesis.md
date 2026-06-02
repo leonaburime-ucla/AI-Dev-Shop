@@ -30,7 +30,7 @@ Merge all pass artifacts and resolve:
 
 Aggregate ALL human-attention markers from all passes into ONE ordered document:
 
-**Blocking (must resolve before Architect proceeds):**
+**Blocking (must resolve before Software Architect proceeds):**
 1. `[NEEDS CLARIFICATION]` — contradictions between sources
 2. `[HUMAN DATA REQUEST]` (priority: blocking) — external data needed
 3. `[CONTRACT VS IMPLEMENTATION]` — observed vs normative conflict on external behavior
@@ -121,7 +121,7 @@ After implementation, verify parity using:
 - Shadow traffic comparison (if infrastructure supports)
 - Consumer inventory regression checks (each consumer's contract still satisfied)
 
-This is not in-scope for extraction but MUST be planned before implementation begins. Note it in the handoff to Architect.
+This is not in-scope for extraction but MUST be planned before implementation begins. Note it in the handoff to Software Architect.
 
 ## Intentional Changes Aggregation
 

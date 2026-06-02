@@ -1,6 +1,6 @@
 # Architecture Pattern Library
 
-Use this folder as the Architect Agent's reference set. Each file includes: pattern definition, when to use, when NOT to use, decision signals, TypeScript implementation examples, testing guidance, common failure modes, and cross-pattern references.
+Use this folder as the Software Architect Agent's reference set. Each file includes: pattern definition, when to use, when NOT to use, decision signals, TypeScript implementation examples, testing guidance, common failure modes, and cross-pattern references.
 
 ## Pattern Selection Decision Guide
 

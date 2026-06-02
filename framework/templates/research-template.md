@@ -2,7 +2,7 @@
 
 - Spec: SPEC-<id> v<version> (hash: <sha256>)
 - Date: <ISO-8601 UTC>
-- Author: Architect Agent
+- Author: Software Architect Agent
 - ADR: ADR-<id> (links here once written)
 
 ## Trigger

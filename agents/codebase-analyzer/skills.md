@@ -10,7 +10,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when evaluating or recommending ports-and-adapters boundaries for existing backend or service code
 
 ## Role
-Analyze an existing codebase before the delivery pipeline begins. Produce a structured findings report and, optionally, a migration plan. This agent does not sit in the delivery pipeline — it runs before it, giving the Coordinator and Architect Agent a clear picture of what they are working with.
+Analyze an existing codebase before the delivery pipeline begins. Produce a structured findings report and, optionally, a migration plan. This agent does not sit in the delivery pipeline — it runs before it, giving the Coordinator and Software Architect Agent a clear picture of what they are working with.
 
 Use this agent when:
 - Dropping AI Dev Shop into an existing project for the first time
@@ -82,7 +82,7 @@ Tests must be written before any structural migration begins.
 - Codebase too large for phased analysis without user scope guidance — stop and ask
 - No detected test files plus no usable configured test command/coverage artifact across the entire codebase, or the same signal in any Critical-severity module — offer Testability Remediation Plan (Phase 4) before migration; do not skip directly to migration planning. Placeholder commands such as `echo "Error: no test specified"` do not count as usable test commands.
 - Critical security findings (hardcoded credentials, exposed secrets) — escalate immediately to human before any pipeline work begins
-- Circular dependencies that span more than 3 modules — flag as requiring Architect Agent review before migration planning
+- Circular dependencies that span more than 3 modules — flag as requiring Software Architect Agent review before migration planning
 
 ## Sampling Disclosure
 
@@ -114,7 +114,7 @@ Note: Confidence reflects sample coverage, not model certainty. A High-confidenc
 This migration plan is based on sampled codebase context. Files and modules not included in the analysis sample may contain architectural patterns, dependencies, or constraints not reflected in this plan. Before executing any migration phase, validate the plan against unsampled modules — especially any modules listed as excluded in the corresponding ANALYSIS report.
 ```
 
-**Downstream agent requirements**: Architect Agent and Coordinator must treat all CodeBase Analyzer findings as informed estimates, not guarantees. Decisions that would be irreversible (deleting code, restructuring core modules, changing public API contracts) must be validated against the actual source files before execution, regardless of the confidence level stated in the analysis.
+**Downstream agent requirements**: Software Architect Agent and Coordinator must treat all CodeBase Analyzer findings as informed estimates, not guarantees. Decisions that would be irreversible (deleting code, restructuring core modules, changing public API contracts) must be validated against the actual source files before execution, regardless of the confidence level stated in the analysis.
 
 ## Guardrails
 - Never modify source files — analysis only

@@ -83,7 +83,7 @@ BMAD does not use inline clarification markers. Clarification happens through wo
 - After clarification answers land, update the affected artifact sections.
 - Rerun the provider-local validator after changes.
 
-## Architect Read Set
+## Software Architect Read Set
 
 Before ADR work begins:
 

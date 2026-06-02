@@ -18,7 +18,7 @@ The following conditions halt the pipeline immediately. The Coordinator must sur
 | Constitution violation without documented exception | architect | The article violated, the ADR section, what the unjustified decision was |
 | Security finding classified Critical or High | security | Full finding, exploit scenario, proposed mitigation |
 | Same failure cluster persists after hitting retry budget (see below) | programmer, tdd | Cluster ID, all failing tests, retry count, spec ACs involved, hypothesis |
-| [NEEDS CLARIFICATION] marker reaches Architect stage unresolved | architect dispatch | The marker text, what decision is blocked, options identified |
+| [NEEDS CLARIFICATION] marker reaches Software Architect stage unresolved | architect dispatch | The marker text, what decision is blocked, options identified |
 | Spec discovered to be wrong mid-implementation | programmer | What the code reveals, what the spec says, recommended spec revision |
 
 ---
@@ -49,7 +49,7 @@ Do not escalate for:
 - Expected test failures during `programmer` cycles (within budget)
 - Red-Team findings classified as ADVISORY only
 - Refactor proposals the Refactor Agent disagrees with
-- Architecture alternatives the Architect considered and rejected with documentation
+- Architecture alternatives the Software Architect considered and rejected with documentation
 - Observer recommendations (these are inputs to future work, not stops)
 - Self-validation runs that end `PARTIAL` after the bounded retry path, provided the report records the exact failing step, evidence, current hypothesis, and remaining risk
 
@@ -87,7 +87,7 @@ The Coordinator does not suggest a preference unless asked. Present options neut
 
 1. Record the decision in `pipeline-state.md` Notes section: what was decided, by whom, when
 2. If the decision results in a spec revision, the spec hash changes — all downstream artifacts (ADR, test certification) are invalidated and must be re-run
-3. If the decision results in a constitution exception, the Architect must document it in the ADR Complexity Justification table before the pipeline resumes
+3. If the decision results in a constitution exception, the Software Architect must document it in the ADR Complexity Justification table before the pipeline resumes
 4. Mark the relevant human checkpoint checkbox in `pipeline-state.md`
 
 ---

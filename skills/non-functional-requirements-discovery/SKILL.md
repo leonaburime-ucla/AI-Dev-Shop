@@ -32,10 +32,10 @@ Read this file for all NFR discovery runs.
 
 ## When to Use
 
-- System Blueprint runs the light pass for greenfield or macro-shaping work.
+- System Design runs the light pass for greenfield or macro-shaping work.
 - Spec Agent preserves/refines an existing NFR table, or runs a compact light
   self-check when no blueprint exists.
-- Architect may run targeted deepening when a quality-attribute axis lacks
+- Software Architect may run targeted deepening when a quality-attribute axis lacks
   enough upstream detail to make an ADR decision.
 - Coordinator may use it during planning discussions to keep requirements,
   assumptions, risks, and downstream owners separated.
@@ -52,9 +52,9 @@ Read this file for all NFR discovery runs.
 
 | Agent | Default Use | Depth Rule |
 |---|---|---|
-| System Blueprint Agent | Primary invoker | Light pass by default; deep pass only on risk signals; at most 5 blocking NFR questions per pass |
+| System Design Agent | Primary invoker | Light pass by default; deep pass only on risk signals; at most 5 blocking NFR questions per pass |
 | Spec Agent | Preserver/refiner | Inherit blueprint NFRs; if no blueprint, compact light pass; at most 3 blocking NFR questions |
-| Architect | Consumer/targeted deepener | Use records to activate ADR axes; deepen only the categories needed for the decision |
+| Software Architect | Consumer/targeted deepener | Use records to activate ADR axes; deepen only the categories needed for the decision |
 | Specialist agents | Read-only consumers | Read upstream NFR records and apply their own domain skills; do not rerun discovery by default |
 
 ## Categories
@@ -145,7 +145,7 @@ total, unless the user explicitly requests exhaustive discovery.
 - Do not name specific technologies, services, vendors, patterns, database
   tactics, or infrastructure tactics in this skill's outputs unless the user
   already provided them as hard constraints.
-- Do not score quality attributes here. Architect scores tradeoffs later.
+- Do not score quality attributes here. Software Architect scores tradeoffs later.
 - Do not turn the category list into a questionnaire dump.
 - Do not invent requirements. Mark unknowns and assumptions explicitly.
 - Do not block downstream work on `SAFE DEFAULT` or `DEFERRED` unknowns; assign a
@@ -162,6 +162,6 @@ Emit:
 - Deep-pass records for triggered categories, if any.
 - Blocking NFR unknowns, if any.
 - Safe default assumptions.
-- Dominant quality-attribute candidates for Architect, derived from the material
+- Dominant quality-attribute candidates for Software Architect, derived from the material
   NFR records, with no scores.
 - Downstream owner for each unresolved or material record.

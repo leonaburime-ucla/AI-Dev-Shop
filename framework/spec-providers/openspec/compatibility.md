@@ -53,7 +53,7 @@ OpenSpec does not use inline clarification markers. Clarification happens throug
 - After clarification answers land, update the affected `proposal.md` sections and delta specs.
 - Rerun the provider-local validator after changes.
 
-## Architect Read Set
+## Software Architect Read Set
 
 Before ADR work begins:
 

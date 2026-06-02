@@ -256,7 +256,7 @@ Waivers appear in the review digest and coverage map. They are not silent — th
 
 ## Downstream Feedback Loop
 
-When Architect, TDD, or Programmer discovers a behavioral question the spec doesn't answer:
+When Software Architect, TDD, or Programmer discovers a behavioral question the spec doesn't answer:
 1. File `[SPEC AMENDMENT REQUEST]` citing gap and implementation context
 2. Return to reverse-spec extraction for that question — implementer does NOT invent the answer
 3. Update requirement with new evidence
@@ -329,7 +329,7 @@ If the active provider template has no field for any of these, preserve them in 
 
 All human-attention markers aggregate into ONE review surface ordered by blocking severity, grouped into tiers. The canonical tier definitions and ordering live in `references/pass-5-synthesis.md`. Summary:
 
-**Blocking (must resolve before Architect proceeds):**
+**Blocking (must resolve before Software Architect proceeds):**
 1. `[NEEDS CLARIFICATION]` — contradictions between sources
 2. `[HUMAN DATA REQUEST]` (priority: blocking) — external data needed
 3. `[CONTRACT VS IMPLEMENTATION]` — observed vs normative conflict on external behavior

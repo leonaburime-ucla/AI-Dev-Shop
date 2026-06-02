@@ -21,8 +21,8 @@ The ADR defines API and event contracts. Contract tests verify the implementatio
 
 - Each contract in the ADR must have at least one contract test.
 - Contract tests verify the shape and behavior of the interface, not the implementation behind it.
-- If the Architect flagged a contract as `consumer-driven`, generate a Pact contract file.
-- If the Architect flagged `schema validation`, generate tests against the OpenAPI schema.
+- If the Software Architect flagged a contract as `consumer-driven`, generate a Pact contract file.
+- If the Software Architect flagged `schema validation`, generate tests against the OpenAPI schema.
 - For cross-domain boundaries, do not rely on freehand mocks as the primary signal; prefer contract fixtures or schemas derived from the ADR contract source.
 - If a mock is used at a boundary, validate it against the contract shape so tests fail on contract drift.
 

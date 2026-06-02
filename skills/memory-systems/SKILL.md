@@ -75,7 +75,7 @@ Consolidation rules:
 
 ## Memory for Multi-Agent Coordination
 
-**The telephone game problem**: When agents pass outputs to other agents, each hop degrades information. An Architect decision passed through Programmer → Code Review → Security loses nuance at each step.
+**The telephone game problem**: When agents pass outputs to other agents, each hop degrades information. A Software Architect decision passed through Programmer → Code Review → Security loses nuance at each step.
 
 Prevention: Do not pass full session histories between agents. The Coordinator always reconstructs context from canonical sources (spec hash, ADR file, project_memory entries) rather than forwarding previous agents' outputs verbatim.
 

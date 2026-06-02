@@ -79,6 +79,6 @@ The Observer reads trace logs to produce these signals:
 - Write a `DISPATCHED` trace entry when the Coordinator dispatches any agent
 - Write a `COMPLETED` trace entry when the agent returns output (include output_hash and duration)
 - Write a `RETRIED` entry on each retry, incrementing retry_count
-- For Architect stage: record `constitution_check` result
+- For Software Architect stage: record `constitution_check` result
 - At end of pipeline run, produce a trace summary in the cycle summary output
 - Weekly: aggregate signals from all feature traces — pay particular attention to constitution_check failure trends

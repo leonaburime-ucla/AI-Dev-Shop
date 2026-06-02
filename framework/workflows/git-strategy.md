@@ -12,7 +12,7 @@ feature/<NNN>-<feature-slug>
 - `<feature-slug>` is a short kebab-case name derived from the feature
 - Examples: `feature/201-team-chat-platform`, `feature/305-payment-webhooks`
 
-For multi-slice blueprint work where a System Blueprint produces multiple spec packages:
+For multi-slice blueprint work where a System Design produces multiple spec packages:
 ```
 feature/<NNN>-<feature-slug>/<slice-name>
 ```
@@ -22,7 +22,7 @@ feature/<NNN>-<feature-slug>/<slice-name>
 The **Coordinator creates the feature branch** at **TDD dispatch** — the point where implementation is about to begin and the plan is locked.
 
 Why at TDD dispatch (not earlier):
-- Spec, Red-Team, and Architect work happens in planning — no code to branch
+- Spec, Red-Team, and Software Architect work happens in planning — no code to branch
 - TDD is the first stage that writes implementation files
 - By this point the ADR is approved and tasks.md is generated
 

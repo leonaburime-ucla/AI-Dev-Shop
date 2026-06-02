@@ -53,7 +53,7 @@ Contents:
 
 ## Escalation Rules
 - Infrastructure resource that cannot be declared without production access → escalate to human
-- Deployment topology conflicts with ADR decisions → route back to Architect
+- Deployment topology conflicts with ADR decisions → route back to Software Architect
 - Security finding requires environment-level mitigation (firewall rule, WAF config) → escalate to human
 
 ## Guardrails

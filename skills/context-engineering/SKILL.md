@@ -200,7 +200,7 @@ The Coordinator always reconstructs context from canonical sources (spec, ADR, p
 
 ## Consensus and Divergence
 
-When multiple agents produce conflicting outputs (e.g., Architect and Code Review disagree on a boundary), the Coordinator must resolve the conflict rather than forwarding both to the next agent.
+When multiple agents produce conflicting outputs (e.g., Software Architect and Code Review disagree on a boundary), the Coordinator must resolve the conflict rather than forwarding both to the next agent.
 
 Resolution strategies:
 1. **Authority precedence**: ADRs take precedence over code review opinions on architecture decisions

@@ -31,8 +31,8 @@ AI Dev Shop Foundation is a drop-in multi-agent delivery framework for coding ag
 In practice, this gives a repo a repeatable way to move from idea to working code without relying on a single giant prompt or ad hoc agent behavior.
 
 ```text
-[VibeCoder] -> [CodeBase Analyzer] -> [System Blueprint] -> Spec
--> [Red-Team] -> Architect -> [Database] -> TDD
+[VibeCoder] -> [CodeBase Analyzer] -> [System Design] -> Spec
+-> [Red-Team] -> Software Architect -> [Database] -> TDD
 -> Programmer -> [QA/E2E] -> TestRunner -> Code Review
 -> [Refactor] -> Security -> [DevOps] -> [Docs] -> Done
 ```
@@ -60,7 +60,7 @@ Current status:
 ## Quick Overview
 
 - **For**: teams and solo builders who want coding agents to work through a defined software-delivery process instead of improvising
-- **Does**: routes work through specialized agents like Coordinator, Spec, Architect, TDD, Programmer, Code Review, and Security
+- **Does**: routes work through specialized agents like Coordinator, Spec, Software Architect, TDD, Programmer, Code Review, and Security
 - **Produces**: durable artifacts such as specs, ADRs, task lists, test certifications, review findings, and project memory
 - **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it, while project-owned state lives in a sibling `ADS-project-knowledge/` folder
 
@@ -168,7 +168,7 @@ This keeps the framework modular. If a better browser provider replaces Playwrig
 - [framework/workflows/multi-agent-pipeline.md](framework/workflows/multi-agent-pipeline.md): detailed stage execution rules
 - [framework/workflows/conventions.md](framework/workflows/conventions.md): file placement and writable/read-only rules
 - [framework/spec-providers/speckit/provider.md](framework/spec-providers/speckit/provider.md): default provider mapping and current Speckit compatibility shims
-- [framework/templates/adr-template.md](framework/templates/adr-template.md): ADR template used by Architect
+- [framework/templates/adr-template.md](framework/templates/adr-template.md): ADR template used by Software Architect
 - [harness-engineering/README.md](harness-engineering/README.md): harness layer, validators, rollout plan, and local source notes
 
 Agent roster note: the toolkit is extensible. `AGENTS.md` lists the current default agents, not a fixed maximum count.

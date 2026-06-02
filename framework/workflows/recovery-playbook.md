@@ -25,11 +25,11 @@ Before resuming, verify the checkpoint is trustworthy:
 |-------|-----|-------------|
 | Spec provider is recorded | Read `spec_provider` from `pipeline-state.md` or fall back to default provider if the run predates provider recording | If unknown, stop and ask human whether to resume under Speckit compatibility mode or update the run |
 | Spec hash matches | Re-hash the file at `spec_entrypoint_path` (or Speckit `feature.spec.md` via `spec_path` compatibility), compare to state file's `spec_hash` | Stop — spec may have changed. Escalate to human before resuming. |
-| Provider validator passed | Read `validator_result`; if not `PASS`, rerun the provider-local validator. If `python3` is unavailable, try `python` or `py`; if runtime is still unavailable, require a human-approved single-line `validator_manual_waiver` | Stop — route back to Spec or human review before resuming at Architect or later. |
+| Provider validator passed | Read `validator_result`; if not `PASS`, rerun the provider-local validator. If `python3` is unavailable, try `python` or `py`; if runtime is still unavailable, require a human-approved single-line `validator_manual_waiver` | Stop — route back to Spec or human review before resuming at Software Architect or later. |
 | Planning preflight valid | If resuming at or after `architect`, rerun Coordinator Planning Preflight from `multi-agent-pipeline.md` | Stop — route to the owning failed stage; do not resume downstream. |
 | Red-Team clearance recorded | Defense-in-depth check covered by Planning Preflight: if resuming at or after `architect`, verify Red-Team completed against the same `spec_hash` and has no unresolved BLOCKING or CONSTITUTION_FLAG state | Stop — run Red-Team or resolve findings before resuming. |
 | Reverse-spec checkpoint recorded | If `reverse_spec_artifacts` is not `N/A`, verify `reverse_spec_review_status: APPROVED` and the referenced `review-digest.md` exists | Stop — present the review digest to the human before resuming. |
-| Blueprint approval recorded | If `system_blueprint_path` is set, verify `system_blueprint_status: APPROVED` | Stop — route back to System Blueprint or human review. |
+| Blueprint approval recorded | If `system_blueprint_path` is set, verify `system_blueprint_status: APPROVED` | Stop — route back to System Design or human review. |
 | Completed stage artifacts exist | Check that every file listed in Completed Stages actually exists on disk | If missing, treat that stage as incomplete and re-run it |
 | Current stage output is partial | Check whether the in-progress stage produced any artifact | If artifact exists and looks complete, treat stage as done and advance |
 | Constitution Check not bypassed | If resuming at or after `architect`, verify adr.md has a completed Constitution Check table | If missing, re-run architect stage |
@@ -54,7 +54,7 @@ Is status WAITING_FOR_HUMAN?
 |-------|-------------|---------------|
 | `spec` | Yes | Re-dispatch Spec Agent with the provider-defined planning surface as input. Instruct it to continue, not restart. |
 | `clarify` | Yes | Re-dispatch Spec Agent in clarify mode against the provider-defined clarification surface. |
-| `architect` | Yes | Re-dispatch Architect Agent. Provide the provider-defined planning surface, existing research.md, and constitution.md. |
+| `architect` | Yes | Re-dispatch Software Architect Agent. Provide the provider-defined planning surface, existing research.md, and constitution.md. |
 | `tasks` | Yes | Regenerate tasks.md from ADR. Safe to overwrite. |
 | `tdd` | Yes | Re-dispatch TDD Agent. Provide existing partial test file if present. |
 | `programmer` | **Partial** | Re-dispatch Programmer with existing code as context. Do not ask it to restart — continue from failing tests. |
@@ -110,7 +110,7 @@ Required payload:
 
 Coordinator actions:
 1. Pause affected downstream work.
-2. Route to System Blueprint Agent if revision is macro/domain-boundary level.
-3. Route to Architect Agent if revision is feature-level technical architecture.
+2. Route to System Design Agent if revision is macro/domain-boundary level.
+3. Route to Software Architect Agent if revision is feature-level technical architecture.
 4. Require human approval on revised blueprint/ADR.
 5. Resume from the last valid checkpoint using updated artifacts.

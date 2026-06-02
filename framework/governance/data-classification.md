@@ -87,7 +87,7 @@ On detection:
 
 ## Secret Storage Policy (for agents advising on architecture)
 
-When a spec requires storing or accessing secrets, the Architect and Programmer agents must follow this hierarchy:
+When a spec requires storing or accessing secrets, the Software Architect and Programmer agents must follow this hierarchy:
 
 1. **Environment variables** — preferred for runtime secrets
 2. **Secrets manager** (AWS Secrets Manager, HashiCorp Vault, etc.) — required for production systems with rotation requirements

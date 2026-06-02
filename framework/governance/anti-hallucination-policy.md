@@ -78,7 +78,7 @@ Do not hide uncertainty behind polished wording.
 
 - `Coordinator`: do not summarize agent output as settled fact when the underlying evidence is missing or conflicting.
 - `CodeBase Analyzer`: findings are informed estimates unless validated against source; never imply guarantee where only partial inspection exists.
-- `Spec`, `Architect`, and `Red-Team`: tie blocking findings to exact spec or governance text.
+- `Spec`, `Software Architect`, and `Red-Team`: tie blocking findings to exact spec or governance text.
 - `Code Review` and `Security`: every finding must identify the artifact, file, path, or behavior that supports it.
 - `Docs`: do not publish product or API claims that were not verified against the current spec or implementation artifacts.
 

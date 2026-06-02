@@ -80,7 +80,7 @@ Single-dimension evaluation (just "is it correct?") misses systemic issues. Use 
 | Idempotency | Tests produce same result on repeat runs |
 | Independence | Tests do not depend on each other's state |
 
-**For Architect Agent output:**
+**For Software Architect Agent output:**
 
 | Dimension | What to Assess |
 |---|---|

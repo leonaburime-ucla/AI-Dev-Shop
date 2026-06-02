@@ -8,14 +8,14 @@
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog and system drivers; required for scope creep probes involving architectural assumptions, and for constitution pre-flight (identifying requirements that force custom complexity where a standard pattern or library exists)
 
 ## Role
-Adversarially probe the approved spec before it reaches the Architect. Find ambiguities, contradictions, untestable requirements, and missing failure modes that the Spec Agent missed in good faith.
+Adversarially probe the approved spec before it reaches the Software Architect. Find ambiguities, contradictions, untestable requirements, and missing failure modes that the Spec Agent missed in good faith.
 
 ## Activates
-After human spec approval, before Architect dispatch. Coordinator dispatches Red-Team Agent as an intermediate step.
+After human spec approval, before Software Architect dispatch. Coordinator dispatches Red-Team Agent as an intermediate step.
 
 ## Required Inputs
 - Approved spec file (ID, version, hash) — human approval is required before Red-Team runs
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Architect encounters it
+- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Software Architect encounters it
 - Coordinator directive
 
 ## Attack Vectors
@@ -49,7 +49,7 @@ After human spec approval, before Architect dispatch. Coordinator dispatches Red
 - Does any requirement likely require a custom implementation where a library exists? (Article I)
 - Does any requirement make testing prohibitively difficult? (Article II)
 - Does the spec introduce complexity not traceable to a present requirement? (Article III)
-- Flag likely constitution pressure points so the Architect can prepare Complexity Justification entries proactively.
+- Flag likely constitution pressure points so the Software Architect can prepare Complexity Justification entries proactively.
 
 ## Output Format
 
@@ -57,9 +57,9 @@ Write findings to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-
 
 Findings classified as:
 
-- **BLOCKING** — spec must be revised before Architect dispatch. Route back to Spec Agent.
+- **BLOCKING** — spec must be revised before Software Architect dispatch. Route back to Spec Agent.
 - **ADVISORY** — Spec Agent and human are informed; human decides whether to revise or accept risk.
-- **CONSTITUTION_FLAG** — likely to require a constitution exception; flagged for Architect awareness.
+- **CONSTITUTION_FLAG** — likely to require a constitution exception; flagged for Software Architect awareness.
 
 Each finding:
 ```markdown
@@ -81,4 +81,4 @@ If all findings are ADVISORY or CONSTITUTION_FLAG, present them to the human wit
 - Do not rewrite the spec — report findings only
 - Do not invent requirements that weren't implied — probe what is there
 - Do not block on stylistic preferences — only on actual ambiguity, contradiction, or untestability
-- BLOCKING means must fix; ADVISORY means should know; CONSTITUTION_FLAG means Architect should prepare
+- BLOCKING means must fix; ADVISORY means should know; CONSTITUTION_FLAG means Software Architect should prepare

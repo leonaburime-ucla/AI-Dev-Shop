@@ -17,3 +17,13 @@ cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
 ```
 
 Then type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, or `/handoff` directly in chat. If you haven't done the copy yet, use Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md` — paste the template contents directly as a prompt.
+
+## Eval Work — Mandatory Pre-reads
+
+Before creating, revising, or auditing any eval suite, ALWAYS read these files first:
+
+- `harness-engineering/agent-evals/bug-taxonomy.md`
+- `harness-engineering/agent-evals/eval-design-playbook.md`
+- `harness-engineering/agent-evals/README.md`
+
+Do not begin fixture design, seed selection, or scoring until all three are loaded into context. This applies to both the coordinator and any dispatched subagent doing eval work.

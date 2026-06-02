@@ -52,7 +52,7 @@ Run as an optional post-implementation audit only when the trigger conditions ab
 10. Check answerability: answer-first summaries, extractable sections, factual sourcing, and useful chunk boundaries.
 11. Compute quantitative metrics from available evidence.
 12. Classify findings as Required, Recommended, or Advisory.
-13. Route fixes to Programmer, Docs, UX/UI Designer, Architect, DevOps, Security, or human decision.
+13. Route fixes to Programmer, Docs, UX/UI Designer, Software Architect, DevOps, Security, or human decision.
 14. Write the retained report under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/search-visibility/`.
 
 ## Finding Severity
@@ -66,7 +66,7 @@ Run as an optional post-implementation audit only when the trigger conditions ab
 
 | Finding Type | Route To |
 |---|---|
-| Rendering strategy, SSR/SSG/ISR vs CSR, route topology | Architect |
+| Rendering strategy, SSR/SSG/ISR vs CSR, route topology | Software Architect |
 | Metadata, JSON-LD, semantic HTML, links, page components | Programmer |
 | Public docs structure, answer-first content, factual sourcing | Docs |
 | Information architecture, navigation, visible content layout | UX/UI Designer |
@@ -105,7 +105,7 @@ Report contents:
 ## Escalation Rules
 
 - Source ledger has stale T2 claims needed for a platform-specific audit -> pause that portion and request refresh.
-- Rendering strategy change is required -> route to Architect instead of Programmer.
+- Rendering strategy change is required -> route to Software Architect instead of Programmer.
 - CDN/WAF/bot rules block target crawlers -> route to DevOps and flag human policy choice if access is intentional.
 - Compliance or privacy conflicts with crawler access -> route to Security or human.
 - Search discoverability requirement conflicts with product privacy/auth requirements -> escalate before recommending public exposure.

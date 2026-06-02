@@ -65,7 +65,7 @@ Resolve conflicts in this order:
 ## Agent Use
 
 - Programmer: activate for Expo/React Native implementation, debugging, SDK upgrades, native modules, API routes, or EAS config changes. Load the target Expo subskill before editing.
-- Architect: activate only when the ADR must choose Expo app topology, Expo Router/API route boundaries, native module strategy, EAS deployment/update strategy, or SDK-upgrade migration approach.
+- Software Architect: activate only when the ADR must choose Expo app topology, Expo Router/API route boundaries, native module strategy, EAS deployment/update strategy, or SDK-upgrade migration approach.
 - Code Review: activate when a diff touches Expo/React Native UI, navigation, data fetching, API routes, native modules, Expo config, EAS workflow/deployment files, or SDK upgrades. Review against the exact subskill that matches the changed surface.
 - QA/E2E: activate when validating Expo Router user journeys, deployment/update behavior, dev-client requirements, or Expo web/native preview flows.
 - DevOps: activate for EAS workflows, EAS Build/Submit, app-store deployment, update health gates, and Expo deployment runbooks.

@@ -13,7 +13,7 @@ This skill produces a macro-level architecture planning artifact before detailed
 
 Provide a high-level system layout so Spec Agent knows what to spec and at what granularity.
 
-This stage exists to prevent downstream spec drift: if specs are written before macro boundaries are clear, they often encode the wrong granularity, assumptions, and ownership model. That causes rework in Architect/TDD/Programmer later.
+This stage exists to prevent downstream spec drift: if specs are written before macro boundaries are clear, they often encode the wrong granularity, assumptions, and ownership model. That causes rework in Software Architect/TDD/Programmer later.
 
 - This is problem-space and system-shape planning.
 - This is where generic functional discovery is modeled before specs.
@@ -209,7 +209,7 @@ Default to **vertical/domain slicing** for decomposition.
 - For existing-codebase extensions, do not approve the blueprint until
   CodeBase Analyzer evidence has either been consumed or a `no_analysis_reason`
   is recorded. Critical/High migration or testability findings that affect the
-  requested feature must be surfaced in the handoff to Spec and Architect.
+  requested feature must be surfaced in the handoff to Spec and Software Architect.
 - Include `Critical User Journeys (Cross-Domain)` so QA/E2E can validate slice convergence end to end.
 - Do not turn functional discovery into a questionnaire dump. Keep the artifact
   proportional to the system size and risk.
@@ -219,6 +219,6 @@ Default to **vertical/domain slicing** for decomposition.
 - Inputs used
 - Blueprint summary
 - NFR discovery summary
-- Dominant quality attributes for Architect handoff
+- Dominant quality attributes for Software Architect handoff
 - Risks/open unknowns
 - Recommended next assignee: Spec Agent

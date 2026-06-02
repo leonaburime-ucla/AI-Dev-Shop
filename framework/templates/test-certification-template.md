@@ -65,7 +65,7 @@ Requirements that are not yet covered. Every gap requires a risk level. High-ris
 
 | Spec Ref | Reason Not Covered | Risk | Resolution |
 |---|---|---|---|
-| EC-03 | Architecture contract not yet defined by Architect | High | Blocked — route to Architect |
+| EC-03 | Architecture contract not yet defined by Software Architect | High | Blocked — route to Software Architect |
 | EC-05 | External dependency unavailable in test environment | Medium | Deferred to integration test phase |
 
 ## Drift Status

@@ -69,7 +69,7 @@ Priority: **P1** = must-have, **P2** = should-have, **P3** = nice-to-have.
 
 ## Open Questions
 
-None. All questions resolved before Architect dispatch.
+None. All questions resolved before Software Architect dispatch.
 
 ## Constitution Compliance
 

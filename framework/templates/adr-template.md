@@ -3,7 +3,7 @@
 - Status: PROPOSED | ACCEPTED | SUPERSEDED | DEPRECATED
 - Date: <ISO-8601 UTC>
 - Spec: <SPEC-id> v<version> (hash: <sha256>)
-- Author: Architect Agent / <human reviewer>
+- Author: Software Architect Agent / <human reviewer>
 
 ## Constitution Check
 

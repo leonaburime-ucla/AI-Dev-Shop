@@ -80,7 +80,7 @@ If none: `None identified.`
 
 ---
 
-### Constitution Check (Architect and Spec stages only)
+### Constitution Check (Software Architect and Spec stages only)
 
 - Constitution version: <version>
 - Violations found: Yes / No

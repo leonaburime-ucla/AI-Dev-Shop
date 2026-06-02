@@ -83,7 +83,7 @@ This rule prevents architecture purity from blocking urgent product work, while 
 
 | Stage | How architecture fitness is used |
 |-------|--------------------------------|
-| Architect | ADR must acknowledge declared boundaries; new patterns must not contradict blocking rules |
+| Software Architect | ADR must acknowledge declared boundaries; new patterns must not contradict blocking rules |
 | Programmer | Modified files checked against rules before handoff |
 | Code Review | Reviewer checks modified files against full rule set; flags violations |
 | Refactor | May address grandfathered violations as dedicated cleanup work |

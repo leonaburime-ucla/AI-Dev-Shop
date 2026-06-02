@@ -34,7 +34,7 @@ Analyzer output should include a short "Testability Map" section with:
 - flaky or over-coupled areas,
 - recommended refactor-before-feature hotspots.
 
-### System Blueprint
+### System Design
 
 Must produce a system shape that is testable at multiple levels:
 - acceptance/integration tests map to user-visible workflows and slice boundaries,

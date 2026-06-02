@@ -25,7 +25,7 @@ It exists to make downstream stages read the full package instead of guessing fi
 Use it to answer:
 - which spec files actually exist for this feature
 - which files were intentionally omitted and why
-- which files Architect, TDD, and Programmer must read
+- which files Software Architect, TDD, and Programmer must read
 
 ---
 

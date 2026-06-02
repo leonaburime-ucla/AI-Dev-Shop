@@ -42,7 +42,7 @@ At minimum, every provider must define:
 - where unresolved clarification decisions live
 - what artifact proves planning readiness
 - what upstream install/runtime model the repo is assuming
-- how that provider maps into AI Dev Shop's downstream Architect, TDD, and Programmer stages
+- how that provider maps into AI Dev Shop's downstream Software Architect, TDD, and Programmer stages
 
 Read `framework/spec-providers/core/provider-contract.md` before editing any provider file.
 

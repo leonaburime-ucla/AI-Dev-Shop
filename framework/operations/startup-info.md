@@ -35,7 +35,7 @@ Copy this section verbatim:
 Agents are specialized roles, each with a `skills.md`. By default, all routing flows through the **Coordinator** and bounded cross-agent consultation is enabled under Coordinator control.
 
 ```text
-[VibeCoder] → [CodeBase Analyzer] → [System Blueprint] → Spec → [Red-Team] → Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[VibeCoder] → [CodeBase Analyzer] → [System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - `[VibeCoder]` is an optional starting point — say "switch to vibecoder" or `/agent vibecoder` to prototype fast, then promote to the full pipeline when ready

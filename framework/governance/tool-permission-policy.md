@@ -9,7 +9,7 @@ Each agent role has an explicit allowed tool scope. Agents operating outside thi
 | Coordinator | Read (project files, state file) | Read-only. No writes to source. No external calls. |
 | Spec Agent | Read, Write (`specs/` only) | Write to feature folder only. |
 | Red-Team Agent | Read | Read spec and constitution.md only. No writes. |
-| Architect Agent | Read, Write (`specs/` only) | Write ADR and research.md only. |
+| Software Architect Agent | Read, Write (`specs/` only) | Write ADR and research.md only. |
 | TDD Agent | Read, Write (test files only) | Write test files. No implementation files. |
 | Programmer Agent | Read, Write (`src/` or equivalent, scoped) | Scoped to files assigned by Coordinator. No test rewrites. |
 | TestRunner Agent | Read, Bash (test runner only) | Run tests. No file writes. |

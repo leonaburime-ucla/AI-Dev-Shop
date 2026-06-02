@@ -73,7 +73,7 @@ Report contents:
   - failing suites should include exact failure output or an offload path if large
 - Failure clusters with:
   - Test names and spec references they cover
-  - Likely failure owner (Programmer, Architect, Spec)
+  - Likely failure owner (Programmer, Software Architect, Spec)
   - Flaky/non-deterministic test notes. Flaky tests block advancement unless
     already listed in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/known-flaky-tests.md`
     with `test_id`, `approved_by`, `approved_at`, `reason`,

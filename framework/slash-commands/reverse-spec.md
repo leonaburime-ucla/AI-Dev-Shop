@@ -43,7 +43,7 @@ The SKILL.md is authoritative for all extraction rules (confidence hierarchy, ex
 - `options` (optional):
   - `layers=<layer-ids>` — which extraction layers to include. Valid IDs defined in `references/extraction-layers.md`: `api`, `domain`, `side-effect`, `data`, `database`, `access-control`, `transaction`, `concurrency`, `failure`, `integration`, `compliance`, `performance`, `observability`, `client-invalidation`, `cache`, `infrastructure`, `migration`, `security` (default: all)
   - `depth=<contracts-only|with-internals>` — `contracts-only` extracts external behavior; `with-internals` also documents internal function contracts for complex modules (default: `contracts-only`)
-  - `target_lang=<python|go|java|etc>` — optional hint passed to Architect later (does NOT affect extraction — specs are always language-agnostic)
+  - `target_lang=<python|go|java|etc>` — optional hint passed to Software Architect later (does NOT affect extraction — specs are always language-agnostic)
 
 ## Workflow
 
@@ -258,7 +258,7 @@ After human approval, the spec enters the normal pipeline:
 - TDD writes tests from the behavioral specs (characterization tests provide the parity oracle)
 - Programmer implements in the target language
 
-The `target_lang` option is passed to the Architect at this stage — it was deliberately kept out of extraction to prevent source-language bias in the spec.
+The `target_lang` option is passed to the Software Architect at this stage — it was deliberately kept out of extraction to prevent source-language bias in the spec.
 
 ## What This Command Does NOT Do
 

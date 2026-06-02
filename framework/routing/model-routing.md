@@ -8,7 +8,7 @@ Each agent role has different cognitive demands. Routing every agent to the same
 |-------|-----------------|-----------|
 | Spec Agent | Frontier | Requires nuanced requirement extraction, ambiguity detection, and precise natural language. Mistakes here propagate through the entire pipeline. |
 | Red-Team Agent | Frontier | Adversarial reasoning requires strong inference. Weak models miss subtle contradictions and untestable requirements. |
-| Architect Agent | Frontier | Pattern selection and tradeoff reasoning are complex. ADR quality determines all downstream work. |
+| Software Architect Agent | Frontier | Pattern selection and tradeoff reasoning are complex. ADR quality determines all downstream work. |
 | TDD Agent | Frontier or Mid-tier | Encoding spec logic into precise assertions requires careful reasoning. Use frontier for complex domains; mid-tier for CRUD-heavy features. |
 | Programmer Agent | Frontier or Mid-tier | Complex implementation → frontier. Routine implementation tasks (boilerplate, standard CRUD) → mid-tier. |
 | Code Review Agent | Mid-tier | Pattern matching against known anti-patterns. Well-defined rubric reduces need for frontier reasoning. |

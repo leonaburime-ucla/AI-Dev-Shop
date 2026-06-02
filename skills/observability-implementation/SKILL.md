@@ -31,7 +31,7 @@ Observability is not logging. It is the ability to ask arbitrary questions about
 - **Context propagation**: across HTTP and message queue boundaries use W3C TraceContext headers.
 - **Sampling strategy guidance**: always-on for errors, probabilistic for success paths.
 
-## Alerting Design (for Architect to specify in ADR)
+## Alerting Design (for Software Architect to specify in ADR)
 
 - Alert on symptoms (high error rate, high latency) not causes (CPU usage, memory).
 - Alert thresholds must be defined in the spec as NFRs — not added post-launch.

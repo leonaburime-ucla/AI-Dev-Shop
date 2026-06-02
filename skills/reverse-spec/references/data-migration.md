@@ -10,11 +10,11 @@ The most common rewrite failure mode is: new code works perfectly, old data brea
 
 Data migration has two stages with different timing:
 
-**Stage 1: Source Data Profile** — extracted during reverse-spec (before Architect). Documents what the existing data looks like, its constraints, dirty data, volumes, and risks. This is the input the Architect needs to design the target schema.
+**Stage 1: Source Data Profile** — extracted during reverse-spec (before Software Architect). Documents what the existing data looks like, its constraints, dirty data, volumes, and risks. This is the input the Software Architect needs to design the target schema.
 
-**Stage 2: Target Migration Mapping** — produced after the Architect proposes a target data model. Maps source fields to target fields with transformations. This lives in the architecture/implementation phase, NOT in reverse-spec extraction.
+**Stage 2: Target Migration Mapping** — produced after the Software Architect proposes a target data model. Maps source fields to target fields with transformations. This lives in the architecture/implementation phase, NOT in reverse-spec extraction.
 
-During reverse-spec, produce Stage 1 only. Stage 2 is a placeholder template showing what the Architect and implementation team will fill in.
+During reverse-spec, produce Stage 1 only. Stage 2 is a placeholder template showing what the Software Architect and implementation team will fill in.
 
 ## Stage 1: Source Data Profile (During Reverse-Spec)
 
@@ -127,9 +127,9 @@ Mark data migration findings with:
 - `[ID FORMAT CHANGE]` — external-facing IDs change, breaking clients
 - `[CUTOVER RISK]` — live-traffic migration requires dual-write, routing, or freeze window
 
-## Stage 2: Target Migration Mapping (After Architect — Template Only)
+## Stage 2: Target Migration Mapping (After Software Architect — Template Only)
 
-This section is NOT filled during reverse-spec extraction. It is a template for the Architect and implementation team once the target data model exists.
+This section is NOT filled during reverse-spec extraction. It is a template for the Software Architect and implementation team once the target data model exists.
 
 | Source Field | Source Type | Target Field | Target Type | Transformation | Risk |
 |-------------|-------------|-------------|-------------|----------------|------|
@@ -137,14 +137,14 @@ This section is NOT filled during reverse-spec extraction. It is a template for 
 | `users.type` | varchar (STI) | — | — | split to separate tables | `[DATA MIGRATION RISK]` |
 | `orders.total` | decimal(8,2) | `orders.total_cents` | bigint | multiply by 100 | precision |
 
-The Architect fills this mapping after proposing the target schema. The reverse-spec extraction provides the Source Data Profile (Stage 1) as input to those decisions.
+The Software Architect fills this mapping after proposing the target schema. The reverse-spec extraction provides the Source Data Profile (Stage 1) as input to those decisions.
 
 ## Relationship to Extraction
 
 Data migration contracts are extracted during Phase 4 (database-resident behavior) and refined during synthesis. They feed into:
-- Architect decisions (can we change the schema or must we preserve it?)
+- Software Architect decisions (can we change the schema or must we preserve it?)
 - TDD test design (tests must handle legacy data shapes)
 - Programmer implementation (migration scripts, backfill logic)
 - Operational planning (downtime window, rollback strategy)
 
-Stage 1 (Source Data Profile) is a reverse-spec output. Stage 2 (Target Mapping) is an Architect/implementation output that references Stage 1.
+Stage 1 (Source Data Profile) is a reverse-spec output. Stage 2 (Target Mapping) is a Software Architect/implementation output that references Stage 1.

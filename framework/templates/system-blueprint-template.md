@@ -2,7 +2,7 @@
 
 - Status: DRAFT | APPROVED
 - Date: <ISO-8601 UTC>
-- Author: System Blueprint Agent
+- Author: System Design Agent
 - Scope: Greenfield | Existing codebase extension
 - Next Action: Human reviews and approves blueprint boundaries before Spec decomposition
 
@@ -137,7 +137,7 @@ human/Coordinator asks for depth.
 - If no CodeBase Analyzer evidence was consumed, no_analysis_reason:
 - Sampling caveats that affect this blueprint:
 - Critical/High findings that affect feature boundaries:
-- Migration/testability constraints to preserve in Spec and Architect handoff:
+- Migration/testability constraints to preserve in Spec and Software Architect handoff:
 
 ---
 
@@ -220,7 +220,7 @@ Define which specs should be written next and at what granularity.
 - Safe default assumptions Spec should preserve:
 - Approved boundaries to preserve:
 - Existing-codebase evidence Spec must cite:
-- Existing-codebase evidence Architect must consume:
+- Existing-codebase evidence Software Architect must consume:
 - Open decisions that Spec should mark with `[NEEDS CLARIFICATION]` if unresolved:
 - Recommended sequencing for spec creation:
 

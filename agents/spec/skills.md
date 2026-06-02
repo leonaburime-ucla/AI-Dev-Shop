@@ -15,7 +15,7 @@ Convert product intent into precise, versioned, testable specifications that bec
 - Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
 - Problem statement and business outcome
 - Constraints (regulatory, performance, platform)
-- Approved `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Blueprint was run. Draft or `REVISE` blueprints are inputs for revision only, not approval for `/plan`.
+- Approved `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Design was run. Draft or `REVISE` blueprints are inputs for revision only, not approval for `/plan`.
 - Relevant CodeBase Analyzer reports for brownfield features: `ANALYSIS-*`, `MIGRATION-*`, and `TESTABILITY-*`
 - Reverse-spec artifacts when normalizing extracted behavior: `merged-requirements.md`, `review-digest.md`, `extraction-manifest.md`, `coverage-map.md`, `consumer-inventory.md`, `intentional-changes.md`, and characterization-test references
 - Existing spec metadata (if updating — include current hash)
@@ -27,17 +27,17 @@ Convert product intent into precise, versioned, testable specifications that bec
 3. Read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text when the provider supports inline clarification markers.
 4. Assign FEAT number by scanning existing feature folders in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
 5. Run the functional model completeness gate before writing detailed specs:
-   - If System Blueprint was run, read its Functional Discovery Model and Handoff to Spec sections.
-   - If System Blueprint was run and its status is not `APPROVED`, stop and route back to Coordinator for human blueprint review.
+   - If System Design was run, read its Functional Discovery Model and Handoff to Spec sections.
+   - If System Design was run and its status is not `APPROVED`, stop and route back to Coordinator for human blueprint review.
    - Preserve approved actors/user types, goals/capabilities, workflows, resources/operations, lifecycle/state, rules, integrations, assumptions, and boundaries.
-   - If the blueprint marks `Functional model status: BLOCKED` or includes `BLOCKING` functional unknowns, convert those into `[NEEDS CLARIFICATION]` markers and do not advance to Architect until resolved.
+   - If the blueprint marks `Functional model status: BLOCKED` or includes `BLOCKING` functional unknowns, convert those into `[NEEDS CLARIFICATION]` markers and do not advance to Software Architect until resolved.
    - If the blueprint includes unresolved `[OWNERSHIP UNCLEAR]`, stop; ownership uncertainty must be resolved before spec approval.
    - If no blueprint exists for a small/no-blueprint change, perform a compact functional-model self-check directly from the user's intent: actors, goals, workflows, resources/operations, state/lifecycle, rules/validations, exceptions, integrations, admin/support, audit/history, settings, and account/data lifecycle where relevant.
    - In compact self-check mode, permissions/ownership, communication/collaboration, and search/reporting/analytics may be covered by the surrounding categories unless the feature specifically touches them.
    - Ask at most 3 blocking clarification questions at a time. The cap limits one interaction, not the number of blockers allowed. If more blockers remain, keep `[NEEDS CLARIFICATION]` markers and do not recommend `/plan`.
    - Derive APIs, state, and data contracts from workflows, resources, operations, and rules; do not start by inventing endpoints or tables.
 6. Run the NFR completeness gate:
-   - If System Blueprint was run, preserve and refine its NFR discovery table, safe assumptions, blocking unknowns, and dominant quality-attribute candidates.
+   - If System Design was run, preserve and refine its NFR discovery table, safe assumptions, blocking unknowns, and dominant quality-attribute candidates.
    - If no blueprint exists, run the compact light pass from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md`; ask at most 3 blocking NFR questions at a time. Overflow blockers remain unresolved and block `/plan`.
    - Spec Agent must not run a full deep pass by itself. It may deepen only the categories required to make acceptance criteria observable/testable, capped at 2 categories per spec pass unless the user or Coordinator explicitly asks for more.
    - Convert `BLOCKING` NFR unknowns into `[NEEDS CLARIFICATION]` markers. For `SAFE DEFAULT` and `DEFERRED` unknowns, record assumptions and downstream owners.
@@ -57,7 +57,7 @@ Convert product intent into precise, versioned, testable specifications that bec
 11. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
 12. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
 13. Run the active provider's validator. For Speckit, run `python3 <AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/validators/validate_spec_package.py <spec_folder_dir> --phase spec --update-hash`. Use the spec package directory, not the `feature.spec.md` file path. Do not hand off until it exits successfully. If `python3` is unavailable, try `python` or `py`; if the validator runtime is still unavailable, stop unless a human approves a single-line `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp, reason, and manual checks performed.
-14. Once the provider-defined readiness artifact fully passes: publish spec delta summary (what changed and why), hand off to Red-Team via Coordinator. Architect dispatch happens only after Red-Team and Coordinator Planning Preflight pass.
+14. Once the provider-defined readiness artifact fully passes: publish spec delta summary (what changed and why), hand off to Red-Team via Coordinator. Software Architect dispatch happens only after Red-Team and Coordinator Planning Preflight pass.
 
 ## Output Format
 - Spec package path

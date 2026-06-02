@@ -43,6 +43,6 @@ None.
 
 ## Routing Decision
 
-0 BLOCKING findings. Spec is cleared for Architect dispatch.
+0 BLOCKING findings. Spec is cleared for Software Architect dispatch.
 
-ADVISORY findings ADV-01 and ADV-02 are included in Architect context for awareness. Neither requires spec revision before ADR.
+ADVISORY findings ADV-01 and ADV-02 are included in Software Architect context for awareness. Neither requires spec revision before ADR.

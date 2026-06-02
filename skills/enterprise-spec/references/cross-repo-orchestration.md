@@ -12,7 +12,7 @@ Program-level location:
 
 ## Repository Sub-Specs
 
-After program-level approval, the Architect decomposes the feature into repository-specific sub-specs.
+After program-level approval, the Software Architect decomposes the feature into repository-specific sub-specs.
 
 Sub-spec path pattern:
 

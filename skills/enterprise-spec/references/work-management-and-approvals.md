@@ -45,7 +45,7 @@ WORK ITEM TRANSITIONS REQUIRED:
 | Phase Transition | Required Approvers | Blocking Effect |
 |---|---|---|
 | Discover -> Spec | Product Manager and Tech Lead | Spec dispatch blocked |
-| Spec -> Design | Architect and Security Lead | Architect dispatch blocked |
+| Spec -> Design | Software Architect and Security Lead | Software Architect dispatch blocked |
 | Design -> Tasks | Engineering Lead | TDD dispatch blocked |
 | Tasks -> Implementation | Tech Lead | Programmer dispatch blocked |
 | Implementation -> Review | QA Lead | Review dispatch blocked |
@@ -60,7 +60,7 @@ WORK ITEM TRANSITIONS REQUIRED:
 |-------|------|----------|------|----------|-------|
 | Discover -> Spec | Product Manager | Jane Doe | 2026-02-18 | Approved | |
 | Discover -> Spec | Tech Lead | Ali Hassan | 2026-02-18 | Approved | |
-| Spec -> Design | Architect | Marco Ricci | 2026-02-20 | Needs Revision | ADR missing |
+| Spec -> Design | Software Architect | Marco Ricci | 2026-02-20 | Needs Revision | ADR missing |
 | Spec -> Design | Security Lead | Priya Singh | 2026-02-21 | Approved | |
 ```
 
