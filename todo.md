@@ -471,15 +471,23 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 **Source:** 2026-06-03 debate consensus (3/3 agreement).
 **What to add:** Design and implement both skills, wire into Programmer agent as conditional skills.
 
-### Enforcement Harness (git hooks + CI) **[OPEN]**
+### Enforcement Harness (git hooks + CI) **[PARTIAL]**
 **What it is:** Git hooks and CI checks running identical enforcement rules. "If you can't measure it, you can't enforce it."
 **Source:** 2026-06-03 debate consensus (3/3 agreement).
-**What to add:** Architecture linting (module import boundaries), governance ADR scope validation, format/type checks. Hooks and CI must run the same commands.
+**Current state:** Profiled runner (`run-all.sh --profile precommit|ci|governance`) implemented. Opt-in hooks installer exists. Pre-commit profile runs fast validators.
+**What's still needed:**
+- Refactor validators to accept `ADS_WORKSPACE_ROOT` env var so governance scenarios can call real validators against fixture workspaces (not just pattern assertions)
+- Once validators are workspace-aware, upgrade governance scenarios from tautological assertions to subprocess invocations of real validator logic
+- Add architecture linting (module import boundaries), governance ADR scope-glob syntax validation
+- CI workflow file (GitHub Actions) that calls `run-all.sh --profile ci`
 
-### Governance Workflow Scenarios (BDD-lite) **[OPEN]**
+### Governance Workflow Scenarios (BDD-lite) **[PARTIAL]**
 **What it is:** 5-10 executable tests covering pipeline governance invariants: approval gates hold after resume, routing doesn't dispatch past blocks, artifact handoffs are complete.
 **Source:** 2026-06-03 debate consensus (2/3 + 1 agrees on need). Plain Pytest with readable scenario names — no Gherkin.
-**What to add:** Integration tests that drive real pipeline workflows end-to-end. Not feature acceptance tests — governance behavior tests.
+**Current state:** 19 governance scenarios in `harness-engineering/governance-scenarios/` covering spec gates, ADR governance, and artifact integrity. All pass in 0.12s. Tests currently assert governance patterns directly (not via real validators).
+**What's still needed:**
+- Upgrade to real validator invocation once validators support workspace targeting
+- Add scenarios for: pipeline-state transition gates, security sign-off gate, Red-Team blocking, Implementation Outline readiness gate
 
 ### Spec Preamble Strengthening **[OPEN]**
 **What it is:** Add a structured "Problem / Why / User Journey" section to the spec template to absorb PRD value without a parallel document type.
