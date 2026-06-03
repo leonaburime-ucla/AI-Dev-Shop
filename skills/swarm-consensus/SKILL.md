@@ -36,6 +36,17 @@ When naming LLM participants to the user, always show the peer model identity fi
 - If the exact model cannot be proven, say `model unresolved` or `local default, exact model unknown`; do not substitute the CLI version.
 - Preflight copy must distinguish `Planned peer models` from `CLI diagnostics`.
 
+### Reporting Results to User (Blocking)
+
+When reporting debate results, synthesis, decision ledgers, or any peer output back to the user, always identify each participant by **model family + version + reasoning mode** — not by CLI name alone.
+
+Examples of correct reporting:
+- `Gemini 3.1 Pro` (not "Gemini" or "gemini-cli")
+- `Codex GPT-5.5 xhigh` (not "Codex" or "codex-cli")
+- `Claude Opus 4.6` (not "Claude" or "claude-cli")
+
+If the model reports its own identity in the response (e.g., Codex session headers show `model: gpt-5.5`), use that. If reasoning effort is known (e.g., `xhigh`, `high`), include it. The user must always know exactly which model produced which output.
+
 ## Model-Agnostic Design
 
 **You are the primary model.** Whatever LLM is currently running this skill is the primary reasoner. You generate your own response first, then dispatch the same prompt to any other available CLI tools, and synthesize the combined output.
@@ -50,7 +61,7 @@ Supported peer CLIs:
 |---|---|---|
 | `claude` | `claude -p --output-format json "<prompt>"` | Claude Code CLI. Prefer structured output when available. |
 | `gemini` | `gemini -m <model> -o json -p "<prompt>"` | Gemini CLI. Put `-m` before `-p` when pinning a model. |
-| `codex` | `codex exec --json "<prompt>"` | OpenAI Codex CLI. Prefer `exec --json`; some repos can inject startup chatter into plain-text runs. |
+| `codex` | `codex exec --ignore-rules --ephemeral --json "<prompt>"` | OpenAI Codex CLI. `--ignore-rules` prevents repo instruction files from triggering mandatory startup loops in peer mode. `--ephemeral` avoids session persistence. For long prompts, pipe via stdin: `cat prompt.md \| codex exec --ignore-rules --ephemeral -s read-only -`. |
 
 If you are Claude Code, you dispatch to `gemini` and `codex`. If you are Gemini, you dispatch to `claude` and `codex`. The skill works identically regardless of who is primary.
 
@@ -363,7 +374,7 @@ Do not rely on subjective "looks abrupt" checks alone.
 # Prefer structured output and keep stderr separate from the peer answer
 claude --output-format json -p "$(cat .swarm-prompt.txt)" 2>peer-claude.stderr
 gemini -m <resolved-model> -o json -p "$(cat .swarm-prompt.txt)" 2>peer-gemini.stderr
-codex exec --json -m <resolved-model> --cd <dispatch-dir> --skip-git-repo-check "$(cat .swarm-prompt.txt)" 2>peer-codex.stderr
+codex exec --ignore-rules --ephemeral --json -m <resolved-model> --cd <dispatch-dir> --skip-git-repo-check "$(cat .swarm-prompt.txt)" 2>peer-codex.stderr
 ```
 
 If a peer CLI returns a non-zero exit code or empty output, mark it as failed in the report and exclude it from synthesis.
@@ -472,17 +483,16 @@ Produce a `consensus-report.md` (or inline if the user prefers) with this struct
 
 ## Individual Responses
 
-### <Primary model name>
+Use the resolved model identity (e.g., "Claude Opus 4.6", "Gemini 3.1 Pro", "Codex GPT-5.5 xhigh") as the heading — not the CLI name alone.
+
+### <Primary: resolved model identity>
 <Summary of primary reasoning>
 
-### Claude (if responded)
-<Summary of Claude's response>
+### <Peer 1: resolved model identity> (if responded)
+<Summary of peer response>
 
-### Gemini (if responded)
-<Summary of Gemini's response>
-
-### Codex (if responded)
-<Summary of Codex's response>
+### <Peer 2: resolved model identity> (if responded)
+<Summary of peer response>
 
 ## Synthesis
 
@@ -496,9 +506,12 @@ Produce a `consensus-report.md` (or inline if the user prefers) with this struct
 <Anything only one model raised>
 
 ### Decision Ledger
-| Decision Point | Primary | Claude | Gemini | Codex | Agreement | Key Why / Movement |
-|---|---|---|---|---|---|---|
-| <point 1> | <position> | <position> | <position> | <position> | Yes/No | <main rationale and any round-to-round movement> |
+
+Use resolved model identities as column headers (e.g., "Claude Opus 4.6", "Gemini 3.1 Pro", "Codex GPT-5.5 xhigh").
+
+| Decision Point | <Primary model> | <Peer 1 model> | <Peer 2 model> | Agreement | Key Why / Movement |
+|---|---|---|---|---|---|
+| <point 1> | <position> | <position> | <position> | Yes/No | <main rationale and any round-to-round movement> |
 
 ### Unresolved Deltas
 <Only include if disagreement remains after synthesis/debate>

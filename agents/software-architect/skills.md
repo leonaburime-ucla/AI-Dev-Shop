@@ -31,6 +31,8 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — load when architecture choices involve Expo app topology, Expo Router/API route boundaries, native module strategy, EAS deployment/update strategy, dev-client requirements, or Expo SDK migration planning
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — load in Design Gate mode only when producing implementation-outline public/exported contracts or load-bearing internal invariant units; use it to define single job, signature shape, test seam, effect boundary, complexity/resource view, and aggregate-risk notes before downstream coding, never to assign `@overallScore` or post-code findings
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — load after ADR pattern/boundary selection when trigger checks may require a post-ADR, pre-tasks implementation outline or explicit SKIP record
+- `<AI_DEV_SHOP_ROOT>/skills/backup-strategy/SKILL.md` — load when the architecture introduces durable state requiring backup coverage decisions (recovery objectives, mechanism selection, failure-domain separation)
+- `<AI_DEV_SHOP_ROOT>/skills/disaster-recovery-planning/SKILL.md` — load when the system has business-critical availability requirements, multi-region architecture, or NFR Discovery identifies RTO/RPO/failover needs
 
 ## Role
 Select and enforce architecture patterns that satisfy spec constraints, enable safe parallel delivery, and give all downstream agents clear boundaries to work within.

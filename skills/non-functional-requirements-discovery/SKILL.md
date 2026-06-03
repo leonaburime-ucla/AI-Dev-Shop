@@ -48,14 +48,20 @@ Read this file for all NFR discovery runs.
 - Do not run a full deep pass for small scripts, prototypes, or narrow changes
   unless the user asks or a clear risk signal exists.
 
-## Agent Usage
+## Usage Modes
 
-| Agent | Default Use | Depth Rule |
+This skill supports multiple usage modes. The invoking context determines which mode
+and depth to use — those constraints belong to the invoker, not this skill.
+
+| Mode | When | What It Produces |
 |---|---|---|
-| System Design Agent | Primary invoker | Light pass by default; deep pass only on risk signals; at most 5 blocking NFR questions per pass |
-| Spec Agent | Preserver/refiner | Inherit blueprint NFRs; if no blueprint, compact light pass; at most 3 blocking NFR questions |
-| Software Architect | Consumer/targeted deepener | Use records to activate ADR axes; deepen only the categories needed for the decision |
-| Specialist agents | Read-only consumers | Read upstream NFR records and apply their own domain skills; do not rerun discovery by default |
+| Light pass | Default for greenfield or macro-shaping work | Quick category classification with safe defaults |
+| Compact light pass | Small features with no upstream blueprint | Minimal classification focused on blocking unknowns |
+| Targeted deepening | A specific quality axis lacks upstream detail | Deep records for only the triggered categories |
+| Read-only consumption | Downstream work references existing NFR records | No new discovery; apply existing records to current task |
+
+Invokers should define their own question caps, depth limits, and pass scope
+in their own configuration. This skill does not enforce per-invoker limits.
 
 ## Categories
 

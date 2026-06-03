@@ -35,15 +35,28 @@ Treat this as guidance, not a hard constraint:
 
 Some peer CLIs perform expensive startup work (reading project docs, running bootstrap sequences) on the first turn. To avoid paying this cost repeatedly within a single workflow (e.g., a `/cowork` run with diagnosis → verification → correction phases), reuse the same peer session across phases.
 
-### Codex Session Reuse
+### Codex Peer Dispatch
 
-Codex reads `AGENTS.md` and performs mandatory startup on the first turn of every new session. This is acceptable as a one-time cost, but subsequent dispatches in the same workflow must reuse the session to avoid repeating it.
+Codex reads repo instruction files (AGENTS.md, `.rules`) and performs mandatory startup on the first turn of every new session unless `--ignore-rules` is used. The AGENTS.md Mandatory Startup section explicitly excludes peer/subagent contexts.
 
-**Pattern:**
+**Two modes:**
+
+#### Single-shot dispatch (default for `/debate`, `/consensus`, `/audit-work`)
+
+Use `--ignore-rules --ephemeral` for one-off prompts where no session continuity is needed:
 
 ```bash
-# Phase 1 — first dispatch, boots once, captures session ID
-codex exec --json -C "$REPO" "Your task..." \
+codex exec --ignore-rules --ephemeral --json -C "$REPO" "Your task..." \
+  > "$RUN_DIR/codex-output.json" 2>"$RUN_DIR/codex-output.stderr"
+```
+
+#### Multi-phase dispatch (for `/cowork` with diagnosis → correction)
+
+Omit `--ephemeral` when you need session reuse across phases. Use `--ignore-rules` alone to prevent startup loops while preserving session persistence:
+
+```bash
+# Phase 1 — first dispatch, captures session ID
+codex exec --ignore-rules --json -C "$REPO" "Your task..." \
   > "$RUN_DIR/codex-phase1.json" 2>"$RUN_DIR/codex-phase1.stderr"
 
 # Extract session ID from JSON stream
@@ -57,7 +70,7 @@ for line in open('$RUN_DIR/codex-phase1.json'):
     except: pass
 ")
 
-# Phase 2+ — resume existing session, no reboot
+# Phase 2+ — resume existing session
 codex exec resume "$SESSION_ID" --json "Next task..." \
   > "$RUN_DIR/codex-phase2.json" 2>"$RUN_DIR/codex-phase2.stderr"
 ```
@@ -113,6 +126,22 @@ what positions are being challenged, which disagreements matter, and what
 evidence or assumption change the peers should address. Do not require the user
 to read a long terminal-rendered prompt to understand why the next dispatch is
 happening.
+
+### Reporting Peer Results to the User
+
+When reporting results, synthesis, decision ledgers, or any peer output back to
+the user, identify each participant by **model family + version + reasoning
+mode** — not by CLI name or generic family alone.
+
+Correct examples:
+- `Gemini 3.1 Pro` (not "Gemini" or "gemini-cli")
+- `Codex GPT-5.5 xhigh` (not "Codex" or "codex-cli")
+- `Claude Opus 4.6` (not "Claude" or "claude-cli")
+
+If the peer session reports its own identity (e.g., Codex session header shows
+`model: gpt-5.5`), use that. If reasoning effort is known (e.g., `xhigh`,
+`high`), include it. The user must always know exactly which model and tier
+produced which output.
 
 ### Peer-Readable Packet Locations
 

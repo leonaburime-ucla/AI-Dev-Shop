@@ -10,6 +10,27 @@ This is strictly required to let the user know exactly who is talking and to con
 
 ---
 # Mandatory Startup
+
+**Scope:** This section applies ONLY when the LLM is the **primary interactive Coordinator** — running the full pipeline for a human user in an interactive session. It does NOT apply when the LLM is operating as:
+- A **peer participant** in any multi-model workflow (Swarm Consensus, `/debate`, `/consensus`)
+- A **cowork participant** (`/cowork`)
+- An **audit peer** (`/audit-work`)
+- A **dispatched subagent** receiving a task prompt from another Coordinator
+- Any **non-interactive invocation** (prompt piped via stdin, passed as CLI argument, or received via API)
+
+**How to detect (in priority order):**
+1. The prompt contains `<<PEER_DISPATCH>>` or `<<SUBAGENT_DISPATCH>>` — deterministic marker inserted by the dispatching Coordinator. Skip startup unconditionally.
+2. The invocation uses `--ignore-rules`, `--ephemeral`, or equivalent CLI flags that suppress project rules — the dispatcher already opted you out.
+3. The prompt is piped via stdin or passed as a non-interactive CLI argument (no TTY).
+
+If none of the above apply but the first input is clearly a structured task prompt with full context provided inline (not a human greeting or open-ended question), treat it as a peer dispatch and skip startup. When in doubt, perform startup — false positive (unnecessary startup for a peer) is recoverable; false negative (skipping startup for an interactive user) is not.
+
+In peer/subagent contexts, the dispatching Coordinator provides all necessary context in the prompt. Do not perform welcome messages, reminder checks, slash-command offers, or subagent-mode resolution. Read the prompt, produce your answer, stop.
+
+---
+
+**Interactive Coordinator startup (when scope applies):**
+
 On the first user message in this repository (including greetings), before any reply:
 1. Open and read `<AI_DEV_SHOP_ROOT>/AGENTS.md`.
 2. Provide a welcome message that MUST include:
@@ -23,7 +44,7 @@ Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/debate`, `/c
 If the user says yes: read the `## slash-commands-setup` section in `reminders.md`, detect the host, and follow the instructions there.
 If the user says "skip" / "don't show again" / "dismiss": append `- slash-commands-setup` to the Dismissed section in `reminders.md` and confirm: "Dismissed. Say 're-enable reminder: slash-commands-setup' anytime to bring it back."
 
-Failure to perform Mandatory Startup is a blocking error. Do not proceed until corrected.
+Failure to perform Mandatory Startup in an interactive Coordinator session is a blocking error. Do not proceed until corrected.
 
 ---
 ## Default Mode: Coordinator — Review Mode

@@ -16,6 +16,8 @@ Conditional skills are not standing context. Load only the subset triggered by t
 
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — load when the rollout includes breaking changes, compatibility windows, canaries, or phased migration
 - `<AI_DEV_SHOP_ROOT>/skills/incident-response/SKILL.md` — load when writing rollback/runbook artifacts, incident hardening work, or post-incident operational follow-up
+- `<AI_DEV_SHOP_ROOT>/skills/backup-strategy/SKILL.md` — load when the deployment introduces or changes durable state requiring backup coverage, restore procedures, or monitoring
+- `<AI_DEV_SHOP_ROOT>/skills/disaster-recovery-planning/SKILL.md` — load when implementing DR infrastructure, configuring failover automation, or executing DR drills
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — load for EAS workflows, EAS Build/Submit, Expo deployment runbooks, app-store release flow, and EAS Update health gates
 
 ## Role

@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.21
-last_updated: 2026-05-20
+version: 1.2.22
+last_updated: 2026-06-03
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -75,6 +75,9 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/external-audit/SKILL.md` | Coordinator (packages current work for one or more external LLM auditors and synthesizes cross-auditor findings back to the user) |
 | `skills/observability-implementation/SKILL.md` | Software Architect, Programmer, Security Agent |
 | `skills/incident-response/SKILL.md` | DevOps Agent, Coordinator (production incident routing), Observer (post-incident pattern analysis) |
+| `skills/backup-strategy/SKILL.md` | DevOps Agent, Software Architect (recovery objectives), Database Agent (mechanism selection) |
+| `skills/disaster-recovery-planning/SKILL.md` | Software Architect (DR architecture), DevOps Agent (implementation and drills), Database Agent (replication topology) |
+| `skills/secure-input-handling/SKILL.md` | Programmer (implementation), TDD Agent (boundary test cases), Security Agent (review verification), Code Review Agent |
 | `skills/data-engineering/SKILL.md` | Database Agent, Software Architect, Programmer |
 | `skills/developer-documentation/SKILL.md` | Docs Agent |
 | `skills/llm-operations/SKILL.md` | Software Architect, Programmer, Coordinator (via shared peer-dispatch rules used by external-audit and swarm-consensus) |
