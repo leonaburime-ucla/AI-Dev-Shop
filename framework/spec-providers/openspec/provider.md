@@ -41,6 +41,8 @@ Runtime assumptions:
 - workflow shape is driven by the selected profile and schema
 - the default profile is `core`; expanded workflow commands require `openspec config profile` followed by `openspec update`
 
+AI Dev Shop default storage maps this OpenSpec surface under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/openspec/`. The upstream paths below describe OpenSpec's native conceptual layout; pipeline state must record the actual AI Dev Shop path used for the run.
+
 ## Native Project Roots
 
 | Path | Purpose |
@@ -139,11 +141,11 @@ For the default `spec-driven` schema:
 
 ## AI Dev Shop Translation Rules
 
-- Do not treat `proposal.md` alone as the whole spec. For modified capabilities, AI Dev Shop must read both delta specs in the change folder and the baseline specs under `openspec/specs/`.
+- Do not treat `proposal.md` alone as the whole spec. For modified capabilities, AI Dev Shop must read both delta specs in the change folder and the baseline specs under the recorded OpenSpec root. By default that root is `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/openspec/`.
 - Treat `design.md` as provider-native technical design input, not as an optional afterthought, when the selected schema requires it.
 - Treat `tasks.md` as provider-native implementation planning input.
 - Treat `archive` and `sync` as provider-owned lifecycle operations that reconcile change state back into baseline specs.
-- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` rather than storing toolkit-only state inside `openspec/`.
+- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` rather than storing toolkit-only state inside the provider planning folder.
 
 ## Activation Checklist
 

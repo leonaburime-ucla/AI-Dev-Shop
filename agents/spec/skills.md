@@ -48,11 +48,11 @@ Convert product intent into precise, versioned, testable specifications that bec
    - For reverse-spec normalization, preserve source evidence, confidence labels, preservation decisions, consumer compatibility notes, coverage status, and intentional-change approvals. Do not collapse them into plain requirements with no provenance.
    - Carry every `[NEEDS CLARIFICATION]`, `[HUMAN DATA REQUEST]` marked blocking, `[CONTRACT VS IMPLEMENTATION]`, `[DISTRIBUTED TRANSACTION RISK]`, and blocking review-digest item forward as a blocker until human review resolves it.
    - Require `reverse_spec_review_status: APPROVED` in `pipeline-state.md` before recommending `/plan`.
-8. Ask the user where to save spec artifacts (if not already specified). If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
+8. Resolve the spec artifact target. Default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly specified another durable project-owned location. If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
 
-   Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
+   Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `provider_native_root`, `provider_output_root`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
 
-9. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<user-specified>/<NNN>-<feature-name>/` using `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
+9. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly requested another durable location. Use `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
 10. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
 11. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
 12. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
@@ -92,12 +92,12 @@ Before signaling handoff readiness:
 
 ## Spec Placement
 
-Specs are written wherever the user specifies. No hardcoded output location.
+Specs are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default so forward planning state stays with the host project and outside the updateable toolkit.
 
-- If the user specifies a path, write there
-- If the user does not specify a path, ask before writing
+- If the user specifies another durable project-owned path, write there
+- If the user does not specify a path, default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/`
 - Follow the active provider's compatibility contract for output structure, subfolder conventions, and required artifacts
-- There is no default location — always ask if the user has not specified one
+- Do not write project-owned spec content under `<AI_DEV_SHOP_ROOT>`
 
 ## Output Path Rule
-Write spec artifacts to the user-specified location. During spec work, never modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/`.
+Write spec artifacts to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default, or to the explicit durable project-owned location the user selected. During spec work, never modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/`.

@@ -131,7 +131,8 @@ This is the project-owned AI Dev Shop workspace. Commit retained project artifac
 
 - `governance/`: project rules and the live constitution
 - `memory/`: stable project memory, learnings, notes, and memory-store entries
-- `reports/`: retained specs, ADRs, reviews, benchmarks, audits, and pipeline outputs
+- `specs/`: provider-native forward specs and planning artifacts
+- `reports/`: retained ADRs, reviews, benchmarks, audits, and pipeline outputs
 - `specs_as_built/`: curated current-state implementation knowledge generated from reverse-spec and post-implementation capture
 - `meta/`: project-owned workflow notes, migration state, and workspace metadata
 - `.local-artifacts/`: local scratch output ignored by git
@@ -206,6 +207,7 @@ ensure_dir "$workspace_root"
 ensure_dir "$workspace_root/governance"
 ensure_dir "$workspace_root/governance/contracts"
 ensure_dir "$workspace_root/memory"
+ensure_dir "$workspace_root/specs"
 ensure_dir "$workspace_root/reports"
 ensure_dir "$workspace_root/specs_as_built"
 ensure_dir "$workspace_root/specs_as_built/components"
@@ -249,6 +251,9 @@ copy_file_if_missing \
 write_file_if_missing "$workspace_root/README.md" "$workspace_readme"
 write_file_if_missing "$workspace_root/governance/README.md" "$governance_readme"
 write_file_if_missing "$workspace_root/memory/README.md" "$memory_readme"
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/specs/README.md" \
+  "$workspace_root/specs/README.md"
 write_file_if_missing "$workspace_root/reports/README.md" "$reports_readme"
 copy_file_if_missing \
   "$ads_root/project-knowledge-template/specs_as_built/README.md" \

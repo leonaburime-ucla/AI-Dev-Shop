@@ -172,7 +172,7 @@ A spec is ready when:
 
 | Content | Location |
 |---|---|
-| Requirements, acceptance criteria, invariants, edge cases | Spec file — at user-specified location |
+| Requirements, acceptance criteria, invariants, edge cases | Spec file — default `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly selects another durable project-owned location |
 | Software Architecture decisions and pattern choices | ADR — see `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` |
 | Project conventions and tribal knowledge | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` |
 | Lessons learned from past mistakes | `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` |

@@ -29,14 +29,14 @@ For the current environment, prefer the probe above plus `harness-engineering/ru
 | **Live browser automation** (`browser_automation`, current provider: Playwright MCP) | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ❌ Not supported | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ⚠️ Probe locally; enabled only when a browser MCP server is configured | ❌ Not supported |
 | **Live Supabase verification** (`supabase_mcp`, current provider: Supabase MCP) | ⚠️ Probe locally; enabled only when a Supabase MCP server is configured | ❌ Not supported | ⚠️ Probe locally; enabled only when a Supabase MCP server is configured | ⚠️ Probe locally; enabled only when a Supabase MCP server is configured | ❌ Not supported |
 | **Simulated multi-agent** (single session, roleplay stages) | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible | ✅ Possible |
-| **Filesystem reads** (provider-native spec roots such as `specs/`, `project-knowledge-template/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
+| **Filesystem reads** (project spec roots such as `ADS-project-knowledge/specs/`, `project-knowledge-template/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`) | ✅ Native | ❌ Requires paste | ✅ Native | ✅ Native | ❌ Requires paste |
 | **Filesystem writes** (state file, spec artifacts) | ✅ Native | ❌ Requires copy-out | ✅ Native | ✅ Native | ❌ Requires copy-out |
 | **Bash tool** (TestRunner: `npm test`, `pytest`, etc.) | ✅ Full | ❌ Not supported | ✅ Full | ⚠️ Limited | ❌ Not supported |
 | **SHA-256 content hashing** (spec hash, ADR hash) | ✅ Via Bash | ⚠️ Manual only | ✅ Via Bash | ✅ Via Bash | ⚠️ Manual only |
 | **Pipeline state file** (`pipeline-state.md`) | ✅ Auto-written | ⚠️ Manual upkeep | ✅ Auto-written | ✅ Auto-written | ⚠️ Manual upkeep |
 | **Constitution gates** (blocking escalation on violation) | ✅ Full | ✅ Full (manual routing) | ✅ Full (manual routing) | ✅ Full (manual routing) | ✅ Full (manual routing) |
 | **[NEEDS CLARIFICATION] marker resolution** | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
-| **FEAT number assignment** | ✅ Auto (reads specs/) | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual |
+| **FEAT number assignment** | ✅ Auto (reads `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`) | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual |
 | **Parallel task execution** (`[P]` markers in tasks.md) | ✅ Full (Task tool) | ❌ Sequential only | ⚠️ Runtime-verified; probe locally | ⚠️ Unverified here; verify locally or with vendor docs | ❌ Sequential only |
 | **Observer Agent** (runs alongside pipeline) | ✅ Full | ⚠️ Deferred pass only | ⚠️ Deferred pass only | ⚠️ Deferred pass only | ⚠️ Deferred pass only |
 | **Memory-store / project knowledge persistence** | ✅ Auto (file writes) | ⚠️ Manual copy-out | ✅ Auto | ✅ Auto | ⚠️ Manual copy-out |

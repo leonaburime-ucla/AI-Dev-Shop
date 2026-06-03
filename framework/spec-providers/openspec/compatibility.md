@@ -15,7 +15,7 @@ It is not upstream OpenSpec documentation.
 
 ## Change Folder Files
 
-All files below are created within a change folder under `openspec/changes/<change-name>/`. Template files live under `templates/`.
+All files below are created within a change folder under the AI Dev Shop OpenSpec root, default `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/openspec/changes/<change-name>/`. Template files live under `templates/`.
 
 | File | Required? | Notes |
 |---|---|---|
@@ -29,16 +29,15 @@ All files below are created within a change folder under `openspec/changes/<chan
 
 When `openspec` is the active provider:
 
-1. Read `openspec/config.yaml` for project context if it exists.
+1. Resolve the OpenSpec root: use the user's explicit durable project-owned location when provided, otherwise default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/openspec/`. Read `<resolved-openspec-root>/config.yaml` for project context if it exists.
 2. Determine the change name from the feature description (kebab-case, e.g., `add-user-auth`).
-3. Ask the user for the change location if `openspec/changes/` does not exist yet.
-4. Create the change folder: `openspec/changes/<change-name>/` and `openspec/changes/<change-name>/specs/`.
-5. Record `spec_provider: openspec`, `spec_entrypoint_path` (pointing to `proposal.md`), `spec_readiness_artifact: all apply-required artifacts present`, `provider_change_id: <change-name>`, and `spec_support_paths` in `pipeline-state.md`.
-6. Write `proposal.md` from the template. Fill: Why (motivation), What Changes (concrete description), Capabilities (new and modified domain names), Impact (affected code, APIs, dependencies).
-7. For each capability listed in the proposal, create a delta spec at `specs/<domain>/spec.md`. Use ADDED, MODIFIED, or REMOVED sections. Each requirement must use RFC 2119 keywords (SHALL, MUST, SHOULD, MAY) and have at least one Scenario with WHEN/THEN format.
-8. Write `design.md` from the template if the feature involves technical decisions. Fill: Context, Goals/Non-Goals, Decisions, Risks/Trade-offs.
-9. Write `tasks.md` from the template. Group tasks under numbered headings. Use checkbox format (`- [ ]`) for each task. Order by dependency.
-10. Run the provider-local validator. Repair any failures before declaring readiness.
+3. Create the change folder: `<resolved-openspec-root>/changes/<change-name>/` and `<resolved-openspec-root>/changes/<change-name>/specs/`.
+4. Record `spec_provider: openspec`, `provider_native_root: openspec/`, `provider_output_root` (the resolved OpenSpec root), `spec_entrypoint_path` (pointing to `proposal.md`), `spec_readiness_artifact: all apply-required artifacts present`, `provider_change_id: <change-name>`, and `spec_support_paths` in `pipeline-state.md`.
+5. Write `proposal.md` from the template. Fill: Why (motivation), What Changes (concrete description), Capabilities (new and modified domain names), Impact (affected code, APIs, dependencies).
+6. For each capability listed in the proposal, create a delta spec at `specs/<domain>/spec.md`. Use ADDED, MODIFIED, or REMOVED sections. Each requirement must use RFC 2119 keywords (SHALL, MUST, SHOULD, MAY) and have at least one Scenario with WHEN/THEN format.
+7. Write `design.md` from the template if the feature involves technical decisions. Fill: Context, Goals/Non-Goals, Decisions, Risks/Trade-offs.
+8. Write `tasks.md` from the template. Group tasks under numbered headings. Use checkbox format (`- [ ]`) for each task. Order by dependency.
+9. Run the provider-local validator. Repair any failures before declaring readiness.
     If `python3` is unavailable, try `python` or `py`; if the validator runtime
     is still unavailable, stop unless a human approves a single-line
     `validator_manual_waiver` in `pipeline-state.md` with reviewer, timestamp,
@@ -59,7 +58,7 @@ Before ADR work begins:
 
 - read `proposal.md` for change intent and scope
 - read every delta spec under `specs/` for requirements and scenarios
-- read relevant baseline specs from `openspec/specs/` for modified capabilities
+- read relevant baseline specs from `<resolved-openspec-root>/specs/` for modified capabilities
 - read `design.md` when present for existing technical decisions
 - do not treat `proposal.md` as sufficient by itself — the delta specs contain the actual requirements
 

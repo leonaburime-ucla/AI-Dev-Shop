@@ -22,7 +22,7 @@ BMAD has two tracks. The Spec Agent must ask which track to use before writing a
 
 ## Planning Artifacts — Standard BMM Track
 
-All files below are created under the configured output folder (default `_bmad-output/`).
+All files below are created under the configured output folder. AI Dev Shop defaults this to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/`; upstream BMAD's native default is `_bmad-output/`.
 
 | File | Required? | Notes |
 |---|---|---|
@@ -46,8 +46,8 @@ When `bmad` is the active provider and the standard track is selected:
 
 1. Ask the user which track to use: standard BMM or quick dev.
 2. Determine the project name and feature scope from the description.
-3. Ask the user for the output location if `_bmad-output/` does not exist yet.
-4. Record `spec_provider: bmad`, `provider_mode: standard_bmm`, `spec_entrypoint_path` (pointing to `PRD.md`), `spec_readiness_artifact: PRD + architecture + epics with per-story GWT + validator pass`, and `spec_support_paths` in `pipeline-state.md`.
+3. Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/` as the default output location unless the user explicitly selected another durable project-owned location.
+4. Record `spec_provider: bmad`, `provider_mode: standard_bmm`, `provider_native_root: _bmad-output/`, `provider_output_root` (default `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/`), `spec_entrypoint_path` (pointing to `PRD.md`), `spec_readiness_artifact: PRD + architecture + epics with per-story GWT + validator pass`, and `spec_support_paths` in `pipeline-state.md`.
 5. Write `PRD.md` from the template. Fill: Product Overview, Problem Statement, Requirements (Functional and Non-Functional), User Stories, Success Metrics, Scope (in/out), Constraints, Dependencies.
 6. Write `architecture.md` from the template if technical design decisions are needed.
 7. Write epics with stories from the template. Use BDD format: "As a [role], I want [action], so that [benefit]." Acceptance criteria must follow Given/When/Then format.
@@ -64,8 +64,8 @@ When `bmad` is the active provider and the quick dev track is selected:
 
 1. Ask the user which track to use: standard BMM or quick dev.
 2. Determine a short feature name (kebab-case).
-3. Ask the user for the output location.
-4. Record `spec_provider: bmad`, `provider_mode: quick_dev`, `spec_entrypoint_path` (pointing to `spec-<feature-name>.md`), `spec_readiness_artifact: spec with Intent + Boundaries + Tasks + Verification + GWT + validator pass`, and `spec_support_paths` in `pipeline-state.md`.
+3. Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/` as the default output location unless the user explicitly selected another durable project-owned location.
+4. Record `spec_provider: bmad`, `provider_mode: quick_dev`, `provider_native_root: _bmad-output/`, `provider_output_root` (default `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/`), `spec_entrypoint_path` (pointing to `spec-<feature-name>.md`), `spec_readiness_artifact: spec with Intent + Boundaries + Tasks + Verification + GWT + validator pass`, and `spec_support_paths` in `pipeline-state.md`.
 5. Write `spec-<feature-name>.md` from the quick-dev template. Fill: Intent (Problem/Approach), Boundaries (Always/Ask First/Never), I/O & Edge-Case Matrix, Code Map, Tasks & Acceptance (with Given/When/Then), Verification commands.
 6. Run the provider-local validator. Repair any failures before declaring readiness.
    If `python3` is unavailable, try `python` or `py`; if the validator runtime

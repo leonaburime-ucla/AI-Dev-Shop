@@ -2,7 +2,7 @@
 
 Curated current-state documentation generated from implemented code and reverse-spec evidence lives here.
 
-Use this folder as the rebuild and migration starting point for the project. Forward specs stay in the active provider's native location, such as `<repo>/specs/<feature-id>/`. Raw extraction evidence stays under `reports/reverse-spec/`.
+Use this folder as the rebuild and migration starting point for the project. Forward specs stay under `../specs/` by default. Raw extraction evidence stays under `reports/reverse-spec/`.
 
 ## Layout
 

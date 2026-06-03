@@ -12,18 +12,18 @@ description: Output root, spec folder structure, and reports folder structure fo
 `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
 `<ADS_PROJECT_KNOWLEDGE_ROOT>` means the sibling project-owned workspace folder where AI Dev Shop writes durable project state (default: `ADS-project-knowledge/` next to the toolkit folder inside the host repo).
 Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` before assuming planning filenames or folder structure.
-Provider-native planning artifacts are written to the **user-specified location** or native provider folders — the Spec Agent asks before writing when the location is not already known. Pipeline artifacts retained by AI Dev Shop core (ADR, research, tasks, test-certification, red-team findings, pipeline state) are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Reports (analysis, test runs, code review, security, observer, consensus, external audit) live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` subfolders.
+Provider-native forward specs and planning artifacts are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default so project planning state stays durable with the host project and outside the updateable toolkit. Use another durable project-owned location only when the user explicitly asks for that override. Pipeline artifacts retained by AI Dev Shop core (ADR, research, tasks, test-certification, red-team findings, pipeline state) are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Reports (analysis, test runs, code review, security, observer, consensus, external audit) live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` subfolders.
 For long-running or resumable work, use a `progress-ledger.md` in the appropriate reports folder per `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/session-continuity.md`.
 For large raw outputs, logs, or traces, use offload files per `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/context-offloading.md`.
 For runtime-changing work that needs app-level validation before handoff, use a self-validation report per `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/self-validation.md`.
 For work that requires an independent evaluator loop, use retained evaluator artifacts per `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/evaluation-loops.md`.
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` for ignored local-only scratch artifacts such as exploratory consensus runs, raw peer stdout/stderr captures, temporary prompts, and host-specific smoke-test baselines that are not meant to ship with the repo.
 Promote artifacts from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` only when the user explicitly wants them retained as reusable project evidence.
-Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/` for curated current-state implementation knowledge produced from reverse-spec or post-implementation capture. Raw extraction evidence stays under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/`; provider-native forward specs stay in the active provider's native location.
+Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/` for curated current-state implementation knowledge produced from reverse-spec or post-implementation capture. Raw extraction evidence stays under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/`; provider-native forward specs stay under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`.
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` for durable project conventions, learnings, notes, and structured memory entries.
 Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` as the live constitution for the host project. Keep the toolkit's bootstrap default in `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/constitution-template.md`.
 
-**Project-owned writable root:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
+**Project-owned writable root:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`, `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
 **Read-only during normal feature work under `<AI_DEV_SHOP_ROOT>`:** `agents/`, `skills/`, `framework/`, `harness-engineering/`, and the repo-local `project-knowledge-template/` template. If the user explicitly asks to maintain or upgrade the toolkit itself, treat that as framework maintainer work and allow edits in these directories.
 
 ---
@@ -71,21 +71,22 @@ Bootstrap guide for new and existing projects: `<AI_DEV_SHOP_ROOT>/framework/tem
 
 ## Planning Surface Convention
 
-Planning artifacts live at the provider-defined location. The exact file set comes from the active provider profile.
+Planning artifacts live under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default. The exact file set and provider-local substructure come from the active provider profile. Upstream providers may document roots such as `<repo>/specs/`, `openspec/`, or `_bmad-output/`; AI Dev Shop maps project-owned planning output into `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` unless the user explicitly chooses another durable location.
 
 Required provider-recorded paths:
 - `spec_provider`
+- `provider_native_root`
+- `provider_output_root`
 - `spec_entrypoint_path`
 - `spec_readiness_artifact`
 
 Optional but recommended:
 - `spec_support_paths`
-- `provider_native_root`
 
 ### Default Speckit Example
 
 ```
-<user-specified>/<NNN>-<feature-name>/
+<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/
   feature.spec.md          (canonical spec — use framework/spec-providers/speckit/templates/spec-system/feature.spec.md)
   api.spec.md              (typed API contracts — if applicable)
   state.spec.md            (state shapes and transitions — if applicable)
@@ -130,7 +131,7 @@ Curated post-implementation and brownfield current-state documentation lives und
 Rules:
 - `components/` owns current implementation truth.
 - `changelog/` owns immutable historical impact records for specs or reverse-spec slices.
-- provider-native feature folders may contain a thin `as-built-impact.md` bridge that links to `specs_as_built/`; it must not duplicate component contracts.
+- provider-native feature folders under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` may contain a thin `as-built-impact.md` bridge that links to `specs_as_built/`; it must not duplicate component contracts.
 - raw reverse-spec evidence stays under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/`.
 - generated and hybrid artifacts should record source-scope freshness metadata per `<AI_DEV_SHOP_ROOT>/framework/contracts/specs-as-built-freshness.md`.
 
@@ -232,5 +233,5 @@ All agent reports live under a single centralized folder in the sibling project 
 - All agents write retained reports here — do not scatter canonical report files elsewhere
 - Test run reports are timestamped and never overwritten — each run is a separate audit artifact
 - The Programmer reads test state by running tests fresh, not by reading reports — reports are audit trail only
-- Provider-native planning artifacts live outside `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` unless the provider profile explicitly says otherwise
+- Provider-native forward specs and planning artifacts live under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`, outside `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`, unless the user explicitly chooses another durable project-owned location
 - Pipeline artifacts (adr.md, tasks.md, test-certification.md, red-team-findings.md) live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`, not scattered elsewhere

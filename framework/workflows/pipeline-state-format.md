@@ -23,6 +23,8 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - coordinator_mode: review | pipeline | direct
 - debug_mode: on | off
 - spec_provider: <speckit | openspec | bmad | other>
+- provider_native_root: <upstream-native conceptual root, e.g. specs/ | openspec/ | _bmad-output/>
+- provider_output_root: <actual durable output root for this run, default under ADS-project-knowledge/specs/>
 - spec_version: <version>
 - spec_hash: <sha256>
 - spec_entrypoint_path: <provider-defined planning entrypoint path>
@@ -170,6 +172,17 @@ Records which upstream planning provider owns the spec surface for this run.
 
 Legacy runs may omit this field. In that case, treat the run as Speckit compatibility mode unless a human says otherwise.
 
+### `provider_native_root` and `provider_output_root` (required for new runs)
+
+```markdown
+provider_native_root: <upstream-native conceptual root>
+provider_output_root: <actual durable output root>
+```
+
+- `provider_native_root` records the upstream provider's conceptual surface, such as `specs/`, `openspec/`, or `_bmad-output/`
+- `provider_output_root` records the actual path AI Dev Shop wrote for this run; the default root is under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`
+- downstream agents must use recorded actual paths, not infer write targets from upstream-native examples
+
 ### `spec_entrypoint_path` and `spec_readiness_artifact` (required for new runs)
 
 ```markdown
@@ -180,6 +193,7 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 - `spec_entrypoint_path` is the file used for drift detection and resume hashing
 - `spec_readiness_artifact` is the file or artifact used to prove the planning surface is ready for architecture work
 - for the default Speckit provider, these typically map to `feature.spec.md` and `spec-dod.md`
+- new AI Dev Shop runs should normally place these paths under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`
 
 ### Planning preflight fields (required before Software Architect dispatch)
 
@@ -316,10 +330,12 @@ scope, reason, and remaining risk in Notes.
 - progress_ledger_path: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/progress-ledger.md
 - current_stage: programmer
 - spec_provider: speckit
+- provider_native_root: specs/
+- provider_output_root: ADS-project-knowledge/specs/003-csv-invoice-export/
 - status: IN_PROGRESS
-- spec_entrypoint_path: specs/003-csv-invoice-export/feature.spec.md
-- spec_readiness_artifact: specs/003-csv-invoice-export/spec-dod.md
-- spec_support_paths: specs/003-csv-invoice-export/api.spec.md, specs/003-csv-invoice-export/state.spec.md, specs/003-csv-invoice-export/orchestrator.spec.md, specs/003-csv-invoice-export/ui.spec.md, specs/003-csv-invoice-export/errors.spec.md, specs/003-csv-invoice-export/behavior.spec.md, specs/003-csv-invoice-export/traceability.spec.md, specs/003-csv-invoice-export/spec-manifest.md
+- spec_entrypoint_path: ADS-project-knowledge/specs/003-csv-invoice-export/feature.spec.md
+- spec_readiness_artifact: ADS-project-knowledge/specs/003-csv-invoice-export/spec-dod.md
+- spec_support_paths: ADS-project-knowledge/specs/003-csv-invoice-export/api.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/state.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/orchestrator.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/ui.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/errors.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/behavior.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/traceability.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/spec-manifest.md
 - spec_mode: greenfield
 - provider_mode: compatibility
 - validator_result: PASS

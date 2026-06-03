@@ -9,7 +9,7 @@ description: Artifact contract for curated post-implementation and brownfield as
 
 `specs_as_built/` is the curated current-state documentation surface generated from implemented code and reverse-spec evidence. It exists for maintainers, migration work, and LLM agents that need to understand or rebuild an existing system without rediscovering behavior directly from source every time.
 
-It is not the provider-native forward spec surface. Forward specs remain wherever the active provider expects them, such as `<repo>/specs/<feature-id>/` for Speckit.
+It is not the provider-native forward spec surface. AI Dev Shop stores provider-native forward specs and planning artifacts under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default. Upstream providers may describe roots such as `<repo>/specs/<feature-id>/`, but AI Dev Shop maps durable project-owned planning output into `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` unless the user explicitly chooses another durable location.
 
 ## Canonical Location
 
@@ -254,7 +254,7 @@ Changelog entries are append-only history. They must not claim to be current sys
 Provider-native feature folders may include a thin bridge file:
 
 ```text
-<repo>/specs/<feature-id>/as-built-impact.md
+<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<feature-id>/as-built-impact.md
 ```
 
 This file links to:

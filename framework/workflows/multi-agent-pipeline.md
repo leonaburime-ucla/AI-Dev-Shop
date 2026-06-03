@@ -6,7 +6,7 @@
 
 All project-owned pipeline artifacts are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>` — the sibling `ADS-project-knowledge/` folder next to the toolkit by default. `<AI_DEV_SHOP_ROOT>` remains the toolkit source tree.
 
-- Provider-native planning artifacts → user-specified location or provider-native folders (Spec Agent asks before writing when needed; active provider and entrypoint paths recorded in pipeline state)
+- Provider-native forward specs and planning artifacts → `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default (only use another durable project-owned location when the user explicitly asks; active provider and entrypoint paths are recorded in pipeline state)
 - Pipeline artifacts (ADR, research, implementation outline, tasks,
   red-team findings, test certification, verification packet, pipeline state)
   → `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`

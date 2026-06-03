@@ -41,6 +41,8 @@ Runtime assumptions:
 - workflows are selected by invoking generated skills or by loading agents and using agent menu triggers
 - the upstream docs recommend fresh chats for each workflow to preserve context quality
 
+AI Dev Shop default storage maps BMAD planning output under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/`. The upstream `_bmad-output/` paths below describe BMAD's native conceptual surface; pipeline state must record the actual AI Dev Shop path used for the run.
+
 ## Native Project Roots
 
 | Path | Purpose |
@@ -156,12 +158,12 @@ Quick flow:
 - Treat `project-context.md` as the provider-native equivalent of a project constitution for implementation behavior.
 - When BMAD already produced `architecture.md`, use it as provider-native architecture input instead of pretending AI Dev Shop is starting from a raw PRD alone.
 - Treat epic/story artifacts and `sprint-status.yaml` as provider-native delivery planning surfaces; BMAD is not naturally modeled as one `tasks.md` file.
-- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` instead of writing toolkit-only state into `_bmad-output/`.
+- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` instead of writing toolkit-only state into the BMAD planning output folder.
 
 ## Activation Checklist
 
 - `_bmad/` exists
-- the configured output folder is known and recorded; assume `_bmad-output/` only when the project actually uses that default
+- the configured output folder is known and recorded; default AI Dev Shop runs use `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/bmad/<feature-name>/`, and `_bmad-output/` applies only when the project explicitly uses upstream's native default
 - generated BMad skills exist for the selected tool, or installation notes are recorded
 - the active BMAD track is recorded as `standard_bmm` or `quick_dev`
 - if using the standard track, `PRD.md` exists before architecture work and the readiness decision is recorded before the dev loop

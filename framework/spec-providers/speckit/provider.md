@@ -31,6 +31,8 @@ Do not present these AI Dev Shop-local artifacts as though they were native upst
 
 Those are local compatibility constructs. Upstream Spec Kit's native feature artifacts live under `specs/<feature-id>/` and `.specify/`.
 
+AI Dev Shop's default storage for durable forward specs is `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<feature-id>/`. The upstream `specs/<feature-id>/` paths below describe Spec Kit's native conceptual surface; pipeline state must record the actual AI Dev Shop path used for the run.
+
 ## Upstream Install And Runtime Model
 
 Upstream Spec Kit is a Python CLI and agent-integration toolkit centered on `specify`.
@@ -132,12 +134,12 @@ Important upstream behavior:
 
 ## AI Dev Shop Translation Rules
 
-- Treat `specs/<feature-id>/spec.md` as the upstream feature-requirements source of truth.
+- Treat the recorded `spec_entrypoint_path` as the feature-requirements source of truth. In AI Dev Shop's default storage mapping, that path is under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<feature-id>/`.
 - Treat `.specify/memory/constitution.md` as provider-native project policy input.
 - When `plan.md` exists, treat it as provider-native technical planning rather than pretending AI Dev Shop invented the architecture context from scratch.
 - When `tasks.md` exists, treat it as provider-native delivery planning input and preserve upstream `[P]` markers.
 - Do not relabel AI Dev Shop-local files as though they were native upstream Spec Kit artifacts.
-- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` instead of mutating the upstream Spec Kit layout to store toolkit-only artifacts.
+- Keep AI Dev Shop retained reports under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<feature>/` instead of mutating the provider planning folder to store toolkit-only artifacts.
 
 ## AI Dev Shop Compatibility Assets
 

@@ -97,6 +97,8 @@ Every provider must describe the same core roles, even if the native file names 
 
 Some providers have dual truth surfaces. Example: OpenSpec keeps `openspec/specs/` as current system truth while an active change lives under `openspec/changes/<change>/`. Provider files must explain that split instead of collapsing it into one guessed file.
 
+AI Dev Shop stores project-owned provider output under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default. Provider files may describe upstream-native roots such as `<repo>/specs/`, `openspec/`, or `_bmad-output/`, but compatibility contracts must state the AI Dev Shop output mapping and pipeline-state paths must record the actual files written.
+
 ---
 
 ## AI Dev Shop Core Ownership
@@ -120,7 +122,8 @@ When a run uses a provider, `pipeline-state.md` should record at least:
 
 - `spec_provider`
 - `provider_version_ref`
-- `provider_native_root`
+- `provider_native_root` (the upstream-native conceptual root, such as `specs/`, `openspec/`, or `_bmad-output/`)
+- `provider_output_root` (the actual durable root used for this run; default under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`)
 - `spec_entrypoint_path`
 - `spec_readiness_artifact`
 - `spec_hash`
@@ -137,7 +140,6 @@ Optional but strongly recommended:
 - `spec_support_paths`
 - `provider_mode`
 - `provider_change_id`
-- `provider_output_root`
 - `provider_install_notes`
 - `system_blueprint_path`
 - `system_blueprint_status`
