@@ -61,9 +61,9 @@ List files that establish a module boundary or house public/exported contracts. 
 
 Include public/exported functions, interfaces, APIs, events, webhooks, SDK/CLI surfaces, and provider-facing contracts. Do not list private helpers unless tagged `[internal-invariant]`.
 
-| Contract ID / Name | File | Owner Module | Kind | Why Needed | Job | Inputs | Outputs | Validation | Errors | Side Effects | Spec/ADR Trace | Test Expectation |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| C-001 <name> | `src/.../<file>` | <module> | API/exported function/event/etc. | <why this contract must exist> | <one job> | <shape/type> | <shape/type> | <preconditions/rules> | <typed errors/failure modes> | <I/O, writes, events, external calls, or none> | <AC/ADR/ref> | <contract/integration/unit expectation> |
+| Contract ID / Name | File | Owner Module | Kind | Why Needed | Job | Inputs | Outputs | Validation | Errors | Effect Boundary | Complexity / Resource View | Aggregate-Risk Note | Spec/ADR Trace | Test Seam / Expectation |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| C-001 <name> | `src/.../<file>` | <module> | API/exported function/event/etc. | <why this contract must exist> | <one job> | <shape/type; required input object and optional options object when applicable> | <shape/type> | <preconditions/rules> | <typed errors/failure modes> | <pure decision / explicit side effects such as I/O, writes, events, external calls, or none> | <time/space complexity when non-trivial; query/I/O shape; caps/timeouts/resource bounds> | <N/A or invariant/adversarial case for validation, batch, reducer, retry, ordering, or cross-record behavior> | <AC/ADR/ref> | <contract/integration/unit expectation and direct assertion seam> |
 
 ## Wiring Map
 
@@ -76,6 +76,14 @@ Include public/exported functions, interfaces, APIs, events, webhooks, SDK/CLI s
 | Boundary | Owner | Reads | Writes | Side Effects | Consistency / Transaction Rule | Migration / Dual-Write Path |
 |---|---|---|---|---|---|---|
 | <table/store/external system> | <module/domain> | <who may read> | <who may write> | <events/webhooks/logs/etc.> | <atomicity/idempotency/order rule> | <N/A or path> |
+
+## Observability And Operational Expectations
+
+Complete for production backend/service/worker/API paths, external I/O, async jobs, or alerting surfaces. If not applicable, state N/A with reason.
+
+| Surface / Flow | Required Signals | Correlation / Trace Context | Metrics | Logs | Alert / Runbook Need | Privacy / Secret Constraints | Trace |
+|---|---|---|---|---|---|---|---|
+| <endpoint/job/external call/queue flow> | <logs/metrics/traces/health check> | <correlation ID and propagation rule> | <latency/error/saturation/counter/histogram> | <structured fields and error taxonomy> | <N/A or symptom alert + runbook owner> | <PII/secret redaction constraints> | <AC/ADR/ref> |
 
 ## Critical Invariants
 

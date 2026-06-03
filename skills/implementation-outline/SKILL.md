@@ -62,10 +62,11 @@ Include:
 
 - Module/domain responsibilities and ownership.
 - Planned files to create or materially change, grouped by module. Each file entry names the public/exported functions, interfaces, or classes it will house.
-- Public/exported function, interface, or class contracts with one job, why the contract is needed, inputs, outputs, validation rules, error contracts, side effects, and trace to spec/ADR.
+- Public/exported function, interface, or class contracts with one job, why the contract is needed, inputs, outputs, validation rules, error contracts, side effects, test seam, complexity/resource view, aggregate-risk note when applicable, and trace to spec/ADR.
 - API, event, webhook, SDK, CLI, or provider-facing contract shapes.
 - Cross-module wiring, transports, and sequencing constraints.
 - Data ownership, persistence boundaries, migration/dual-write paths, and side-effect boundaries.
+- Observability expectations for production backend/service/worker/API paths, external I/O, async jobs, and alerting surfaces, including correlation, logs, metrics, traces, alert/runbook needs, and privacy constraints.
 - Load-bearing invariants that downstream tests and implementation must preserve.
 
 Exclude:
