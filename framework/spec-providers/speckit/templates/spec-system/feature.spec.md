@@ -44,7 +44,32 @@ What problem are we solving and for whom? What is the current state of pain? Why
 
 **Desired state:** Describe the outcome the user/system should reach after this feature ships.
 
+**Why now:** What makes this the right time? (e.g., blocking a launch, compliance deadline, user churn signal, dependency just became available, technical debt reached a tipping point.) If there is no time pressure, say so — "quality-of-life improvement, no deadline."
+
 **Success signal:** How will we know the problem is solved? (Measurable — e.g., "Finance admin can export 500 invoices in under 30 seconds, confirmed by integration test.")
+
+---
+
+## User Journey
+
+Step-by-step flow from the user's perspective. This is NOT implementation — it's how the user experiences the feature from trigger to outcome.
+
+1. **Trigger:** What causes the user to start this flow? (e.g., "User clicks 'Export' on the invoices page")
+2. **Steps:** Walk through each interaction point. Number them.
+3. **Outcome:** What does the user see/have when done?
+4. **Alternate paths:** What happens on error, cancellation, or edge conditions from the user's view?
+
+> Example:
+> **Trigger:** Finance admin needs to reconcile unpaid invoices for the billing period.
+> **Steps:**
+> 1. Navigates to Invoices → Batch Actions
+> 2. Selects billing period and clicks "Export All Unpaid"
+> 3. System shows progress indicator with count
+>
+> **Outcome:** Browser downloads ZIP; toast confirms "328 invoices exported."
+> **Alternate paths:** On error: toast shows "Export failed — 3 invoices could not be processed" with retry link. On cancellation: export stops, partial file is discarded, user sees "Export cancelled."
+
+Note: This section owns the high-level user-visible flow. Deterministic ordering rules, precedence logic, and edge behavior detail belong in `behavior.spec.md`.
 
 ---
 
@@ -181,6 +206,8 @@ The Spec Agent completes this. The Coordinator verifies before routing.
 - [ ] Dependencies table is complete — no blank failure mode or fallback cells
 - [ ] Constitution Compliance table complete — all 8 articles marked COMPLIES / EXCEPTION / N/A
 - [ ] Scope: in-scope list present and non-empty
+- [ ] Problem Statement: "Why now" field is filled (even if answer is "no deadline")
+- [ ] User Journey: trigger, steps, outcome, and alternate paths are present
 - [ ] Scope: out-of-scope list present and non-empty
 - [ ] Full spec-system package present: all `PRESENT` files listed in spec-manifest.md exist
 - [ ] behavior.spec.md complete (if feature has non-trivial ordering or precedence rules)

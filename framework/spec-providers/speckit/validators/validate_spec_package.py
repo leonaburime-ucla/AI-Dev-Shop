@@ -41,7 +41,7 @@ ALL_LOGICAL_FILES = ALWAYS_REQUIRED[:1] + OPTIONAL + ALWAYS_REQUIRED[1:]
 
 EXPECTED_DOD_ITEMS = (
     [f"A-{idx:02d}" for idx in range(1, 11)]
-    + [f"B-{idx:02d}" for idx in range(1, 32)]
+    + [f"B-{idx:02d}" for idx in range(1, 33)]
     + [f"C-{idx:02d}" for idx in range(1, 20)]
     + [f"D-{idx:02d}" for idx in range(1, 11)]
     + [f"E-{idx:02d}" for idx in range(1, 9)]

@@ -54,6 +54,8 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/pattern-priming/SKILL.md` | Programmer |
 | `skills/inline-code-documentation/SKILL.md` | Programmer |
 | `skills/adr-governance/SKILL.md` | Software Architect (promotion), Programmer (conditional governance enforcement), Code Review Agent (audit reference), Refactor Agent (conditional), TDD Agent (conditional) |
+| `skills/ui-loop/SKILL.md` | Programmer (conditional for UI-heavy tasks) |
+| `skills/focused-test/SKILL.md` | Programmer (conditional for test-driven iteration) |
 | `skills/constitution-compliance/SKILL.md` | Software Architect |
 | `skills/superpowers-brainstorming/SKILL.md` | VibeCoder Agent |
 | `skills/superpowers-using-git-worktrees/SKILL.md` | Programmer, VibeCoder Agent |

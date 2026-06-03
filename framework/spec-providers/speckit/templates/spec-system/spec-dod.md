@@ -67,29 +67,30 @@
 | B-06 | `last_edited` is a valid ISO-8601 UTC timestamp | | |
 | B-07 | `owner` is set to a named human or team (not blank, not "TBD") | | |
 | B-08 | Overview section is present and describes the feature in 1–3 sentences | | |
-| B-09 | Problem Statement is present with Current state, Desired state, and Success signal | | |
-| B-10 | Scope: In-scope list is present and non-empty | | |
-| B-11 | Scope: Out-of-scope list is present and non-empty | | |
-| B-12 | Zero `[NEEDS CLARIFICATION]` markers remain anywhere in `feature.spec.md` | | |
-| B-13 | All Open Questions have an owner AND a resolution target date | | |
-| B-14 | Requirements section has at least one REQ-* item | | |
-| B-15 | All REQ-* items are observable and testable — no vague qualifiers ("fast", "robust", "intuitive", "seamless", "easy") | | |
-| B-16 | All REQ-* items are independently verifiable (can be tested without testing another REQ) | | |
-| B-17 | Acceptance Criteria section has at least one AC-* item | | |
-| B-18 | Every REQ-* has at least one corresponding AC-* | | |
-| B-19 | All AC-* items follow Given/When/Then format | | |
-| B-20 | All AC-* items have a [P1], [P2], or [P3] priority tag | | |
-| B-21 | All P1 AC items are independently testable (can be verified without other stories complete) | | |
-| B-22 | No AC item requires knowledge of the implementation to evaluate (no "the database contains…", "the Redux store has…") | | |
-| B-23 | Invariants section has at least one INV-* item | | |
-| B-24 | All INV-* items are written as absolute statements ("must always" / "must never") — not "should" | | |
-| B-25 | Edge Cases section has at least one EC-* item | | |
-| B-26 | All EC-* items are concrete scenarios ("What happens when X?") — not categories ("Handle edge cases") | | |
-| B-27 | All EC-* items have an explicit Expected Behavior | | |
-| B-28 | Dependencies table is complete — no blank Failure Mode or Fallback cells | | |
-| B-29 | Constitution Compliance table is complete — all 8 articles marked COMPLIES / EXCEPTION / N/A | | |
-| B-30 | Any EXCEPTION in the Constitution Compliance table has a note in this DoD or in the ADR | | |
-| B-31 | Implementation Readiness Gate checklist in `feature.spec.md` is complete and shows PASS | | |
+| B-09 | Problem Statement is present with Current state, Desired state, Why now, and Success signal | | |
+| B-10 | User Journey section is present with Trigger, Steps, Outcome, and Alternate paths | | |
+| B-11 | Scope: In-scope list is present and non-empty | | |
+| B-12 | Scope: Out-of-scope list is present and non-empty | | |
+| B-13 | Zero `[NEEDS CLARIFICATION]` markers remain anywhere in `feature.spec.md` | | |
+| B-14 | All Open Questions have an owner AND a resolution target date | | |
+| B-15 | Requirements section has at least one REQ-* item | | |
+| B-16 | All REQ-* items are observable and testable — no vague qualifiers ("fast", "robust", "intuitive", "seamless", "easy") | | |
+| B-17 | All REQ-* items are independently verifiable (can be tested without testing another REQ) | | |
+| B-18 | Acceptance Criteria section has at least one AC-* item | | |
+| B-19 | Every REQ-* has at least one corresponding AC-* | | |
+| B-20 | All AC-* items follow Given/When/Then format | | |
+| B-21 | All AC-* items have a [P1], [P2], or [P3] priority tag | | |
+| B-22 | All P1 AC items are independently testable (can be verified without other stories complete) | | |
+| B-23 | No AC item requires knowledge of the implementation to evaluate (no "the database contains…", "the Redux store has…") | | |
+| B-24 | Invariants section has at least one INV-* item | | |
+| B-25 | All INV-* items are written as absolute statements ("must always" / "must never") — not "should" | | |
+| B-26 | Edge Cases section has at least one EC-* item | | |
+| B-27 | All EC-* items are concrete scenarios ("What happens when X?") — not categories ("Handle edge cases") | | |
+| B-28 | All EC-* items have an explicit Expected Behavior | | |
+| B-29 | Dependencies table is complete — no blank Failure Mode or Fallback cells | | |
+| B-30 | Constitution Compliance table is complete — all 8 articles marked COMPLIES / EXCEPTION / N/A | | |
+| B-31 | Any EXCEPTION in the Constitution Compliance table has a note in this DoD or in the ADR | | |
+| B-32 | Implementation Readiness Gate checklist in `feature.spec.md` is complete and shows PASS | | |
 
 ---
 
