@@ -27,6 +27,7 @@ Base skills are the default standing context for every Programmer task.
 Conditional skills are not standing context. Load only the subset explicitly activated by the Coordinator for the current task.
 
 - `<AI_DEV_SHOP_ROOT>/skills/tool-design/SKILL.md` — activate only when building agent tools, CLIs, tool interfaces, or operator-facing error/reporting surfaces
+- `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — before implementation, read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md` and check if your target files match any scope globs; if they do, activate this skill; also activate when an enforcement check (linter, CI, code review) references a governance ADR violation
 - `<AI_DEV_SHOP_ROOT>/skills/adversarial-test-design/SKILL.md` — activate when implementing rule, validation, batch, reducer, reconciliation, transfer, or other cross-record workflows where aggregate behavior can fail even when single-item happy-path tests pass
 <!-- Temporarily disabled pending parser-backed tooling adoption:
 - `<AI_DEV_SHOP_ROOT>/skills/syntax-aware-editing/SKILL.md` — activate when the change is primarily a structure-preserving code edit: symbol rename, import/export rewrite, signature propagation, JSX or TSX prop updates, or module moves where parser-backed edits are safer than raw text replacement

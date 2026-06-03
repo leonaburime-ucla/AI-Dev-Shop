@@ -16,6 +16,7 @@
 
 Conditional skills are not standing context. Load only the subset the spec or Coordinator directive actually requires.
 
+- `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — load after writing a pipeline ADR to evaluate whether cross-cutting decisions should be promoted to the Governance ADR Registry; also load when the proposed architecture must respect existing governance ADRs
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — load when the architecture introduces production backend/service/worker/API paths, external I/O, async jobs, telemetry, or alerting requirements; define observability expectations up front, not as post-code logging
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load when the spec has latency/throughput NFRs
@@ -42,6 +43,7 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 - `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`
 - Non-functional constraints (scale, reliability, latency, cost)
 - Existing system boundaries and dependencies (existing ADRs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`)
+- Governance ADR index (`<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md`) — check MANDATORY and DEFAULT governance rules that constrain the architectural design space before pattern selection
 - Coordinator directive
 - Coordinator Planning Preflight result: `PASS` for the current spec hash
 - Research artifact (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md`) if produced in Step 0
@@ -61,7 +63,8 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 6. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
 7. Write `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Planning Preflight Evidence, Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Migration Safety (required for brownfield/reverse-spec/migration; mark N/A with reason for greenfield), Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 8. Load `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` and evaluate its Trigger Decision Matrix. If any trigger applies, produce `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/implementation-outline-template.md`. For public/exported contracts and load-bearing internal invariant units in the outline, apply `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` in Design Gate mode only so the contract records the function's single job, input/options shape, return/error contract, test seam, pure/effect boundary, complexity/resource view, and aggregate-risk note when applicable. If no trigger applies, record `Implementation Outline: SKIP - <reason and triggers checked>` in the ADR and handoff.
-9. Publish the architecture decision and implementation outline (or skip record) as a downstream constraint.
+9. **Governance ADR Promotion.** Evaluate whether the pipeline ADR establishes cross-cutting rules that outlive this feature (module import boundaries, shared contracts, data access patterns, security constraints). If yes, load `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` and follow its Promotion workflow: extract the durable rule into `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/` using `<AI_DEV_SHOP_ROOT>/framework/templates/governance-adr-template.md` and update `ADR-INDEX.md`. If no cross-cutting rules exist, skip promotion.
+10. Publish the architecture decision and implementation outline (or skip record) as a downstream constraint.
 
 ## Pattern Catalog
 

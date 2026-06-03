@@ -441,6 +441,52 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 
 ---
 
+## Governance Deep Dive **[OPEN]**
+
+### ADR Governance Bloat Audit
+**What it is:** Evaluate whether the governance ADR registry, comply-or-explain model, and $adr skill add genuine enforcement value or just ceremonial overhead.
+**Why it matters:** Added 2026-06-03 based on a 3-model debate recommending ADRs + focused skills. But governance layers can easily become "process for process's sake" — rules that no one reads, exceptions that never trigger re-evaluation, or skills that load context without changing outcomes.
+**What to evaluate:**
+- After 3-5 governance ADRs are written: do agents actually invoke the $adr skill during implementation? Does the JIT lookup change their behavior, or do they just comply anyway from the existing pipeline ADR?
+- Is the exception ledger tracking real deviations, or is it always empty (meaning rules are too broad or too obvious)?
+- Does the 3-in-90-day re-evaluation trigger ever fire? If not, is the threshold wrong or are the ADRs just correct?
+- Is there measurable context cost? Compare token usage on tasks with/without governance ADR loading.
+- Could the same enforcement be achieved by linter rules alone without the document layer?
+**Audit criteria:**
+- If no governance ADR has been referenced by an agent in 30 days of active pipeline use → the registry is dead weight
+- If no exceptions are recorded after 10+ features → rules are either too obvious or too broad
+- If the $adr skill loads but agents never deviate or escalate → the skill is ceremony
+**Integration tests to run after first real ADRs exist:**
+- Does `architecture-fitness.md` conflict with or duplicate governance ADRs? Clarify division of responsibility if they compete.
+- Does `escalation-policy.md` need a formal governance ADR trigger, or does the skill's inline "escalate to Coordinator" instruction suffice?
+- Do agents correctly read ADR-INDEX.md, match scope globs, and load only ACCEPTED ADRs?
+- Does the exception ledger actually get written to, and does the 3-in-90-day trigger fire when it should?
+- Does the Architect promotion step fire on cross-cutting decisions and skip on feature-scoped ones?
+**Done when:**
+- A retained audit report exists with evidence-based keep/prune/revise decisions for the governance layer
+- Any unused governance ADRs are either deprecated or the enforcement mechanism is strengthened
+
+### Focused Loop Skills ($ui-loop, $test) **[OPEN]**
+**What it is:** Specialized operating modes for the generic commit→push→feedback loop. $ui-loop iterates fast in browser and reconciles after. $test runs focused test suites based on coverage and file changes.
+**Source:** 2026-06-03 debate consensus (3/3 agreement).
+**What to add:** Design and implement both skills, wire into Programmer agent as conditional skills.
+
+### Enforcement Harness (git hooks + CI) **[OPEN]**
+**What it is:** Git hooks and CI checks running identical enforcement rules. "If you can't measure it, you can't enforce it."
+**Source:** 2026-06-03 debate consensus (3/3 agreement).
+**What to add:** Architecture linting (module import boundaries), governance ADR scope validation, format/type checks. Hooks and CI must run the same commands.
+
+### Governance Workflow Scenarios (BDD-lite) **[OPEN]**
+**What it is:** 5-10 executable tests covering pipeline governance invariants: approval gates hold after resume, routing doesn't dispatch past blocks, artifact handoffs are complete.
+**Source:** 2026-06-03 debate consensus (2/3 + 1 agrees on need). Plain Pytest with readable scenario names — no Gherkin.
+**What to add:** Integration tests that drive real pipeline workflows end-to-end. Not feature acceptance tests — governance behavior tests.
+
+### Spec Preamble Strengthening **[OPEN]**
+**What it is:** Add a structured "Problem / Why / User Journey" section to the spec template to absorb PRD value without a parallel document type.
+**Source:** 2026-06-03 debate consensus (3/3 reject standalone PRDs, agree on strengthening spec preamble).
+
+---
+
 ## Notes
 
 - None of these require Python or code — all are markdown documentation, agent instruction files, and schema definitions

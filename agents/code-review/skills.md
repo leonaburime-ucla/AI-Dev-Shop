@@ -18,6 +18,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — Expo/React Native review router; activate when diffs touch Expo Router, native UI, data fetching, API routes, native modules, Expo config, EAS workflows/deployment, SDK upgrades, or React Native performance-sensitive surfaces
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — backward compatibility and contract validation
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` — load when reviewing API surface changes that alter style choice, pagination/filtering policy, error model, lifecycle policy, webhook semantics, or SDK-facing ergonomics
+- `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — activate when reviewing diffs that touch files governed by governance ADRs; read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md` to check scope glob matches against changed files; verify compliance or flag deviations
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance checks for privacy/consent/claims/account-flow UX risks
 
 ## Role

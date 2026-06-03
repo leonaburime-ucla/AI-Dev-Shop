@@ -205,6 +205,7 @@ log "Active provider: $active_provider"
 
 ensure_dir "$workspace_root"
 ensure_dir "$workspace_root/governance"
+ensure_dir "$workspace_root/governance/adrs"
 ensure_dir "$workspace_root/governance/contracts"
 ensure_dir "$workspace_root/memory"
 ensure_dir "$workspace_root/specs"
@@ -223,6 +224,14 @@ copy_file_if_missing \
 copy_file_if_missing \
   "$ads_root/framework/templates/bootstrap/constitution-template.md" \
   "$workspace_root/governance/constitution.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/adrs/README.md" \
+  "$workspace_root/governance/adrs/README.md"
+
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/governance/adrs/ADR-INDEX.md" \
+  "$workspace_root/governance/adrs/ADR-INDEX.md"
 
 copy_file_if_missing \
   "$ads_root/project-knowledge-template/governance/contracts/specs-as-built-freshness.md" \

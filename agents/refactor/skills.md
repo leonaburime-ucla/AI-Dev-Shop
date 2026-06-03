@@ -10,6 +10,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity/scaling debt, query-shape awareness, and implementation-style guardrails
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer with micro-level refactor rules for modular/composable/testable units; use as the primary standard when evaluating refactor proposals
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — use failed `@overallScore` findings as targeted extraction, split, deletion, or boundary-stabilization proposal input
+- `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — activate when refactoring files governed by governance ADRs; read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md` to check scope glob matches against target files; ensure refactoring respects cross-cutting rules or documents exceptions
 <!-- Temporarily disabled pending parser-backed tooling adoption:
 - `<AI_DEV_SHOP_ROOT>/skills/syntax-aware-editing/SKILL.md` — use when a proposal depends on coordinated renames, import/export repairs, signature propagation, or module moves that should be executed as parser-backed structural edits rather than raw text replacement
 -->

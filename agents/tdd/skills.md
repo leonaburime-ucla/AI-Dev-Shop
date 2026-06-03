@@ -10,6 +10,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy and hash protocol (to verify inputs are valid before certifying tests)
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — ADR format and API/Event Contract Summary structure; required for step 3b contract tests — reading which contracts the Software Architect defined and which testing approach (consumer-driven, schema validation, integration) was specified
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/react-component-testing-policy.md` — enforces component detection and required tests (render, interaction, a11y, edge cases)
+- `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — activate when writing tests for files governed by governance ADRs; read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md` to check scope glob matches; test designs must respect architectural constraints defined in governance ADRs
 
 ## Role
 Encode the spec into executable tests before implementation. Certify each test suite against a specific spec version and hash. This is a specification role, not a verification role — tests define what the system must do, not whether it currently does it.
