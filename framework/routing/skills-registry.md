@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.22
-last_updated: 2026-06-03
+version: 1.2.23
+last_updated: 2026-06-05
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -43,10 +43,12 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Review Agent (React component API patterns) |
 | `skills/ux-design/SKILL.md` | UX/UI Designer Agent (design system creation, visual direction, component/state design, implementation-ready handoff) |
 | `skills/interface-design/SKILL.md` | UX/UI Designer Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
+| `skills/gstack-design/SKILL.md` | Manual/user-invoked via `/gstack-design`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/vercel-web-design-guidelines/SKILL.md` | UX/UI Designer Agent, Code Review Agent, QA/E2E Agent (UI/UX guideline audits) |
 | `skills/vercel-react-native-skills/SKILL.md` | Programmer, QA/E2E Agent, Code Review Agent (React Native/Expo tactical guidance) |
 | `skills/expo-react-native/SKILL.md` | Programmer, Software Architect, Code Review Agent, QA/E2E Agent, DevOps Agent (progressive-disclosure router for official Expo skills and React Native tactical rules) |
 | `skills/expo/skills/*/SKILL.md` | Loaded only through `skills/expo-react-native/SKILL.md` (vendored official Expo plugin subskills for UI, data fetching, API routes, native modules, EAS, deployment, upgrades, and update insights) |
+| `skills/gstack-ios/SKILL.md` | Manual/user-invoked via `/gstack-ios`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/sql-data-modeling/SKILL.md` | Database Agent |
 | `skills/postgresql/SKILL.md` | Database Agent, Supabase Sub-Agent |
 | `skills/supabase/SKILL.md` | Supabase Sub-Agent |
@@ -83,6 +85,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/llm-operations/SKILL.md` | Software Architect, Programmer, Coordinator (via shared peer-dispatch rules used by external-audit and swarm-consensus) |
 | `skills/handoff/SKILL.md` | Coordinator, all agents when producing cross-session, cross-host, or next-agent continuation handoffs |
 | `skills/devops-delivery/SKILL.md` | DevOps Agent |
+| `skills/gstack-release/SKILL.md` | Manual/user-invoked via `/gstack-release`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/security-review/SKILL.md` | Software Architect (design-time threat surface only), Security, Code Review, DevOps |
 | `skills/performance-engineering/SKILL.md` | TestRunner Agent, Software Architect |
 | `skills/api-contracts/SKILL.md` | Spec Agent, Code Review Agent, Docs Agent |

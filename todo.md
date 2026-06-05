@@ -20,6 +20,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
 - System Design Skill Coverage: **DONE** (all 14 depth topics in `operational-depth-patterns.md`)
+- Garry Tan gstack Intake: **OPEN / PARTIAL** (design/iOS/release domain skills extracted; skill testing and remaining stripping/adaptation still pending)
 
 ---
 
@@ -53,6 +54,66 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ---
 
 ## External OSS Intake
+
+### Garry Tan `gstack` Intake and Decomposition **[OPEN / PARTIAL]**
+**Source repo:** `https://github.com/garrytan/gstack`
+**Local clone:** `/Users/la/Desktop/Multi-Agent Swarm Foundation/other-repos-to-learn-from/gstack`
+**Current checkout inspected:** `cab774cc` on `main`
+**Review intent:** Learn from and selectively adapt. Do not vendor gstack wholesale, install its runtime assumptions, or copy generated skill preambles into AI Dev Shop.
+**What it is:** Garry Tan's open-source AI engineering workflow stack: a large skill pack plus browser daemon, QA/review/ship workflows, setup scripts for multiple agent hosts, memory/gbrain sync, and test/eval infrastructure.
+**Why it matters:** It overlaps with AI Dev Shop's goal of turning an LLM coding session into a structured software team, but it takes a different product shape: skill-first, Claude Code oriented, strong browser tooling, generated `SKILL.md` files, and many practical workflow commands.
+**Completed first extraction:**
+- `skills/gstack-design/` plus `/gstack-design` slash command.
+- `skills/gstack-ios/` plus `/gstack-ios` slash command.
+- `skills/gstack-release/` plus `/gstack-release` slash command.
+- `framework/routing/skills-registry.md` entries for all three, marked manual/slash-invoked and not wired into the default pipeline.
+- Peer-reviewed through `/cowork` with Claude Opus 4.6 and Gemini 3.1 Pro Preview. Both approved with no blockers or should-fix items; post-implementation audit also approved.
+
+**Do not redo as standalone gstack-domain skills unless new evidence changes the decision:**
+- `gstack-design`
+- `gstack-ios`
+- `gstack-release`
+
+**Follow-up: test the new skills before promotion:**
+- Run `/gstack-design consultation`, `/gstack-design shotgun`, `/gstack-design html`, and `/gstack-design review` on small sample tasks. Confirm each mode reads only one reference and produces useful output.
+- Run `/gstack-ios qa`, `/gstack-ios fix`, `/gstack-ios design-review`, `/gstack-ios clean`, and `/gstack-ios sync` against either a real iOS project or a fixture. Confirm unavailable device/simulator paths fail gracefully.
+- Run `/gstack-release ship`, `/gstack-release setup-deploy`, `/gstack-release landing-report`, `/gstack-release canary`, and `/gstack-release land-and-deploy` on a safe fixture or dry-run repo. Confirm push/merge/deploy actions stop for explicit approval.
+- Add lightweight validation checks for these skills: frontmatter, reference existence, one-reference routing language, no banned runtime assumptions outside `upstream-notes.md`, and destructive-action approval language.
+- Decide after testing whether any of these graduate from `0.1.0` manual/slash-invoked skills to default pipeline integration.
+
+**Remaining gstack stripping/adaptation targets:**
+- Skill taxonomy and workflow shape: compare `/office-hours`, `/autoplan`, `/plan-*`, `/review`, `/qa`, `/ship`, `/cso`, `/learn`, and `/context-*` against AI Dev Shop's Coordinator pipeline and agents.
+- Browser daemon architecture: study `ARCHITECTURE.md`, `browse/src/`, `BROWSER.md`, and browser tests for persistent Chromium, refs, logs, screenshots, cookies, auth, and tunnel security.
+- Skill generation system: study `SKILL.md.tmpl`, per-skill templates, `scripts/gen-skill-docs.ts`, and resolver modules under `scripts/resolvers/` for token reduction, generated docs, and host overlays.
+- Host integration: study `setup`, `hosts/`, `docs/ADDING_A_HOST.md`, and Codex/OpenCode/Cursor/Kiro adapters for cross-host install and command naming patterns.
+- Safety and scoping: inspect `/careful`, `/freeze`, `/guard`, prompt-injection defenses, path validation, token registry, dual-listener tunnel design, and security tests.
+- Memory and continuity: inspect `/learn`, `/context-save`, `/context-restore`, gbrain docs/scripts, timeline/review/question logs, and project slug/state path conventions.
+- QA/review/release loop: release has a first extraction; continue inspecting `/review`, `/qa`, `/qa-only`, `/benchmark`, and tests for ideas that could strengthen AI Dev Shop's post-code stages without duplicating the new `gstack-release` skill.
+- Evaluation and regression infrastructure: inspect `package.json` scripts, `test/`, `browse/test/`, skill evals, free/eval test splits, parity/size checks, and slop scanning.
+
+**Stripping rule for future adaptations:**
+- Keep portable workflow ideas, mode maps, safety gates, validation checks, and useful operator UX.
+- Strip generated preambles, telemetry/config hooks, `~/.gstack` state assumptions, gbrain wiring, hardcoded local binaries, Claude-only AskUserQuestion plumbing, and daemon/runtime dependencies unless deliberately reimplemented as AI Dev Shop-native tooling.
+
+**Questions to answer during review:**
+- Which gstack ideas are superior to our current framework and should be adapted?
+- Which ideas are redundant because AI Dev Shop already has a stronger pipeline equivalent?
+- Which ideas are too Claude-Code-specific or too operationally heavy for this repo?
+- Where does gstack use generated artifacts or executable tests to enforce things we currently enforce only by prose?
+- What would a small, low-risk adaptation look like before any larger port?
+**Suggested review order:**
+1. Read or refresh `README.md`, `ARCHITECTURE.md`, `AGENTS.md`, `CLAUDE.md`, `SKILL.md.tmpl`, and `package.json`.
+2. Build a command/skill inventory from all root skill folders and summarize their purpose, inputs, outputs, and state writes.
+3. Trace the browser daemon call path from CLI to server to Chromium using `browse/src/cli.ts`, `browse/src/server.ts`, `browse/src/browser-manager.ts`, and `browse/src/snapshot.ts`.
+4. Trace generated-skill plumbing through `scripts/gen-skill-docs.ts` and `scripts/resolvers/`.
+5. Compare remaining gstack workflows against AI Dev Shop pipeline stages and mark each idea as `adopt`, `adapt`, `already-covered`, or `skip`.
+6. Produce a retained report in the project knowledge area with concrete recommendations, file references, risks, completed adaptations, and next implementation candidates.
+**Done when:**
+- A decomposition report exists with architecture map, skill inventory, safety model notes, and testing/eval summary.
+- The report includes a direct comparison table against AI Dev Shop stages.
+- The three new domain skills are tested on sample tasks and either promoted, revised, or explicitly kept experimental.
+- At least 5 remaining concrete ideas are classified as `adopt/adapt/already-covered/skip`, with rationale.
+- Any future adaptation has a small first task and a clear no-vendor/no-drift policy.
 
 ### Code Report Video Intake Queue
 **Source video:** `https://www.youtube.com/watch?v=Xn-gtHDsaPY`
