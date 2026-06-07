@@ -14,3 +14,6 @@ dist/
 build/
 project-knowledge-template/.local-artifacts/
 ADS-project-knowledge/
+integrations/graphify/upstream/
+graphify-out/
+.github/workflows/

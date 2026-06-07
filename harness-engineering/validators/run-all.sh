@@ -31,6 +31,7 @@ run_advisory_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/doc_garden_audit.py"
   python3 "$ROOT_DIR/harness-engineering/validators/doc_staleness_audit.py"
   bash "$ROOT_DIR/harness-engineering/validators/probe_host_capabilities.sh"
+  bash "$ROOT_DIR/harness-engineering/validators/check_graphify_capability.sh"
 }
 
 run_precommit_checks() {

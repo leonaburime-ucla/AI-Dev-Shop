@@ -458,7 +458,6 @@ def build_environment_key(environment: dict[str, str]) -> str:
     return "|".join(
         [
             environment["cli"],
-            environment["cli_version"],
             environment["hostname"],
             environment["system"],
             environment["release"],
@@ -510,10 +509,16 @@ def resolve_cache_artifact_path(value: str | None) -> Path | None:
 
 def normalize_environment_key(key: str) -> str:
     parts = key.split("|")
-    if len(parts) >= 3:
+    # Cache validity is about whether the same host/OS/machine/transport can
+    # reach the same model. CLI patch versions drift frequently and are kept as
+    # diagnostics in the environment record, but they should not invalidate a
+    # proven model ID by themselves.
+    if len(parts) >= 7:
+        parts = [parts[0], *parts[2:]]
+    if len(parts) >= 2:
         for suffix in (".local", ".lan"):
-            if parts[2].endswith(suffix):
-                parts[2] = parts[2][: -len(suffix)]
+            if parts[1].endswith(suffix):
+                parts[1] = parts[1][: -len(suffix)]
     return "|".join(parts)
 
 
@@ -530,6 +535,7 @@ def find_cached_discovery(
     normalized_key = normalize_environment_key(environment_key)
     exact_match: dict | None = None
     hint_match: dict | None = None
+    exact_requested = is_exact_model_identifier(requested_model)
     for entry in reversed(entries):
         if not isinstance(entry, dict):
             continue
@@ -542,6 +548,11 @@ def find_cached_discovery(
         if requested_model and entry.get("requested_model") == requested_model:
             exact_match = entry
             break
+        if requested_model and entry.get("winner_model") == requested_model:
+            exact_match = entry
+            break
+        if exact_requested:
+            continue
         if requested_hint and entry.get("requested_model_hint") == requested_hint:
             hint_match = entry
     return exact_match or hint_match
@@ -1226,7 +1237,8 @@ def persist_claude_discovery(
                     if not isinstance(entry, dict):
                         continue
                     if (
-                        entry.get("environment_key") == cache_entry.get("environment_key")
+                        normalize_environment_key(entry.get("environment_key", ""))
+                        == normalize_environment_key(cache_entry.get("environment_key", ""))
                         and entry.get("requested_model") == cache_entry.get("requested_model")
                         and entry.get("artifact_path") != str(resolved_artifact_path)
                     ):
@@ -1275,7 +1287,8 @@ def persist_claude_discovery(
             for entry in cache.get("entries", [])
             if not (
                 isinstance(entry, dict)
-                and entry.get("environment_key") == environment_key
+                and normalize_environment_key(entry.get("environment_key", ""))
+                == normalize_environment_key(environment_key)
                 and entry.get("requested_model") == discovery.get("requested_claude_model")
             )
         ]

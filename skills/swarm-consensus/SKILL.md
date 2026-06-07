@@ -33,7 +33,7 @@ When naming LLM participants to the user, always show the peer model identity fi
 - Use model names or model IDs such as `Claude: <resolved-model>`, `Gemini: <resolved-model>`, and `Codex: <resolved-model>`.
 - Do not present CLI version strings such as `2.1.84`, `0.38.1`, or `codex-cli 0.125.0` as model names or model versions.
 - CLI versions belong only in diagnostics, smoke-test evidence, or the `CLI Version` column of the final report.
-- If the exact model cannot be proven, say `model unresolved` or `local default, exact model unknown`; do not substitute the CLI version.
+- If the exact model cannot be proven, say `model unresolved` or `local default, exact model unknown`; do not substitute the CLI version. For `/consensus` and `/debate`, that unresolved label is a blocking status and must not be dispatched.
 - Preflight copy must distinguish `Planned peer models` from `CLI diagnostics`.
 
 ### Reporting Results to User (Blocking)
@@ -122,10 +122,14 @@ From the output:
 - Record the CLI version string separately from the resolved model ID — these are not the same thing, and CLI version must never be displayed as model identity
 - Skip any CLI that is not installed — do not error, just note it as absent in the report
 - Check for any user-saved model version preferences (e.g. from a prior "always use Opus for consensus" instruction) and apply them via CLI flags if the tool supports it
+- Before any peer prompt preview or dispatch, run the Model Memory Map using the smoke-test harness in model-plan mode:
+  `python3 skills/swarm-consensus/scripts/cli_smoke_test.py --model-plan-only --output-format json`
+- The model-plan lookup must inspect retained smoke-test proof first, especially `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`, then legacy local smoke-test caches, dated smoke-test reports, retained/local consensus reports, repo-local evidence, and only then home CLI defaults. Do not rely on CLI version output for model identity.
 - Run preflight transparency announcement before asking any model:
-  - `Planned peer models: Claude=<resolved-model-or-unresolved>, Gemini=<resolved-model-or-unresolved>, Codex=<resolved-model-or-unresolved>.`
+  - `Planned peer models: Claude=<exact-model-or-not-installed>, Gemini=<exact-model-or-not-installed>, Codex=<exact-model-or-not-installed>.`
   - `CLI diagnostics: Claude CLI=<version-or-not-installed>, Gemini CLI=<version-or-not-installed>, Codex CLI=<version-or-not-installed>.`
   - If a CLI is missing, mark its model as `not installed` and its CLI diagnostic as `not installed`.
+- If an installed peer's exact model ID cannot be proven before dispatch, this is a blocking condition, not a confirmation gate. Do not ask the user to reply `run` for unresolved or local-default models. Stop and ask for exact model pins, or ask whether to run/update the smoke test first.
 
 A minimum viable swarm is **primary model + 1 peer**. If no peers are available, tell the user and stop — running consensus with only one model produces no value. **This is a graceful stop, not a pipeline failure.** If Swarm Consensus was invoked as part of a pipeline stage, that stage proceeds using the primary model's output alone — the pipeline is not blocked by missing peer CLIs.
 
@@ -136,8 +140,8 @@ Before dispatching prompts, resolve the planned model for each available peer CL
 1. Per-run override from the current prompt (`claude_model=...`, `gemini_model=...`, `codex_model=...`)
 2. Project knowledge root evidence from `<ADS_PROJECT_KNOWLEDGE_ROOT>` or sibling `ADS-project-knowledge/`
 3. AI Dev Shop repo-local evidence such as repo `.local-artifacts/`, repo `reports/`, and `tmp/peer-dispatch/`
-4. Home CLI defaults such as `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`
-5. Alias assumption such as `sonnet`, `opus`, `latest`, or `preview`
+4. Home CLI defaults such as `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`, but only when they expose an exact model ID rather than a family alias
+5. Candidate ladders such as `skills/swarm-consensus/references/model-candidate-ladders.json` for smoke-test discovery candidates only. Candidate ladders are not proof by themselves.
 
 Use `skills/llm-operations/references/peer-llm-dispatch.md` as the canonical Model Memory Map. The smoke-test harness implements that order with `--model-plan-only`.
 
@@ -145,17 +149,19 @@ For each peer, record:
 
 - `requested_model`: what the run asked for, if anything
 - `resolved_model`: the exact model ID proven from CLI config/output, if available
-- `selection_source`: `per_run_override`, `saved_preference`, `local_default`, `alias_assumption`, `smoke_test_discovery`, or `unknown`
+- `selection_source`: `per_run_override`, `saved_preference`, `home_cli_exact_default`, `local_default` with exact `command_model`, `smoke_test_discovery`, `session_success`, or `unknown`
 
-If any peer model is not explicitly pinned for the current run, or the exact resolved model ID cannot be proven, pause before dispatch and tell the user:
+If any installed peer model is not exact, is alias-only, is inferred from a local default without an exact `command_model`, or the exact resolved model ID cannot be proven, stop before packet preview or dispatch and tell the user:
 
-- which peer models are planned
-- which ones are inferred rather than explicitly pinned
-- how to override them for this run
+- which installed peer models are blocked
+- which smoke-test/cache/model-plan sources were checked
+- how to proceed: provide exact `claude_model=...`, `gemini_model=...`, `codex_model=...` pins or approve running/updating the smoke test
 
 Use this pattern:
 
-`Planned peer models: Claude=<resolved-or-inferred>, Gemini=<resolved-or-inferred>, Codex=<resolved-or-inferred>. Reply with "run" to proceed or override with claude_model=..., gemini_model=..., codex_model=....`
+`Blocked: exact peer model is not proven for <peer-list>. Checked smoke-test model plan and saved model evidence. Reply with exact model pins (claude_model=..., gemini_model=..., codex_model=...) or say "run smoke test" to prove current models. I will not dispatch peers with unresolved, alias-only, or exact-unknown local defaults.`
+
+`run` is not a valid response to this model-proof block. The normal peer-dispatch `run` gate is available only after every installed peer selected for the swarm has an exact planned model ID.
 
 Do not silently upgrade a peer to a newly released model family/version just because it exists. If a newer model may be better, tell the user and let them choose.
 
@@ -186,9 +192,7 @@ Consensus runs should avoid silently drifting to newer model families/versions.
 - Gemini: use `-m` when the user or a saved preference pins one.
 - Codex: use `-m` when the user or a saved preference pins one.
 
-If a configured or inferred model appears stale, unavailable, preview-only, alias-based, or unknown, state it before the run and continue only if:
-- the user confirms the plan, or
-- the user supplies an override for this run.
+If a configured model appears stale, unavailable, preview-only, alias-based, or unknown, state it before the run and stop. Continue only after the user supplies exact pins or a smoke-test/model-plan run proves exact model IDs. Do not dispatch consensus/debate peers with `local default, exact model unknown`.
 
 ### Smoke-Test Reference
 

@@ -3,6 +3,7 @@
 - Last Updated: 2026-04-26
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed dependency mapping, hotspot detection, and blast-radius analysis before proposing changes
 - `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md` — tech debt taxonomy, refactor proposal format, rules of safe refactoring, what not to refactor
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — architectural boundary rules and ADR format; needed when a finding reveals a boundary violation to escalate to Architect
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern reference files; needed when proposing structural mismatch fixes that require knowledge of the correct pattern structure
@@ -25,6 +26,26 @@ Propose non-behavioral improvements that reduce complexity and tech debt. Every 
 - Active spec metadata (to confirm tests exist for code being refactored)
 
 ## Workflow
+
+### Phase 0: Graphify Gate
+
+Graphify provides zero-token dependency mapping, hotspot detection, and blast-radius analysis.
+
+**Decision logic:**
+
+1. Count files in target: `find <TARGET_REPO> -type f | wc -l`
+2. If **<500 files**: skip Graphify, proceed directly to Phase 1.
+3. If **500–4,999 files**: ask the user — "This codebase has N files. We have Graphify available, which maps dependencies and blast radius for refactoring targets — without burning tokens reading files. Want to use it, or proceed with direct analysis?"
+4. If **≥5,000 files**: recommend Graphify — "This codebase has N files. We recommend using Graphify to map blast radius and dependencies before proposing changes — it's zero-token AST extraction and will save significant exploration cost at this scale. Proceed with Graphify?"
+5. If the user declines, skip graph queries and proceed with standard workflow.
+
+When graph is available, use it for:
+- Blast-radius estimation before proposing changes (degree + path queries)
+- Identifying downstream dependents of refactor targets
+- Detecting whether a refactor would break a cycle or create one
+
+### Phase 1: Finding Review
+
 1. Review each finding from Code Review, the Function Quality Assessment section, or the Coverage Gap List using the taxonomy in `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md`.
 2. Classify finding type (naming drift, duplication, oversized unit, structural mismatch, dead code, complexity debt, untestable coupling).
 2a. For Function Quality Assessment findings, name the smallest extraction, split, deletion, dependency injection, error-contract cleanup, or boundary-stabilization move that would improve the score without changing behavior.

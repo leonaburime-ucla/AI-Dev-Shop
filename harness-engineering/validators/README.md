@@ -47,6 +47,14 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks version-sensitive host capabilities against the local environment when a reliable probe exists
   - prints `enabled`, `unavailable`, or `unverified` instead of relying on stale memory or docs alone
   - intended for explicit audits, troubleshooting, or filtered host checks rather than mandatory startup
+- `check_graphify_capability.sh`
+  - checks whether Graphify is installed, whether the managed upstream checkout exists, and which installer path (`uv`, `pipx`, or local Python) is available
+  - read-only by default; clones into `integrations/graphify/upstream/` only with `--download`, updates only with `--update`, and refreshes copied skill references only with `--sync-skill`
+  - used by Coordinator and CodeBase Analyzer before relying on Graphify-backed repo maps
+- `check_graphify_freshness.py`
+  - writes and checks `.ads-graphify-status.json` beside each target repo's `graphify-out/`
+  - records generation time, target git state, source mtime, Graphify version, mode, and semantic-pass approval
+  - advisory by default; use `--strict` when a stale graph should fail a workflow
 - `resolve_subagent_mode.sh`
   - resolves whether the current run should default to `subagent-assisted` or `single-agent` mode
   - emits startup-friendly copy that includes the token-cost tradeoff and user toggles
@@ -74,6 +82,27 @@ Check whether live Supabase verification is enabled on the current host:
 
 ```bash
 bash harness-engineering/validators/probe_host_capabilities.sh --host <detected-host> --capability supabase_mcp
+```
+
+Check whether Graphify is available for repo mapping:
+
+```bash
+bash harness-engineering/validators/check_graphify_capability.sh
+```
+
+Download or update the managed Graphify checkout inside AI Dev Shop:
+
+```bash
+bash harness-engineering/validators/check_graphify_capability.sh --download
+bash harness-engineering/validators/check_graphify_capability.sh --update
+bash harness-engineering/validators/check_graphify_capability.sh --update --sync-skill
+```
+
+Write or check Graphify freshness metadata for a target repo:
+
+```bash
+python3 harness-engineering/validators/check_graphify_freshness.py <target-repo> --write --mode code_update
+python3 harness-engineering/validators/check_graphify_freshness.py <target-repo>
 ```
 
 Resolve startup mode for the current host:

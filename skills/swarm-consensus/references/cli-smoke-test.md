@@ -61,7 +61,7 @@ Interpret the discovery result this way:
 - discovery mode also updates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`
 - each cache update also writes a dated snapshot under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/history/`
 - the script still falls back to the legacy `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` cache if the retained cache is missing
-- cache hits are valid only for the same environment tuple: hostname, OS, machine, Claude CLI version, and transport requirement, and only when the cached artifact path still exists
+- cache hits are valid only for the same environment tuple: hostname, OS, machine, and transport requirement, and only when the cached artifact path still exists. Claude CLI version is recorded as diagnostics but does not invalidate model proof by itself.
 
 Run Codex in an isolated directory to compare raw CLI behavior against repo-local behavior:
 
@@ -91,4 +91,4 @@ Interpretation rules:
 - update the ladder file when a newer exact model ID becomes available or an older one is retired
 - if there is no exact environment cache hit and no fresh discovery artifact, Claude is not yet proven for that environment
 - if a newer model family looks better, update the saved preference only after rerunning this test
-- runtime consensus runs should still show inferred models to the user and allow per-run overrides
+- runtime `/consensus` and `/debate` runs must not dispatch peers with inferred, alias-only, exact-unknown local-default, or unknown exact model IDs. Show the block and require exact pins or a fresh smoke-test/model-plan proof before the normal peer-dispatch `run` gate.

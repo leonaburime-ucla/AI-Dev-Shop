@@ -1,6 +1,6 @@
 # Coordinator Agent
 - Version: 1.8.2
-- Last Updated: 2026-03-25
+- Last Updated: 2026-06-06
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)

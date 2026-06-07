@@ -271,7 +271,8 @@ If that retry falls back to plain text, keep the fallback on a shorter bounded t
 ## Model And Prompt Hygiene
 
 - Pin the model when the user requests it or when reproducibility matters.
-- If the workflow promises exact model reporting, do not dispatch on an inferred or alias-only model. Require an explicit or locally proven exact model name/version before running.
+- If the workflow promises exact model reporting, do not dispatch on an inferred, unknown, alias-only, or exact-unknown local default model. Require an explicit or locally proven exact model name/version before running.
+- For `/consensus` and `/debate`, exact model reporting is mandatory. The Coordinator must run the Model Memory Map, including the smoke-test model-plan lookup, before showing any peer prompt preview. If any installed selected peer lacks an exact model ID, stop with a blocking model-proof gate; do not ask for or accept `run`.
 - When resolving model names, always check `skills/swarm-consensus/references/cli-smoke-test.md` for documented model IDs before falling back to CLI probes or asking the user. That file is the canonical source for locally verified peer model names/versions.
 - Before declaring a peer model unresolved, run the Model Memory Map below. Do not stop at `which <cli>` or `<cli> --version`; CLI version strings prove tool availability only, not model identity.
 - If a requested Claude model is unproven locally or the CLI rejects it, run `skills/swarm-consensus/scripts/cli_smoke_test.py` in discovery mode before asking the user for another model. Do not keep guessing manually when the smoke harness already exists.
@@ -309,6 +310,7 @@ Interpretation rules:
 - Treat a Claude cache entry as environment-exact proof only when hostname, OS, machine, Claude CLI version, transport requirement, and artifact path match the current run. If those do not match but an exact model appears in retained smoke reports or consensus reports, use it as a saved preference and say current-host proof is stale or requires a fresh smoke test.
 - Treat project knowledge and repo-local evidence as higher priority than home CLI defaults; home defaults are still required fallback sources when project/repo evidence is absent.
 - Treat `~/.gemini/settings.json` `model.name` as the saved Gemini model preference when present. Do not demote it to unresolved just because `gemini --version` only returns the CLI version.
+- For `/consensus` and `/debate`, a peer with no exact model after this lookup is blocked. Do not proceed by labeling it `local default, exact model unknown`; that phrase is a stop condition, not a dispatchable plan. A home/local default is acceptable only when the model-plan output provides an exact `command_model`.
 - Never print `model unresolved` until every source in this map has been checked or is unavailable.
 
 ## Capability Discovery

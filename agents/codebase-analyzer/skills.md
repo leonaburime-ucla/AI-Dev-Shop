@@ -1,9 +1,10 @@
 # CodeBase Analyzer Agent
 - Version: 1.1.0
-- Last Updated: 2026-03-12
+- Last Updated: 2026-06-06
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md` — phased analysis protocol, token budget strategy, findings report format, flaw categories and severity
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed repo mapping, stale graph checks, and query-first architecture discovery
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — current state classification, target pattern selection, phase plan format, migration principles
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog, system drivers analysis, DDD vocabulary, tradeoff framework
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern details and implementation guidance for the recommended target architecture
@@ -24,10 +25,32 @@ Use this agent when:
 
 ## Workflow
 
+### Phase 0: Graphify Gate
+
+Graphify provides a zero-token structural code graph (AST extraction, dependency mapping, community detection, hotspot analysis). It is most valuable for large or unfamiliar codebases.
+
+**Decision logic:**
+
+1. Count files in target: `find <TARGET_REPO> -type f | wc -l`
+2. If **<500 files**: skip Graphify, proceed directly to Analysis Only.
+3. If **500–4,999 files**: ask the user — "This codebase has N files. We have Graphify available, which builds a structural dependency graph for navigating architecture, finding hotspots, and detecting cycles — without burning tokens reading files. Want to use it, or proceed with direct exploration?"
+4. If **≥5,000 files**: recommend Graphify — "This codebase has N files. We recommend using Graphify to build a structural map before analysis — it's zero-token AST extraction and will save significant exploration cost at this scale. Proceed with Graphify?"
+5. If the user declines, skip to Analysis Only (no graph).
+
+**Graphify Bootstrap (when proceeding):**
+
+1. Run capability check: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh`
+2. If `unavailable` or `unverified`: install graphify — run `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh --download`, then activate the venv or confirm the CLI is on PATH
+3. If capability is `enabled`: check freshness — `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO>`
+4. If stale or missing: `graphify update <TARGET_REPO> --force` (--force prevents duplicate edges on incremental runs)
+5. Write freshness metadata: `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO> --write --mode code_update`
+
+Once the graph is fresh, prefer graph queries over broad file reads for discovery and architecture questions. Fall back to raw source sampling only when graph evidence is insufficient.
+
 ### Analysis Only
-1. Estimate codebase size — determine approach (full / phased / focus-area)
-2. Run Phase 1: Discovery — directory structure, package files, README
-3. Run Phase 2: Architecture Scan — entry points, layer structure, dependency direction
+1. If graph available: query for architecture structure, dependency hotspots, and entry points
+2. Run Phase 1: Discovery — directory structure, package files, README (use graph communities to prioritize if available)
+3. Run Phase 2: Architecture Scan — entry points, layer structure, dependency direction (validate graph paths against source if available)
 4. Run Phase 3: Code Sampling — quality indicators, test coverage signal, security surface
 5. Write findings report to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md`
 6. Report to Coordinator: analysis complete, report location, severity summary
