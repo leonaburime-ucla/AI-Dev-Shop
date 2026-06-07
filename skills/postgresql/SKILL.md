@@ -17,6 +17,25 @@ Keep this file lean. Open references only when you need concrete syntax or deepe
 - `references/database-programmability.md` for triggers, stored functions, extensions, and full-text search
 - `references/performance-and-operations.md` for partitioning, `EXPLAIN ANALYZE`, performance anti-patterns, and transaction isolation
 
+## Upstream References (Progressive Disclosure)
+
+For concrete incorrect-vs-correct SQL examples with metrics, load selectively from the official Supabase Postgres best-practices skill (installed in `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/` — never hand-edit):
+
+- `references/conn-pooling.md` — pooler configuration rules
+- `references/conn-limits.md` — connection limit tuning
+- `references/conn-idle-timeout.md` — idle timeout behavior
+- `references/conn-prepared-statements.md` — prepared statements with poolers
+- `references/monitor-pg-stat-statements.md` — query statistics
+- `references/monitor-vacuum-analyze.md` — vacuum/analyze tuning
+- `references/lock-deadlock-prevention.md` — deadlock prevention
+- `references/lock-skip-locked.md` — skip-locked queue pattern
+- `references/lock-short-transactions.md` — short transaction rules
+- `references/data-n-plus-one.md` — N+1 detection
+- `references/data-batch-inserts.md` — batch insert patterns
+- `references/data-upsert.md` — upsert patterns
+
+All paths relative to `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/`. Do not load these by default — only when the task specifically involves that concern.
+
 ## Working Rules
 
 - A simple `SELECT` does not need a CTE.

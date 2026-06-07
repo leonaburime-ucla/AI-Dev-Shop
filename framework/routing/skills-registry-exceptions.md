@@ -16,4 +16,5 @@ Example entry: `skills/<deprecated-skill>/SKILL.md` — deprecated but kept temp
 
 ## Current Exceptions
 
-None.
+- `skills/supabase-upstream/SKILL.md` — official Supabase vendor drop; loaded only through progressive disclosure references in `skills/supabase/SKILL.md` and `agents/database/supabase/skills.md`; not a standalone agent skill
+- `skills/supabase-postgres-best-practices/SKILL.md` — official Supabase vendor drop; loaded only through progressive disclosure references in `skills/supabase/SKILL.md`, `skills/postgresql/SKILL.md`, and `agents/database/supabase/skills.md`; not a standalone agent skill

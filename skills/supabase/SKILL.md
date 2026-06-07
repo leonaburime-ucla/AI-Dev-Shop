@@ -59,6 +59,29 @@ Start here, then load only the reference you need:
 - `references/edge-functions-and-auth.md` for edge functions, secrets, `auth.users`, profiles, and custom claims
 - `references/performance-and-gotchas.md` for indexing, pagination, planning, and silent-failure traps
 
+## Upstream References (Progressive Disclosure)
+
+When the task requires depth beyond what this skill's own references provide, load selectively from the official Supabase agent-skills (installed in `<AI_DEV_SHOP_ROOT>/skills/` — never hand-edit those directories):
+
+**Supabase CLI, migrations, and operational safety:**
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-upstream/SKILL.md` for CLI workflow (`supabase migration new`, `db pull`, `db advisors`), MCP server troubleshooting, security checklist (BOLA/IDOR, views-bypass-RLS, `auth.role()` deprecation, JWT freshness), and changelog verification
+
+**Postgres performance and operations (load by concern):**
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/conn-pooling.md` — connection pooler configuration
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/conn-limits.md` — connection limit tuning
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md` — idle connection timeout
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md` — prepared statement behavior with poolers
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md` — query statistics monitoring
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md` — vacuum and analyze tuning
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md` — deadlock prevention patterns
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/lock-skip-locked.md` — skip-locked queue pattern
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/data-n-plus-one.md` — N+1 query detection
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/data-batch-inserts.md` — batch insert patterns
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/data-upsert.md` — upsert patterns
+- `<AI_DEV_SHOP_ROOT>/skills/supabase-postgres-best-practices/references/security-rls-performance.md` — RLS performance optimization
+
+Do not load these by default. Load only when the specific task requires that topic.
+
 ## Preflight
 
 Run this preflight before claiming live Supabase verification:
