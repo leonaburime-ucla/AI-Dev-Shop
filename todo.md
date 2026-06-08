@@ -20,6 +20,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
 - System Design Skill Coverage: **DONE** (all 14 depth topics in `operational-depth-patterns.md`)
+- Temporal Durable Workflow Skill: **OPEN** (dedicated durable workflow guidance still needed)
 - Garry Tan gstack Intake: **OPEN / PARTIAL** (design/iOS/release domain skills extracted; skill testing and remaining stripping/adaptation still pending)
 
 ---
@@ -162,6 +163,20 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ---
 
 ## Pipeline Gaps
+
+### Temporal Durable Workflow Skill **[OPEN]**
+**What it is:** Add a dedicated skill for Temporal-style durable workflow systems and related durable orchestration patterns.
+**Why it matters:** Existing skills cover queues, async jobs, outbox, saga, retries, idempotency, and orchestration, but they do not provide focused guidance for when a workflow engine is the right abstraction, how to model durable workflow state, how to version workflows, or how to test/resume long-running executions.
+**What to add:**
+- Create a durable workflow skill covering Temporal-style workflows, cloud state machines, durable functions, activity idempotency, workflow IDs, timers, signals, cancellation, compensation, replay/versioning, observability, and worker failure recovery.
+- Include decision guidance for queue vs job worker vs event bus vs durable workflow engine.
+- Add test guidance for retries, timeout paths, crash/resume behavior, compensation, duplicate activity execution, and in-flight workflow version changes.
+- Add routing guidance for which agents should load it: likely Software Architect, Programmer, TDD, QA/E2E, TestRunner, DevOps, and Code Review when durable workflow requirements are present.
+**Done when:**
+- A new skill exists under `skills/` with concise execution guidance and references.
+- `framework/routing/skills-registry.md` maps the skill to the right agents conditionally.
+- Relevant agent `skills.md` files mention the skill only as conditional context.
+- A small fixture/eval or checklist validates that agents distinguish simple async jobs from durable workflows.
 
 ### Harness Audit Follow-Ons **[DONE]**
 **Completed 2026-05-18/19.** All 10 items resolved. Key deliverables:

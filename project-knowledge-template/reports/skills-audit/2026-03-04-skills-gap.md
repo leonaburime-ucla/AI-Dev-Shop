@@ -78,7 +78,7 @@ Gap:
 
 ### 6) Frontend Design and GEO Coverage
 Current state:
-- Local toolkit has architectural frontend guidance (`skills/frontend-react-orcbash/SKILL.md`) and review/a11y assets.
+- Local toolkit has architectural frontend guidance (`skills/feature-slice-design/SKILL.md`) and review/a11y assets.
 
 External coverage added:
 - `shadcn-ui`: practical component integration workflow and registry-driven usage.

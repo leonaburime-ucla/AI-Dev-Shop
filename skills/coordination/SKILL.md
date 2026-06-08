@@ -187,7 +187,7 @@ When dispatching an agent that separates base skills from conditional skills:
 - Do not activate every optional skill by default.
 
 Default Programmer activation rules:
-- `frontend-react-orcbash` when scope includes React, Next.js, frontend components, hooks, or UI state or orchestrator work
+- `feature-slice-design` when scope includes frontend application architecture, component composition, UI state boundaries, or feature/entity slice work
 - `backend-implementation` when scope includes backend, service, worker, API-handler, or CLI implementation work; this becomes the default backend entrypoint and loads narrower backend skills such as `hexagonal-architecture`, `api-design`, `api-contracts`, `observability-implementation`, and `change-management` only when the task actually needs them
 - `tool-design` when the task builds agent tools, CLIs, tool interfaces, or operator-facing error or reporting surfaces
 - `observability-implementation` when the task adds or changes external I/O, telemetry, tracing, or instrumentation points

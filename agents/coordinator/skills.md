@@ -9,6 +9,9 @@
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — readiness gate and trigger/SKIP contract before tasks.md generation; downstream consumption rules for TDD and Programmer
+- `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — blueprint readiness and decomposition-gate reference when routing System Design output to Spec
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed discovery reference when Coordinator needs zero-token repo maps for routing or scoped dispatch
+- `<AI_DEV_SHOP_ROOT>/skills/handoff/SKILL.md` — cross-session, cross-host, and next-agent handoff quality gates
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-dispatching-parallel-agents/SKILL.md` — parallel-split guidance for independent work or failure clusters
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-writing-plans/SKILL.md` — manual implementation-plan drafting when the user explicitly asks for a plan artifact
 

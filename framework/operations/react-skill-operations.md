@@ -10,11 +10,11 @@ This file operationalizes React skill usage across agents.
 
 For any React/Next.js component task, load these by default:
 
-- `skills/frontend-react-orcbash/SKILL.md`
+- `skills/feature-slice-design/SKILL.md`
 - `skills/vercel-react-best-practices/SKILL.md`
 - `skills/vercel-composition-patterns/SKILL.md`
 
-`skills/frontend-react-orcbash/SKILL.md` is React-only. It is not the generic ports-and-adapters skill. For Python, backend TypeScript, Go, Java, workers, CLIs, or service code, use `skills/hexagonal-architecture/SKILL.md` instead of Orc-BASH.
+`skills/feature-slice-design/SKILL.md` is frontend application architecture. It is not the generic ports-and-adapters skill. For Python, backend TypeScript, Go, Java, workers, CLIs, or service code, use `skills/hexagonal-architecture/SKILL.md` instead.
 
 If UI audit/review is requested, also load:
 
@@ -32,7 +32,7 @@ also load:
 - `skills/vercel-react-native-skills/SKILL.md`
 
 Do not load React/Next.js web skills merely because React Native uses React.
-Load `frontend-react-orcbash`, `vercel-react-best-practices`, or
+Load `feature-slice-design`, `vercel-react-best-practices`, or
 `vercel-composition-patterns` for React Native only when the project also has a
 web/Next.js surface in the current task.
 
@@ -45,7 +45,7 @@ Apply this priority order:
 1. Spec acceptance criteria and explicit user constraints
 2. Security and data-classification rules
 3. Accessibility requirements
-4. Architecture boundaries (Orc-BASH for React web frontends, Expo Router/EAS/native boundaries for Expo, generic hexagonal/ADR constraints elsewhere)
+4. Architecture boundaries (FSD for frontend applications, Expo Router/EAS/native boundaries for Expo, generic hexagonal/ADR constraints elsewhere)
 5. Official Expo skills for Expo platform behavior, SDK migration, EAS, and Expo APIs
 6. Performance and rendering tactics (Vercel best-practices for web React, Vercel React Native rules for React Native)
 7. Style/readability preferences
@@ -114,7 +114,7 @@ For each benchmark, score:
 
 Use this one-liner to force deterministic skill loading:
 
-`React strict mode: apply frontend-react-orcbash + vercel-react-best-practices + vercel-composition-patterns, and cite the exact rules used.`
+`React strict mode: apply feature-slice-design + vercel-react-best-practices + vercel-composition-patterns, and cite the exact rules used.`
 
 `Expo strict mode: apply expo-react-native, load only the matching official Expo subskill(s), add vercel-react-native-skills for React Native rendering/performance, and cite the exact skill/rules used.`
 
@@ -122,4 +122,4 @@ Use this one-liner to force deterministic skill loading:
 
 For React-only implementation details on dependency-driven `useEffect` debugging expectations, follow:
 
-- `skills/frontend-react-orcbash/SKILL.md` (Anti-Patterns + DI Compliance Checklist)
+- `skills/feature-slice-design/SKILL.md` (Dependency Rules + Enforcement)

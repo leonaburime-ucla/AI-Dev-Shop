@@ -292,8 +292,13 @@ Check model sources in this order:
 1. Per-run controls: `claude_model=...`, `gemini_model=...`, `codex_model=...`.
 2. Project knowledge root evidence: resolve `<ADS_PROJECT_KNOWLEDGE_ROOT>` from `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-project-knowledge/`, then inspect retained and local smoke-test caches, discovery reports, and consensus reports there.
 3. AI Dev Shop repo evidence: inspect repo `.local-artifacts/`, repo `reports/`, and bounded peer-dispatch packets under `tmp/peer-dispatch/`.
-4. Home CLI config files that expose model defaults. Claude CLI uses `~/.claude/settings.json`; Gemini CLI uses `~/.gemini/settings.json` and the model name is at `model.name`; these are fallback preferences such as `us.anthropic.claude-opus-4-6-v1[1m]` or `gemini-3.1-pro-preview`.
+4. Workspace and home CLI config files that expose model defaults. Workspace config (`.gemini/settings.json` in repo root) takes precedence over home config (`~/.gemini/settings.json`). Claude CLI uses `~/.claude/settings.json`; Gemini CLI uses `model.name` in settings; Codex reports its model in the session startup header (`model: <id>`). These are fallback preferences such as `us.anthropic.claude-opus-4-6-v1[1m]` or `gemini-3.1-pro-preview`.
 5. Candidate ladders: `skills/swarm-consensus/references/model-candidate-ladders.json`. These are discovery candidates, not proof by themselves.
+
+**Explicitly invalid evidence (never use):**
+
+- Asking the peer LLM "what model are you?" — models hallucinate their own identity. Self-report is not evidence regardless of how confidently the model answers.
+- CLI version strings alone (e.g., `gemini --version` → `0.43.0`) — these prove tool availability, not model identity.
 
 To make this lookup mechanical, run:
 

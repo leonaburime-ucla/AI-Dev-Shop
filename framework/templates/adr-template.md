@@ -58,7 +58,7 @@ State the decision in one or two sentences. Be direct — no "we are considering
 
 State whether this decision follows or departs from the project's default architecture heuristic.
 
-- Default heuristic: modular monolith at the macro level, vertical slices for feature ownership, and hexagonal boundaries only where external I/O or business-critical logic justify them. React frontends use Orc-BASH. Small or simple features should avoid unnecessary architecture ceremony.
+- Default heuristic: modular monolith at the macro level, vertical slices for feature ownership, and hexagonal boundaries only where external I/O or business-critical logic justify them. Frontend applications use Feature-Sliced Design. Small or simple features should avoid unnecessary architecture ceremony.
 - Alignment: FOLLOWS / DEPARTS
 - Notes: <why this decision follows the default, or which concrete constraints justify a departure>
 

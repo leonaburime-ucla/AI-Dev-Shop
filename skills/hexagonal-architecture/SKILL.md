@@ -13,7 +13,7 @@ This is the generic, stack-agnostic ports-and-adapters skill.
 
 - Use it for Python, Go, Java, backend TypeScript, CLIs, workers, batch jobs, and service code.
 - Use it when the main goal is testable business logic with infrastructure isolated at the edges.
-- Do not use `frontend-react-orcbash` for these tasks. Orc-BASH is a React frontend specialization, not a general backend pattern.
+- Do not use this for frontend application architecture. This skill is for backend and service code.
 
 ## Best Fit
 
@@ -46,8 +46,6 @@ Do not force hexagonal architecture onto work that is simpler than the pattern:
 - single-file utilities,
 - UI-only React component work,
 - teams that do not need explicit boundary control yet.
-
-For React frontend architecture, use `skills/frontend-react-orcbash/SKILL.md` instead.
 
 ## Core Model
 
@@ -139,14 +137,6 @@ Refactor immediately if any of these appear:
 - the core importing ORM models, HTTP request objects, or framework decorators,
 - dependency injection done via hidden globals or service locators,
 - tests asserting internal adapter calls instead of observable behavior.
-
-## Relation to Orc-BASH
-
-`frontend-react-orcbash` is a React-specific specialization of the same boundary idea.
-
-- Use **hexagonal-architecture** for backend and non-React systems.
-- Use **frontend-react-orcbash** for React UI/state/hooks/orchestrator work.
-- If a product uses both backend services and React frontends, the backend can use this skill while the frontend uses Orc-BASH.
 
 ## Output Expectations
 

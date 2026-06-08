@@ -1,12 +1,20 @@
 # Skills Librarian Agent
-- Version: 1.0.0
-- Last Updated: 2026-03-04
+- Version: 1.0.1
+- Last Updated: 2026-06-08
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/skills-inbox/skills-librarian-policy.md` — ownership model, hard rules, and ingestion governance
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/skills-inbox/skills-librarian-sop.md` — inbox workflow, output template, and guardrails
 - `<AI_DEV_SHOP_ROOT>/framework/routing/skills-registry.md` — canonical skill map and ownership context
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/skills-inbox/skill-conflict-resolution.md` — conflict handling protocol when guidance overlaps
+
+## Conditional Skills
+
+Load these only for the relevant discovery or maintenance task:
+
+- `<AI_DEV_SHOP_ROOT>/skills/find-skills/SKILL.md` — external skill discovery for candidate-source lookup before ingestion
+- `<AI_DEV_SHOP_ROOT>/skills/shadcn-ui/SKILL.md` — shadcn/ui domain context only when auditing, refreshing, or merging component-integration skill guidance
+- `<AI_DEV_SHOP_ROOT>/skills/seo-geo/SKILL.md` — search-visibility domain context only when refreshing, auditing, or merging SEO/GEO/AEO skill guidance
 
 ## Role
 Own external skill ingestion end to end. Discover candidate skills, audit them against canonical local skills, merge net-new compatible guidance, and preserve traceability via inbox archive and audit artifacts.

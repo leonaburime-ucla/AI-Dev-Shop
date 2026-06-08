@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.24
-last_updated: 2026-06-06
+version: 1.2.25
+last_updated: 2026-06-08
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -13,7 +13,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 |---|---|
 | `skills/spec-writing/SKILL.md` | Spec Agent |
 | `skills/test-design/SKILL.md` | TDD Agent |
-| `skills/architecture-decisions/SKILL.md` | Software Architect, Programmer, System Design Agent (secondary) |
+| `skills/architecture-decisions/SKILL.md` | Software Architect, Programmer, System Design Agent (secondary), TestRunner Agent (failure classification reference) |
 | `skills/implementation-outline/SKILL.md` | Software Architect (producer), Coordinator (gate), TDD Agent and Programmer (consumers) |
 | `skills/code-review/SKILL.md` | Code Review Agent |
 | `skills/refactor-patterns/SKILL.md` | Refactor Agent |
@@ -25,7 +25,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
 | `skills/agent-evaluation/SKILL.md` | Observer |
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
-| `skills/codebase-graph/SKILL.md` | Coordinator, CodeBase Analyzer |
+| `skills/codebase-graph/SKILL.md` | Coordinator, CodeBase Analyzer, Refactor Agent |
 | `skills/architecture-migration/SKILL.md` | CodeBase Analyzer |
 | `skills/reverse-spec/SKILL.md` | Coordinator, Spec Agent, CodeBase Analyzer, Software Architect (brownfield and rewrite workflows) |
 | `skills/design-patterns/SKILL.md` | Software Architect, CodeBase Analyzer, System Design Agent (secondary) |
@@ -38,7 +38,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/non-functional-requirements-discovery/SKILL.md` | System Design Agent, Spec Agent, Software Architect (targeted deepening) |
 | `skills/system-blueprint/SKILL.md` | System Design Agent, Coordinator |
 | `skills/system-design/SKILL.md` | System Design Agent, Software Architect (shared macro-topology and architecture-spec reference) |
-| `skills/frontend-react-orcbash/SKILL.md` | Programmer (React frontends) |
+| `skills/feature-slice-design/SKILL.md` | Programmer (frontend applications — React, Vue, Svelte, Angular, plain TS) |
 | `skills/testable-design-patterns/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Review Agent (child layer for testability and coverage-friendly structure; always load alongside `coding-foundations`) |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Review Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Review Agent (React component API patterns) |
@@ -53,7 +53,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/sql-data-modeling/SKILL.md` | Database Agent |
 | `skills/postgresql/SKILL.md` | Database Agent, Supabase Sub-Agent |
 | `skills/supabase/SKILL.md` | Supabase Sub-Agent |
-| `skills/systematic-debugging/SKILL.md` | Skills Librarian, Programmer (debug process reference) |
+| `skills/systematic-debugging/SKILL.md` | Programmer (debug process reference) |
 | `skills/pattern-priming/SKILL.md` | Programmer |
 | `skills/inline-code-documentation/SKILL.md` | Programmer |
 | `skills/adr-governance/SKILL.md` | Software Architect (promotion), Programmer (conditional governance enforcement), Code Review Agent (audit reference), Refactor Agent (conditional), TDD Agent (conditional) |
@@ -70,7 +70,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/superpowers-writing-plans/SKILL.md` | Coordinator |
 | `skills/shadcn-ui/SKILL.md` | Skills Librarian, Programmer, UX/UI Designer Agent (frontend component integration reference) |
 | `skills/seo-geo/SKILL.md` | Search Visibility (primary), Skills Librarian (refresh/maintenance). Do not load as standing context for delivery agents; route through the optional Search Visibility module when explicitly triggered. |
-| `skills/web-compliance/SKILL.md` | UX/UI Designer Agent, Code Review Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
+| `skills/web-compliance/SKILL.md` | UX/UI Designer Agent, Search Visibility, Code Review Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
 | `skills/find-skills/SKILL.md` | Skills Librarian only (external discovery) |
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
@@ -91,7 +91,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/performance-engineering/SKILL.md` | TestRunner Agent, Software Architect |
 | `skills/api-contracts/SKILL.md` | Spec Agent, Code Review Agent, Docs Agent |
 | `skills/api-design/SKILL.md` | Spec Agent, Software Architect, Code Review Agent, Docs Agent |
-| `skills/frontend-accessibility/SKILL.md` | Code Review Agent, QA/E2E Agent |
+| `skills/frontend-accessibility/SKILL.md` | UX/UI Designer Agent, Search Visibility, Code Review Agent, QA/E2E Agent |
 | `skills/e2e-test-architecture/SKILL.md` | QA/E2E Agent, TDD Agent |
 | `skills/rag-ai-integration/SKILL.md` | Software Architect, Programmer, Database Agent |
 | `skills/change-management/SKILL.md` | Programmer, DevOps Agent, Software Architect, Database Agent |
