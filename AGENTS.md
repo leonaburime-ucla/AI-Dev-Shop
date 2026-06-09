@@ -214,6 +214,7 @@ Use these files for operating detail instead of expanding this file:
 - Anti-hallucination and evidence rules: `<AI_DEV_SHOP_ROOT>/framework/governance/anti-hallucination-policy.md`
 - Knowledge routing and memory writes: `<AI_DEV_SHOP_ROOT>/framework/governance/knowledge-routing.md`
 - Session continuity and resume ledger rules: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/session-continuity.md`
+- Experimental validation disclosure mandate: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/experimental-validation.md`
 - Pre-completion and loop-detection tripwires: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/tripwires.md`
 - Path and artifact conventions: `<AI_DEV_SHOP_ROOT>/framework/workflows/conventions.md`
 - Pipeline state and job lifecycle: `<AI_DEV_SHOP_ROOT>/framework/workflows/pipeline-state-format.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/job-lifecycle.md`, `<AI_DEV_SHOP_ROOT>/framework/workflows/recovery-playbook.md`

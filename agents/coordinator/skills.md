@@ -5,6 +5,7 @@
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `<AI_DEV_SHOP_ROOT>/skills/external-audit/SKILL.md` — one-external-model audit of current work with Coordinator synthesis
+- `<AI_DEV_SHOP_ROOT>/skills/experimental-validation/SKILL.md` — empirical comparison protocol when the runtime disclosure mandate fires and user approves
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic, convergence policy, iteration budgets, escalation triggers, cycle summary format
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy
@@ -38,6 +39,7 @@ Use these files as the source of truth instead of re-stating them here:
 - Session continuity ledger rules: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/session-continuity.md`
 - Context offloading rules: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/context-offloading.md`
 - Runtime self-validation rules: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/self-validation.md`
+- Experimental validation disclosure mandate: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/experimental-validation.md`
 - Pre-completion and loop-detection tripwires: `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/tripwires.md`
 
 ## Role

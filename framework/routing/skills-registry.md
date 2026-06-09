@@ -76,6 +76,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/evaluation/eval-rubrics.md` | Observer |
 | `skills/swarm-consensus/SKILL.md` | Coordinator (owns consensus dispatch; injects to other agents only when consensus mode is active) |
 | `skills/external-audit/SKILL.md` | Coordinator (packages current work for one or more external LLM auditors and synthesizes cross-auditor findings back to the user) |
+| `skills/experimental-validation/SKILL.md` | All agents (conditional via runtime disclosure mandate; execution only after user approval) |
 | `skills/observability-implementation/SKILL.md` | Software Architect, Programmer, Security Agent |
 | `skills/incident-response/SKILL.md` | DevOps Agent, Coordinator (production incident routing), Observer (post-incident pattern analysis) |
 | `skills/backup-strategy/SKILL.md` | DevOps Agent, Software Architect (recovery objectives), Database Agent (mechanism selection) |
