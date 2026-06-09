@@ -180,9 +180,44 @@ Before the full peer review or debate call, run a cheap readability probe agains
 - Fix the dispatch path, prefer `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/peer-dispatch/<workflow>/`, and retry once before spending tokens on the real task.
 - Do not treat a failed readability probe as model disagreement or reasoning failure.
 
+### Transport Observability Classification
+
+Before attempting the handshake, classify the transport's observability tier. This determines which handshake strategy is physically possible.
+
+**Tier 1 — Streaming-observable:**
+The peer CLI streams output in real-time. ACK text is visible as soon as the peer emits it. Full handshake protocol applies as-is with the 60-second ACK window.
+
+- Gemini CLI (`gemini -p`): streams by default.
+- Any peer with `--stream` or equivalent live-output mode.
+
+**Tier 2 — Deferred-observable:**
+The peer CLI buffers ALL stdout until process exit. ACK exists in the output but cannot be observed within the 60-second window during a long task. Use the **probe-then-dispatch** two-call pattern:
+
+1. **Probe call** — ACK-only prompt, trivial workload, short timeout (60s). The prompt asks only for `ACK_PACKET_RECEIVED <marker>` and nothing else. Because the prompt is tiny, the peer exits quickly and the buffered ACK becomes visible.
+2. **Dispatch call** — full task prompt, sent only after the probe returns a valid ACK. The full workflow timeout starts here.
+
+This separates "can the peer receive my packet and respond" from "can the peer do the substantive work" into two calls, making the handshake verifiable even through a buffered transport.
+
+- Codex CLI (`codex exec`): buffers all stdout until exit.
+- Claude CLI (`claude -p`): may buffer until exit in headless mode.
+
+**Tier 3 — Unobservable:**
+The transport provides no structured output, no streaming, and no reliable way to confirm the peer received or processed anything. Examples: a CLI that writes only to an external log, a fire-and-forget webhook, or a broken pipe where stdout is lost.
+
+- **STOP.** Do not proceed with dispatch.
+- Tell the user: what transport was attempted, why it's unobservable, and that proceeding would risk silent failure with no way to detect or recover.
+- Ask the user what to do. Possible options to present:
+  1. Switch to a different transport mode for this peer (if one exists).
+  2. Use a different peer that supports an observable transport.
+  3. Proceed degraded with explicit acknowledgment that failure will be silent.
+- Do NOT silently skip the handshake. Do NOT optimistically assume the peer will respond. Do NOT proceed and hope for the best. Silent failure is the worst outcome — it wastes time, tokens, and the user's trust.
+- If the user chooses option 3 (proceed degraded), log it explicitly in the run output so future readers know the handshake was intentionally skipped and why.
+
+**Classification rule:** If you cannot physically observe the peer's ACK within the ACK window while the peer is still working on the full task, the transport is NOT Tier 1. If the peer's output is completely unavailable by any means (not even after exit), it's Tier 3. Everything else is Tier 2.
+
 ### Peer Handshake Gate
 
-Before starting the full peer-task timer for any long peer dispatch, run a cheap packet-bound handshake and show the result to the user.
+Before starting the full peer-task timer for any long peer dispatch, run a cheap packet-bound handshake and show the result to the user. Apply the handshake strategy matching the transport's observability tier (see above).
 
 - The handshake must prove the peer received the actual packet or prompt marker, not merely a generic request.
 - For file-based packets, the readability probe is the handshake. Require the peer to return `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.` before the full task starts.
@@ -191,12 +226,14 @@ Before starting the full peer-task timer for any long peer dispatch, run a cheap
 - Start the full `cowork_timeout_seconds`, `swarm_timeout_seconds`, or audit timer only after the handshake succeeds.
 - If the handshake fails, returns empty output, or times out, classify it as `handshake_failed` or the more specific transport failure (`path_or_permission_failure`, `malformed_or_no_output`, capacity error) and fix transport before spending the full task budget.
 - The handshake is transport evidence only. Do not synthesize it as a peer answer.
-- Adaptive escalation order:
-  1. Try the easiest supported packet-bound ACK transport first.
-  2. If it fails, fix the packet location or prompt transport and retry once using another supported method such as stdin, file path, in-repo dispatch copy, prompt file, session resume, or a CLI/provider-specific attachment mechanism.
-  3. If the peer CLI supports streaming output, use streaming mode so ACK text can be observed as soon as the peer starts emitting tokens.
-  4. If context retention matters, use a same-run ACK + task invocation: the peer reads the packet marker, emits `ACK_PACKET_RECEIVED ...`, then continues the substantive task in that same run.
-  5. If all supported transports fail, mark that peer unavailable or ask the user whether to proceed degraded.
+- Adaptive escalation order (informed by Transport Observability Classification):
+  1. Classify the transport tier first. If Tier 3 (unobservable), STOP and escalate to user immediately.
+  2. For Tier 1 (streaming): try the easiest supported packet-bound ACK transport. Observe ACK in real-time within the 60-second window.
+  3. For Tier 2 (deferred/buffered): use the probe-then-dispatch two-call pattern. Send a lightweight ACK-only prompt first with a 60-second timeout. Only dispatch the full task after the probe returns a valid ACK.
+  4. If the probe or streaming ACK fails, fix the packet location or prompt transport and retry once using another supported method such as stdin, file path, in-repo dispatch copy, prompt file, session resume, or a CLI/provider-specific attachment mechanism.
+  5. If the peer CLI supports streaming output but was invoked in buffered mode, switch to streaming mode so ACK text can be observed as soon as the peer starts emitting tokens (promotes from Tier 2 to Tier 1).
+  6. If context retention matters AND transport is Tier 1, use a same-run ACK + task invocation: the peer reads the packet marker, emits `ACK_PACKET_RECEIVED ...`, then continues the substantive task in that same run. Do NOT use same-run ACK on Tier 2 transports — the ACK is unobservable until exit, defeating its purpose.
+  7. If all supported transports fail, mark that peer unavailable and tell the user what was tried and why it failed. Do not silently proceed.
 
 ### Live-Run Observation
 
