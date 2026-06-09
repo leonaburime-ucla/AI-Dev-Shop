@@ -2,6 +2,19 @@
 
 This file is the source of truth for command-level routing guards that prevent similar-looking requests from being handled by the wrong workflow.
 
+## Execution Intent Dispatch Guard
+
+When the user expresses execution intent for specialist work (e.g., "let's start the specs", "write the plan", "implement this"), the Coordinator must resolve ownership and dispatch — not fulfill directly.
+
+This guard works in concert with the Ownership-Resolution Gate in `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/tripwires.md`. The gate is the enforcement mechanism; this guard is the routing-level obligation that triggers it.
+
+On execution intent detection:
+1. Emit a routing decision: `[Routing: <content-type> → Owner: <agent> → Action: dispatch/proceed]`
+2. If owner is a specialist → dispatch immediately, produce zero specialist content
+3. If owner is Coordinator → check preconditions per the gate, then proceed
+
+No clarifying question is needed when the intent is unambiguous. Treat inline drafting the same as file writing — "let's start the specs" means route to Spec Agent, not write requirements prose.
+
 ## Subagent Default Guard
 
 When the user invokes `/reverse-spec` or `/code-review`, default to **spawned subagents** when all of these are true:
