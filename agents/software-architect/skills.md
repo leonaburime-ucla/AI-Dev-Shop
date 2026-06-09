@@ -20,9 +20,6 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/feature-slice-design/SKILL.md` — load when the architecture includes a frontend application; default frontend architecture methodology for any framework (React, Vue, Svelte, Angular, plain TS)
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — load when the architecture involves migrating from an existing system, introducing FSD to a brownfield codebase, or replacing infrastructure components incrementally
-- `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — load when the architecture must define system-level testing boundaries, E2E test topology, or test infrastructure that constrains service shape
-- `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — load when the frontend has accessibility compliance requirements (WCAG, ADA, Section 508) that constrain component architecture, rendering strategy, or interaction patterns
-- `<AI_DEV_SHOP_ROOT>/skills/postgresql/SKILL.md` — load when making data-layer architecture decisions for PostgreSQL-backed systems (schema strategy, indexing approach, partitioning, connection topology)
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — load when the architecture introduces production backend/service/worker/API paths, external I/O, async jobs, telemetry, or alerting requirements; define observability expectations up front, not as post-code logging
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load when the spec has latency/throughput NFRs
 - `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — load when a quality-attribute axis lacks upstream NFR specifics; run targeted deepening only, not full rediscovery
