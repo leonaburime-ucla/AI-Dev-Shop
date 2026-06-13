@@ -18,9 +18,9 @@
 - <verification run or not run>
 
 ## Auditor Matrix
-| Auditor | Requested Model | Resolved Model | Selection Source | CLI Version | Output Mode | Suggest Mode Used | Attempts | Status |
-|---|---|---|---|---|---|---|---|---|
-| <claude | gemini | codex> | <requested or "n/a"> | <exact model name/version or "not proven"> | <per_run_override | saved_preference | local_cli_proof | smoke_test_discovery | unknown> | <version> | <json | text> | <patches | notes | fell-back-to-notes | none> | <count> | <Responded | Failed | Timed out | Retry exhausted | Not installed | Skipped> |
+| Auditor | Requested Model | Resolved Model | Selection Source | CLI Version | Score | Rationale | Path to 10 | Output Mode | Suggest Mode Used | Attempts | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| <claude | gemini | codex> | <requested or "n/a"> | <exact model name/version or "not proven"> | <per_run_override | saved_preference | local_cli_proof | smoke_test_discovery | unknown> | <version> | <1-10> | <one-sentence rationale> | <what would raise to 10, or "n/a" if 10> | <json | text> | <patches | notes | fell-back-to-notes | none> | <count> | <Responded | Failed | Timed out | Retry exhausted | Not installed | Skipped> |
 
 ## Degraded Coverage
 - <none | planned auditor(s) failed/skipped/mis-scoped; state whether `min_auditors` was met and whether failed auditors should be retried with the same packet>

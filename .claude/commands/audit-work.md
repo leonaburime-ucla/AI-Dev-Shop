@@ -58,6 +58,14 @@ Act as an External Audit Coordinator.
    - use any host-specific live-run timing or fallback bounds from the host reference you loaded
    - if the peer exits successfully but returns an empty answer body, classify it as `empty_result_transport_failure` and retry once with a tighter bounded prompt and constrained read-only tool surface when supported
    - delete the temporary dispatch copy after the run unless the user explicitly asks to retain it for debugging or evidence
+   - **Scoring Gate (mandatory):** The auditor dispatch prompt must require a numerical score (1-10) with:
+     - The score and one-sentence rationale (required even for a 10)
+     - Top issues that reduced the score (if < 10)
+     - What specifically would raise the score to 10 (if < 10)
+   - Score bands: below 7 = blocking finding; 7-9 = pass with advisory "path to 10" items surfaced in `Decision Points For User`; 10 = clean pass.
+   - An auditor score below 7 is treated as a blocking finding. The coordinator must surface the "what would make it a 10" items as action items in `Decision Points For User`.
+   - If the auditor omits a score, returns a non-numeric value, or provides an out-of-range number, retry once with an explicit score reminder. If still missing, classify as `degraded coverage` and note the omission in the report.
+   - An auditor's stated blocker findings are always binding regardless of score — a score of 8 does not override explicitly flagged blockers.
 9. Synthesize the result back to the user. The final answer must include:
    - the exact report structure from `skills/external-audit/references/external-audit-report-template.md`
    - the exact auditor model version used (`Resolved Model`) and the auditor CLI version
@@ -67,8 +75,9 @@ Act as an External Audit Coordinator.
    - `Coordinator Response -> Agree`
    - `Coordinator Response -> Change`
    - `Coordinator Response -> Disagree`
+   - `Auditor Matrix` (include score, rationale, and path-to-10 per the report template)
    - `Audit Outcome`
-   - `Decision Points For User`
+   - `Decision Points For User` (must include "what would make it a 10" items when score < 10)
    - if the exact model version cannot be proven, do not run the audit; ask for a pinned model instead
 10. Before writing the final report, if the user has not already specified retention, ask:
    `Save external audit report? Reply "save report" to retain it in <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/runs/, "local only" to keep it in <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/runs/, or "inline only" for no file.`

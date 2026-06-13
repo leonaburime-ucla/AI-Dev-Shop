@@ -85,6 +85,15 @@ Act as an External Audit Coordinator.
    - if all planned auditors fail, stop and report the failure matrix instead of synthesizing findings
    - if some auditors fail and successful respondents are fewer than `min_auditors`, stop and ask whether to retry failed auditors using `reuse_packet=<path>`, proceed with degraded coverage, or abort
    - if some auditors fail but successful respondents still meet `min_auditors`, proceed only with a prominent `Degraded Coverage` note and a decision point to rerun failed auditors from the same packet
+   - **Scoring Gate (mandatory):** Every auditor dispatch prompt must require a numerical score (1-10) with:
+     - The score and one-sentence rationale (required even for a 10)
+     - Top issues that reduced the score (if < 10)
+     - What specifically would raise the score to 10 (if < 10)
+   - Score bands: below 7 = blocking finding; 7-9 = pass with advisory "path to 10" items surfaced in `Decision Points For User`; 10 = clean pass.
+   - An auditor score below 7 is treated as a blocking finding. The coordinator must surface the "what would make it a 10" items as action items in `Decision Points For User`.
+   - If an auditor omits a score, returns a non-numeric value, or provides an out-of-range number, retry once with an explicit score reminder. If still missing, classify as `degraded coverage` and note the omission in the report.
+   - An auditor's stated blocker findings are always binding regardless of score — a score of 8 does not override explicitly flagged blockers.
+   - All scores are included in the `Auditor Matrix` section of the final report.
 11. If any auditor returned suggested changes, save them as proposal artifacts using `skills/external-audit/references/proposed-fixes-template.md`.
    - Default save path: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/proposed-fixes/<timestamp>/`
    - Retained save path only when the user explicitly asks: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/proposed-fixes/<timestamp>/`
@@ -96,7 +105,7 @@ Act as an External Audit Coordinator.
    - the exact auditor model version used (`Resolved Model`) and the auditor CLI version for each planned auditor
    - the effective `suggest_changes` mode used
    - `Work Log`
-   - `Auditor Matrix`
+   - `Auditor Matrix` (must include each auditor's 1-10 score and one-line rationale)
    - `Degraded Coverage` when any planned auditor failed, was skipped, or did not review the target scope
    - `Per-Auditor Scope Checks`
    - `What The External LLMs Said`
@@ -107,7 +116,7 @@ Act as an External Audit Coordinator.
    - `Coordinator Response -> Disagree`
    - `Coordinator Response -> Proposed Fix Handling`
    - `Audit Outcome`
-   - `Decision Points For User`
+   - `Decision Points For User` (must include "what would make it a 10" items from any auditor scoring < 10)
    - if any exact model version cannot be proven, do not run the audit; ask for pinned model(s) instead
    - if two or more auditors independently converge on the same finding, do not dismiss it in `Disagree` without making it a `Decision Points For User` item and explaining the evidence required to override it
 13. Before writing the final report, if the user has not already specified retention, ask:

@@ -164,6 +164,9 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 
 ## Pipeline Gaps
 
+### Graphify `--agent-cache` RFC **[OPEN]**
+**What it is:** Add `--agent-cache` flag to graphify that produces a greppable JSONL of chunk-level summaries with namespace inheritance and line pointers — precomputed cache so agents skip the grep/read/assess/repeat loop. Debate consensus (3/3): no vector DB, no BM25 for MVP, no community rollups — just chunked summaries + grep. See `ADS-project-knowledge/.local-artifacts/swarm-consensus/runs/20260609T-agent-cache-debate-report.md` for full spec. PR branch exists on fork: `leonaburime-ucla/graphify` (`docs/node-summaries-rfc`); upstream PR #1166 covers file-level summaries; this extends to chunk-level.
+
 ### Temporal Durable Workflow Skill **[OPEN]**
 **What it is:** Add a dedicated skill for Temporal-style durable workflow systems and related durable orchestration patterns.
 **Why it matters:** Existing skills cover queues, async jobs, outbox, saga, retries, idempotency, and orchestration, but they do not provide focused guidance for when a workflow engine is the right abstraction, how to model durable workflow state, how to version workflows, or how to test/resume long-running executions.
@@ -428,6 +431,33 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Scorer reports activation recall and false-positive activation rate per skill across real run results.
 - At least one high-risk shared skill and one conditional skill have retained normal vs removed/minimized ablation evidence.
 - The docs state that standalone `skills-evals/` fixtures are deferred unless imported/community skills, cross-agent conflicts, or noisy ablations prove they are needed.
+
+### Memory-Regression Skill Evals **[OPEN]**
+**What it is:** An agent eval suite for the memory-regression skill — verifying that agents correctly apply bounded-growth testing, select the right adapter, avoid known antipatterns, and produce working test scaffolds.
+**Why it matters:** The skill has 8 platform adapters with platform-specific gotchas, a universal measurement pattern, and gating promotion criteria. Without evals, there's no way to measure whether agents actually follow the methodology or fall into documented antipatterns.
+**What to build:**
+- Seed catalog targeting staff+ complexity across platforms (not just browser/Node)
+- Seeds should cover the known failure modes:
+  - Unsigned subtraction without safe cast (Go uint64, Rust usize)
+  - Measuring before GC / not forcing cleanup
+  - Using wrong GC API (Thread.activeCount vs ThreadMXBean, RSS vs heapUsed)
+  - Asserting on absolute values instead of growth delta
+  - Not draining HTTP response bodies (Go, Node)
+  - Testing with production heap size (hides leaks)
+  - Copy-pasting adapter snippets without adaptation (wrong framework, missing setup)
+  - Confusing diagnostic-only vs gate-ready tests
+  - Setting arbitrary budgets without empirical calibration
+  - Missing non-heap resources (FDs, GPU, direct buffers) when present in workload
+  - Incorrectly promoting a high-variance test to blocking gate
+- Grading rubric should check: correct adapter selection for platform, proper bounded-growth pattern (warmup→baseline→stress→cleanup→measure→assert), no antipattern violations, actionable failure output, correct GC/cleanup strategy for platform
+- Minimum 24 seeds across browser, Node, Go, Python, JVM, mobile, and GPU/native
+**Likely location:**
+- `harness-engineering/agent-evals/memory-regression-evals/benchmark-suite/`
+**Done when:**
+- Seeds exist at staff+ complexity covering major failure modes per platform
+- Scorer can evaluate test scaffolds against SKILL.md methodology and adapter correctness
+- Running the suite reveals which platforms/patterns agents struggle with most
+- At least 2 negative controls (correct but suspicious patterns that should NOT be flagged)
 
 ### Fixing Programmer Evals **[OPEN]**
 **Source:** Opus 4.6 eval run on 2026-05-29. Scored 95.9% (71/74 CAUGHT, 3 MISSED, 0 PARTIAL). Run exposed structural weaknesses in the eval design rather than meaningful agent skill gaps.

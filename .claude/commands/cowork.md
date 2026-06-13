@@ -97,6 +97,14 @@ This is a collaborative implementation workflow, not Swarm Consensus debate and 
    - For each file-level lease diff, dispatch all non-writers to verify the diff against the shared edit plan and current file state.
    - Require explicit `APPROVE` or `REJECT` with reasons.
    - A rejection must identify the violated plan item, changed behavior, missed edge case, or test gap.
+   - **Scoring Gate (mandatory):** Every verifier must include a numerical score (1-10) with:
+     - The score and one-sentence rationale (required even for a 10)
+     - Top issues that reduced the score (if < 10)
+     - What specifically would raise the score to 10 (if < 10)
+   - Score/vote precedence: an explicit `REJECT` is always binding regardless of score. Additionally, a score below 7 is treated as a `REJECT` even if the verifier said APPROVE.
+   - Scores 7-9 with APPROVE: pass. The "path to 10" items are surfaced as `should-fix` in the final output but do NOT trigger re-verification.
+   - If a verifier omits a score, returns a non-numeric value, or provides an out-of-range number, retry the verification request once with an explicit score reminder. If still missing, treat that verifier's response as abstained and note it in the final output.
+   - Scores are included in the final output's verifier votes section.
    - Give the writer at most `max_retry_cycles` peer-verification retry cycles for that file. If verification still fails, restore the cowork baseline for in-scope files, present the disagreement ledger, and stop.
 
 9. Test and formatting gate.
@@ -112,6 +120,8 @@ This is a collaborative implementation workflow, not Swarm Consensus debate and 
    - Prefer a different model family from the writer for the auditor. If no external auditor is available, invoke the primary model in a fresh context/session so it does not rubber-stamp its own prior output.
    - When same-family audit is used, disclose it in the final output. For medium/high risk, require user confirmation before proceeding with a same-family auditor.
    - The audit examines the actual implemented diff, not the plan. It catches mistakes that only surface in written code.
+   - The `/audit-work` scoring gate applies here: the auditor must return a 1-10 score. An audit score below 7 becomes a normalized `blocker` for correction rounds. Scores 7-9 are advisory — the "path to 10" items are surfaced as `should-fix` but do not block. A score of 10 with no findings skips correction rounds.
+   - If the auditor omits a score, returns a non-numeric value, or provides an out-of-range number, treat it as a malformed response: retry once with an explicit score reminder, then classify as `degraded coverage` if still missing.
    - The Coordinator normalizes audit findings into `blocker`, `should-fix`, or `optional` while preserving the auditor's original wording and severity rationale.
    - Present the full normalized audit findings to the user and the writer before correction rounds begin.
    - Audit-skip policy: `/audit-work` may be skipped only when `audit=skip` is explicitly provided AND all of these hold:
@@ -145,9 +155,9 @@ This is a collaborative implementation workflow, not Swarm Consensus debate and 
      - file lease map
      - summary of changes
      - disagreement ledger
-     - verifier votes
+     - verifier votes (must include each verifier's 1-10 score, rationale, and path-to-10)
      - tests/checks run and results
-     - audit findings summary (auditor family, same-family disclosure if applicable)
+     - audit findings summary (auditor family, same-family disclosure if applicable, auditor score)
      - correction rounds: what was accepted, what was rejected, and why
      - self-verification results
      - unresolved blockers (if any) requiring user decision
