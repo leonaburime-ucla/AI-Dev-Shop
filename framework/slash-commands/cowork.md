@@ -160,8 +160,9 @@ Core collaboration invariant:
      - The score and one-sentence rationale (required even for a 10)
      - Top issues that reduced the score (if < 10)
      - What specifically would raise the score to 10 (if < 10)
-   - Score/vote precedence: an explicit `REJECT` is always binding regardless of score. Additionally, a score below 7 is treated as a `REJECT` even if the verifier said APPROVE.
-   - Scores 7-9 with APPROVE: pass. The "path to 10" items are surfaced as `should-fix` in the final output but do NOT trigger re-verification.
+   - Score/vote precedence: an explicit `REJECT` is always binding regardless of score. Additionally, a score below the risk-tier floor is treated as a `REJECT` even if the verifier said APPROVE.
+   - **Risk-tiered score floor:** low risk = 7, medium/high risk = 8.5. A score below the applicable floor triggers a correction cycle.
+   - Scores at or above the floor with APPROVE: pass. The "path to 10" items are surfaced as `should-fix` in the final output but do NOT trigger re-verification.
    - If a verifier omits a score, returns a non-numeric value, or provides an out-of-range number, retry the verification request once with an explicit score reminder. If still missing, treat that verifier's response as abstained and note it in the final output.
    - Scores are included in the final output's verifier votes section.
    - Give the writer at most `max_retry_cycles` peer-verification retry cycles for that file. If verification still fails, restore the cowork baseline for in-scope files, present the disagreement ledger, and stop.
@@ -179,7 +180,7 @@ Core collaboration invariant:
    - Prefer a different model family from the writer for the auditor. If no external auditor is available, invoke the primary model in a fresh context/session so it does not rubber-stamp its own prior output.
    - When same-family audit is used, disclose it in the final output. For medium/high risk, require user confirmation before proceeding with a same-family auditor.
    - The audit examines the actual implemented diff, not the plan. It catches mistakes that only surface in written code: logic errors, missed edge cases, regressions, style violations, and plan-drift the peer verifiers may have missed.
-   - The `/audit-work` scoring gate applies here: the auditor must return a 1-10 score. An audit score below 7 becomes a normalized `blocker` for correction rounds. Scores 7-9 are advisory — the "path to 10" items are surfaced as `should-fix` but do not block. A score of 10 with no findings skips correction rounds.
+   - The `/audit-work` scoring gate applies here: the auditor must return a 1-10 score. An audit score below the risk-tier floor (low=7, medium/high=8.5) becomes a normalized `blocker` for correction rounds. Scores at or above the floor are advisory — the "path to 10" items are surfaced as `should-fix` but do not block. A score of 10 with no findings skips correction rounds.
    - If the auditor omits a score, returns a non-numeric value, or provides an out-of-range number, treat it as a malformed response: retry once with an explicit score reminder, then classify as `degraded coverage` if still missing.
    - The Coordinator normalizes audit findings into `blocker`, `should-fix`, or `optional` while preserving the auditor's original wording and severity rationale.
    - Present the full normalized audit findings to the user and the writer before correction rounds begin.
@@ -205,6 +206,12 @@ Core collaboration invariant:
    - If the self-verification spots a problem, flag it as an unresolved blocker for the user rather than triggering another correction cycle.
    - If blockers from the audit remain unaddressed after all correction rounds (writer disagreed with a blocker), flag this prominently in the final output for user decision.
    - If no audit findings require changes (clean audit), skip correction rounds and proceed to final output.
+   - **Escalation ceiling (hard cap):** Total scoring attempts across the entire cowork run (peer verification + audit + correction re-scores) must not exceed 3 per file. On hitting the ceiling:
+     1. Do NOT restore baseline or discard the work.
+     2. Keep the current state of the files as-is.
+     3. Record all unresolved findings in a `## Human Escalation` section in the final output with: the remaining blocker text, which peer raised it, the score delta from the floor, and what was already attempted.
+     4. Mark the cowork run status as `ESCALATED — requires human decision` (not failed).
+     5. The human decides whether to accept as-is, apply specific remaining fixes, or revert.
 
 12. Final output.
    - Include:

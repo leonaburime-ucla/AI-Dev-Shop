@@ -89,10 +89,12 @@ Act as an External Audit Coordinator.
      - The score and one-sentence rationale (required even for a 10)
      - Top issues that reduced the score (if < 10)
      - What specifically would raise the score to 10 (if < 10)
-   - Score bands: below 7 = blocking finding; 7-9 = pass with advisory "path to 10" items surfaced in `Decision Points For User`; 10 = clean pass.
-   - An auditor score below 7 is treated as a blocking finding. The coordinator must surface the "what would make it a 10" items as action items in `Decision Points For User`.
+   - **Risk-tiered score floor:** low risk = 7, medium/high risk = 8.5. A score below the applicable floor is treated as a blocking finding.
+   - Score bands: below floor = blocking finding; at/above floor to 9 = pass with advisory "path to 10" items surfaced in `Decision Points For User`; 10 = clean pass.
+   - The coordinator must surface the "what would make it a 10" items as action items in `Decision Points For User`.
    - If an auditor omits a score, returns a non-numeric value, or provides an out-of-range number, retry once with an explicit score reminder. If still missing, classify as `degraded coverage` and note the omission in the report.
    - An auditor's stated blocker findings are always binding regardless of score — a score of 8 does not override explicitly flagged blockers.
+   - **Escalation ceiling (hard cap):** Total scoring attempts (initial + retries) must not exceed 3 per auditor. On hitting the ceiling: do NOT discard findings or block indefinitely. Record all unresolved blockers in a `## Human Escalation` section with the remaining blocker text, which auditor raised it, the score delta from the floor, and what was already attempted. Mark the audit status as `ESCALATED — requires human decision`. The human decides whether to accept, fix, or revert.
    - All scores are included in the `Auditor Matrix` section of the final report.
 11. If any auditor returned suggested changes, save them as proposal artifacts using `skills/external-audit/references/proposed-fixes-template.md`.
    - Default save path: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/proposed-fixes/<timestamp>/`

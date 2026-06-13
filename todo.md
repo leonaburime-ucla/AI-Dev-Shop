@@ -432,6 +432,36 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - At least one high-risk shared skill and one conditional skill have retained normal vs removed/minimized ablation evidence.
 - The docs state that standalone `skills-evals/` fixtures are deferred unless imported/community skills, cross-agent conflicts, or noisy ablations prove they are needed.
 
+### Advanced Frontend Architecture Eval **[OPEN]**
+**What it is:** An agent eval suite for the `advanced-frontend-architecture` skill — verifying that agents correctly apply the scoring framework, select appropriate depth levels, produce well-reasoned traces, and don't hallucinate architecture tradeoffs.
+**Why it matters:** The skill uses a 14-dimension scoring matrix with leveled depth selectors (Senior→Staff→Principal→Distinguished). Without evals, there's no way to measure whether agents produce actionable reasoning traces vs generic tech-blog summaries, or whether depth escalation triggers fire correctly.
+**What to build:**
+- Seed catalog targeting staff+ complexity across different architecture decision scenarios
+- Seeds should cover known failure modes:
+  - Scoring all dimensions equally instead of weighting by context
+  - Recommending micro-frontends for small teams (anti-pattern blindness)
+  - Staying at Senior depth when multi-team/migration context demands Staff+
+  - Hallucinating performance characteristics of architectures
+  - Recommending SSR/hybrid for pure internal dashboards (mismatched rendering strategy)
+  - Missing migration path reasoning for non-greenfield decisions
+  - Producing score tables without evidence-backed argument chains
+  - Failing to identify reversal triggers or follow-up decisions
+  - Confusing internal component patterns (MVC/MVVM) with deployment architectures
+  - Applying Distinguished-depth reasoning when Senior suffices (over-engineering noise)
+  - Scoring BFF/GraphQL as a competing macro architecture instead of a complementary data layer
+  - Failing to compose stacks (scoring SSR and Modular Mono separately instead of as one candidate like "SSR + Modular Mono + BFF")
+  - Not marking N/A for internal-pattern dimensions (Delivery/Cost/Resilience when evaluating MVC vs FSD)
+  - Over-escalating to Distinguished for routine org-wide decisions that are Principal-level (no actual platform bet)
+- Grading rubric should check: correct candidate selection, appropriate depth escalation, dimension weighting rationale, evidence-backed scoring, complete reasoning trace structure, actionable recommendation with reversal triggers
+- Minimum 24 seeds across rendering decisions, team-scaling decisions, migration decisions, and pattern-selection decisions
+**Likely location:**
+- `harness-engineering/agent-evals/frontend-architecture-evals/benchmark-suite/`
+**Done when:**
+- Seeds exist at staff+ complexity covering the major failure modes
+- Scorer can evaluate reasoning traces against SKILL.md methodology and trace format
+- Running the suite reveals which dimensions/depth-levels agents handle poorly
+- At least 2 negative controls (reasonable architecture choices that should NOT be flagged as wrong)
+
 ### Memory-Regression Skill Evals **[OPEN]**
 **What it is:** An agent eval suite for the memory-regression skill — verifying that agents correctly apply bounded-growth testing, select the right adapter, avoid known antipatterns, and produce working test scaffolds.
 **Why it matters:** The skill has 8 platform adapters with platform-specific gotchas, a universal measurement pattern, and gating promotion criteria. Without evals, there's no way to measure whether agents actually follow the methodology or fall into documented antipatterns.
@@ -458,6 +488,22 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Scorer can evaluate test scaffolds against SKILL.md methodology and adapter correctness
 - Running the suite reveals which platforms/patterns agents struggle with most
 - At least 2 negative controls (correct but suspicious patterns that should NOT be flagged)
+
+### AGENTS.md Hot/Cold Split **[OPEN]**
+**What it is:** Split `AGENTS.md` (223 lines, loaded every turn) into a hot file (~100 lines, always-active rules) and a cold bootstrap file (read once on first turn). Third file: move the 24-line Reference Docs path catalog to `framework/operations/reference-index.md` — it's not startup-only (needed mid-session for lookups) but not always-active (not needed every turn), so it's an on-demand lookup index, not hot or cold.
+**Why it matters:** ~7k tokens wasted per turn on startup/install/reference content that's irrelevant after turn 1. Shorter instruction surface may improve instruction compliance.
+**What to do:**
+- Verify actual model versions of peer CLIs before any audit work
+- Build parity evals first (must-have: first-turn startup, peer dispatch skip, mid-session routing, resume after compression, hot-file-only sufficiency)
+- Run evals against current single-file as baseline
+- Implement the split
+- Run evals against split files, compare
+- Only ship if all must-have scenarios pass and token savings are confirmed
+**Risks:** cold file not read on first turn, context compression losing startup state, mode-switch regression. Mitigated by idempotent bootstrap contract.
+**Done when:**
+- Eval suite exists and passes against baseline
+- Split implemented and eval suite still passes
+- Token savings measured quantitatively
 
 ### Fixing Programmer Evals **[OPEN]**
 **Source:** Opus 4.6 eval run on 2026-05-29. Scored 95.9% (71/74 CAUGHT, 3 MISSED, 0 PARTIAL). Run exposed structural weaknesses in the eval design rather than meaningful agent skill gaps.
