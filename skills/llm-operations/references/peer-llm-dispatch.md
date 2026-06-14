@@ -2,6 +2,60 @@
 
 Use this reference when one LLM is asking another LLM CLI to review, debate, or validate work.
 
+## Structural Gap Scan (Mandatory Pre-Packet Gate)
+
+Before constructing the shared context packet, the Coordinator must scan the user's input material (prompt, doc, spec, or proposal) for load-bearing structural gaps — entire concerns or architectural dimensions that are absent, not merely under-detailed.
+
+**This gate is about missing floors, not missing furniture.** Do not flag cosmetic, editorial, or minor omissions. Only flag gaps where the absence would cause peers to reason from a materially incomplete picture or produce recommendations that silently ignore a critical dimension.
+
+**Trigger:** This gate fires when the input material describes a system, architecture, pipeline, workflow, or proposal that peers will reason about. It does NOT fire for narrow code-level questions, single-file reviews, or mechanical tasks.
+
+**What to scan for:**
+
+1. **Missing operational concerns** — Does the input cover how the system fails, recovers, rolls back, and scales? If it only describes the happy path, that's a structural gap.
+2. **Missing lifecycle stages** — Does it cover build, deploy, run, monitor, and decommission? If entire lifecycle stages are absent, flag them.
+3. **Missing cross-cutting concerns** — Security, observability, cost, compliance, data governance, disaster recovery, capacity planning. If any of these are load-bearing for the described system and entirely absent, flag them.
+4. **Missing failure modes** — Does it describe what happens when components fail, third parties are unavailable, or traffic spikes? If the system has external dependencies and no failure handling is described, flag it.
+5. **Missing boundaries/interfaces** — Does it define what's inside vs outside scope? If the system interacts with other systems and those interfaces are unspecified, flag them.
+6. **Missing sequencing/phasing** — If the proposal is ambitious, does it describe how to get there incrementally? If it's all-or-nothing with no rollout strategy, flag it.
+
+**How to apply:**
+
+1. Read the input material in full.
+2. Identify which category the material falls into (system design, pipeline, architecture, workflow, proposal).
+3. Based on that category, check whether each relevant structural dimension is present, absent, or explicitly deferred.
+4. For each gap found: state the missing dimension in one line and why its absence is load-bearing (what goes wrong if peers don't consider it).
+5. Present the gaps to the user before packet construction. Ask: "Should I add these to the packet for peers to address, or are any intentionally out of scope?"
+6. Incorporate confirmed gaps into the context packet as explicit open questions for peers, with an instruction that peers are expected to surface additional structural gaps the Coordinator may have missed.
+
+**What this gate does NOT do:**
+
+- Does not block dispatch indefinitely — if the user says "send it as-is," proceed.
+- Does not flag gaps that are already explicitly marked as "out of scope" or "deferred" in the input.
+- Does not flag vendor-specific gaps (e.g., "you didn't mention which CDN") — only role-level gaps (e.g., "there's no caching layer described at all").
+- Does not generate the fixes itself — it identifies what's missing and asks the user whether to include it.
+- Does not apply to narrow/mechanical tasks where the input is already bounded.
+
+**Escalation:** If the scan reveals 2+ structural gaps, tell the user the input material may need a revision pass before dispatch to avoid sending peers an incomplete foundation. Recommend but do not require.
+
+---
+
+## Unlisted Option Prompt (Mandatory)
+
+When the peer-facing prompt presents named options, candidates, or proposed shifts for the peer to evaluate, always include one additional open-ended option that asks the peer to surface a strong alternative not listed.
+
+**Rule:** Every prompt that presents options A/B/C/D or a numbered list of proposals must end with a variant of:
+
+> "Is there a strong option, shift, or decomposition not listed above that you believe is better or that the framing has missed? If yes, describe it and explain why it's stronger than the presented options."
+
+**Why:** The Coordinator's option set is bounded by its own reasoning. Peers with different priors or domain knowledge may see a framing the Coordinator missed entirely. Without this prompt, peers anchor on the listed options and never surface the unlisted one — even if it's stronger.
+
+**What this does NOT do:**
+- Does not require the peer to invent something if the listed options are comprehensive — "No, the listed options cover it" is a valid response.
+- Does not dilute the peer's main argument — place this prompt after the adversarial task, not before it.
+
+---
+
 ## Default Pattern
 
 - Build a shared packet first.
@@ -43,10 +97,28 @@ Codex reads repo instruction files (AGENTS.md, `.rules`) and performs mandatory 
 
 #### Single-shot dispatch (default for `/debate`, `/consensus`, `/audit-work`)
 
-Use `--ignore-rules --ephemeral` for one-off prompts where no session continuity is needed:
+Use `--ignore-rules --ephemeral` for one-off prompts where no session continuity is needed.
+
+**CRITICAL: Always pipe prompts via stdin with the `-` flag.** Codex hangs on long inline prompts and cannot read arbitrary file paths in read-only sandbox mode. The only reliable transport for prompts longer than ~200 words is stdin:
 
 ```bash
-codex exec --ignore-rules --ephemeral --json -C "$REPO" "Your task..." \
+echo "Your task prompt here.
+
+$(cat "$PACKET_PATH")" | codex exec --ignore-rules --ephemeral --json -s read-only -m "$MODEL" -C "$REPO" - \
+  > "$RUN_DIR/codex-output.json" 2>"$RUN_DIR/codex-output.stderr"
+```
+
+**Failure modes that require stdin transport:**
+- Inline prompt without stdin (`codex exec "long prompt"`) → hangs with "Reading additional input from stdin..."
+- File-read instruction in read-only mode (`codex exec "Read /tmp/file.md"`) → sandbox blocks access, process hangs indefinitely
+- Very long inline prompt with `--json` → process starts but never completes (no `item.completed` event)
+
+**The `-` flag is mandatory for all debate/consensus/audit Codex dispatches.** Do not attempt inline prompts or file-read instructions for Codex. Always pipe via stdin.
+
+Legacy inline pattern (DO NOT USE for prompts > 200 words):
+
+```bash
+codex exec --ignore-rules --ephemeral --json -C "$REPO" "Short task only..." \
   > "$RUN_DIR/codex-output.json" 2>"$RUN_DIR/codex-output.stderr"
 ```
 
