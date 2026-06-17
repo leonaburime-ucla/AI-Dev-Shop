@@ -85,6 +85,13 @@ Act as an External Audit Coordinator.
    - if all planned auditors fail, stop and report the failure matrix instead of synthesizing findings
    - if some auditors fail and successful respondents are fewer than `min_auditors`, stop and ask whether to retry failed auditors using `reuse_packet=<path>`, proceed with degraded coverage, or abort
    - if some auditors fail but successful respondents still meet `min_auditors`, proceed only with a prominent `Degraded Coverage` note and a decision point to rerun failed auditors from the same packet
+   - **Per-finding rationale gate (mandatory):** Every auditor dispatch prompt must require a concise `Finding Rationale` for each finding. Do not ask for private chain-of-thought. Require observable audit reasoning in this structure:
+     - `Checked:` files, artifacts, commands, or packet sections inspected
+     - `Expected:` the contract, behavior, invariant, or quality bar the work should satisfy
+     - `Observed:` the concrete mismatch, omission, risk, or evidence found
+     - `Why it matters:` user, correctness, security, maintainability, or workflow impact
+     - `Recommended fix:` the smallest actionable fix or the decision needed
+     - `Confidence:` high, medium, or low, with the main uncertainty if not high
    - **Scoring Gate (mandatory):** Every auditor dispatch prompt must require a numerical score (1-10) with:
      - The score and one-sentence rationale (required even for a 10)
      - Top issues that reduced the score (if < 10)
@@ -111,6 +118,7 @@ Act as an External Audit Coordinator.
    - `Degraded Coverage` when any planned auditor failed, was skipped, or did not review the target scope
    - `Per-Auditor Scope Checks`
    - `What The External LLMs Said`
+   - `Per-Finding Rationales`
    - `Cross-Auditor Synthesis`
    - `Suggested Changes By Auditor`
    - `Coordinator Response -> Agree`

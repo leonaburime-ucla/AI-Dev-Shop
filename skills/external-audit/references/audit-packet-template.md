@@ -50,6 +50,13 @@ Return:
 2. Findings ordered by severity using this taxonomy: `blocker` means must fix before relying on the work; `high` means real risk if ignored; `medium` means notable improvement or maintainability risk; `low` means minor inconsistency or polish
 3. File references when possible
 4. Which changes are blockers vs optional improvements
-5. What looks solid and should probably stay unchanged
-6. If `Suggested changes mode` is `notes`, include `Suggested Changes` with file-level edit guidance and concise replacement snippets when useful
-7. If `Suggested changes mode` is `patches`, include `Suggested Changes` plus `Proposed File Changes` with unified diffs or bounded replacement snippets only for files you actually reviewed; if the scope is too uncertain for safe patch proposals, fall back to notes and say why
+5. For each finding, include `Finding Rationale` with these fields. Do not include private chain-of-thought; provide concise evidence-backed audit reasoning only:
+   - `Checked:` files, artifacts, commands, or packet sections inspected
+   - `Expected:` the contract, behavior, invariant, or quality bar the work should satisfy
+   - `Observed:` the concrete mismatch, omission, risk, or evidence found
+   - `Why it matters:` user, correctness, security, maintainability, or workflow impact
+   - `Recommended fix:` the smallest actionable fix or the decision needed
+   - `Confidence:` high, medium, or low, with the main uncertainty if not high
+6. What looks solid and should probably stay unchanged
+7. If `Suggested changes mode` is `notes`, include `Suggested Changes` with file-level edit guidance and concise replacement snippets when useful
+8. If `Suggested changes mode` is `patches`, include `Suggested Changes` plus `Proposed File Changes` with unified diffs or bounded replacement snippets only for files you actually reviewed; if the scope is too uncertain for safe patch proposals, fall back to notes and say why

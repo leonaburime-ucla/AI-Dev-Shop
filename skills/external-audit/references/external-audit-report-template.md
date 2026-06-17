@@ -49,6 +49,13 @@
 ### <Auditor CLI> Suggested Changes
 - <summary of file-level suggestions, or "none returned">
 
+## Per-Finding Rationales
+
+### <Auditor CLI>
+| Finding | Checked | Expected | Observed | Why It Matters | Recommended Fix | Confidence |
+|---|---|---|---|---|---|---|
+| <finding title or id> | <files/artifacts/commands/packet sections inspected> | <contract/behavior/invariant/quality bar> | <mismatch/omission/risk/evidence> | <impact> | <smallest actionable fix or decision needed> | <high/medium/low + uncertainty if any> |
+
 ## Cross-Auditor Synthesis
 
 ### Converged Findings

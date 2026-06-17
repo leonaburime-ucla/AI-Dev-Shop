@@ -1,7 +1,7 @@
 ---
 name: external-audit
-version: 1.4.0
-last_updated: 2026-05-25
+version: 1.5.0
+last_updated: 2026-06-17
 description: Package the current work for one or more external LLM auditors, capture independent reviews, and return a decision-ready cross-auditor synthesis to the user.
 ---
 
@@ -172,14 +172,21 @@ Audit prompt requirements:
 2. Ask for findings ordered by severity using this taxonomy: `blocker` means must fix before relying on the work; `high` means real risk if ignored; `medium` means notable improvement or maintainability risk; `low` means minor inconsistency or polish.
 3. Ask for file references when possible.
 4. Ask which issues are real blockers vs optional improvements.
-5. Ask for a short strengths section so the user sees what each auditor thinks is solid.
-6. Require each auditor to begin with an `Auditor Scope Check` before any findings. That scope check must restate what it believes it is auditing, the active scope and audit target, which files or artifacts it actually reviewed, and any ambiguity or mismatch it noticed.
-7. Prefer a short prompt that references the dispatch packet path over embedding the full packet body inline when the peer can read files directly.
-8. If the packet already contains a bounded file list, prefer a bounded sectioned prompt over an open-ended repo audit prompt.
-9. For Claude Code packet-first audits, prefer a constrained `Read`-only tool surface when that is enough to inspect the packet and the listed files.
-10. If `suggest_changes=notes`, require a `Suggested Changes` section with file-level edit guidance and concise replacement snippets when useful.
-11. If `suggest_changes=patches`, require a `Suggested Changes` section plus a `Proposed File Changes` section with unified diffs or bounded replacement snippets only for files the auditor actually reviewed. If safe patching is not grounded enough, require the auditor to fall back to notes and explain why.
-12. Never ask auditors to apply edits or assume their patches are authoritative. Suggested changes are proposal-only artifacts for later review.
+5. Require a concise `Finding Rationale` for every finding. Do not ask for private chain-of-thought. The rationale must expose audit evidence in this structure:
+   - `Checked:` files, artifacts, commands, or packet sections inspected
+   - `Expected:` the contract, behavior, invariant, or quality bar the work should satisfy
+   - `Observed:` the concrete mismatch, omission, risk, or evidence found
+   - `Why it matters:` user, correctness, security, maintainability, or workflow impact
+   - `Recommended fix:` the smallest actionable fix or the decision needed
+   - `Confidence:` high, medium, or low, with the main uncertainty if not high
+6. Ask for a short strengths section so the user sees what each auditor thinks is solid.
+7. Require each auditor to begin with an `Auditor Scope Check` before any findings. That scope check must restate what it believes it is auditing, the active scope and audit target, which files or artifacts it actually reviewed, and any ambiguity or mismatch it noticed.
+8. Prefer a short prompt that references the dispatch packet path over embedding the full packet body inline when the peer can read files directly.
+9. If the packet already contains a bounded file list, prefer a bounded sectioned prompt over an open-ended repo audit prompt.
+10. For Claude Code packet-first audits, prefer a constrained `Read`-only tool surface when that is enough to inspect the packet and the listed files.
+11. If `suggest_changes=notes`, require a `Suggested Changes` section with file-level edit guidance and concise replacement snippets when useful.
+12. If `suggest_changes=patches`, require a `Suggested Changes` section plus a `Proposed File Changes` section with unified diffs or bounded replacement snippets only for files the auditor actually reviewed. If safe patching is not grounded enough, require the auditor to fall back to notes and explain why.
+13. Never ask auditors to apply edits or assume their patches are authoritative. Suggested changes are proposal-only artifacts for later review.
 
 Prefer structured output when the CLI supports it.
 
@@ -269,6 +276,7 @@ Use `skills/external-audit/references/external-audit-report-template.md` as the 
    - which external LLMs were planned, dispatched, responded, failed, or skipped
    - what each external LLM said it was auditing
    - what each external LLM said
+   - the per-finding rationale each auditor gave, including checked/expected/observed/impact/fix/confidence
    - where auditors agreed, disagreed, or missed issues another auditor caught
    - what suggested changes each auditor returned
    - what you agree with
