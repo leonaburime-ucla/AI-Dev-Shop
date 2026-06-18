@@ -116,6 +116,23 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - At least 5 remaining concrete ideas are classified as `adopt/adapt/already-covered/skip`, with rationale.
 - Any future adaptation has a small first task and a clear no-vendor/no-drift policy.
 
+### Loop Engineering **[OPEN]**
+**Source video:** `https://www.youtube.com/watch?v=RVEaDvh6f5A`
+**Source repo:** `https://github.com/owainlewis/youtube-tutorials/tree/main/tutorials/loop-engineering`
+**Reference site (starting point, not canonical):** `https://signals.forwardfuture.ai/loop-library/`
+**What it is:** Loop engineering patterns for AI agent workflows — structured approaches to iterative agent loops, feedback cycles, and convergence strategies.
+**Why it matters:** The pipeline already uses retry budgets and convergence checks, but dedicated loop engineering patterns could strengthen how agents iterate, self-correct, and know when to stop.
+**What to add:**
+- Watch the video and extract key loop engineering concepts, patterns, and anti-patterns.
+- Review the tutorial repo for concrete implementations and compare against current pipeline loop behavior.
+- Review the Forward Future Loop Library as one useful reference source only; do not treat it as the main taxonomy because stronger loop libraries likely exist and loop patterns will keep improving.
+- Survey broader loop-pattern sources before adopting names, categories, or implementation guidance into AI Dev Shop.
+- Identify which patterns are already covered by existing harness work (retry budgets, narrowing-first gates, loop-until-dry) and which are genuinely new.
+- Determine adoption candidates: patterns that could improve agent iteration quality, convergence speed, or resource efficiency.
+**Done when:**
+- Key patterns are extracted and classified as `adopt/adapt/already-covered/skip`.
+- Any adopted patterns have a clear integration point in the existing pipeline or harness docs.
+
 ### Code Report Video Intake Queue
 **Source video:** `https://www.youtube.com/watch?v=Xn-gtHDsaPY`
 **What it is:** Curated list of outside open-source agent/tooling repos mentioned in a March 12, 2026 Code Report video that are worth evaluating for future adoption.
@@ -626,12 +643,35 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 ### Enforcement Harness (git hooks + CI) **[PARTIAL]**
 **What it is:** Git hooks and CI checks running identical enforcement rules. "If you can't measure it, you can't enforce it."
 **Source:** 2026-06-03 debate consensus (3/3 agreement).
-**Current state:** Profiled runner (`run-all.sh --profile precommit|ci|governance`) implemented. Opt-in hooks installer exists. Pre-commit profile runs fast validators.
+**Current state:** Profiled runner (`run-all.sh --profile precommit|ci|governance`) implemented. Opt-in hooks installer exists. Pre-commit profile runs fast validators (path references, registry integrity, contracts). No application-level test execution yet.
 **What's still needed:**
 - Refactor validators to accept `ADS_WORKSPACE_ROOT` env var so governance scenarios can call real validators against fixture workspaces (not just pattern assertions)
 - Once validators are workspace-aware, upgrade governance scenarios from tautological assertions to subprocess invocations of real validator logic
 - Add architecture linting (module import boundaries), governance ADR scope-glob syntax validation
 - CI workflow file (GitHub Actions) that calls `run-all.sh --profile ci`
+- **Add application-level checks to harness hooks and CI.** Current hooks only run framework structural validators. Extend with a three-tier check model:
+
+  **Pre-commit (fast, changed files only):**
+  - Format changed files (Prettier, Black, gofmt, etc.)
+  - Lint changed files (ESLint, Ruff, golangci-lint, etc.)
+  - Maybe typecheck affected files (tsc --noEmit on changed + dependents)
+
+  **Pre-push (broader, still local):**
+  - Unit tests (full suite or affected)
+  - Full typecheck
+  - Maybe integration smoke tests (fast subset)
+
+  **CI (full pipeline, runs on every PR/push):**
+  - Full lint
+  - Full typecheck
+  - All unit tests
+  - Integration tests
+  - Playwright E2E
+  - Detox E2E (maybe nightly or before release only)
+  - Build (production bundle)
+  - Security scans (dependency audit, SAST)
+
+  Implementation should: auto-detect project tooling from config files (package.json, tsconfig, pytest.ini, go.mod, Podfile, etc.), scope pre-commit checks to changed files only for speed, fail the hook on any check failure, respect timeouts, and allow per-project override config. The DevOps agent should be able to generate these hook configs as part of its Delivery Workflow.
 
 ### Governance Workflow Scenarios (BDD-lite) **[PARTIAL]**
 **What it is:** 5-10 executable tests covering pipeline governance invariants: approval gates hold after resume, routing doesn't dispatch past blocks, artifact handoffs are complete.
@@ -644,6 +684,24 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 ### Spec Preamble Strengthening **[OPEN]**
 **What it is:** Add a structured "Problem / Why / User Journey" section to the spec template to absorb PRD value without a parallel document type.
 **Source:** 2026-06-03 debate consensus (3/3 reject standalone PRDs, agree on strengthening spec preamble).
+
+---
+
+## Integrations
+
+### UI Scraper — Crawlee Setup and Testing **[OPEN]**
+**What it is:** Download Crawlee into `integrations/ui-scraper/` and test it against factory.ai at all viewport sizes.
+**Why it matters:** The scraper captures page structure/styles/assets for later UI reproduction. Need to validate it works across responsive breakpoints before building the reproduction pipeline.
+**What to do:**
+- `cd integrations/ui-scraper && npm init -y && npm install crawlee playwright`
+- Build a basic PlaywrightCrawler entry point that spiders factory.ai
+- Test at all viewport widths: fullscreen (1920px), laptop (1440px), tablet (768px), mobile (375px)
+- Capture DOM snapshots, computed styles, and asset references at each size
+- Verify output is usable for downstream UI reproduction
+**Done when:**
+- Crawlee is installed and a working crawler exists
+- factory.ai is fully crawled at all responsive breakpoints (fullscreen → mobile)
+- Output per page/size is saved in a structured format ready for reproduction
 
 ---
 

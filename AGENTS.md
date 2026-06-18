@@ -59,8 +59,9 @@ Failure to perform Mandatory Startup in an interactive Coordinator session is a 
 
 Read user intent and switch modes automatically. If a specialist agent is clearly better suited to answer or execute and the user has not explicitly asked to remain in Review Mode, switch out of Review Mode. If unclear, ask one clarifying question before switching.
 
-To enter Agent Direct Mode: `/agent <name>` or "talk to <agent>", "switch to <agent>", "let me talk to <agent> directly".
-To enter Agent Direct Mode with consensus enabled: `/agent <name> consensus` or "talk to <agent> in consensus mode".
+To enter Agent Direct Mode: say "talk to <agent>", "switch to <agent>", or "let me talk to <agent> directly".
+If slash-command templates have been explicitly installed in the current host, `/agent <name>` may be available as a template command; do not assume Claude itself supports `/agent`.
+To enter Agent Direct Mode with consensus enabled: say "talk to <agent> in consensus mode". If slash-command templates are installed, `/agent <name> consensus` may also be available.
 Consultation mode is enabled by default; say "disable consultation mode" to turn it off, or "enable consultation mode" to turn it back on.
 Sub-agent assistance defaults to automatic when the current host verifies helper-agent support; say `single-agent mode` or `disable subagents` to keep work in one context, or `re-enable subagents` / `auto subagent mode` to restore automatic helper use.
 To enter Direct Mode: "exit coordinator", "just talk to me normally".
@@ -94,7 +95,7 @@ Agents are specialized roles, each with a `skills.md`. By default, all routing f
 [VibeCoder] → [CodeBase Analyzer] → [System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
-- `[VibeCoder]` is an optional starting point — say "switch to vibecoder" or `/agent vibecoder` to prototype fast, then promote to the full pipeline when ready
+- `[VibeCoder]` is an optional starting point — say "switch to vibecoder" to prototype fast, then promote to the full pipeline when ready. If slash-command templates are installed, `/agent vibecoder` may also be available.
 - Software Architect conditionally produces an **Implementation Outline** or explicit SKIP before tasks.md generation
 - `[Observer]` is passive and active across all stages when enabled
 - `[...]` stages are optional; dispatched by Coordinator when spec/ADR triggers them or when you specifically ask for them
@@ -133,7 +134,7 @@ Use `<AI_DEV_SHOP_ROOT>/framework/routing/skills-registry.md` for shared-skill o
 
 ## Agent Direct Mode — Shared Rules
 
-These rules apply to every agent when operating in Agent Direct Mode (invoked via `/agent <name>` or equivalent phrasing):
+These rules apply to every agent when operating in Agent Direct Mode (invoked via natural-language phrasing such as "talk to <agent>", or via `/agent <name>` only when slash-command templates are installed):
 
 - **Operate at full capability.** All skills, tools, and outputs are available — no features disabled.
 - **Proceed with available context.** Do not block because a pipeline artifact is missing; note the gap and continue with the best available context.
@@ -147,7 +148,7 @@ These rules apply to every agent when operating in Agent Direct Mode (invoked vi
 
 Detailed Agent Direct consensus and cross-agent consultation rules live in `<AI_DEV_SHOP_ROOT>/framework/operations/interaction-modes.md`.
 
-- `/agent <name> consensus` enables the active direct agent to use Swarm Consensus for high-level debatable questions.
+- "talk to <agent> in consensus mode" enables the active direct agent to use Swarm Consensus for high-level debatable questions. If slash-command templates are installed, `/agent <name> consensus` may also be available.
 - Consultation mode is default ON; Coordinator remains router of record, one owner stays accountable, and consultation is advice-only unless escalated.
 
 ### Debate Routing Guard (Blocking)

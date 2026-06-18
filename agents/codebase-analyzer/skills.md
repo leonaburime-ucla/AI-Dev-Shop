@@ -42,7 +42,7 @@ Graphify provides a zero-token structural code graph (AST extraction, dependency
 1. Run capability check: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh`
 2. If `unavailable` or `unverified`: install graphify — run `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh --download`, then activate the venv or confirm the CLI is on PATH
 3. If capability is `enabled`: check freshness — `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO>`
-4. If stale or missing: `graphify update <TARGET_REPO> --force` (--force prevents duplicate edges on incremental runs)
+4. If stale or missing: run `GRAPHIFY_OUT="$(python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO> --prepare-output --print-output-path)" graphify update <TARGET_REPO> --force` (--force prevents duplicate edges on incremental runs)
 5. Write freshness metadata: `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO> --write --mode code_update`
 
 Once the graph is fresh, prefer graph queries over broad file reads for discovery and architecture questions. Fall back to raw source sampling only when graph evidence is insufficient.

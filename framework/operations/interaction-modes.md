@@ -4,7 +4,9 @@ This file is the source of truth for Agent Direct consensus behavior and cross-a
 
 ## Agent Consensus Variant
 
-If Agent Direct Mode is started with `consensus` enabled (`/agent <name> consensus`):
+If Agent Direct Mode is started with `consensus` enabled, for example by saying
+"talk to <agent> in consensus mode" or by using `/agent <name> consensus` when
+slash-command templates are installed:
 
 - The active direct agent may invoke Swarm Consensus for high-level debatable questions.
 - Consensus mode defaults to `single-pass` unless the user requests `debate`.

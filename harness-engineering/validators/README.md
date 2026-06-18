@@ -52,7 +52,9 @@ These validators are the first mechanical enforcement layer for this repo.
   - read-only by default; clones into `integrations/graphify/upstream/` only with `--download`, updates only with `--update`, and refreshes copied skill references only with `--sync-skill`
   - used by Coordinator and CodeBase Analyzer before relying on Graphify-backed repo maps
 - `check_graphify_freshness.py`
-  - writes and checks `.ads-graphify-status.json` beside each target repo's `graphify-out/`
+  - prepares reports-backed Graphify output under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/`
+  - prints the path to use as `GRAPHIFY_OUT` so Graphify writes directly into the reports location
+  - writes and checks `.ads-graphify-status.json` beside the reports-backed graph output
   - records generation time, target git state, source mtime, Graphify version, mode, and semantic-pass approval
   - advisory by default; use `--strict` when a stale graph should fail a workflow
 - `resolve_subagent_mode.sh`
@@ -101,8 +103,17 @@ bash harness-engineering/validators/check_graphify_capability.sh --update --sync
 Write or check Graphify freshness metadata for a target repo:
 
 ```bash
+GRAPHIFY_OUT="$(python3 harness-engineering/validators/check_graphify_freshness.py <target-repo> --prepare-output --print-output-path)" \
+  graphify update <target-repo> --force
 python3 harness-engineering/validators/check_graphify_freshness.py <target-repo> --write --mode code_update
 python3 harness-engineering/validators/check_graphify_freshness.py <target-repo>
+```
+
+If an older run already created a non-empty `<target-repo>/graphify-out/`
+directory at the target root, migrate it into the reports location first:
+
+```bash
+python3 harness-engineering/validators/check_graphify_freshness.py <target-repo> --prepare-output --migrate-existing-output
 ```
 
 Resolve startup mode for the current host:

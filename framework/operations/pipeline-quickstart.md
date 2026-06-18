@@ -79,9 +79,14 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 | `/audit-work` | External auditor review | Independent findings from one or more external auditors plus Coordinator cross-auditor synthesis |
 | `/cowork` | Cowork Coordinator + external peer LLMs | Shared diagnosis, approved edit plan, leased file edits, peer verification, and test/audit outcome |
 | `/handoff` | Coordinator | Compact continuation document for another agent, host, or future session |
-| `/agent <name>` | Named agent (direct) | Enters Agent Direct Mode with the specified agent |
-| `/agent <name> consensus` | Named agent (direct + consensus) | Enters Agent Direct Mode and enables Swarm Consensus for debatable high-level questions |
-| `/agent vibecoder` | VibeCoder Agent (direct, optional) | Quick-and-dirty prototype output with minimal structure |
+| `talk to <agent>` / `switch to <agent>` | Named agent (direct) | Enters Agent Direct Mode with the specified agent |
+| `talk to <agent> in consensus mode` | Named agent (direct + consensus) | Enters Agent Direct Mode and enables Swarm Consensus for debatable high-level questions |
+| `switch to vibecoder` | VibeCoder Agent (direct, optional) | Quick-and-dirty prototype output with minimal structure |
+
+`/agent <name>` and `/agent <name> consensus` are template commands only when
+`framework/slash-commands/agent.md` has been installed into a host that supports
+custom slash commands. Claude may reject `/agent` when that template is not
+installed; use the natural-language forms above in that case.
 
 ## Human Checkpoints (Blocking)
 

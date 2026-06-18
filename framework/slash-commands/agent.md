@@ -2,6 +2,11 @@ The user wants to enter Agent Direct Mode with a specific agent.
 
 Requested agent: $ARGUMENTS
 
+Host note: this file is a slash-command template, not a Claude built-in command.
+If Claude rejects `/agent <name>`, tell the user to use natural language instead,
+such as "talk to architect", "switch to programmer", or
+"talk to architect in consensus mode".
+
 Steps:
 1. Identify the agent from $ARGUMENTS. Valid names: `spec`, `architect`, `tdd`, `programmer`, `testrunner`, `code-review`, `refactor`, `security`, `observer`, `red-team`, `codebase-analyzer`, `database`, `coordinator`.
 2. Detect optional mode keyword:
@@ -20,7 +25,7 @@ Steps:
    - `If you want more detail on modes, thresholds, or round controls, ask and I will explain further.`
    - `I will show model identity first in preflight, with CLI versions only as diagnostics. If any model is inferred instead of explicitly pinned for this run, I will ask you to confirm or override it first.`
    - `Consensus reports must use the Step 5 template from the swarm skill. Debate mode can add a round trace, but it cannot replace the required report sections.`
-   - `Switch back with /agent <name> (or "talk to <agent> directly").`
+   - `Switch back with "talk to <agent> directly". If slash-command templates are installed, /agent <name> may also work.`
 6. For all subsequent messages, follow `<AI_DEV_SHOP_ROOT>/AGENTS.md` → `Agent Direct Mode — Shared Rules`.
 
 To end Agent Direct Mode: user says "back to coordinator", "resume coordinator", or addresses the Coordinator directly.

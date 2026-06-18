@@ -16,7 +16,8 @@ or delete the line from the Dismissed section.
 
 ## slash-commands-setup
 
-Available commands: `/spec` `/plan` `/tasks` `/implement` `/code-review` `/clarify` `/agent` `/consensus` `/debate` `/audit-work` `/cowork` `/handoff`
+Available template commands: `/spec` `/plan` `/tasks` `/implement` `/code-review` `/clarify` `/agent` `/consensus` `/debate` `/audit-work` `/cowork` `/handoff`
+Note: `/agent` works only after the template is installed into a host that supports custom slash commands. In Claude, use natural language such as "talk to architect" or "switch to programmer" if `/agent <name>` errors.
 Placeholder note: `<AI_DEV_SHOP_ROOT>` means the toolkit folder path (usually `AI-Dev-Shop-speckit/`).
 
 ### Claude Code
