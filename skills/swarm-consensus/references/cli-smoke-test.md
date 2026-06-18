@@ -19,9 +19,9 @@ Run it with current preferences:
 
 ```bash
 python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
-  --claude-model sonnet \
-  --gemini-model gemini-3.1-pro-preview \
-  --codex-model gpt-5.4 \
+  --claude-model us.anthropic.claude-opus-4-6-v1 \
+  --agy-model "Gemini 3.1 Pro (High)" \
+  --codex-model gpt-5.5 \
   --save-artifact
 ```
 
@@ -67,7 +67,7 @@ Run Codex in an isolated directory to compare raw CLI behavior against repo-loca
 
 ```bash
 python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
-  --codex-model gpt-5.4 \
+  --codex-model gpt-5.5 \
   --codex-cd /tmp \
   --save-artifact
 ```

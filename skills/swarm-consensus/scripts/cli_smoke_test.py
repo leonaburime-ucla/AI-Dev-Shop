@@ -19,6 +19,7 @@ from typing import List
 import tomllib
 
 END_MARKER = "<<SWARM_END>>"
+DEFAULT_AGY_MODEL = "Gemini 3.1 Pro (High)"
 DISCOVERY_CACHE_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[3]
 HOST_ROOT = REPO_ROOT.parent
@@ -130,9 +131,30 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_DISCOVERY_CACHE_PATH,
         help="Path for the environment-keyed Claude discovery cache.",
     )
+    parser.add_argument(
+        "--agy-model",
+        default=None,
+        help="agy model name for this test run (e.g. 'Gemini 3.1 Pro (High)'). Defaults to DEFAULT_AGY_MODEL.",
+    )
+    parser.add_argument(
+        "--agy-cd",
+        default="/tmp",
+        help="Working directory for agy dispatch. Defaults to /tmp to avoid loading AGENTS.md.",
+    )
     parser.add_argument("--skip-claude", action="store_true")
-    parser.add_argument("--skip-gemini", action="store_true")
+    parser.add_argument(
+        "--skip-gemini",
+        action="store_true",
+        default=True,
+        help="Skip legacy gemini CLI (default: True — gemini is sunsetted).",
+    )
+    parser.add_argument(
+        "--include-legacy-gemini",
+        action="store_true",
+        help="Probe the legacy gemini CLI even though it is sunsetted for the individual tier. Overrides --skip-gemini.",
+    )
     parser.add_argument("--skip-codex", action="store_true")
+    parser.add_argument("--skip-agy", action="store_true")
     return parser
 
 
@@ -570,6 +592,8 @@ def extract_response(case_name: str, stdout: str) -> str:
         if case_name == "gemini_json":
             payload = json.loads(stripped)
             return str(payload.get("response", ""))
+        if case_name == "agy_text":
+            return stripped
         if case_name == "codex_json":
             messages: List[str] = []
             for line in stripped.splitlines():
@@ -720,33 +744,46 @@ def resolve_model_plan(
             "note": codex_note,
         }
 
+    if "agy" in installed:
+        agy_requested = args.agy_model  # None when user did not pass --agy-model
+        agy_resolved = agy_requested or DEFAULT_AGY_MODEL
+        plan["agy"] = {
+            "cli": "agy",
+            "requested_model": agy_requested or "",
+            "resolved_model": agy_resolved,
+            "selection_source": "per_run_override" if agy_requested else "default",
+            "command_model": agy_resolved,
+            "note": f"agy replaces gemini CLI; run from {args.agy_cd} to avoid AGENTS.md pickup",
+        }
+
     return plan
 
 
 def build_cases(
     args: argparse.Namespace,
     model_plan: dict[str, dict[str, object]],
-) -> list[tuple[str, list[str]]]:
+) -> list[tuple[str, list[str], str | None]]:
     prompt = args.prompt
-    cases: list[tuple[str, list[str]]] = []
+    cases: list[tuple[str, list[str], str | None]] = []
 
     if not args.skip_claude and command_exists("claude"):
         claude_base = ["claude"]
         claude_model = str(model_plan.get("claude", {}).get("command_model", "")).strip()
         if claude_model:
             claude_base += ["--model", claude_model]
-        cases.append(("claude_text", claude_base + ["-p", prompt]))
+        cases.append(("claude_text", claude_base + ["-p", prompt], None))
         cases.append(
-            ("claude_json", claude_base + ["-p", "--output-format", "json", prompt])
+            ("claude_json", claude_base + ["-p", "--output-format", "json", prompt], None)
         )
 
-    if not args.skip_gemini and command_exists("gemini"):
+    include_gemini = getattr(args, "include_legacy_gemini", False) or not args.skip_gemini
+    if include_gemini and command_exists("gemini"):
         gemini_base = ["gemini"]
         gemini_model = str(model_plan.get("gemini", {}).get("command_model", "")).strip()
         if gemini_model:
             gemini_base += ["-m", gemini_model]
-        cases.append(("gemini_text", gemini_base + ["-p", prompt]))
-        cases.append(("gemini_json", gemini_base + ["-o", "json", "-p", prompt]))
+        cases.append(("gemini_text", gemini_base + ["-p", prompt], None))
+        cases.append(("gemini_json", gemini_base + ["-o", "json", "-p", prompt], None))
 
     if not args.skip_codex and command_exists("codex"):
         codex_base = ["codex", "exec", "--json"]
@@ -754,14 +791,19 @@ def build_cases(
         if codex_model:
             codex_base += ["-m", codex_model]
         codex_base += ["--cd", args.codex_cd, "--skip-git-repo-check"]
-        cases.append(("codex_json", codex_base + [prompt]))
+        cases.append(("codex_json", codex_base + [prompt], None))
+
+    if not args.skip_agy and command_exists("agy"):
+        agy_model = str(model_plan.get("agy", {}).get("command_model", DEFAULT_AGY_MODEL)).strip()
+        # cwd isolates agy from the repo so it doesn't load AGENTS.md
+        cases.append(("agy_text", ["agy", "--model", agy_model, "--print", prompt], args.agy_cd))
 
     return cases
 
 
 def probe_cli_versions() -> list[dict[str, str]]:
     records: list[dict[str, str]] = []
-    for cli in ("claude", "gemini", "codex"):
+    for cli in ("claude", "gemini", "codex", "agy"):
         path = shutil.which(cli)
         if not path:
             records.append({"cli": cli, "path": "not installed", "version": "n/a"})
@@ -786,7 +828,12 @@ def probe_cli_versions() -> list[dict[str, str]]:
     return records
 
 
-def run_case(case_name: str, command: list[str], timeout_seconds: int) -> dict[str, object]:
+def run_case(
+    case_name: str,
+    command: list[str],
+    timeout_seconds: int,
+    cwd: str | None = None,
+) -> dict[str, object]:
     start = time.time()
     status = "ok"
     rc = 0
@@ -799,6 +846,7 @@ def run_case(case_name: str, command: list[str], timeout_seconds: int) -> dict[s
             capture_output=True,
             text=True,
             timeout=timeout_seconds,
+            cwd=cwd,
         )
         rc = completed.returncode
         stdout = ensure_text(completed.stdout)
@@ -1100,6 +1148,7 @@ def render_report(
         f"- Prompt: `{args.prompt}`",
         f"- Case timeout: `{args.case_timeout}s`",
         f"- Codex --cd: `{args.codex_cd}`",
+        f"- agy --cd: `{args.agy_cd}`",
         "",
         "## CLI Versions",
         "",
@@ -1117,7 +1166,7 @@ def render_report(
             "| CLI | Requested | Resolved | Selection Source | Note |",
             "|---|---|---|---|---|",
         ]
-        for cli in ("claude", "gemini", "codex"):
+        for cli in ("claude", "gemini", "codex", "agy"):
             item = model_plan.get(cli)
             if not item:
                 continue
@@ -1198,6 +1247,7 @@ def render_json_report(
         "prompt": args.prompt,
         "case_timeout_seconds": args.case_timeout,
         "codex_cd": args.codex_cd,
+        "agy_cd": args.agy_cd,
         "cli_versions": cli_versions,
         "model_resolution": model_plan,
         "results": [slim_case_result(result) for result in results],
@@ -1336,13 +1386,13 @@ def main() -> int:
             discovery["persistence"] = persistence
     cases = build_cases(args, model_plan)
     if args.discover_claude:
-        cases = [case for case in cases if not case[0].startswith("claude_")]
+        cases = [case for case in cases if not case[0].startswith("claude_")]  # case[0] is name
 
     if not cases and not args.discover_claude:
-        print("No runnable cases found. Install at least one of: claude, gemini, codex.", file=sys.stderr)
+        print("No runnable cases found. Install at least one of: claude, agy, codex.", file=sys.stderr)
         return 1
 
-    results = [run_case(name, command, args.case_timeout) for name, command in cases]
+    results = [run_case(name, command, args.case_timeout, cwd) for name, command, cwd in cases]
     if args.output_format == "json":
         report = render_json_report(results, args, cli_versions, discovery, model_plan)
         suffix = ".json"

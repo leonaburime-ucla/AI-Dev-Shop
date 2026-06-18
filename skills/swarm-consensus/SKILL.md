@@ -60,10 +60,10 @@ Supported peer CLIs:
 | CLI | Invocation | Notes |
 |---|---|---|
 | `claude` | `claude -p --output-format json "<prompt>"` | Claude Code CLI. Prefer structured output when available. |
-| `gemini` | `gemini -m <model> -o json -p "<prompt>"` | Gemini CLI. Put `-m` before `-p` when pinning a model. |
+| `agy` | `agy --model "Gemini 3.1 Pro (High)" --print "<prompt>"` | Gemini peer via agy CLI (replaces sunsetted `gemini` CLI). **Must run with `cwd=/tmp`** — no `--ignore-rules` flag; running from repo root loads AGENTS.md. Default model: `Gemini 3.1 Pro (High)`. Plain-text output only, no JSON mode. Use full stdout (stripped) as answer. |
 | `codex` | `codex exec --ignore-rules --ephemeral --json "<prompt>"` | OpenAI Codex CLI. `--ignore-rules` prevents repo instruction files from triggering mandatory startup loops in peer mode. `--ephemeral` avoids session persistence. For long prompts, pipe via stdin: `cat prompt.md \| codex exec --ignore-rules --ephemeral -s read-only -`. |
 
-If you are Claude Code, you dispatch to `gemini` and `codex`. If you are Gemini, you dispatch to `claude` and `codex`. The skill works identically regardless of who is primary.
+If you are Claude Code, you dispatch to `agy` and `codex`. If you are running via `agy` (Gemini), you dispatch to `claude` and `codex`. The skill works identically regardless of who is primary.
 
 ### Participant Roles
 
@@ -113,8 +113,9 @@ Before dispatching anything, run these checks via shell:
 
 ```bash
 which claude && claude --version 2>/dev/null || echo "claude: not installed"
-which gemini && gemini --version 2>/dev/null || echo "gemini: not installed"
+which agy    && agy    --version 2>/dev/null || echo "agy: not installed"
 which codex  && codex  --version 2>/dev/null || echo "codex: not installed"
+which gemini && gemini --version 2>/dev/null || echo "gemini: not installed (sunsetted)"
 ```
 
 From the output:
@@ -126,8 +127,8 @@ From the output:
   `python3 skills/swarm-consensus/scripts/cli_smoke_test.py --model-plan-only --output-format json`
 - The model-plan lookup must inspect retained smoke-test proof first, especially `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`, then legacy local smoke-test caches, dated smoke-test reports, retained/local consensus reports, repo-local evidence, and only then home CLI defaults. Do not rely on CLI version output for model identity.
 - Run preflight transparency announcement before asking any model:
-  - `Planned peer models: Claude=<exact-model-or-not-installed>, Gemini=<exact-model-or-not-installed>, Codex=<exact-model-or-not-installed>.`
-  - `CLI diagnostics: Claude CLI=<version-or-not-installed>, Gemini CLI=<version-or-not-installed>, Codex CLI=<version-or-not-installed>.`
+  - `Planned peer models: Claude=<exact-model-or-not-installed>, agy/Gemini=<exact-model-or-not-installed>, Codex=<exact-model-or-not-installed>.`
+  - `CLI diagnostics: Claude CLI=<version-or-not-installed>, agy CLI=<version-or-not-installed>, Codex CLI=<version-or-not-installed>.`
   - If a CLI is missing, mark its model as `not installed` and its CLI diagnostic as `not installed`.
 - If an installed peer's exact model ID cannot be proven before dispatch, this is a blocking condition, not a confirmation gate. Do not ask the user to reply `run` for unresolved or local-default models. Stop and ask for exact model pins, or ask whether to run/update the smoke test first.
 
@@ -189,7 +190,7 @@ Discovery should expand the maintained ladder at `skills/swarm-consensus/referen
 Consensus runs should avoid silently drifting to newer model families/versions.
 
 - Claude: use `--model` when the user or a saved preference pins one.
-- Gemini: use `-m` when the user or a saved preference pins one.
+- agy (Gemini): use `--model` when the user or a saved preference pins one.
 - Codex: use `-m` when the user or a saved preference pins one.
 
 If a configured model appears stale, unavailable, preview-only, alias-based, or unknown, state it before the run and stop. Continue only after the user supplies exact pins or a smoke-test/model-plan run proves exact model IDs. Do not dispatch consensus/debate peers with `local default, exact model unknown`.
@@ -377,7 +378,7 @@ Do not rely on subjective "looks abrupt" checks alone.
 # Example patterns — adapt to actual CLI support
 # Prefer structured output and keep stderr separate from the peer answer
 claude --output-format json -p "$(cat .swarm-prompt.txt)" 2>peer-claude.stderr
-gemini -m <resolved-model> -o json -p "$(cat .swarm-prompt.txt)" 2>peer-gemini.stderr
+agy --model "Gemini 3.1 Pro (High)" --print "$(cat "$(pwd)/.swarm-prompt.txt")" > peer-agy.txt 2>peer-agy.stderr  # run with cwd=/tmp via subprocess, not shell cd
 codex exec --ignore-rules --ephemeral --json -m <resolved-model> --cd <dispatch-dir> --skip-git-repo-check "$(cat .swarm-prompt.txt)" 2>peer-codex.stderr
 ```
 
@@ -472,15 +473,15 @@ Produce a `consensus-report.md` (or inline if the user prefers) with this struct
 |---|---|---|---|---|---|---|---|
 | Primary | <your CLI> | <requested> | <resolved> | <version> | <source> | Responded | 1 |
 | Peer | claude | <requested or "n/a"> | <resolved or "unknown"> | <version or "not installed"> | <source> | Responded / Failed / Failed (Truncated) / Timed out / Retry exhausted / Withdrawn / Not installed / Resource unavailable | <count> |
-| Peer | gemini | <requested or "n/a"> | <resolved or "unknown"> | <version or "not installed"> | <source> | Responded / Failed / Failed (Truncated) / Timed out / Retry exhausted / Withdrawn / Not installed / Resource unavailable | <count> |
+| Peer | agy    | <requested or "n/a"> | <resolved or "unknown"> | <version or "not installed"> | <source> | Responded / Failed / Failed (Truncated) / Timed out / Retry exhausted / Withdrawn / Not installed / Resource unavailable | <count> |
 | Peer | codex  | <requested or "n/a"> | <resolved or "unknown"> | <version or "not installed"> | <source> | Responded / Failed / Failed (Truncated) / Timed out / Retry exhausted / Withdrawn / Not installed / Resource unavailable | <count> |
 
 ## Dispatch Diagnostics
 | CLI | Output Mode | stdout Parser | stderr Summary | Retry Notes |
 |---|---|---|---|---|
 | claude | json | result field / end marker | <short summary> | <attempt summary> |
-| gemini | json | response field / end marker | <short summary> | <attempt summary> |
-| codex | json | event stream / agent message | <short summary> | <attempt summary> |
+| agy    | text | full stdout stripped / end marker | <short summary> | <attempt summary> |
+| codex  | json | event stream / agent message | <short summary> | <attempt summary> |
 
 ## Debate Trace
 <Only include in debate mode. Capture round-by-round deltas, rationale changes, withdrawals, and position shifts before synthesis. For each disputed decision point, record each model's current position, why it held that position that round, whether it changed, and what would change its mind.>

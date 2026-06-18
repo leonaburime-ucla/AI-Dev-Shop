@@ -155,9 +155,35 @@ codex exec resume "$SESSION_ID" --json "Next task..." \
 - If `resume` fails (e.g., session expired or corrupted), classify as `malformed_or_no_output` and start a fresh session.
 - Session reuse is scoped to one workflow run. Do not reuse Codex sessions across different `/cowork`, `/consensus`, or `/audit-work` runs.
 
-### Gemini Session Reuse
+### agy (Gemini via agy CLI) Session Reuse
 
-Gemini CLI in headless mode (`-p`) does not perform expensive startup (it prioritizes the prompt over project docs). Session reuse is not required for Gemini but is available via `--resume latest` or `--resume <index>` if multi-turn dispatch is needed.
+The `gemini` CLI has been sunsetted for the individual tier. Use `agy` as the Gemini peer instead.
+
+**Key dispatch rules for `agy`:**
+
+- **Always run from `/tmp`** (or any directory outside the repo). `agy` has no `--ignore-rules` flag and will load `AGENTS.md` if invoked from within the repo, polluting the peer's context with Coordinator startup noise.
+- **Model flag:** `--model "Gemini 3.1 Pro (High)"` (use the exact string from `agy models`). The default peer model is `Gemini 3.1 Pro (High)`.
+- **Output mode:** `agy` returns plain text via `--print`. There is no `--output-format json` equivalent. Use the full stdout (stripped) as the peer answer — do not truncate to last line.
+- **Transport observability:** Tier 2 (deferred/buffered). Use probe-then-dispatch pattern.
+- **No session reuse** currently available in headless `--print` mode.
+
+**Single-shot dispatch pattern:**
+
+```bash
+cd /tmp && agy --model "Gemini 3.1 Pro (High)" --print "$(cat /path/to/prompt.txt)"
+```
+
+**What the `agy` preamble looks like:** When run from inside the repo, `agy` boots the Coordinator and prints startup info before the answer. Running from `/tmp` suppresses this entirely — output is the raw model response only.
+
+**Available models (from `agy models`):**
+- `Gemini 3.5 Flash (Low/Medium/High)`
+- `Gemini 3.1 Pro (Low/High)` ← default peer
+- `Claude Sonnet 4.6 (Thinking)`, `Claude Opus 4.6 (Thinking)` (same-family, exclude when primary is Claude)
+- `GPT-OSS 120B (Medium)`
+
+### Gemini Session Reuse (legacy — gemini CLI sunsetted)
+
+The original `gemini` CLI (`gemini -p`) is no longer available on the individual tier (`IneligibleTierError`). Use `agy` above.
 
 ### Claude CLI Session Reuse
 
@@ -346,7 +372,8 @@ Keep it to one short line. Don't add stall warnings or recommendations — the u
 
 - **Codex CLI** (`codex exec`): Buffers ALL stdout until process exit. Zero bytes during execution is normal. GPT-5.5 at xhigh reasoning takes 3-5 minutes for complex prompts. This is expected, not a stall.
 - **Claude CLI** (`claude -p`): May buffer until exit in headless mode.
-- **Gemini CLI** (`gemini -p`): Typically streams; byte growth is a valid liveness signal.
+- **agy** (`agy --print`): Buffers until process exit (Tier 2). Typical response time 15-30s. If invoked with the wrong model name format it will hang indefinitely — always verify the model string with `agy models` first.
+- **Gemini CLI** (`gemini -p`): Sunsetted for individual tier. Use `agy` instead.
 
 **Cost:** Zero tokens, negligible CPU (~1ms per check). The heartbeat adds no peer interaction — it only inspects local process state and file size.
 
