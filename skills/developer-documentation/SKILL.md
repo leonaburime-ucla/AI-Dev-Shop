@@ -46,6 +46,6 @@ The `@important` pattern: use `// @important: <reason>` for traps that future en
 ## References
 
 - README structure: `references/readme-template.md`
-- API docs, changelogs, migration guides: `references/api-and-migration-docs.md`
+- API docs and migration guides: `references/api-and-migration-docs.md`
 - Tutorial structure and teaching flow: `references/tutorial-pattern.md`
 - Changelog format and known-gotchas pattern: `references/changelog-template.md`

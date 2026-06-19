@@ -110,19 +110,13 @@ async function isSafeUrl(url: string): Promise<boolean> {
     return false;
   }
 
-  // Block private/reserved ranges
+  // Allow only public unicast addresses.
+  // ipaddr.process() normalizes IPv4-mapped IPv6 before range classification.
   for (const { address } of addresses) {
     try {
-      const ip = ipaddr.parse(address);
+      const ip = ipaddr.process(address);
       const range = ip.range();
-      if (
-        range === 'loopback' ||
-        range === 'linkLocal' ||
-        range === 'private' ||
-        range === 'uniqueLocal' ||
-        range === 'broadcast' ||
-        range === 'multicast'
-      ) {
+      if (range !== 'unicast') {
         return false;
       }
     } catch {
@@ -132,6 +126,10 @@ async function isSafeUrl(url: string): Promise<boolean> {
 
   return true;
 }
+
+// Known limitation: Azure IMDS (168.63.129.16) is classified as unicast by
+// ipaddr.js and not blocked by range checks. For Azure deployments, add an
+// explicit IP blocklist or use ssrf-req-filter for socket-level protection.
 
 // Use { redirect: 'error' } to prevent SSRF via redirects
 async function safeFetch(url: string) {

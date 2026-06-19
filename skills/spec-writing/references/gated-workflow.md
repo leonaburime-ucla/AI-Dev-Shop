@@ -31,7 +31,7 @@ A spec is ready to hand off when it can answer these six questions:
 - **Scope Boundary** — what is explicitly out of scope and why
 - **Open Questions** — what is unresolved, who owns it, and by when
 
-A spec does not need to be long, but it must answer the questions an implementer would otherwise guess. (For AI agent session setup completeness — Objective/Commands/Code Style/etc. — see `context-engineering/references/session-setup-patterns.md`.)
+A spec does not need to be long, but it must answer the questions an implementer would otherwise guess. (For AI agent session setup completeness — Tech Stack/Commands/Conventions/Agent Boundaries — see `context-engineering/references/session-setup-patterns.md`.)
 
 ## Living Document Principle
 

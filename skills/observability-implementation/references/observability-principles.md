@@ -84,7 +84,7 @@ Good:  "p99 latency is 450ms, p50 is 35ms"
 Bad:   "average latency is 38ms"   ← hides 450ms tail
 ```
 
-Prometheus histograms with `histogram_quantile` give accurate percentiles from aggregated bucket data. Use them.
+Prometheus histograms with `histogram_quantile` give aggregatable percentile estimates from bucket data. Accuracy depends on bucket boundaries — align buckets with your SLO thresholds. Native histograms (Prometheus 2.40+) give better resolution automatically.
 
 ---
 
@@ -148,8 +148,11 @@ process.on('SIGTERM', () => {
 ```
 
 ```bash
-# Start with auto-instrumentation loaded before app code
+# Node 18/20 (CommonJS): use --require
 node --require ./tracing.js dist/server.js
+
+# Node 22+ (ESM / "type": "module"): use --import
+node --import ./tracing.js dist/server.js
 ```
 
 Auto-instrumentation covers: HTTP/HTTPS, Express, Fastify, Prisma, pg, mysql2, Redis, gRPC, and more — without modifying application code.

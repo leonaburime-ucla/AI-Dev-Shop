@@ -20,7 +20,7 @@ Targets apply at the **75th percentile** of page loads. A page "passes" a metric
 What symptom are you seeing?
 ├── First page load is slow
 │   → Tool: Lighthouse (lab) + PageSpeed Insights (field/CrUX)
-│   → Metrics: LCP, FCP, TTI, TBT
+│   → Metrics: LCP, FCP, TBT, Speed Index
 ├── Interactions feel sluggish (click, type, toggle)
 │   → Tool: Chrome DevTools Performance panel → Interactions tab
 │   → Metrics: INP, Long Tasks (>50ms), blocking time
@@ -44,15 +44,15 @@ What symptom are you seeing?
 
 ```html
 <picture>
-  <!-- Art direction: different crop on small screens -->
+  <!-- Art direction: different crop on small screens (single URL per source, no w descriptor needed) -->
   <source
     media="(max-width: 768px)"
-    srcset="hero-mobile.avif 768w"
+    srcset="hero-mobile.avif"
     type="image/avif"
   />
   <source
     media="(max-width: 768px)"
-    srcset="hero-mobile.webp 768w"
+    srcset="hero-mobile.webp"
     type="image/webp"
   />
   <!-- Resolution switching: multiple sizes for larger screens -->
@@ -188,7 +188,8 @@ Each route becomes a separate chunk. Users only download code for pages they vis
 |----------|--------|-----------|
 | JavaScript (gzipped) | < 200KB | Beyond this, parse/compile time dominates on mid-range mobile |
 | CSS (gzipped) | < 50KB | Large CSS slows render-blocking stylesheet parse |
-| Time to Interactive | < 3.5s on 4G | 4G throttling (10Mbps, 50ms RTT) is the baseline for mobile perf |
+| Total Blocking Time (lab) | < 200ms | Lab proxy for main-thread responsiveness; measured by Lighthouse |
+| INP (field/RUM) | < 200ms at p75 | Current Core Web Vitals responsiveness target (replaces FID) |
 | Lighthouse Performance score | ≥ 90 | Composite score; correlates with CWV thresholds |
 | LCP image | < 200KB (AVIF) | Largest contentful image; compress before shipping |
 

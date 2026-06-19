@@ -193,7 +193,11 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      // Move focus into dialog when it opens
+      // Move focus into dialog when it opens.
+      // Note: this demonstrates focus-on-open only.
+      // For full WCAG 2.4.3 compliance, also trap focus (Tab/Shift+Tab
+      // cycles within dialog). Use `focus-trap-react` or implement via
+      // a keydown handler on the dialog container.
       firstFocusableRef.current?.focus();
     }
   }, [isOpen]);
@@ -254,4 +258,4 @@ Always verify layouts at these viewport widths:
 | 1024px | Small laptops, iPad landscape |
 | 1440px | Standard desktop monitor |
 
-Common failure points: navigation collapse/expand, table overflow, image scaling, form layout, font size readability, touch target size (minimum 44x44px per WCAG).
+Common failure points: navigation collapse/expand, table overflow, image scaling, form layout, font size readability, touch target size (WCAG 2.2 AA minimum is 24×24px with exceptions; 44×44px is WCAG 2.5.5 AAA and the Apple HIG / mobile best-practice target).

@@ -105,7 +105,7 @@ If any gate is unresolved, stop and surface the gap instead of guessing.
 
 **One-Version Rule.** Maintain one version of the API wherever possible. Multiple versions multiply maintenance cost, create diamond-dependency problems, and signal that the contract wasn't designed with longevity in mind.
 
-Load `references/branded-types.md` for branded ID types (TypeScript) and Input/Output type separation patterns.
+When the API is TypeScript-owned, generated TypeScript clients are in scope, or primitive ID mixups are a concrete risk, load `references/branded-types.md` for branded ID types and Input/Output type separation patterns.
 
 *Source: Addy Osmani / agent-skills / api-and-interface-design*
 
