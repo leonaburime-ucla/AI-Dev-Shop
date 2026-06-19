@@ -8,6 +8,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load test execution and pass/fail criteria (activated when performance harness constraints exist in tasks.md)
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — E2E test execution reference
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog and layer/boundary definitions; required for step 5 failure classification — distinguishing "architecture issue" (wrong layer, dependency direction violation) from "implementation bug" (logic error within correct structure)
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md` — mutation testing sensor contract; defines tools, thresholds, timeout policy, and gate behavior for step 3f
 
 ## Role
 Execute the full verification suite after implementation and report trustworthy pass/fail evidence to the Coordinator. This is a verification role — running existing tests, not writing new ones.
@@ -52,6 +53,38 @@ Execute the full verification suite after implementation and report trustworthy 
    If any metric fails, mark coverage as failing.
 3d. Build the Coverage Gap List: all Below Threshold files with their current %, target %, and uncovered line/branch/function/statement counts. Assign priority: High (core business logic or API adapters), Medium (orchestrators, infrastructure adapters), Low (view/UI components). If a per-file coverage baseline exists in `tasks.md`, flag any touched file whose coverage decreased vs. that baseline as a regression, regardless of whether it is still above threshold.
 3e. For any gate failure or remaining uncovered lines in changed/high-priority runtime paths, produce explicit rationale before stopping: what is uncovered, why it was not coverable in this cycle, and what route/action is required next.
+3f. **Mutation quality gate** (conditional — runs only when `mutation_tests` slot is
+   declared in computational controls):
+   - After all suites are green and coverage is evaluated, run the mutation testing
+     command from the `mutation_tests` slot against touched source files only.
+   - Replace `{touched_files}` in the command with the list of modified source files
+     that have corresponding tests. Format the list to match the tool's expected syntax
+     (e.g., comma-separated glob for Stryker, space-separated paths for mutmut).
+   - Enforce the timeout from the slot declaration (default 600s). Kill and classify
+     as Escalation (inconclusive) if exceeded.
+   - Parse results using the sensor contract in
+     `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`.
+   - Apply gate behavior:
+     - Score regression >10% vs baseline → Hard Blocker (pipeline stops)
+     - Score below ratcheted module floor → Escalation (slipped below established quality)
+     - Score below 60% absolute → Escalation (Coordinator decides)
+     - Score >=60% and <70% → Advisory (noted in report)
+     - Score >=70% with regression >0% and <=10% → Advisory (minor regression noted)
+     - Score >=70% with no regression or improvement → Pass
+     - Timeout → Escalation (inconclusive)
+     - Tool error or unsupported stack → Advisory (sensor degraded)
+     - Survived mutants in critical-path code (auth/payment/data-integrity) → Escalation regardless of overall score
+   - On first run for a project (no baseline exists): record initial scores to
+     `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-baseline.json`,
+     report advisory only, do not block. Recording baseline is evidence capture,
+     not test authoring — consistent with TestRunner's verification role.
+   - Include survived mutant details in the run report under a
+     `## Mutation Quality` section.
+   - Route gate failures: Hard Blocker → back to Programmer/TDD before Code Review;
+     Escalation → Coordinator decides routing.
+   - If the mutation_tests slot is not declared, or its Command field is empty,
+     "not declared", or "none": do not run; include
+     `Mutation: N/A — slot not declared` in the report.
 4. Run acceptance checks against spec criteria. Verify total executed tests is
    greater than zero and matches or exceeds the expected runnable test count in
    `test-certification.md`. `0 tests found`, skipped-only runs, or empty suites

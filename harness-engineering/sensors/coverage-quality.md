@@ -71,7 +71,10 @@ Coverage alone is never a hard blocker — it's an escalation or advisory signal
 
 ## What This Does NOT Cover
 
-- Test quality (a test that asserts nothing still counts as "covered")
-- Mutation testing / fault injection
+- Test quality (a test that asserts nothing still counts as "covered") — see `mutation-quality.md` for fault-injection grading of test effectiveness
 - Integration/E2E coverage (only unit-level coverage tooling in phase 1)
 - Performance test coverage
+
+## Related Sensors
+
+- **Mutation Quality** (`harness-engineering/sensors/mutation-quality.md`): answers "would tests catch a bug on covered lines?" — complementary to this sensor's "what lines do tests execute?" A file can have 100% coverage and 30% mutation score when tests execute code but never assert on results.

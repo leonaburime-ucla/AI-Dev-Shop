@@ -17,6 +17,17 @@
 - <why>
 - <verification run or not run>
 
+## Internal Verification
+- **Verifier persona:** <Code Review | TDD | Security | generic adversarial verifier>
+- **Evidence packet:** <path or summary of what was included>
+- **Excluded rationale statement:** confirmed excluded author-side rationale (implementation reasoning, confidence claims, dismissed alternatives)
+- **Findings:** <hard blockers / escalations / advisories / none — with count>
+- **Gate recommendation:** <hard blocker | escalation | advisory | no issue>
+- **Mutation-quality interpretation:** <summary or N/A if sensor not active>
+- **Residual risk:** <remaining uncertainty after internal verification>
+- **External peer audit still required:** <yes/no and why>
+- **Score:** <1-10>
+
 ## Auditor Matrix
 | Auditor | Requested Model | Resolved Model | Selection Source | CLI Version | Score | Rationale | Path to 10 | Output Mode | Suggest Mode Used | Attempts | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|

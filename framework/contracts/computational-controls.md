@@ -56,6 +56,18 @@ Every host project should declare as many of these as apply. Each slot is a sing
 - **Success criteria**: exit code 0
 - **Environment**: note any required services (database, Redis, etc.)
 
+### mutation_tests
+
+- **Command**: e.g., `npx stryker run --mutate '{touched_files}'`, `mutmut run --paths-to-mutate={touched_files}`
+- **Working directory**: project root unless specified
+- **Required**: yes/no
+- **Blocking**: conditional (default behavior is escalation; hard-blocks only on >10% score regression — full gate logic in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`)
+- **Timeout**: default 600 (mutation testing is expensive; projects may increase)
+- **Success criteria**: exit code 0 (gate behavior beyond exit code — including absolute thresholds, regression checks, and first-run baseline — is defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`)
+- **Scope placeholder**: `{touched_files}` is replaced at runtime with the list of modified source files that have corresponding test files (mutating untested files produces no meaningful signal). Format per tool syntax (comma-separated glob for Stryker, space-separated for mutmut, etc.)
+- **Baseline location**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-baseline.json`
+- **Notes**: triggered by TestRunner after green suite + coverage evaluation. If this slot is not declared, the mutation quality sensor is inactive (advisory note only).
+
 ### static_analysis
 
 - **Command**: e.g., `npm run analyze`, `semgrep --config=auto`
@@ -70,9 +82,11 @@ Every host project should declare as many of these as apply. Each slot is a sing
 | Stage | Slots used |
 |-------|-----------|
 | Programmer (during implementation) | lint, typecheck, build, unit_tests |
-| Programmer (before handoff) | all declared slots |
-| TestRunner | unit_tests, integration_tests |
+| Programmer (before handoff) | all declared slots except mutation_tests |
+| TestRunner | unit_tests, integration_tests, mutation_tests* |
 | Code Review | lint, typecheck, static_analysis |
+
+*`mutation_tests` runs conditionally after `unit_tests` and `integration_tests` pass. See TestRunner agent skills for sequencing details.
 
 ## Behavior When Contract Is Missing
 

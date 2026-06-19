@@ -55,8 +55,80 @@ Act as an External Audit Coordinator.
    - A valid Claude proof is an exact environment cache hit with a real artifact path, an exact-model `session_success` earlier in the current session on the same host/CLI, or a fresh discovery run that writes a new artifact.
    - If discovery finds a working exact Claude model in the same requested family/version, use it and continue.
    - If discovery finds only a different family/version, stop and ask the user before switching.
-9. If any planned exact auditor model/version is not explicitly pinned or locally proven, stop and print a model-pinning gate:
+9. If any planned exact auditor model/version is not explicitly pinned or locally proven, record a pending model-pinning gate but do not stop yet. Continue through Internal Subagent Verification (steps 9a-9l). External dispatch remains blocked until the model issue is resolved at step 9m.
+
+## Internal Subagent Verification Protocol
+
+9a. Before dispatching any external peer audit, run one internal verification subagent inside the current session. This supplements the external peer audit path; it does not replace external review for high-risk, disputed, release-sensitive, security-sensitive, or architecture-significant work.
+
+9b. Build a curated evidence packet for the internal verifier. Include only:
+   - Active spec: requirements, acceptance criteria, invariants, and explicit non-goals from `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`
+   - Active contracts: computational controls, architecture fitness rules, interface contracts, and relevant ADRs from `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/` and `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`
+   - Output artifacts: current diff, changed files, new or changed test files, generated artifacts, and migration files
+   - Test evidence: TestRunner report, command output summaries, coverage data, mutation quality results from `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`, and known skipped or unavailable checks
+   - Review rubric: Code Review dimensions from `<AI_DEV_SHOP_ROOT>/agents/code-review/skills.md`
+   - Relevant domain skill: for example `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` for TDD output or `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` for Programmer output
+   - Any explicit user constraints that affect correctness, risk, compatibility, or delivery scope
+
+9c. Exclude all author-side rationale from the evidence packet. Do not provide implementation reasoning, decision justification, confidence claims, "why I chose this," dismissed alternatives, or self-assessments from the authoring agent. The verifier must evaluate the work on observable requirements, artifacts, and evidence only. This exclusion prevents rationalization bias and forces evaluation entirely on the merits.
+
+9d. Spawn the verifier with adversarial framing:
+   > "Assume defects exist. Your job is to find them, not confirm correctness. Evaluate this work strictly against the provided specs, contracts, and evidence."
+   Require the verifier to read the supplied rubric and domain skill before review. Default persona selection (priority order — when work matches multiple categories, use the highest-priority persona): Security agent for security-sensitive work > Code Review agent for implementation work > TDD agent for test-design work. If no specific persona applies, use a generic adversarial verifier without agent-specific bootstrapping. If using a reserved pipeline agent persona, bootstrap it from `<AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md` and require confirmation that the persona file was loaded.
+
+9e. The verifier must inspect the curated packet against the active spec, contracts, tests, and review rubric. To maximize first-pass coverage, the verifier must work through these explicit dimensions in order before reporting:
+   1. Cross-file consistency: are thresholds, gate behaviors, terminology, enums, and paths identical everywhere they appear?
+   2. Contract violations: does the implementation match declared interfaces, slot definitions, and stage tables?
+   3. Requirement drift: does the output satisfy every acceptance criterion in the spec?
+   4. Logic completeness: are conditions mutually exclusive and exhaustive? Are there unreachable states?
+   5. Template/registry propagation: are all new concepts registered in indexes, templates, and README files?
+   6. Incorrect behavior: will an agent following these instructions produce the intended result unambiguously?
+   7. Weak or absent tests: is claimed coverage backed by evidence?
+   8. Unsafe assumptions: are there implicit dependencies on ordering, environment, or undeclared state?
+   9. Regressions: does this change break existing documented behavior?
+   10. Security issues, migration/data risks, and evidence gaps
+   After exhausting this checklist, the verifier should also surface any other issues found. The checklist front-loads structured coverage; freeform discovery is the catch-all at the end.
+
+9f. Mutation quality results are part of the verifier's evidence. Survived mutants may be cited as concrete evidence of weak test coverage. Escalate finding severity by one level when:
+   - The mutation score on touched files is below the sensor's passing threshold (70%) AND the work product claims test adequacy or completeness, OR
+   - Survived mutants directly correspond to acceptance criteria or invariant assertions (matching by file and function)
+   The verifier may suppress escalation only by citing a specific equivalent-mutant classification or out-of-scope determination with file/line evidence.
+
+9g. Each verifier finding must use this structure:
+   - **Checked:** the requirement, contract, behavior, test claim, or risk area examined
+   - **Expected:** what the spec, contract, rubric, or reasonable engineering standard requires
+   - **Observed:** what the artifacts or evidence show
+   - **Why it matters:** the user impact, correctness risk, maintainability risk, or release risk
+   - **Recommended fix:** the smallest actionable correction or next investigation step
+   - **Confidence:** high, medium, or low, with a short reason
+
+9h. Classify each finding by severity: critical, high, medium, low, or advisory. Also assign one gate recommendation per finding:
+   - **Hard blocker:** must be fixed before merge, release, or external audit
+   - **Escalation:** requires owner, architect, security, database, or external peer review before proceeding
+   - **Advisory:** useful improvement but not blocking
+   - **No issue:** checked area passed with no actionable defect
+   The internal verifier must also produce a numerical score (1-10) with one-sentence rationale, using the same risk-tiered score floor as external auditors (low risk = 7, medium/high risk = 8.5). A score below the applicable floor is treated as a blocking finding that prevents proceeding to external dispatch.
+
+9i. If the verifier reports zero findings, it must still provide:
+   - **Checks performed:** concise list of concrete areas reviewed
+   - **Evidence used:** diff, tests, reports, mutation data, contracts, and spec references considered
+   - **Residual risk:** what may still be wrong despite no findings
+   - **Gate recommendation:** no issue, advisory, or escalation if uncertainty remains
+
+9j. Zero findings are allowed, but zero findings on high-risk work are not a completion signal by themselves. For high-risk, disputed, release-sensitive, security-sensitive, or architecture-significant changes, external peer audit (step 10) is mandatory even when the internal verifier finds no issues. Optionally, run a second internal pass with a different persona before proceeding to step 10 for additional coverage.
+
+9k. Gate handling:
+   - If the internal verifier finds any hard blocker, return the work to the responsible implementation or upstream stage. Do NOT proceed to external audit dispatch (step 10).
+   - If the verifier recommends escalation, route to the appropriate specialist or external peer audit before completion.
+   - If only advisory issues are found, record them in the audit result and let the Coordinator decide whether to fix now or defer. Proceed to step 10.
+   - If no issues are found and the work is routine risk, proceed to step 10 (external audit dispatch).
+   - If no issues are found and the work is high risk, proceed to step 10 — external peer audit is mandatory for high-risk work regardless of internal results.
+
+9l. Record the internal verification result in the audit artifact under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/internal-verification/`. Include the curated packet summary, excluded rationale statement, verifier findings, gate recommendation, mutation-quality interpretation, residual risk, and whether external peer audit is still required.
+
+9m. Model-pinning gate (deferred from step 9): If any planned exact auditor model/version is still not explicitly pinned or locally proven after internal verification completes, stop before external dispatch and print:
    `Planned auditors: <CLI=model-or-unproven list>. Exact model/version is not proven for: <CLI list>. Reply with auditors=... and claude_model=..., gemini_model=..., or codex_model=... using exact model name/version(s) to proceed.`
+
 10. If every planned exact auditor model/version is explicit or locally proven, dispatch the audit prompt to each planned auditor independently.
    - every auditor gets the same canonical packet
    - auditors must not see each other's answers before responding

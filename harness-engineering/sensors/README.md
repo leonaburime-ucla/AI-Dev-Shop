@@ -20,6 +20,7 @@ A scheduled or event-driven check that measures codebase health decay over time.
 | [Dead Code](dead-code.md) | computational | PR + scheduled | Observer → Refactor | `dead-code.md` |
 | [Dependency Drift](dependency-drift.md) | computational | daily + lockfile change | Observer → Security/DevOps | `dependency-drift.md` |
 | [Coverage Quality](coverage-quality.md) | computational + inferential | PR + scheduled | Observer → TDD/Programmer | `coverage-quality.md` |
+| [Mutation Quality](mutation-quality.md) | computational | PR (conditional) + scheduled | TestRunner PR gate; Observer scheduled trends → TDD/Programmer | `mutation-quality.md` |
 
 ## Standard Artifact Location
 
@@ -36,6 +37,8 @@ Promoted findings (those that trigger action) are copied to:
 3. Observer reads artifact during its next pass (or immediately if sensor triggers escalation)
 4. Observer classifies findings and routes to the appropriate agent
 5. Receiving agent acts (refactor, patch, add tests) or the finding is added to `tech-debt-tracker.md`
+
+**Exception:** Mutation Quality operates as a dual-mode sensor. In PR context, TestRunner owns and gates on mutation results inline (not via Observer routing). In scheduled context, Observer owns full-scope mutation trend tracking and routes to TDD/Programmer. This is a documented exception to the Observer-only routing pattern above.
 
 ## What Is NOT in Phase 1
 
