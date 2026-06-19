@@ -64,7 +64,8 @@ Execute the full verification suite after implementation and report trustworthy 
      as Escalation (inconclusive) if exceeded.
    - Parse results using the sensor contract in
      `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`.
-   - Apply gate behavior:
+   - Apply gate behavior (when multiple conditions match, apply the most severe:
+     Hard Blocker > Escalation > Advisory > Pass):
      - Score regression >10% vs baseline → Hard Blocker (pipeline stops)
      - Score below ratcheted module floor → Escalation (slipped below established quality)
      - Score below 60% absolute → Escalation (Coordinator decides)

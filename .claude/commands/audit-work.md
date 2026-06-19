@@ -65,7 +65,7 @@ Act as an External Audit Coordinator.
    - Active spec: requirements, acceptance criteria, invariants, and explicit non-goals from `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`
    - Active contracts: computational controls, architecture fitness rules, interface contracts, and relevant ADRs from `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/` and `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`
    - Output artifacts: current diff, changed files, new or changed test files, generated artifacts, and migration files
-   - Test evidence: TestRunner report, command output summaries, coverage data, mutation quality results from `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`, and known skipped or unavailable checks
+   - Test evidence: TestRunner report, command output summaries, coverage data, mutation quality results from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-quality-<timestamp>.md` (plus the sensor contract at `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md` for gate interpretation), and known skipped or unavailable checks
    - Review rubric: Code Review dimensions from `<AI_DEV_SHOP_ROOT>/agents/code-review/skills.md`
    - Relevant domain skill: for example `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` for TDD output or `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` for Programmer output
    - Any explicit user constraints that affect correctness, risk, compatibility, or delivery scope
