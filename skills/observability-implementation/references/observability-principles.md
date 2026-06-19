@@ -148,10 +148,10 @@ process.on('SIGTERM', () => {
 ```
 
 ```bash
-# Node 18/20 (CommonJS): use --require
+# CommonJS preload
 node --require ./tracing.js dist/server.js
 
-# Node 22+ (ESM / "type": "module"): use --import
+# ESM preload (available in Node 18.18+ and 20+)
 node --import ./tracing.js dist/server.js
 ```
 

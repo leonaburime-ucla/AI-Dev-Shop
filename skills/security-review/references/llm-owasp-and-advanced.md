@@ -127,9 +127,11 @@ async function isSafeUrl(url: string): Promise<boolean> {
   return true;
 }
 
-// Known limitation: Azure IMDS (168.63.129.16) is classified as unicast by
-// ipaddr.js and not blocked by range checks. For Azure deployments, add an
-// explicit IP blocklist or use ssrf-req-filter for socket-level protection.
+// Known limitation: Azure platform/WireServer IP 168.63.129.16 is classified
+// as unicast by ipaddr.js and not blocked by range checks. Azure IMDS itself
+// is 169.254.169.254 and is blocked as link-local by the check above. For
+// Azure deployments, add an explicit platform-IP policy or use ssrf-req-filter
+// for socket-level protection.
 
 // Use { redirect: 'error' } to prevent SSRF via redirects
 async function safeFetch(url: string) {

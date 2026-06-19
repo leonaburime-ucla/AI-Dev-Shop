@@ -18,6 +18,13 @@ cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
 
 Then type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, or `/handoff` directly in chat. If you haven't done the copy yet, use Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md` — paste the template contents directly as a prompt.
 
+## Tmp Space
+
+If `/tmp` fills up (ENOSPC during audits or task spawning), clean stale session dirs:
+```bash
+rm -rf /private/tmp/claude-501/
+```
+
 ## Eval Work — Mandatory Pre-reads
 
 Before creating, revising, or auditing any eval suite, ALWAYS read these files first:

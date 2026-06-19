@@ -195,9 +195,9 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
     if (isOpen) {
       // Move focus into dialog when it opens.
       // Note: this demonstrates focus-on-open only.
-      // For full WCAG 2.4.3 compliance, also trap focus (Tab/Shift+Tab
-      // cycles within dialog). Use `focus-trap-react` or implement via
-      // a keydown handler on the dialog container.
+      // For modal-dialog accessibility, also trap focus (Tab/Shift+Tab
+      // cycles within dialog) per WAI-ARIA APG. Use `focus-trap-react`
+      // or implement via a keydown handler on the dialog container.
       firstFocusableRef.current?.focus();
     }
   }, [isOpen]);
