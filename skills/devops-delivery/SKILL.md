@@ -34,6 +34,16 @@ The pipeline produces tested, reviewed, secure code. This skill covers the last 
 - **Canary**: route small % of traffic to new version; catch issues before full rollout; requires feature flag or load balancer support.
 - **Choose based on**: criticality of service, rollback speed requirement, infra cost tolerance.
 
+## Delivery Principles
+
+**Shift Left.** Move quality checks as early in the pipeline as possible — a failure caught in lint costs nothing; the same failure caught in production costs everything. Every gate that can run before the next one should.
+
+Load `references/quality-gate-pipeline.md` for the full gate sequence diagram and CI optimization strategies.
+Load `references/pre-launch-checklist.md` before any production deployment.
+Load `references/rollout-decision-thresholds.md` during or after a rollout to decide advance/hold/rollback.
+
+*Source: Addy Osmani / agent-skills / ci-cd-and-automation, shipping-and-launch*
+
 ## Environment Management
 
 - Promote artifacts (not source) through environments: dev → staging → production.

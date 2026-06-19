@@ -111,6 +111,14 @@ Route Recommendation:
 Programmer Agent to implement. TestRunner to verify green before and after.
 ```
 
+## Refactoring Guardrails
+
+**Chesterton's Fence.** Understand why code exists before removing it. Check git blame and surrounding context before simplifying — the apparent complexity may be a deliberate invariant, a workaround for a specific bug, or a constraint not visible in the code. If you can't explain why it's there, don't remove it yet.
+
+**Rule of 500.** If a refactoring would touch more than 500 lines, invest in automation (codemods, AST transforms) rather than manual edits. When this threshold is crossed, load `references/rule-of-500.md` for codemod guidance and the over-simplification failure modes to avoid.
+
+*Source: Addy Osmani / agent-skills / code-simplification*
+
 ## Rules of Safe Refactoring
 
 1. **Tests must be green before you start.** Never refactor against failing tests.

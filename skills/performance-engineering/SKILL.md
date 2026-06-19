@@ -49,3 +49,7 @@ Performance is a spec requirement, not an afterthought. When a spec declares lat
 - **Missing database index**: full table scan on filtered query — fix with index on filter column(s).
 - **Synchronous blocking I/O in hot path**: network call or disk read blocking the event loop.
 - **Cold-start latency**: first request penalty — warm up before measuring.
+
+## References
+
+For web/frontend performance work, load `references/web-performance-targets.md` for Core Web Vitals targets, image optimization patterns, and performance budgets.

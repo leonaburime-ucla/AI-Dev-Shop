@@ -210,3 +210,12 @@ Software Architect, or Spec.
 **Ignoring non-functional characteristics**: Correctness is necessary. So is not fetching 10,000 rows into memory on every request.
 
 **Conflating review with refactor**: Code review identifies problems and routes them. It does not implement fixes. Fixes go back to Programmer or Refactor Agent via Coordinator.
+
+## References
+
+Load `references/review-discipline.md` when:
+- Sizing a change or deciding whether to split it
+- Writing or structuring review feedback (honesty rules, sycophancy red flags)
+- Adding a new dependency (dependency discipline checklist)
+- Setting up a review process for a team or PR template
+- Reviewing a large or high-risk change that warrants multi-model review

@@ -30,6 +30,16 @@ Close out implementation with a small, explicit decision tree.
 - final branch state
 - final worktree state
 
+## Branch and Commit Standards
+
+**Trunk-Based Development** is the recommended default (DORA research: high-performing engineering teams use short-lived branches merged frequently to trunk). Keep branches alive for hours or days, not weeks. Long-lived branches are a merge-debt accumulation pattern.
+
+Load `references/commit-standards.md` for:
+- Conventional commit types table (feat/fix/refactor/test/docs/chore)
+- Change Summaries pattern — the structured post-implementation communication format with CHANGES MADE / THINGS I DIDN'T TOUCH / POTENTIAL CONCERNS sections
+
+*Source: Addy Osmani / agent-skills / git-workflow-and-versioning*
+
 ## Reference
 
 - Preconditions:

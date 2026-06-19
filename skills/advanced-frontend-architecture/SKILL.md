@@ -28,10 +28,13 @@ Evaluate frontend architecture candidates against project constraints. Produce a
 Read this file for the evaluation procedure. Load references only when needed:
 
 - `references/architecture-catalog.md` — candidate profiles and scoring baselines
+- `references/frontend-implementation-patterns.md` — AI Aesthetic anti-patterns, component architecture rules, state management guide, loading patterns, accessibility implementation
 - Cross-reference `<AI_DEV_SHOP_ROOT>/skills/system-design/SKILL.md` for CDN/edge/load-balancing/capacity
 - Cross-reference `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` for pattern implementation details
 - Cross-reference `<AI_DEV_SHOP_ROOT>/skills/vercel-react-best-practices/SKILL.md` for React performance specifics
 - Cross-reference `<AI_DEV_SHOP_ROOT>/skills/feature-slice-design/SKILL.md` for FSD layer implementation
+
+When **reviewing** frontend components or evaluating a frontend architecture decision, load `references/frontend-implementation-patterns.md` for the AI Aesthetic anti-patterns, component architecture rules, and accessibility implementation patterns. For hands-on implementation work, route to `skills/frontend-react-orcbash/SKILL.md` or `skills/feature-slice-design/SKILL.md`.
 
 ---
 

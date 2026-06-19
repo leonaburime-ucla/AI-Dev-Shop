@@ -205,3 +205,9 @@ until the tests exist.
 **No cross-module phases**: One phase touches one module or one boundary type. Broad phases that touch everything fail.
 
 **Confirm with Architect**: The migration plan should be reviewed against the project's ADRs (if any exist) before the Coordinator dispatches the Programmer Agent to execute phases.
+
+## References
+
+When planning system deprecations, sunsetting APIs, or migrating legacy systems, load `references/deprecation-lifecycle.md` for the compulsory vs. advisory deprecation decision framework, the Churn Rule, zombie code identification, and Hyrum's Law applied to deprecation.
+
+*Source: Addy Osmani / agent-skills / deprecation-and-migration*

@@ -99,6 +99,16 @@ For each included file, list what contracts it houses and why that separation ex
 - TDD Agent: uses the Contract Map, Wiring Map, and Critical Invariants to build the Outcome Matrix and contract/integration tests. If skipped but needed, reports `[OUTLINE_REQUESTED]`.
 - Programmer: uses the Contract Map and Wiring Map in the ADR checklist and Architecture Audit. If skipped but needed, reports `[OUTLINE_REQUESTED]`.
 
+## Work Breakdown
+
+Load `references/work-breakdown.md` for:
+- Task sizing table (XS–XL with file counts, time estimates, and examples)
+- "When to break a task down further" rules (can't describe AC in 3 bullets, crosses two independent subsystems, title contains "and")
+- Risk-First Slicing — tackle highest-risk piece first, fail fast before investing in dependent slices
+- Contract-First Slicing — define the shared API contract first, then let backend and frontend parallelize against mock data
+
+*Source: Addy Osmani / agent-skills / planning-and-task-breakdown*
+
 ## Anti-Patterns
 
 - Turning the outline into pseudo-code.

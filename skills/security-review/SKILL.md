@@ -163,3 +163,7 @@ Human Sign-Off Required: Yes
 **Human sign-off required**: Any Critical finding. Any High finding that affects authentication, authorization, or data exfiltration.
 
 The Security Agent never commits code directly. It produces a findings report. The Programmer implements the fix. The Security Agent verifies.
+
+## References
+
+When reviewing code that interacts with LLMs, handles external npm dependencies, or exposes server-side URL fetch endpoints, load `references/llm-owasp-and-advanced.md` before proceeding.

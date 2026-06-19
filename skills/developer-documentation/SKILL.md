@@ -35,8 +35,17 @@ Use this for README files, tutorials, API references, migration guides, changelo
 5. Document breaking or high-impact changes with migration steps and compatibility notes.
 6. Verify examples, command names, file paths, and config keys against the current implementation or approved spec.
 
+## Inline Comment Discipline
+
+Comment the **why**, not the what. Well-named identifiers explain what code does. Comments exist for hidden constraints, subtle invariants, workarounds for specific bugs, or behavior that would surprise a future reader. If removing the comment wouldn't confuse anyone, don't write it.
+
+The `@important` pattern: use `// @important: <reason>` for traps that future engineers will fall into — non-obvious behavior, known gotchas, or constraints that look removable but aren't.
+
+*Source: Addy Osmani / agent-skills / documentation-and-adrs*
+
 ## References
 
 - README structure: `references/readme-template.md`
 - API docs, changelogs, migration guides: `references/api-and-migration-docs.md`
 - Tutorial structure and teaching flow: `references/tutorial-pattern.md`
+- Changelog format and known-gotchas pattern: `references/changelog-template.md`

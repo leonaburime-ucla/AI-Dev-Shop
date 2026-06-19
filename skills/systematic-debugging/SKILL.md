@@ -282,6 +282,9 @@ These techniques are part of systematic debugging and available in this director
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
 - **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+- **`references/debugging-advanced.md`** - Non-reproducible bug triage tree, git bisect pattern, safe fallback templates
+
+For non-reproducible bugs or regression investigations, load `references/debugging-advanced.md` for the triage tree, git bisect pattern, and safe fallback templates.
 
 **Related skills:**
 - **superpowers:test-driven-development** - For creating failing test case (Phase 4, Step 1)

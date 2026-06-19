@@ -293,6 +293,16 @@ Load `references/property-based-testing.md` when you need:
 - library guidance
 - certification examples
 
+## Test Quality Heuristics
+
+**DAMP over DRY in tests.** A test should tell a complete story without requiring the reader to trace through shared helpers. Clarity is the priority — duplication is the acceptable cost. Shared setup is fine for infrastructure; avoid shared setup for the scenario logic itself.
+
+**Beyoncé Rule.** If you liked it, you should have put a test on it. When an infrastructure change breaks behavior, the test owner is responsible — not the infrastructure change author. Tests claim ownership of what they cover.
+
+**Mock preference order.** Use the most realistic option available: Real implementation > Fake (in-memory) > Stub > Mock (interaction-based). Use mocks only when the real implementation is too slow, non-deterministic, or has uncontrollable side effects.
+
+**Test sizes by resource use** (orthogonal to unit/integration/E2E pyramid): load `references/test-size-model.md` when classifying tests by resource footprint rather than scope.
+
 ## Coverage Gaps
 
 When a requirement cannot be tested (missing architecture contract, unresolved spec ambiguity, external dependency not yet available):

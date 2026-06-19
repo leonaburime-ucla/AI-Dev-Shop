@@ -99,6 +99,16 @@ If any gate is unresolved, stop and surface the gap instead of guessing.
 - Name the migration path for breaking changes at design time, not during rollout.
 - If a design mixes interfaces, describe how they relate instead of pretending they are interchangeable.
 
+## API Contract Principles
+
+**Hyrum's Law.** With enough users, every observable behavior of your API becomes a de facto contract — including undocumented quirks, error message text, timing, and ordering. Design with this in mind: anything you expose will be depended upon, whether you intended it or not.
+
+**One-Version Rule.** Maintain one version of the API wherever possible. Multiple versions multiply maintenance cost, create diamond-dependency problems, and signal that the contract wasn't designed with longevity in mind.
+
+Load `references/branded-types.md` for branded ID types (TypeScript) and Input/Output type separation patterns.
+
+*Source: Addy Osmani / agent-skills / api-and-interface-design*
+
 ## Composition With Other Skills
 
 - `skills/api-contracts/SKILL.md` after the interface style is chosen and concrete contract shapes exist

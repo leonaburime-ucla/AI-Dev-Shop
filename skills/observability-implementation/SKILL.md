@@ -46,3 +46,7 @@ Observability is not logging. It is the ability to ask arbitrary questions about
 - [ ] Request latency histogram emitted per endpoint
 - [ ] Health check endpoint returns 200 with service metadata (version, uptime)
 - [ ] No secrets or raw PII in any log output
+
+## References
+
+Before designing any telemetry, load `references/observability-principles.md` for the define-working-first discipline, RED/USE frameworks, cardinality rules, and alerting requirements.

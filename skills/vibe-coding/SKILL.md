@@ -20,6 +20,12 @@ Ship a rough prototype fast. Optimize for momentum and learning, not production 
 - Prefer minimal files and direct implementation.
 - Avoid heavy architecture, templates, and documentation unless requested.
 - Work on a scratch branch or scratch directory — do not commit exploratory code to main.
+- **Under-specification check**: if the request has no clear artifact (what to build), no target user (who it is for), or no success condition (how to know it works) — offer one sentence before building: "This is open-ended — want me to run a quick structured sharpening before we build, or just start?" Default is start if no answer. If the request contains **contradictory directions**, do not default to start — ask the user to resolve the contradiction first.
+
+## Available Skills (suggest to user, not callable tools)
+
+- `idea-refine` skill — structured sharpening pass: diverge via lenses → cluster → stress-test → "Not Doing" list. Suggest when user is exploring options.
+- `interview-me` skill — one-question-at-a-time intent extraction. Suggest when user can't articulate what success looks like.
 
 ## Output Expectations
 

@@ -9,6 +9,10 @@ description: Use when managing agent context windows, designing context injectio
 
 The goal is always the smallest set of high-signal tokens that maximizes the likelihood of desired outcomes. Every agent gets exactly what it needs for its task — nothing more.
 
+Load `references/session-setup-patterns.md` for: CLAUDE.md/rules file template, Brain Dump and Selective Include context injection patterns, cross-tool rules file equivalents (.cursorrules, AGENTS.md, etc.), MCP integration table, and the Silent Confusion anti-pattern.
+
+*Source: Addy Osmani / agent-skills / context-engineering*
+
 ## Agent Skills Files as the Primary Context Mechanism
 
 Each agent's `skills.md` file is loaded once at dispatch and defines its operating parameters. It does not grow during a session.

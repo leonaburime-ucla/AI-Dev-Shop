@@ -289,6 +289,14 @@ Always include `spec-manifest.md` documenting what was produced and what was omi
 
 When creating specs for existing code, write requirements from the observable behavior — what the code *does*, not what you wish it did. If the code has bugs or design problems, note them in a `## Known Issues` section rather than speccing desired behavior as if it exists. Reference other files by name — do not restate what they do.
 
+## Writing Sharp Requirements
+
+**Reframe instructions as success criteria.** Vague requirements ("make it faster", "improve the UX") must be translated into measurable criteria ("LCP < 2.5s on 4G", "task completion rate > 85%") before a spec can be written. Always confirm the reframed criteria with the user before proceeding.
+
+Load `references/gated-workflow.md` for the gated spec workflow diagram (SPECIFY → PLAN → TASKS → IMPLEMENT with human review gates) and the six-area spec completeness checklist.
+
+*Source: Addy Osmani / agent-skills / spec-driven-development*
+
 ## Spec Change Protocol
 
 When requirements change mid-development:
