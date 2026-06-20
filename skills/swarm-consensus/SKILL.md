@@ -280,6 +280,24 @@ If the prompt requires online resources (URLs, external files, live data from th
 
 **Rationale:** Some LLMs in the swarm may not have web access, or the same URL may return differently across models. Pre-fetching by the primary model guarantees all peers reason from identical source material.
 
+### Source Material Gate (hard requirement, debate mode)
+
+When a debate or consensus question originates from or explicitly references an external resource (article, paper, blog post, documentation page, or any URL the user shared as the basis for the discussion):
+
+1. **The full text of that source material MUST be embedded in the peer dispatch packet.** A summary or paraphrase is not sufficient — peers need the same primary source the primary model reasoned from.
+2. The primary model must attempt to fetch the resource before dispatch. Use web fetch, Wayback Machine, or any available retrieval method.
+3. If the resource cannot be fetched (auth wall, paywall, rate limit, 403/429):
+   - Tell the user: "I couldn't fetch [URL]. For a higher-quality debate, I need the full source text so all participants reason from identical material."
+   - Ask the user to paste the article/paper content directly, or provide an accessible alternative URL.
+   - Explain: "Having full context materially improves debate quality — without it, peers may hallucinate details or argue from incomplete understanding."
+4. If the user cannot provide the text either:
+   - Ask whether to proceed with whatever partial content was obtained (e.g., title, snippet, cached excerpt).
+   - If proceeding, add a `## Source Material Limitation` section to the peer packet declaring exactly what was and was not available.
+   - All participants must be told the source is incomplete so they can flag reasoning gaps.
+5. Never dispatch a debate where the triggering source was available to the primary model but withheld from peers. That creates an asymmetric information advantage that undermines debate integrity.
+
+**Rationale:** Debates triggered by external research lose most of their value when peers argue from summaries or partial context. The primary model has already read the source — peers deserve the same grounding to produce genuinely independent, well-informed positions.
+
 ### Prompt Transport Safety (hard requirement)
 
 Do not pass large or untrusted prompt text directly as shell-interpolated inline strings.

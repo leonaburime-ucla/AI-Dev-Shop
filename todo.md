@@ -116,6 +116,47 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - At least 5 remaining concrete ideas are classified as `adopt/adapt/already-covered/skip`, with rationale.
 - Any future adaptation has a small first task and a clear no-vendor/no-drift policy.
 
+### Arbor HTR Mode Integration **[OPEN]**
+**Source:** 3-model debate (Claude Opus 4.6, Gemini 3.1 Pro, Codex GPT-5.5 xhigh) on 2026-06-20.
+**Paper:** "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement" (Jin et al., Renmin University + Microsoft Research, arXiv:2606.11926, June 2026).
+**Local paper copy:** `/Users/la/Downloads/arbor htr.pdf`
+**Debate report:** `ADS-project-knowledge/reports/swarm-consensus/runs/20260620-arbor-htr-mode-debate.md`
+**What it is:** Add an opt-in "Arbor HTR Mode" to the Coordinator — a persistent hypothesis-tree-driven optimization loop that achieves 2.5x verified gains over flat coding agents on autonomous optimization tasks.
+**Why it matters:** The existing linear pipeline is excellent for spec→implement→review, but has no mechanism for iterative, multi-hypothesis optimization of an existing artifact (e.g., improving a RAG pipeline, tuning a prompt suite, evolving a harness). Arbor fills that gap with structured exploration, cumulative learning, and held-out validation.
+**Debate consensus (3/3):**
+- Build as opt-in Coordinator mode, not external tool (reuses existing dispatch, skills, worktrees, governance)
+- Enforce no-edit boundary via tool restriction when in Arbor HTR Mode (paper's core invariant)
+- Implement <200-word insight propagation (ablation: more important than tree structure alone)
+- Add convergence sensor (warn → paradigm_shift → stop)
+- Leverage existing `skills/` for domain plugins
+- Require pilot before production promotion
+- Separate artifact root from pipeline state (zero coupling to linear pipeline)
+**Files to create:**
+- `skills/arbor-htr/SKILL.md` — mode lifecycle, tree protocol, convergence rules, tool boundary spec
+- `skills/arbor-htr/references/hypothesis-tree-schema.md` — node schema (h_n, ι_n, μ_n)
+- `skills/arbor-htr/references/coordinator-prompt.md` — adapted from paper Appendix B.1.1
+- `skills/arbor-htr/references/executor-prompt.md` — adapted from paper Appendix B.1.2
+- `framework/workflows/arbor-htr-mode.md` — mode entry/exit, budget, promotion
+- `framework/templates/htr-node-template.md` — 4-field hypothesis (Mechanism, Hypothesis, Observable, Conflicts)
+- `framework/templates/htr-run-report-template.md`
+- `framework/templates/merge-gate-report-template.md`
+- `framework/slash-commands/optimize.md` — `/optimize` entrypoint
+- `harness-engineering/sensors/htr-convergence.md` — stagnation detection
+- `harness-engineering/validators/validate_arbor_isolation.py`
+- `harness-engineering/validators/validate_arbor_eval_split.py`
+- `harness-engineering/harness-evals/arbor-htr/` — eval suite
+- `AGENTS.md` update — add Arbor HTR Mode to Coordinator mode table
+- `framework/routing/agent-index.md` — reserve `Optimizer` and `Optimization Executor` names
+**Artifact layout per run:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/optimization/<run-slug>/` with `htr-tree.jsonl`, per-node dirs, budget ledger, merge-gate reports.
+**Eval targets:** merge-gate integrity, attribution purity, repeat-failure suppression, token efficiency, resume fidelity, zero main-worktree contamination, cross-task transfer, insight quality, convergence behavior.
+**Risks to monitor:** insight hallucination poisoning, worktree I/O bottlenecks on local machines, paradigm-shift prompt effectiveness, token budget governance (paper reports 20M–43M tokens/run).
+**Done when:**
+- Skill, workflow, and mode definition files exist and pass structural validators
+- Coordinator can enter/exit Arbor HTR Mode with correct tool restriction
+- At least one pilot optimization run completes end-to-end with a retained tree and merge-gate evidence
+- Eval suite exists with seeded failure modes (executor contamination, insight drift, false promotion)
+- Convergence sensor detects stagnation and escalates correctly
+
 ### Loop Engineering **[OPEN]**
 **Source video:** `https://www.youtube.com/watch?v=RVEaDvh6f5A`
 **Source repo:** `https://github.com/owainlewis/youtube-tutorials/tree/main/tutorials/loop-engineering`
