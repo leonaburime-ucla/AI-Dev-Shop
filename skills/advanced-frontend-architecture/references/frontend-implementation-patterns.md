@@ -2,6 +2,11 @@
 
 # Frontend Implementation Patterns
 
+> Framework note: the examples below use React/TypeScript syntax. They are
+> tactical UI implementation patterns, not architecture-selection rules. In
+> Angular, Vue, Svelte, or plain TypeScript projects, transpose the principle to
+> native idioms instead of importing React concepts into the architecture.
+
 ## Avoid the AI Aesthetic
 
 These signals mark AI-generated or template-default UI. Each one alone is a yellow flag; several together are a red flag for low-quality design.

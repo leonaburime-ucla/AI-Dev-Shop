@@ -1,260 +1,296 @@
 ---
 name: advanced-frontend-architecture
-version: 1.0.0
-last_updated: 2026-06-13
-description: Use when evaluating, comparing, or scoring frontend architecture candidates. Produces ADR-shaped reasoning traces with leveled depth (Senior→Staff→Principal→Distinguished). Not for implementation — for architectural decision-making.
+version: 2.0.0
+last_updated: 2026-06-23
+description: Framework-agnostic frontend architecture selector and validator for Software Architect when choosing, scoring, or validating frontend code-organization paradigms and combinations across React, Angular, Vue, Svelte, or plain TypeScript. Covers framework-native conventions, DDD/domain modeling, vertical slices, Feature-Sliced Design, hexagonal frontend ports/adapters, orchestration/Orc-BASH, and the pure-core mirrored-UI article stack. Use for frontend architecture ADR selection, proposal validation, drift/conformance checks, and Architect handoff contracts; not for implementation or default agent loading without eval evidence.
 ---
 
-# Skill: Advanced Frontend Architecture Evaluation
+# Skill: Advanced Frontend Architecture
 
-Evaluate frontend architecture candidates against project constraints. Produce a structured reasoning trace that scores each candidate across core dimensions, with depth controlled by engineering level.
+Use this skill to select or validate frontend architecture. It is owned by the
+Software Architect. Programmer agents consume the resulting ADR/handoff and load
+the implementation skills named there; they should not use this skill to
+reselect architecture during implementation.
 
-## When to Use
+This skill is framework-agnostic. React has richer local implementation
+references in this repo, but React patterns are not defaults and must not leak
+into Angular, Vue, Svelte, or plain TypeScript decisions.
 
-- Choosing between rendering strategies, component patterns, or deployment models
-- Architecture review or ADR production for frontend systems
-- Comparing current architecture against alternatives
-- Evaluating frontend system design proposals
-- Scoring architecture fitness for team/product evolution
+## Operating Modes
 
-## When NOT to Use
+### Selection Mode
 
-- Writing components or implementing features (use `frontend-react-orcbash` or `feature-slice-design`)
-- Backend/infrastructure capacity planning (use `system-design`)
-- Choosing between specific design patterns for implementation (use `design-patterns`)
+Use Selection Mode when:
+
+- No approved frontend architecture ADR exists for the project/module.
+- The user asks which paradigm, folder strategy, or combination fits.
+- A feature changes frontend boundaries, ownership, state placement, or import
+  rules enough that local conventions are not enough.
+
+Goal: produce an ADR-shaped recommendation and a Programmer handoff.
+
+### Validation Mode
+
+Use Validation Mode when:
+
+- A frontend architecture ADR or proposal already exists.
+- The user asks whether the design fits, whether code is drifting, or whether a
+  proposed implementation violates the architecture.
+- A reversal trigger, migration concern, or boundary violation is suspected.
+
+Goal: decide whether the architecture still holds, has drifted, or needs a new
+Selection Mode pass.
+
+### Skip
+
+Skip this skill when:
+
+- The task is leaf-level implementation inside an existing convention.
+- The task is copy, styling, one component, or one bug with no boundary impact.
+- The concern is backend/service/worker architecture; use `system-design`,
+  `hexagonal-architecture`, or `backend-implementation` instead.
+- An approved ADR exists and there is no drift signal or explicit validation
+  request.
 
 ## Load Strategy
 
-Read this file for the evaluation procedure. Load references only when needed:
+Read this file first. Load references only when the mode requires them:
 
-- `references/architecture-catalog.md` — candidate profiles and scoring baselines
-- `references/frontend-implementation-patterns.md` — AI Aesthetic anti-patterns, component architecture rules, state management guide, loading patterns, accessibility implementation
-- Cross-reference `<AI_DEV_SHOP_ROOT>/skills/system-design/SKILL.md` for CDN/edge/load-balancing/capacity
-- Cross-reference `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` for pattern implementation details
-- Cross-reference `<AI_DEV_SHOP_ROOT>/skills/vercel-react-best-practices/SKILL.md` for React performance specifics
-- Cross-reference `<AI_DEV_SHOP_ROOT>/skills/feature-slice-design/SKILL.md` for FSD layer implementation
+- `references/architecture-catalog.md`: load in Selection Mode to build the
+  candidate set and understand paradigm/composition profiles.
+- `references/frontend-selection-scorecard.md`: load when scoring candidates or
+  choosing dimension weights.
+- `references/handoff-contract.md`: load before producing the Architect to
+  Programmer handoff.
+- `references/frontend-implementation-patterns.md`: load only for tactical UI
+  review or implementation-pattern validation. It contains React/TSX examples
+  and is not part of architecture selection.
 
-When **reviewing** frontend components or evaluating a frontend architecture decision, load `references/frontend-implementation-patterns.md` for the AI Aesthetic anti-patterns, component architecture rules, and accessibility implementation patterns. For hands-on implementation work, route to `skills/frontend-react-orcbash/SKILL.md` or `skills/feature-slice-design/SKILL.md`.
+Cross-reference implementation skills only after selection:
 
----
+- `skills/frontend-react-orcbash/SKILL.md`: React implementation of Orc-BASH.
+- `skills/feature-slice-design/SKILL.md`: FSD implementation and import rules.
+- `skills/hexagonal-architecture/SKILL.md`: general ports/adapters reference;
+  adapt carefully for frontend and framework boundaries.
+- `skills/design-patterns/SKILL.md`: implementation details for selected
+  patterns.
 
-## Core Dimensions
+## Mode Router
 
-Every evaluation scores candidates across these 14 dimensions. The depth selector controls how deeply each is analyzed.
+1. Check for an active frontend architecture ADR, governance ADR, or Coordinator
+   directive.
+2. If no ADR exists and the request affects architecture boundaries, run
+   Selection Mode.
+3. If an ADR exists and the request asks for fit, drift, conformance, migration,
+   or reversal analysis, run Validation Mode.
+4. If an ADR exists and the task is implementation-only, route to Programmer
+   with the ADR's named implementation skills.
+5. If the context is ambiguous, state the ambiguity and do the least expensive
+   useful pass:
+   - trivial/small CRUD: recommend framework-native conventions with a revisit
+     trigger;
+   - structural uncertainty: run Selection Mode.
 
-| # | Dimension | Evaluates |
-|---|---|---|
-| 1 | Rendering strategy | CSR/SSR/SSG/hybrid/partial/RSC fit given content-vs-interactivity ratio |
-| 2 | State architecture | Essential state identification, altitude, reducers, sync complexity |
-| 3 | Data-fetching | REST/GraphQL/tRPC, BFF, cache normalization, streaming, mutations |
-| 4 | Performance | Bundle splitting, lazy loading, critical CSS, windowing, Core Web Vitals |
-| 5 | Component boundaries | Module structure, composition patterns, layer separation |
-| 6 | Delivery model | Deploy independence, monorepo, feature flags, canary, rollback |
-| 7 | Migration path | From current state to target; strangler fig, coexistence, phased rollout |
-| 8 | Ownership topology | Team boundaries, Conway's law, contract ownership, BFF responsibility |
-| 9 | Resilience | Failure modes (hydration mismatch, CDN outage, state desync), recovery |
-| 10 | Observability | Web Vitals RUM, client errors, synthetic monitoring, replay |
-| 11 | Design system | Token strategy, component library ownership, versioning, adoption |
-| 12 | Testing strategy | Unit/component/contract/visual/e2e balance, confidence vs cost |
-| 13 | Security/privacy | Auth boundary, CSP, third-party risk, PII exposure, supply chain |
-| 14 | Cost | Infra per request, build-time, operational burden, team hiring cost |
+## Selection Procedure
 
----
+### Step 1: Intake
 
-## Depth Selector
+Gather only the facts needed to choose candidates:
 
-Level controls the evaluation bar, not which dimensions are scored. All 14 dimensions are always present; depth determines evidence requirements, time horizon, and stakeholder scope.
+- Goal and non-goals
+- Current architecture or greenfield status
+- Framework constraint: React, Angular, Vue, Svelte, multi-framework, or none
+- Domain complexity and whether the frontend owns real business rules
+- UI surface area, route count, and state complexity
+- Team topology and ownership model
+- Lifespan, migration pressure, and expected change rate
+- Delivery needs: one deployable, independent deploys, or platform ownership
+- Risk constraints: compliance, security, performance, budget, and timeline
 
-### Senior (L5) — "What and Why"
+If facts are missing, proceed with explicit confidence labels. Do not invent
+team size, framework, performance targets, or compliance requirements.
 
-- **Focus:** Viable technical approach, practical tradeoffs, implementation risks, immediate NFR compliance.
-- **Trigger:** Default. Use for any bounded architecture decision.
-- **Evidence bar:** Project requirements, team size, traffic shape.
-- **Time horizon:** Current release cycle.
+### Step 2: Run Intake Axes
 
-### Staff (L6) — "How to Get There"
+Load `references/frontend-selection-scorecard.md`.
 
-All of Senior, plus:
+Use the four intake axes to filter and route candidates:
 
-- **Focus:** Cross-team coordination, migration rollout, platform leverage, failure playbooks, DX metrics.
-- **Trigger:** Multiple teams affected, phased migration, shared platform requirements.
-- **Evidence bar:** Team topology, existing tech debt, deployment pipeline constraints.
-- **Time horizon:** 6-18 months.
+- Domain complexity
+- UI surface and framework diversity
+- Team/ownership topology
+- Lifespan and migration pressure
 
-### Principal (L7) — "Multi-Year Strategy"
+Use the cost gate: if the project is simple CRUD, single framework, one small
+team, short-lived, and single deployable, recommend framework-native conventions
+with a revisit trigger instead of running a full scorecard.
 
-All of Staff, plus:
+### Step 3: Build Candidate Set
 
-- **Focus:** Architecture roadmap with breakpoints, governance model, portfolio cost, blast radius, strategic reversibility.
-- **Trigger:** Org-wide standardization, high-risk irreversible decisions, executive-facing recommendations.
-- **Evidence bar:** Org growth projections, market pressure, compliance roadmap.
-- **Time horizon:** 2-4 years.
+Load `references/architecture-catalog.md`.
 
-### Distinguished (L8+) — "Industry Direction"
+Select 2-4 composed candidates. Candidates are stacks, not isolated buzzwords:
 
-All of Principal, plus (only when actionable):
+- Runtime/rendering layer: SPA, SSG, SSR/hybrid, native framework routing.
+- Topology layer: single app, modular monolith, micro-frontends.
+- Data/I/O layer: direct REST/RPC, BFF, GraphQL/tRPC, server actions/loaders.
+- Internal pattern layer: framework-native, DDD/domain modeling, vertical
+  slices, FSD, hexagonal ports/adapters, orchestration/Orc-BASH, article stack.
 
-- **Focus:** Platform capability forecasting, ecosystem bets, novel operating models from first principles.
-- **Trigger:** Only when explicitly requested or when the decision involves betting on unproven platform capabilities.
-- **Evidence bar:** W3C/TC39 proposals, browser vendor signals, platform adoption curves.
-- **Time horizon:** 4-7 years.
+Examples:
 
----
+- `framework-native + route-level slices`
+- `SPA + modular monolith + FSD boundaries`
+- `SSR/hybrid + DDD core + vertical slices`
+- `pure modules + hexagonal ports + mirrored ui/<framework> + guards`
+- `React + Orc-BASH for justified orchestration/state/API seams`
 
-## Evaluation Procedure
+Do not score BFF/GraphQL, SSR, or micro-frontends as if they were the same class
+of decision as FSD or vertical slices. Compose them when relevant.
 
-### Step 1: Establish Decision Context
+### Step 4: Score Candidates
 
-Gather or clarify:
+Use the 4 intake axes plus the 8 primary deep dimensions from
+`references/frontend-selection-scorecard.md`.
 
-- **Goal**: what outcome the architecture must enable
-- **Constraints**: team size, budget, timeline, existing codebase, compliance
-- **Non-goals**: what this decision explicitly does NOT solve
-- **Current architecture**: what exists today (or greenfield)
-- **Change horizon**: how long until the next architecture inflection
-- **Risk tolerance**: startup-move-fast vs regulated-move-carefully
-- **Content-vs-interactivity ratio**: static-heavy, interactive-heavy, or mixed
-- **Traffic shape**: steady, bursty, seasonal, growing
+Default to the 8 primary dimensions. Split out extended dimensions only when a
+material tradeoff would otherwise be hidden. For example, split
+Rendering/Performance/Data Fetching when SSR has good initial HTML but risky
+hydration or request waterfalls.
 
-### Step 2: Select Candidates
+Scoring rules:
 
-Load `references/architecture-catalog.md`. Select 2-4 candidates that plausibly fit the constraints. Discard candidates whose anti-patterns match the context.
+- Score 1-5 where 1 is poor fit, 3 is adequate, and 5 is excellent fit.
+- Use confidence: high, medium, or low.
+- Mark N/A when a dimension belongs to the host architecture rather than the
+  internal pattern being compared.
+- Weight by project evidence, not equal arithmetic totals.
+- For high-weight dimensions, include evidence, constraint interaction,
+  candidate comparison, failure mode, tradeoff, score, confidence, and missing
+  information.
+- For low-weight dimensions, one line is enough.
+- Do not compute a weighted GPA. Use scores to expose tradeoffs and select a
+  recommendation.
 
-**Composition model:** Candidates are often composed stacks, not isolated layers. A candidate like "SSR/Hybrid + Modular Mono + BFF" counts as one entry. Compose by layer: runtime (SSR/SPA/SSG) supplies rendering defaults, topology (Monolith/MFE) supplies delivery/ownership/boundaries, data layer (BFF/GraphQL) modifies data-fetching/security/cost, and internal patterns (FSD/Vertical Slices) inherit host architecture dimensions. Score the resulting composed stack. Use N/A or "inherits from host" where a layer does not independently affect a dimension.
+### Step 5: Select Decision Scope
 
-### Step 3: Select Depth
+Use scope-based depth. The level names are compatibility labels, not persona
+instructions.
 
-Default to Senior (L5). Escalate to higher depth when:
+- Bounded (Senior/L5): one team, one release, reversible, limited migration.
+- Cross-cutting (Staff/L6): multiple teams or slices, 6-18 month horizon,
+  shared guardrails, or phased migration.
+- Strategic (Principal/L7): org-wide standard, multi-year impact, governance,
+  platform cost, or hard-to-reverse choices.
+- Exploratory (Distinguished/L8+): explicit platform bet, unproven technology,
+  browser/runtime ecosystem assumption, or industry-direction question.
 
-- Multiple teams will be affected (→ Staff)
-- Decision is hard to reverse or has >18-month impact (→ Principal)
-- User explicitly requests higher depth
-- User explicitly requests Distinguished depth, or the decision involves betting on unproven platform capabilities (→ Distinguished)
+Escalate based on decision blast radius and reversibility, not the user's title.
 
-### Step 4: Score Each Candidate
+### Step 6: Produce Handoff
 
-For each of the 14 dimensions (all 14 must appear in the Scoring Summary table; argument chains below can be terse for low-weight dimensions):
+Load `references/handoff-contract.md` and emit the required Architecture Handoff.
+The handoff is the boundary between Architect and Programmer. It must name the
+implementation skills and the decision boundaries so Programmer does not reopen
+architecture selection.
 
-1. **Evidence**: what facts from the context inform this score
-2. **Constraint interaction**: how project constraints affect this dimension
-3. **Candidate comparison**: relative strength/weakness across candidates
-4. **Failure modes**: what goes wrong at the depth level being evaluated
-5. **Tradeoff**: what you gain vs give up
-6. **Score**: 1-5 (1=poor fit, 3=adequate, 5=excellent fit)
-7. **Confidence**: high/medium/low (based on available evidence)
-8. **Missing information**: what would change the score if known
+## Validation Procedure
 
-For Internal Component Patterns (MVC, FSD, etc.): dimensions tied to deployment topology (Delivery, Cost, Resilience) should be scored N/A with a note "internal pattern — inherits from host architecture."
+1. Identify the ADR/proposal and selected architecture combo.
+2. Extract invariants: folder map, import direction, public APIs, state
+   ownership, framework assumptions, enforcement gates, and reversal triggers.
+3. Compare current proposal/code evidence against those invariants.
+4. Classify each finding:
+   - Holds: evidence matches the ADR.
+   - Drift: implementation deviates but the ADR may still be valid.
+   - Reversal trigger: project facts changed enough to rerun Selection Mode.
+   - Unknown: not enough evidence; name the missing evidence.
+5. Recommend one of:
+   - Keep ADR and fix implementation drift.
+   - Amend ADR narrowly.
+   - Rerun Selection Mode.
+   - Route to implementation skill because the issue is tactical.
 
-Weight dimensions by relevance to the specific decision context. Weights control argument depth and tie-breaking priority, not arithmetic aggregation — do not compute weighted-sum GPAs.
+Do not turn Validation Mode into general code review. Validate architecture fit
+and boundary conformance only.
 
-### Step 5: Produce Level Overlay
-
-After scoring at the base level, add the depth overlay:
-
-- **Senior baseline**: practical fit, implementation risks, performance implications
-- **Staff additions** (if depth ≥ Staff): migration path, ownership model, guardrails, cross-team risks
-- **Principal additions** (if depth ≥ Principal): 2-4 year evolution, governance, cost model, reversibility
-- **Distinguished additions** (if depth = Distinguished): ecosystem bets, platform assumptions, novel model justification
-
-### Step 6: Synthesize Recommendation
-
-Produce the final recommendation with:
-
-- **Chosen approach** and one-sentence justification
-- **Why not the alternatives** (strongest disqualifier for each runner-up)
-- **Preconditions** (what must be true for this to succeed)
-- **Reversal triggers** (signals that this decision should be revisited)
-- **Follow-up decisions** (what this choice defers or creates)
-- **Next level teaser** (one-liner on what deeper evaluation would scrutinize)
-
----
-
-## Output Format: Reasoning Trace
-
-Produce this structure. All 14 dimensions must appear in the Scoring Summary. Argument chains: full detail for high-weight dimensions, terse rationale for low-weight. Be terse, technical, and decisive.
+## Output Format: Selection
 
 ```markdown
 ## Decision Context
-- Status: [Evaluating | Proposed | Decided]
+- Status: Proposed
 - Goal:
-- Constraints:
 - Non-goals:
 - Current architecture:
+- Framework constraint:
+- Team/ownership:
+- Domain complexity:
 - Change horizon:
-- Risk tolerance:
-- Evaluation depth: [Senior | Staff | Principal | Distinguished]
+- Decision scope: [Bounded | Cross-cutting | Strategic | Exploratory]
+- Confidence:
+
+## Intake Result
+| Axis | Finding | Routing Effect | Confidence |
+|---|---|---|---|
 
 ## Candidate Set
-(list 2-4 candidates)
-1. [Candidate] — one-line characterization
-2. [Candidate] — one-line characterization
+1. [Composed candidate] - [one-line characterization]
+2. [Composed candidate] - [one-line characterization]
 
 ## Scoring Summary
-| Dimension | Weight | [Cand 1] | [Cand 2] | ... | Winner | Confidence |
-|---|---:|---:|---:|---:|---|---|
-(all 14 dimensions must appear; use N/A for internal-pattern-only inapplicable dimensions)
+| Dimension | Weight | [Candidate 1] | [Candidate 2] | Winner | Confidence |
+|---|---:|---:|---:|---|---|
 
 ## Argument Chain
-### [Dimension Name]
+### [High-weight Dimension]
 - Evidence:
 - Constraint interaction:
 - Candidate comparison:
 - Failure modes:
 - Tradeoff:
-- Score: [1-5]
+- Score:
 - Confidence:
 - Missing information:
 
-(full chain for high-weight dimensions; terse "Score: X — [one-line rationale]" for low-weight dimensions)
-
-## Level Overlay
-### Senior Baseline
-- Practical fit:
-- Implementation risks:
-- Performance implications:
-
-### Staff Additions (if applicable)
-- Migration path:
-- Ownership model:
-- Guardrails/tooling:
-- Cross-team risks:
-
-### Principal Additions (if applicable)
-- 2-4 year evolution:
-- Governance model:
-- Cost/blast-radius model:
-- Strategic reversibility:
-
-### Distinguished Additions (if applicable)
-- Ecosystem/platform bets:
-- Industry-direction assumptions:
-- Novel operating model (if justified):
-
 ## Decision
 - Chosen approach:
-- Why not alternatives:
-
-## Preconditions & Consequences
+- Why this won:
+- Why not the alternatives:
 - Preconditions:
-- Consequences:
-- Reversal triggers:
 - Follow-up decisions:
-- Next level teaser:
+- Reversal triggers:
+
+## Architecture Handoff
+[Use references/handoff-contract.md]
 ```
 
----
+## Output Format: Validation
 
-## Dimension Weighting Heuristics
+```markdown
+## Validation Context
+- ADR/proposal reviewed:
+- Selected architecture:
+- Evidence reviewed:
+- Validation scope:
 
-Not all dimensions matter equally in every context. Default weights by scenario:
-
-| Scenario | Heavy weight (×2) | Standard (×1) | Light (×0.5) |
+## Invariants Checked
+| Invariant | Expected | Observed | Result |
 |---|---|---|---|
-| E-commerce / media | performance, rendering, observability | data-fetching, delivery, design-system | ownership, cost |
-| Enterprise SaaS | state, testing, security | component-boundaries, observability, cost | rendering, design-system |
-| Platform / many teams | ownership, delivery, design-system | migration, resilience, testing | rendering, performance |
-| Startup / greenfield | performance, cost, delivery | state, data-fetching, component-boundaries | migration, ownership, resilience |
-| Regulated / compliance | security, testing, observability | resilience, cost, delivery | rendering, design-system |
 
-Override weights when the decision context makes a different prioritization obvious.
+## Findings
+| Finding | Class | Evidence | Recommended Action |
+|---|---|---|---|
+
+## Verdict
+- [Holds | Drift fix required | ADR amendment required | Rerun Selection Mode]
+- Rationale:
+- Next assignee:
+```
+
+## Eval Gate
+
+This skill is available for explicit architecture selection and validation.
+Default embedding into Software Architect or Programmer standing context must
+wait for ablation eval evidence. The eval must compare agent behavior with and
+without this skill and measure architecture fit, over-engineering, false
+activation, context cost, and Programmer overreach.

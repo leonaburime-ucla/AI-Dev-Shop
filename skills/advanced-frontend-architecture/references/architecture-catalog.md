@@ -1,200 +1,242 @@
 # Frontend Architecture Catalog
 
-Condensed profiles for architecture evaluation. Each entry provides enough to score against the 14 core dimensions — not enough to implement. For implementation details, load the cross-referenced skill.
+Use this catalog to build candidate sets for `advanced-frontend-architecture`.
+It is a selector reference, not an implementation guide. Score composed
+candidates that match the project context; do not treat every entry as a rival
+at the same architectural layer.
 
----
+## Composition Model
 
-## Macro Architecture Candidates
+Frontend architecture choices usually compose across four layers:
 
-### 1. Static / SSG
+| Layer | Examples | Decides |
+|---|---|---|
+| Runtime/rendering | SPA, SSG, SSR/hybrid, framework-native routing | Initial render, hydration, route data, SEO/perf baseline |
+| App topology | Single app, modular monolith, micro-frontends | Deploy boundary, ownership, release independence |
+| Data/I/O | REST/RPC, BFF, GraphQL/tRPC, server loaders/actions | Request shape, backend coupling, cache/mutation boundary |
+| Internal organization | Framework-native, DDD, vertical slices, FSD, hexagonal, orchestration/Orc-BASH, article stack | Folder structure, import direction, state/business-rule placement |
 
-**Examples:** Astro, 11ty, Hugo, vanilla HTML/CSS
+Build 2-4 candidates by composing layers. Example:
 
-**Characterization:** Pre-built HTML served from CDN. Zero runtime JS unless explicitly added. Maximum performance, minimum interactivity.
+`SSR/hybrid + modular monolith + BFF + vertical slices`
 
-| Dimension | Profile |
+## Runtime and Topology Candidates
+
+### Static / SSG
+
+Pre-built HTML served from a CDN. Best for content-heavy, low-interactivity
+surfaces.
+
+- Strong when: docs, marketing, blogs, catalogs with infrequent updates.
+- Weak when: user-generated content, dashboards, real-time collaboration,
+  personalization.
+- Transition: move to SSR/hybrid when interactivity or personalization grows.
+
+### SPA
+
+Single HTML shell rendered in the browser. Best for rich internal tools where
+SEO and first paint are not primary constraints.
+
+- Strong when: admin panels, dashboards, authenticated internal tools.
+- Weak when: SEO-critical content, slow networks, low-powered devices.
+- Transition: add SSR/hybrid when initial-load or SEO pressure rises.
+
+### SSR / Hybrid
+
+Server-rendered initial HTML with route-by-route static, server, and client
+rendering choices. Examples include Next.js, Nuxt, SvelteKit, Remix, and Astro
+hybrid.
+
+- Strong when: content plus interactivity, e-commerce, SaaS marketing/product
+  blends, mixed public/authenticated surfaces.
+- Weak when: pure internal tools, offline-first apps, or highly dynamic
+  real-time UIs where server render adds little value.
+- Watch: hydration cost, server/client state split, framework impedance.
+
+### Modular Frontend Monolith
+
+One deployable frontend with enforced internal module or domain boundaries.
+
+- Strong when: one product, growing team, shared release train, need for
+  stronger boundaries before micro-frontends are justified.
+- Weak when: truly autonomous product teams need independent deploys.
+- Common internal patterns: FSD, vertical slices, DDD module boundaries,
+  dependency-cruiser or ESLint boundaries.
+
+### Micro-frontends
+
+Multiple independently built/deployed frontend applications composed into one
+experience.
+
+- Strong when: large org, autonomous teams, independent deployment is worth
+  runtime and operational complexity.
+- Weak when: small teams, startups, tightly coupled product surfaces, MVPs.
+- Watch: duplicate dependencies, version skew, shared state, design-system
+  governance, shell failure modes.
+
+### BFF / GraphQL / tRPC Data Layer
+
+A complementary data layer, not a competing macro architecture.
+
+- Strong when: frontend needs aggregate data across services, mobile/web share
+  a data contract, backend release cycles block frontend iteration.
+- Weak when: simple CRUD against one backend, prototypes, small teams.
+- Score it as part of a composed candidate, not as a rival to FSD or vertical
+  slices.
+
+## Internal Organization Candidates
+
+### Framework-native
+
+Use the framework's idioms without adding a branded architecture.
+
+| Framework | Native organization signals |
 |---|---|
-| Rendering | Excellent — pre-built, CDN-served, sub-100ms TTFB |
-| State | Minimal — no client state beyond form inputs |
-| Data-fetching | Build-time only; content changes require rebuild |
-| Performance | Excellent — smallest possible bundle, best LCP/CLS |
-| Component boundaries | Weak — no runtime composition model |
-| Delivery | Simple — static hosting, CDN invalidation |
-| Migration | Easy to migrate FROM; hard to migrate TO from interactive apps |
-| Resilience | Excellent — no server to fail, CDN redundancy |
-| Cost | Lowest — static hosting is near-free |
+| React | Route/app conventions, colocated components/hooks, server-state library, local composition |
+| Angular | Standalone components or feature modules, services via DI, route-level boundaries |
+| Vue/Nuxt | SFCs, composables, Pinia where needed, route/page conventions |
+| Svelte/SvelteKit | Route groups, load functions, stores, module scripts |
+| Plain TypeScript | ES modules, explicit dependency injection, small domain-neutral libraries |
 
-**Sweet spot:** Content sites, blogs, docs, marketing pages. Team 1-5. Any lifetime.
-**Anti-pattern:** User-generated content, real-time features, personalization, dashboards.
-**Transitions:** → SSR/Hybrid when interactivity needs grow. ← from any pattern for content-only sections.
+- Strong when: small team, simple CRUD/admin, short lifespan, low domain
+  complexity.
+- Weak when: cross-team ownership, complex business rules, multi-framework
+  shared core, long-lived platform.
+- Revisit trigger: repeated cross-feature imports, duplicated business rules,
+  hard-to-test state transitions, or unclear placement decisions.
 
----
+### DDD / Domain Modeling
 
-### 2. SPA (Client-Side Rendered)
+Use bounded contexts, domain vocabulary, pure domain rules, and explicit domain
+ownership in the frontend where the frontend owns meaningful business behavior.
 
-**Examples:** React CRA, Vue CLI, Angular CLI, Vite + React/Vue
+- Strong when: UI enforces real business rules, workflows have invariants,
+  multiple contexts use shared vocabulary, or offline/client-side decisions must
+  be testable.
+- Weak when: frontend is mostly forms over backend CRUD or domain logic belongs
+  entirely server-side.
+- Often composed with: vertical slices, hexagonal ports/adapters, article stack.
 
-**Characterization:** Single HTML shell, full app rendered in browser via JS. Rich interactivity, poor initial load and SEO.
+### Vertical Slices
 
-| Dimension | Profile |
-|---|---|
-| Rendering | Weak initial load (white screen); excellent runtime reactivity |
-| State | Strong — full client state management (Redux, Zustand, Pinia) |
-| Data-fetching | Client-side; waterfall risk without careful orchestration |
-| Performance | Poor LCP without optimization; good INP once loaded |
-| Component boundaries | Framework-native (React components, Vue SFCs) |
-| Delivery | Simple — static bundle to CDN |
-| Migration | Easy to start; expensive to add SSR later |
-| Resilience | Weak — JS failure = blank page; no graceful degradation |
-| Cost | Low infra; high bundle-optimization effort at scale |
+Organize by user capability or workflow rather than horizontal folders like
+`components/`, `hooks/`, and `services/`.
 
-**Sweet spot:** Internal tools, dashboards, admin panels. Team 2-15. Medium lifetime (2-5 years).
-**Anti-pattern:** SEO-critical, content-heavy, low-powered devices, slow networks.
-**Transitions:** → SSR/Hybrid for SEO/performance. → Modular Monolith for team scaling. ← from MVC/server-rendered apps.
+- Strong when: features change together, teams own capabilities, local cohesion
+  matters more than shared technical layers.
+- Weak when: slices are tiny and numerous, duplication pressure is high, or no
+  boundary enforcement exists.
+- Guard: cross-slice internals are private; shared needs move to domain/shared
+  APIs.
 
----
+### Feature-Sliced Design (FSD)
 
-### 3. SSR / Hybrid (Meta-framework)
+Use standardized layers such as `app`, `pages`, `widgets`, `features`,
+`entities`, and `shared`, with public APIs and unidirectional imports.
 
-**Examples:** Next.js, Nuxt, SvelteKit, Remix, Astro (hybrid mode)
+- Strong when: medium-large frontend, shared team vocabulary, predictable
+  placement, linter-enforced boundaries.
+- Weak when: small apps, prototypes, teams unwilling to adopt the vocabulary, or
+  frameworks whose native structure fights the FSD layer model.
+- Implementation reference: `skills/feature-slice-design/SKILL.md`.
 
-**Characterization:** Server-renders initial HTML, hydrates on client. Mixes static, server-rendered, and client-rendered per route. Best balance of performance + interactivity.
+### Hexagonal Frontend
 
-| Dimension | Profile |
-|---|---|
-| Rendering | Excellent — SSR eliminates white screen; RSC reduces JS shipped |
-| State | Moderate complexity — server/client state boundary management |
-| Data-fetching | Server-side fetching eliminates client waterfalls; streaming support |
-| Performance | Good LCP/CLS; INP depends on hydration strategy |
-| Component boundaries | Framework-opinionated (app router, file-based routing) |
-| Delivery | More complex — requires server/edge runtime, not just CDN |
-| Migration | Moderate — hydration boundary requires explicit client/server split |
-| Resilience | Moderate — server failure degrades to loading state, not blank page |
-| Cost | Higher — server compute for SSR; edge functions for low-latency |
+Keep framework-free core/domain/use cases behind ports and adapters. UI and
+infrastructure depend inward; domain does not import the framework, fetch,
+stores, or component libraries.
 
-**Sweet spot:** E-commerce, SaaS marketing, content + interactivity mix. Team 3-30. Long lifetime.
-**Anti-pattern:** Pure internal tools (overkill), offline-first apps, extremely dynamic real-time UIs.
-**Transitions:** → Modular Monolith or MFE for org scaling. ← from SPA needing SEO/perf. ← from SSG needing interactivity.
+- Strong when: business rules need isolated tests, API/backend may change,
+  multi-surface or multi-framework sharing is plausible.
+- Weak when: all logic is UI-only, backend owns all invariants, or ceremony
+  exceeds likely payoff.
+- Often composed with: DDD, vertical slices, article stack.
 
----
+### Orchestration / Orc-BASH
 
-### 4. Modular Frontend Monolith
+Separate wiring from business logic, API calls, state management, hooks or
+framework reactivity, and UI presentation.
 
-**Examples:** Domain-sliced Next.js/Nuxt app, Nx/Turborepo workspace with one deployable, FSD-structured app
+- Framework-neutral concept: an orchestration layer wires pure logic, adapters,
+  state, and UI-facing view models/composables/services.
+- React-specific implementation: Orc-BASH in
+  `skills/frontend-react-orcbash/SKILL.md`.
+- Strong when: the same logic feeds multiple pages/components, state/API seams
+  need strict tests, or adapter swapping matters.
+- Weak when: a single component owns a simple local interaction.
+- Gate: do not recommend `frontend-react-orcbash` for Angular, Vue, or Svelte.
+  Translate orchestration into native services/composables/stores for those
+  frameworks.
 
-**Characterization:** Single deployed application with strict internal domain boundaries. Teams own modules but share a deploy pipeline. Enforced via linting, module boundaries, and code ownership.
+### Article Stack: Pure Core + Mirrored UI + Guards
 
-| Dimension | Profile |
-|---|---|
-| Rendering | Inherits from underlying framework (SSR/CSR/hybrid) |
-| State | Requires discipline — global state leaks across boundaries easily |
-| Component boundaries | Strong with enforcement (ESLint boundaries, barrel exports, FSD layers) |
-| Delivery | Single deploy — simpler infra, but all-or-nothing releases |
-| Ownership | Module-level ownership via CODEOWNERS; shared build pipeline |
-| Migration | Natural step from SPA; stepping stone to MFE |
-| Resilience | Moderate — one broken module can block the whole deploy |
-| Cost | Moderate — single infra, but long build times at scale |
+Named recipe from the user's article. It composes:
 
-**Sweet spot:** Growing teams (10-50 devs) that aren't ready for MFE complexity. Medium-long lifetime.
-**Anti-pattern:** Truly independent teams needing autonomous deploy. Very small teams (unnecessary overhead).
-**Transitions:** → Micro-frontends when deploy independence becomes critical. ← from SPA when boundaries are needed.
+1. DDD vocabulary and bounded contexts.
+2. Framework-free `modules/<domain>/` core.
+3. Hexagonal ports/adapters for I/O.
+4. Vertical slices for user actions/use cases.
+5. Mirrored `ui/<framework>/<domain>/<slice>/` presentation tree when multiple
+   reactivity paradigms exist.
+6. Orchestration layer that wires UI to use cases, state, and adapters.
+7. Boundary guards in lint/CI.
 
----
+Strong when:
 
-### 5. Micro-frontends
+- Domain-heavy frontend needs testable framework-free core.
+- Multiple frameworks or reactivity paradigms must share logic.
+- Long-lived product has more than one surface and real boundary risk.
+- Team can maintain import guards and handoff discipline.
 
-**Examples:** Module Federation (Webpack/Rspack), single-spa, Piral, iframe composition, Vercel multi-zone
+Weak when:
 
-**Characterization:** Independent frontend applications composed at runtime into a single user experience. Each team owns, builds, deploys independently. Shell provides shared concerns (auth, routing, design tokens).
+- Simple CRUD/admin or prototype.
+- Single small React/Vue/Svelte app with no shared core pressure.
+- Framework-native route/data conventions are enough.
+- No one will enforce the boundary rules.
 
-| Dimension | Profile |
-|---|---|
-| Rendering | Complex — cross-app hydration, shared layout negotiation |
-| State | Isolated per MFE; shared state via shell injection or event bus |
-| Data-fetching | Per-MFE BFFs; risk of duplicate requests without coordination |
-| Performance | Overhead — runtime composition, duplicate dependencies, version skew |
-| Component boundaries | Maximum — enforced by deploy boundary |
-| Delivery | Excellent independence — each team deploys on own schedule |
-| Ownership | Maximum autonomy — vertical slices with full FE+BE ownership |
-| Migration | Expensive to adopt; strangler fig from monolith over 6-18 months |
-| Resilience | Good isolation — one MFE failure doesn't crash others (with error boundaries) |
-| Design system | Critical — visual cohesion requires shared token/component library |
-| Cost | Highest — multiple build pipelines, shell maintenance, coordination overhead |
-
-**Sweet spot:** Large orgs (50-500+ FE devs), multiple product teams, enterprise platforms. Long lifetime (5+ years).
-**Anti-pattern:** Small teams (<10 devs), startups, MVPs, apps with tightly coupled features.
-**Transitions:** ← from Modular Monolith when deploy independence is needed. Rarely transitions to something else (hard to reverse).
-
----
-
-### 6. BFF + GraphQL (Data Architecture Layer — Complementary)
-
-**Examples:** Apollo Server, Hasura, Pothos, tRPC (BFF variant), Relay
-
-**Characterization:** Dedicated backend-for-frontend aggregation layer. Owned by FE team. Single query replaces multiple REST calls. Can sit in front of microservices. **Not a competing macro architecture** — layers on top of any candidate above (SPA, SSR, MFE). Include in the candidate set only when the evaluation is specifically about data-fetching strategy, not rendering/deployment topology.
-
-| Dimension | Profile |
-|---|---|
-| Data-fetching | Excellent — eliminates underfetching/overfetching, single round-trip |
-| Performance | Reduces client waterfalls; server-side resolution is fast |
-| Ownership | FE-team owned; decouples from backend service release cycles |
-| Delivery | Adds infra (BFF server); but front+back can iterate independently |
-| Resilience | Single point of failure if BFF goes down; needs redundancy |
-| Cost | Moderate — BFF hosting + GraphQL expertise |
-| Security | Centralizes auth/rate-limiting; but exposes full schema surface |
-
-**Sweet spot:** Multi-service backends, mobile + web sharing data layer, complex data requirements. Team 5-50.
-**Anti-pattern:** Simple CRUD with one backend, very small teams, prototypes.
-**Transitions:** Complementary to any macro architecture above. Often added to SPA or SSR apps.
-
----
-
-## Internal Component Patterns
-
-These are internal structuring approaches, not macro deployment architectures. They determine how code is organized within a deployed application.
-
-| Pattern | Core Idea | Strength | Weakness | When to Use |
-|---|---|---|---|---|
-| **MVC** | Model-View-Controller separation | Simple mental model | Fat controllers, not SPA-native | Legacy/simple server-rendered apps |
-| **MVP** | Passive view, presenter handles logic | Better testability than MVC | Fat presenter, boilerplate | Apps needing strict view/logic separation |
-| **MVVM** | Two-way binding, ViewModel for UI state | Natural for reactive frameworks | Implicit state flow, debugging complexity | Vue/Knockout apps with complex UI state |
-| **Hexagonal** | Ports & adapters, business logic at center | Framework-independent core, testable | Ceremony overhead, over-engineering risk | Long-lived apps, multiple I/O channels |
-| **Vertical Slices** | Self-contained feature units (own model/logic/UI) | Team autonomy, parallel development | Cross-slice inconsistency, duplication risk | Large apps, cross-functional teams |
-| **FSD** | Strict layer hierarchy (app→pages→widgets→features→entities→shared) | Predictable imports, clear boundaries | Learning curve, framework-specific adaptation | Medium-large React/Vue/Svelte apps |
-
-**Progression:** MVC → MVP → MVVM (increasing UI logic sophistication) → Hexagonal (framework independence) → Vertical Slices (feature autonomy) → FSD (strict compositional hierarchy).
-
-**Decision heuristic:** If the framework is already opinionated (Next.js, Nuxt), start with its conventions + FSD for boundaries. Only reach for hexagonal/clean arch when the business logic layer is substantial enough to justify the abstraction.
-
----
+Confidence note: treat this as a composed recipe. It can win when its concerns
+are actually present; do not select it for novelty alone.
 
 ## Quick Candidate Selection
 
-Given constraints, narrow to 2-4 candidates:
-
-| If... | Start with... |
+| Context | Candidate set to start with |
 |---|---|
-| Content-heavy, SEO-critical, low interactivity | Static/SSG or SSR/Hybrid |
-| Interactive dashboard, internal tool | SPA + Modular Monolith |
-| E-commerce, mixed content + interaction | SSR/Hybrid + BFF |
-| Multiple teams, independent deploy needed | Micro-frontends |
-| Complex data from many services | BFF + GraphQL (layer on top of any macro arch) |
-| Greenfield, small team, fast iteration | SPA (upgrade path to SSR/Hybrid later) |
-| Long-lived, large team, growing | Modular Monolith → Micro-frontends progression |
+| Small CRUD/admin, one team | Framework-native; maybe SPA + native routing |
+| Internal dashboard with moderate state | SPA or SSR/hybrid + framework-native or vertical slices |
+| Domain-heavy single framework | DDD + vertical slices; FSD if team vocabulary/enforcement matters |
+| React app with justified state/API/orchestration seams | Vertical slices or FSD + React Orc-BASH for selected domains |
+| Multi-framework shared core | Article stack; hexagonal frontend + mirrored UI |
+| Medium-large team, one deployable | Modular monolith + FSD or vertical slices |
+| Many autonomous teams requiring independent deploy | Micro-frontends + design-system governance |
+| Complex backend aggregation | Add BFF/GraphQL/tRPC to the chosen runtime/topology candidate |
+| Brownfield with existing conventions | Existing convention + migration path; score migration cost heavily |
 
----
+## Candidate Anti-patterns
 
-## Scoring Baseline by Dimension
+| Candidate | Avoid when |
+|---|---|
+| Framework-native only | Domain rules are duplicated, imports sprawl, or multiple teams need boundaries |
+| FSD | App is tiny, team rejects vocabulary, or framework-native structure would be clearer |
+| Vertical slices | No guardrails exist and slices need many shared internals |
+| Hexagonal frontend | Frontend has little domain behavior and all invariants are server-owned |
+| Orc-BASH | Framework is not React, or there are no orchestration/state/API seams |
+| Article stack | No multi-framework/shared-core/domain-heavy pressure exists |
+| Micro-frontends | Independent deploys are not worth runtime and platform cost |
+| BFF/GraphQL | A single simple backend already serves the UI well |
 
-Default scores (1-5) when no project-specific evidence overrides. Use as starting point, not as final answer. This table is authoritative for all 14 dimensions — narrative profiles above highlight only differentiating dimensions.
+## Baseline Fit Signals
 
-| Candidate | Render | State | Data | Perf | Boundaries | Delivery | Migration | Ownership | Resilience | Observe | Design-Sys | Test | Security | Cost |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Static/SSG | 5 | 1 | 2 | 5 | 2 | 5 | 4 | 2 | 5 | 3 | 2 | 4 | 4 | 5 |
-| SPA | 2 | 4 | 3 | 2 | 3 | 4 | 3 | 3 | 2 | 3 | 3 | 4 | 3 | 4 |
-| SSR/Hybrid | 4 | 3 | 4 | 4 | 4 | 3 | 3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 |
-| Modular Mono | 3 | 3 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 |
-| Micro-FE | 3 | 3 | 3 | 2 | 5 | 5 | 2 | 5 | 4 | 3 | 5 | 3 | 3 | 2 |
-| BFF+GraphQL | — | — | 5 | 4 | — | 3 | 3 | 4 | 3 | 3 | — | 3 | 4 | 3 |
+Use these as starting priors, not final scores.
 
-These are unweighted baselines. The evaluation procedure applies context-specific weights and adjusts scores based on evidence.
+| Candidate | Best signals | Weak signals |
+|---|---|---|
+| Framework-native | simplicity, low ceremony, ecosystem fit | weak boundary enforcement |
+| DDD/domain modeling | domain fit, testable rules | ceremony for CRUD |
+| Vertical slices | cohesion, team autonomy | duplication risk |
+| FSD | legibility, enforcement, shared vocabulary | learning curve, rigidity |
+| Hexagonal frontend | coupling control, testability | ceremony, adapter overhead |
+| Orchestration/Orc-BASH | explicit seams, reuse, testability | React-specific implementation risk |
+| Article stack | multi-framework core, long-term boundaries | split tree and guard overhead |
+| Modular monolith | team scaling with one deployable | all-or-nothing releases |
+| Micro-frontends | deploy autonomy | high platform/runtime cost |

@@ -21,6 +21,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
 - System Design Skill Coverage: **DONE** (all 14 depth topics in `operational-depth-patterns.md`)
 - Temporal Durable Workflow Skill: **OPEN** (dedicated durable workflow guidance still needed)
+- Ponytail Code-Bloat Eval: **OPEN** (download + 3-condition eval: nothing vs ponytail vs YAGNI one-liner)
+- Self-Harness Research Intake: **OPEN** (evaluate trace-mined, self-proposed harness-rule improvements with regression gates)
 - Garry Tan gstack Intake: **OPEN / PARTIAL** (design/iOS/release domain skills extracted; skill testing and remaining stripping/adaptation still pending)
 
 ---
@@ -55,6 +57,37 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ---
 
 ## External OSS Intake
+
+### Ponytail Download and Code-Bloat Eval **[OPEN]**
+**Source repo:** `https://github.com/DietrichGebert/ponytail`
+**What it is:** Download Ponytail (CLAUDE.md / system-prompt addon focused on code minimalism) and run a controlled eval comparing agent output quality under three instruction conditions.
+**Why it matters:** Quantifies whether terse system-prompt rules actually reduce bloat and improve outcomes, or whether they trade correctness for brevity. Provides evidence for which CLAUDE.md instructions (if any) to adopt into AI Dev Shop's pipeline.
+**What to do:**
+- Clone Ponytail into `/Users/la/Desktop/Multi-Agent Swarm Foundation/other-repos-to-learn-from/ponytail`
+- Design a multi-condition eval comparing three system-prompt treatments across several agents:
+  1. **Nothing** — bare agent, no minimalism instructions
+  2. **Ponytail** — full Ponytail CLAUDE.md content loaded
+  3. **One-liner** — only the line: "Follow YAGNI principles, and one-liner solutions"
+- Run each condition across multiple agents (minimum 3 distinct models/agent configs)
+- Score each run on the following dimensions:
+  - **Correctness** — does the output actually solve the problem correctly?
+  - **Bloat** — lines of code, unnecessary abstractions, over-engineering, dead code
+  - **Tokens** — total input + output token count for the run
+  - **Cost** — dollar cost of the run
+  - **Time** — wall-clock duration
+  - **Safe** — no security vulnerabilities, no unsafe patterns introduced
+- Use identical task fixtures across all conditions for fair comparison
+- Record results in a structured format (TSV or JSONL) with condition, agent, task, and all six scores
+**Eval design notes:**
+- Task fixtures should include a mix of: small utility function, medium feature implementation, refactor of existing code, and bug fix — enough variety to avoid one-trick results
+- Each condition × agent × task combination is one run; aim for at least 3 tasks × 3 agents × 3 conditions = 27 minimum runs
+- "Correctness" is binary or near-binary (tests pass / requirements met); bloat and safety require rubric-based scoring
+- Report aggregate scores per condition and per agent, plus interaction effects (does Ponytail help model X but hurt model Y?)
+**Done when:**
+- Ponytail is cloned locally
+- Eval suite exists with task fixtures, scoring rubric, and run harness
+- At least one full comparison run is completed and results are retained
+- A summary report exists showing which condition(s) produce the best correctness-to-bloat ratio without sacrificing safety
 
 ### Garry Tan `gstack` Intake and Decomposition **[OPEN / PARTIAL]**
 **Source repo:** `https://github.com/garrytan/gstack`
@@ -156,6 +189,24 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - At least one pilot optimization run completes end-to-end with a retained tree and merge-gate evidence
 - Eval suite exists with seeded failure modes (executor contamination, insight drift, false promotion)
 - Convergence sensor detects stagnation and escalates correctly
+
+### Self-Harness Research Intake **[OPEN]**
+**Source article:** `https://venturebeat.com/orchestration/researchers-introduce-self-harness-a-framework-that-lets-ai-agents-rewrite-their-own-rules-boosting-performance-up-to-60`
+**Source paper:** `https://arxiv.org/abs/2606.09498`
+**What it is:** Research on letting an LLM-based agent improve its own operating harness through a loop of Weakness Mining, Harness Proposal, and Proposal Validation.
+**Why it matters:** AI Dev Shop already treats harness engineering as a first-class workflow, but most rule changes are still human-authored. Self-Harness is directly relevant because it turns execution traces into model-specific, regression-tested harness modifications instead of adding generic instructions.
+**Reported result to verify:** The paper reports held-out pass-rate gains on Terminal-Bench-2.0 across MiniMax M2.5, Qwen3.5-35B-A3B, and GLM-5; the largest relative gain is about 60%.
+**What to add:**
+- Read the paper and extract the concrete protocol: trace inputs, weakness mining, minimal harness edit proposal, validation split, regression test criteria, and accept/reject rules.
+- Compare Self-Harness against existing AI Dev Shop work: State-of-the-Art Harness Engineering Gaps, Context De-Noise Hardening, Ponytail evals, Arbor HTR Mode, and loop engineering.
+- Design an AI Dev Shop-safe variant where the agent can propose harness edits but cannot auto-land them without validators, eval evidence, and an explicit Coordinator or human gate.
+- Add seeded eval cases for overfitted harness edits, unsafe self-permission expansion, prompt bloat, instruction drift, and cross-model regression.
+- Test whether proposed harness improvements transfer across at least two model families or whether they should stay model-specific.
+**Done when:**
+- A retained research report classifies Self-Harness ideas as `adopt`, `adapt`, `already-covered`, or `skip`.
+- The report maps any adoption candidates to existing pipeline, harness, skill-format, eval, and artifact surfaces.
+- A candidate workflow exists for trace capture, weakness mining, proposal storage, validation evidence, approval, and rollback.
+- At least one pilot run produces an accepted or rejected harness proposal with retained evidence.
 
 ### Loop Engineering **[OPEN]**
 **Source video:** `https://www.youtube.com/watch?v=RVEaDvh6f5A`
@@ -490,11 +541,17 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - At least one high-risk shared skill and one conditional skill have retained normal vs removed/minimized ablation evidence.
 - The docs state that standalone `skills-evals/` fixtures are deferred unless imported/community skills, cross-agent conflicts, or noisy ablations prove they are needed.
 
-### Advanced Frontend Architecture Eval **[OPEN]**
-**What it is:** An agent eval suite for the `advanced-frontend-architecture` skill — verifying that agents correctly apply the scoring framework, select appropriate depth levels, produce well-reasoned traces, and don't hallucinate architecture tradeoffs.
-**Why it matters:** The skill uses a 14-dimension scoring matrix with leveled depth selectors (Senior→Staff→Principal→Distinguished). Without evals, there's no way to measure whether agents produce actionable reasoning traces vs generic tech-blog summaries, or whether depth escalation triggers fire correctly.
+### Advanced Frontend Architecture Ablation Eval **[OPEN]**
+**What it is:** Build the eval suite that gates default embedding/adoption of the refactored `advanced-frontend-architecture` skill. Compare Software Architect and Programmer behavior with and without the skill loaded, then use measured deltas to decide whether it should become a default agent load path or remain explicitly invoked.
+**Why it matters:** The recent frontend architecture debate proposed a framework-agnostic selector for DDD, vertical slices, FSD, Orc-BASH/orchestration, hexagonal ports/adapters, and framework-native approaches. Do not assume the skill improves outcomes just because the refactor exists. First prove whether it changes agent decisions, improves architecture fit, or causes collateral harm through context load, default bias, verbosity, or over-engineering.
 **What to build:**
 - Seed catalog targeting staff+ complexity across different architecture decision scenarios
+- Run each fixture as an ablation matrix:
+  - **Software Architect without skill** — no `advanced-frontend-architecture` loaded
+  - **Software Architect with refactored skill** — skill loaded explicitly, not as standing default context
+  - **Programmer without skill** — no frontend architecture selector context; should follow an approved ADR or local conventions
+  - **Programmer with forced skill** — skill loaded to detect whether implementation agents overreach into architecture selection
+- Do not embed/adopt the refactored selector/validator skill as a default agent load path until the first ablation report exists. The refactor itself can proceed independently; the eval gates promotion to default context and should answer which agents should load it, when they should load it, and which failure modes it must target.
 - Seeds should cover known failure modes:
   - Scoring all dimensions equally instead of weighting by context
   - Recommending micro-frontends for small teams (anti-pattern blindness)
@@ -510,14 +567,23 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
   - Failing to compose stacks (scoring SSR and Modular Mono separately instead of as one candidate like "SSR + Modular Mono + BFF")
   - Not marking N/A for internal-pattern dimensions (Delivery/Cost/Resilience when evaluating MVC vs FSD)
   - Over-escalating to Distinguished for routine org-wide decisions that are Principal-level (no actual platform bet)
-- Grading rubric should check: correct candidate selection, appropriate depth escalation, dimension weighting rationale, evidence-backed scoring, complete reasoning trace structure, actionable recommendation with reversal triggers
-- Minimum 24 seeds across rendering decisions, team-scaling decisions, migration decisions, and pattern-selection decisions
+- Add new framework-agnostic paradigm-selection fixtures:
+  - Small CRUD/admin frontend where framework-native conventions should win
+  - Domain-heavy single-framework app where DDD/vertical slices may beat strict FSD
+  - Multi-framework shared-core scenario where pure modules plus `ui/<framework>/` may be justified
+  - Brownfield app with existing conventions where migration cost should dominate
+  - React case where Orc-BASH helps only if orchestration/state/API seams are justified
+  - Angular/Vue/Svelte cases to prove the scoring does not leak React hook assumptions
+- Grading rubric should check: correct candidate selection, appropriate depth escalation, dimension weighting rationale, evidence-backed scoring, complete reasoning trace structure, actionable recommendation with reversal triggers, and whether Programmer stays inside the Architect-approved handoff instead of reselecting architecture
+- Minimum 24 seeds across rendering decisions, team-scaling decisions, migration decisions, pattern-selection decisions, and framework-agnostic paradigm-composition decisions
+- Follow-up cleanup candidate: consider deleting or relocating the skill's `handoff-contract` portion if skill files should not reference specific pipeline agents such as Software Architect or Programmer. Prefer agent-neutral wording like "architecture decision owner" and "implementation agent" if the contract remains.
 **Likely location:**
 - `harness-engineering/agent-evals/frontend-architecture-evals/benchmark-suite/`
 **Done when:**
 - Seeds exist at staff+ complexity covering the major failure modes
-- Scorer can evaluate reasoning traces against SKILL.md methodology and trace format
-- Running the suite reveals which dimensions/depth-levels agents handle poorly
+- Scorer can evaluate reasoning traces against SKILL.md methodology, trace format, and ablation variants
+- A retained ablation report compares Software Architect and Programmer with/without the skill and records target lift, false-positive activation, context-cost delta, and misrouting/overreach
+- Running the suite reveals which dimensions/depth-levels agents handle poorly and whether default adoption of the refactored selector/validator skill is justified
 - At least 2 negative controls (reasonable architecture choices that should NOT be flagged as wrong)
 
 ### Memory-Regression Skill Evals **[OPEN]**
