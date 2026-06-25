@@ -24,6 +24,10 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Ponytail Code-Bloat Eval: **OPEN** (download + 3-condition eval: nothing vs ponytail vs YAGNI one-liner)
 - Self-Harness Research Intake: **OPEN** (evaluate trace-mined, self-proposed harness-rule improvements with regression gates)
 - Garry Tan gstack Intake: **OPEN / PARTIAL** (design/iOS/release domain skills extracted; skill testing and remaining stripping/adaptation still pending)
+- Anthropic Cybersecurity Skills Intake: **OPEN** (Security-owned install, consolidation into one skill, eval gate before default wiring)
+- Codebase Memory MCP Intake: **OPEN** (audit/install MCP code graph server, benchmark against Graphify and current codebase-analysis workflow)
+- Matt Pocock Skills Re-Intake: **OPEN** (rerun engineering-skill review, dedupe against existing pipeline and imported skills)
+- NVIDIA SkillSpector Intake: **OPEN** (evaluate AI-agent skill scanner as import/install guardrail)
 
 ---
 
@@ -57,6 +61,117 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ---
 
 ## External OSS Intake
+
+### NVIDIA SkillSpector Intake and Skill-Install Guardrail **[OPEN]**
+**Owner:** Security Agent with Skills Librarian and Coordinator routing oversight.
+**Source repo:** `https://github.com/nvidia/skillspector`
+**Upstream install note:** README lists `uv tool install git+https://github.com/NVIDIA/skillspector.git`, source install via clone + `make install`, Docker usage, and optional MCP server mode.
+**Local intake target:** `/Users/la/Desktop/Multi-Agent Swarm Foundation/other-repos-to-learn-from/skillspector`
+**What it is:** Security scanner for AI agent skills. It scans Git repos, URLs, zip files, directories, or single skill files for vulnerabilities, malicious patterns, and risky instructions before installing agent skills. Upstream describes static analysis plus optional LLM semantic evaluation, multiple report formats, baseline suppression, and MCP server mode exposing a `scan_skill` tool.
+**Why it matters:** AI Dev Shop is adding more external skill intake work. A scanner purpose-built for agent skills could become a preflight gate before installing or adapting third-party skills, especially for prompt injection, data exfiltration, unsafe tool access, supply-chain risk, MCP least-privilege issues, and malicious instruction patterns.
+**Integration intent:** Evaluate as a security and governance guardrail for external-skill intake. Do not treat a clean SkillSpector scan as sufficient approval by itself; it should feed Security/Skills Librarian review, not replace source inspection, license checks, or evals.
+**What to do:**
+- Clone the upstream repo into the local external-repos intake folder.
+- Review `README.md`, `pyproject.toml`, Dockerfile, MCP mode, baseline format, model/provider configuration, vulnerability pattern definitions, tests, and any network calls or dependency lookups.
+- Run static-only scans (`--no-llm`) against a mix of known local skills, imported gstack skills, and deliberately suspicious fixture skills.
+- If LLM mode is tested, use an explicit throwaway fixture and record provider/model/env-var requirements; do not expose secrets in retained reports.
+- Evaluate whether SkillSpector should become a required preflight for `skills/` imports, `skills-inbox` reviews, MCP server installs, or external skill packs such as `Anthropic-Cybersecurity-Skills` and `mattpocock/skills`.
+- Define how findings map to AI Dev Shop decisions: `block`, `needs human approval`, `needs Security review`, `allow with baseline`, or `false positive`.
+**Eval requirement:**
+- Build a small scanner-eval fixture set with benign skills, risky-but-legitimate skills, prompt-injection skills, exfiltration attempts, dangerous shell install instructions, MCP over-permission examples, and false-positive traps.
+- Compare SkillSpector findings against manual Security review and existing AI Dev Shop skill-format/skills-inbox checks.
+- Score precision, recall, severity accuracy, false-positive rate, runtime, dependency/network behavior, report usability, and whether baseline suppression hides important drift.
+- Test both standalone CLI output and MCP `scan_skill` output if MCP mode is considered for Coordinator or Skills Librarian workflows.
+**Done when:**
+- Upstream repo is cloned and audited locally.
+- At least one static-only scan pass has run on local skills and suspicious fixtures.
+- A retained report recommends reject, manual-only, optional preflight, or required intake gate.
+- If adopted, the required integration point is named: `skills-inbox`, Skills Librarian intake, Security review, Coordinator external-skill install preflight, or CI.
+
+### Matt Pocock Skills Re-Intake **[OPEN]**
+**Source repo:** `https://github.com/mattpocock/skills`
+**Upstream install note:** README lists `npx skills@latest add mattpocock/skills`.
+**Local intake target:** `/Users/la/Desktop/Multi-Agent Swarm Foundation/other-repos-to-learn-from/mattpocock-skills`
+**What it is:** Small, composable engineering skills from Matt Pocock's agent setup, focused on practical software delivery rather than a full process framework. The repo includes user-invoked flows such as `grill-me`, `grill-with-docs`, `triage`, `to-prd`, `to-issues`, `prototype`, and `improve-codebase-architecture`, plus model-invoked disciplines such as `tdd`, `diagnosing-bugs`, `domain-modeling`, and `codebase-design`.
+**Why it matters:** Some of these ideas likely overlap with work already in AI Dev Shop, gstack extraction, Spec/TDD/CodeBase Analyzer flows, VibeCoder, and advanced frontend architecture work. A second pass should find any missed high-signal habits without duplicating existing pipeline machinery.
+**Integration intent:** Re-review and selectively adapt. Do not install or vendor the whole pack into default context. Prefer small portable patterns, prompts, rubrics, and eval seeds that improve existing agents.
+**What to do:**
+- Clone or install the upstream repo into the local external-repos intake folder.
+- Inventory every skill, classify it as `adopt`, `adapt`, `already-covered`, `covered-by-gstack`, `needs-eval`, or `skip`.
+- Pay special attention to `grill-with-docs`, `domain-modeling`, `codebase-design`, `diagnosing-bugs`, `tdd`, `to-issues`, `to-prd`, `prototype`, and `improve-codebase-architecture`.
+- Compare each candidate against existing AI Dev Shop surfaces: Spec, TDD, VibeCoder, CodeBase Analyzer, System Design, Software Architect, `skills/systematic-debugging`, `skills/test-design`, `skills/reverse-spec`, `skills/feature-slice-design`, and gstack-derived skills.
+- Identify whether any useful pieces should become updates to existing skills rather than new standalone skills.
+- Preserve source notes in an intake report before adapting content; avoid copied personal workflow assumptions, Claude-only setup assumptions, or issue-tracker-specific defaults unless deliberately converted into AI Dev Shop-native rules.
+**Eval requirement:**
+- Add or extend evals only for candidates that would change default agent behavior.
+- For alignment/grilling/domain-model candidates, test whether agents ask better clarifying questions without creating interview fatigue.
+- For TDD/debugging/design candidates, run baseline-vs-adapted comparisons on small but realistic implementation, bug diagnosis, and architecture-repair fixtures.
+- Score correctness, useful clarification rate, unnecessary-question rate, token cost, implementation quality, and overlap/noise against existing skills.
+**Done when:**
+- Local clone or install exists for review.
+- A retained intake report classifies all upstream skills and identifies overlap with current AI Dev Shop skills.
+- Any adoption candidates have a concrete target file, expected behavioral improvement, and eval path.
+- Coordinator can decide whether this repo contributes new material, confirms existing coverage, or should be kept as reference-only.
+
+### Codebase Memory MCP Install and Eval **[OPEN]**
+**Owner:** CodeBase Analyzer Agent with Coordinator routing oversight; Security Agent reviews installer/config-write risk before enablement.
+**Source repo:** `https://github.com/DeusData/codebase-memory-mcp`
+**Upstream install note:** README lists one-line install via `curl ... | bash`, manual release archive install, package managers, and an optional graph UI.
+**Local intake target:** `/Users/la/Desktop/Multi-Agent Swarm Foundation/other-repos-to-learn-from/codebase-memory-mcp`
+**What it is:** Code intelligence MCP server that indexes repositories into a persistent local knowledge graph using tree-sitter and hybrid LSP-style analysis. Upstream claims 158-language support, fast indexing, sub-ms structural queries, 14 MCP tools, static binaries, local-only processing, and optional graph visualization.
+**Why it matters:** AI Dev Shop already has CodeBase Analyzer and a Graphify-backed `skills/codebase-graph/SKILL.md`, but codebase discovery still depends on choosing the right graph backend, detecting stale graphs, and falling back to targeted source reads when graph evidence is weak. A local MCP graph backend might improve live agent ergonomics or persistent memory, but it must prove value against Graphify rather than duplicating it.
+**Integration intent:** Evaluate as an optional codebase-analysis backend, not as an automatic default install. Do not pipe remote installers directly into the shell during intake. Clone/audit first, then test on fixtures or disposable repos before configuring this live toolkit or other working repos. Treat Graphify as the incumbent baseline for structural graphing.
+**What to do:**
+- Clone the upstream repo into the local external-repos intake folder.
+- Review `README.md`, `install.sh`, `install.ps1`, `server.json`, release/signing/checksum flow, local database path, generated config writes, hooks, instruction-file changes, uninstall behavior, and network/update behavior.
+- Run Security review on the installer and binary trust model before enabling it in any agent host.
+- Install only in an isolated test environment first, preferably with `--skip-config` or equivalent binary-only mode if available.
+- Index at least two fixture repos: one small TypeScript/React repo and one larger mixed-language repo.
+- Compare tool output against both Graphify and current direct CodeBase Analyzer discovery on architecture overview, route detection, impact analysis, dead-code identification, cross-file call tracing, stale-index handling, and token cost.
+- Decide whether integration should be manual-only, Coordinator-invoked for brownfield analysis, CodeBase Analyzer default when verified, or rejected.
+**Eval requirement:**
+- Build a codebase-analysis eval or benchmark slice with at least three conditions: baseline `rg`/file-read discovery, Graphify-assisted discovery, and Codebase Memory MCP-assisted discovery.
+- Minimum metrics: answer correctness, missed critical files, hallucinated relationships, source-evidence quality, token count, wall-clock time, indexing cost, query ergonomics, stale-index behavior, graph refresh reliability, and security/config side effects.
+- Include adversarial fixtures for generated files, vendored code, monorepo packages, dynamic imports, framework routes, IaC manifests, renamed symbols, dead code that is intentionally kept, and stale graph state after edits.
+- Add a safety regression checklist for local-only processing, no unexpected config mutation, clean uninstall, and no secret or source exfiltration.
+**Done when:**
+- Upstream repo is cloned and audited locally.
+- Installation path and rollback/uninstall steps are documented.
+- At least one isolated install/index run has completed.
+- A retained eval report compares direct discovery, Graphify-assisted discovery, and MCP-assisted discovery.
+- Coordinator has a clear adoption decision: reject, manual-only, keep Graphify as incumbent, conditional CodeBase Analyzer backend, or default verified backend.
+
+### Anthropic Cybersecurity Skills Intake and Consolidation **[OPEN]**
+**Owner:** Security Agent
+**Source repo:** `https://github.com/mukul975/Anthropic-Cybersecurity-Skills`
+**Upstream install note:** README lists `npx skills add mukul975/Anthropic-Cybersecurity-Skills` and direct git clone as options.
+**Local intake target:** `/Users/la/Desktop/Multi-Agent Swarm Foundation/other-repos-to-learn-from/Anthropic-Cybersecurity-Skills`
+**What it is:** Large cybersecurity skill library for AI agents: 817 structured skills across 29 security domains with mappings to MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, MITRE D3FEND, NIST AI RMF, and MITRE F3.
+**Why it matters:** The Security agent currently has strong review guidance, secure-input handling, architecture trust-boundary support, and web-compliance screening, but it does not have a broad practitioner playbook for DFIR, threat hunting, malware analysis, cloud security, red team, SOC, vulnerability management, AI security, and related security operations.
+**Integration intent:** Learn from and selectively adapt. Do not bulk-import 817 separate skills into this repo. Distill the useful workflows into one consolidated Security-owned skill, then wire that one skill into `agents/security/skills.md` only after eval evidence supports it.
+**Candidate target skill:** `skills/cybersecurity-practitioner/SKILL.md`
+**Support files if needed:** Keep deep references under `skills/cybersecurity-practitioner/references/`; avoid one upstream domain becoming one local skill unless the eval proves the consolidated skill is too dense to use reliably.
+**What to do:**
+- Clone or install the upstream repo into the local external-repos intake folder.
+- Inventory domains, frontmatter schema, framework mappings, license, generated files, scripts, and any unsafe tool assumptions.
+- Identify overlap with existing local skills: `security-review`, `secure-input-handling`, `web-compliance`, `observability-implementation`, `incident-response`, `framework/governance/tool-permission-policy.md`, and data-classification guidance.
+- Build a consolidation map that classifies upstream material as `adopt`, `summarize`, `reference-only`, `already-covered`, or `skip`.
+- Create one consolidated Security skill focused on agent-executable security fieldcraft: when to apply a workflow, required evidence, safe tool-use boundaries, verification steps, and report shape.
+- Keep offensive, dual-use, malware, credential, and exploit material under explicit defensive/authorized-use guardrails. The skill should help the Security agent review and investigate, not silently turn normal code tasks into offensive operations.
+- Add `skills/cybersecurity-practitioner/SKILL.md` to the skills registry and `agents/security/skills.md` only after the eval gate passes.
+**Eval requirement:**
+- Build a Security-agent eval slice before default adoption, preferably under `harness-engineering/agent-evals/security-evals/benchmark-suite/`.
+- Run an ablation: Security agent baseline vs consolidated cybersecurity skill loaded.
+- Include seeds for at least: incident triage, cloud misconfiguration, web-app vuln review, dependency/CVE response, suspicious logs/threat hunting, AI-security prompt/tool boundary risk, and a negative-control benign case.
+- Score detection quality, severity accuracy, evidence grounding, false positives, safe refusal/authorization boundaries, context cost, and whether the skill over-activates on ordinary code-review work.
+- Add at least one harm probe for unsafe offensive detail, one prompt-injection/conflicting-instruction probe, and one context-overload probe.
+**Done when:**
+- Upstream repo is cloned or otherwise installed locally for review.
+- A retained intake report exists with license, structure, overlap, safety risks, and consolidation recommendations.
+- One consolidated Security skill exists and passes skill-format checks.
+- Security eval seeds and scoring rubric exist.
+- At least one baseline-vs-skill ablation run is recorded.
+- The Coordinator has enough evidence to decide whether to wire the consolidated skill into Security by default, keep it conditional/manual, or reject it.
 
 ### Ponytail Download and Code-Bloat Eval **[OPEN]**
 **Source repo:** `https://github.com/DietrichGebert/ponytail`
