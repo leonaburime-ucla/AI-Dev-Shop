@@ -8,6 +8,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT_KNOWLEDGE_TEMPLATE = ROOT / "project-knowledge-template"
+REPO_PATH_PREFIX_RE = r"(?:\.claude/commands|agents|skills|framework|integrations|project-knowledge-template|harness-engineering)"
+IGNORED_INTEGRATION_ARTIFACT_DIRS = frozenset(
+    {"upstream", "bin", ".venv", "venv", "node_modules", "dist", "build"}
+)
 SCAN_TARGETS = [
     ROOT / "AGENTS.md",
     ROOT / "CLAUDE.md",
@@ -17,6 +21,7 @@ SCAN_TARGETS = [
     ROOT / "agents",
     ROOT / "skills",
     ROOT / "framework",
+    ROOT / "integrations",
     ROOT / "project-knowledge-template/README.md",
     ROOT / "project-knowledge-template/governance",
     ROOT / "project-knowledge-template/memory",
@@ -27,10 +32,10 @@ SCAN_TARGETS = [
 AI_DEV_SHOP_ROOT_RE = re.compile(r"<AI_DEV_SHOP_ROOT>/([A-Za-z0-9_./-]+)")
 ADS_PROJECT_KNOWLEDGE_ROOT_RE = re.compile(r"<ADS_PROJECT_KNOWLEDGE_ROOT>/([A-Za-z0-9_./-]+)")
 BACKTICK_PATH_RE = re.compile(
-    r"`((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|(?:\.claude/commands|agents|skills|framework|project-knowledge-template|harness-engineering)/[A-Za-z0-9_./-]+(?:\.[A-Za-z0-9_-]+)?)`"
+    rf"`((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|{REPO_PATH_PREFIX_RE}/[A-Za-z0-9_./-]+(?:\.[A-Za-z0-9_-]+)?)`"
 )
 MARKDOWN_LINK_RE = re.compile(
-    r"\]\(((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|(?:\.claude/commands|agents|skills|framework|project-knowledge-template|harness-engineering)/[^)#\s]+)"
+    rf"\]\(((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|{REPO_PATH_PREFIX_RE}/[^)#\s]+)"
 )
 
 
@@ -47,16 +52,43 @@ def should_skip(path_text: str) -> bool:
     return any(token in path_text for token in ("<", ">", "*", "...", "$", "{", "}"))
 
 
+def repo_relative_parts(path: Path | str) -> tuple[str, ...]:
+    path = Path(path)
+    try:
+        rel = path.relative_to(ROOT)
+    except ValueError:
+        rel = path
+    return rel.parts
+
+
+def is_ignored_integration_artifact(parts: tuple[str, ...]) -> bool:
+    if len(parts) < 3 or parts[0] != "integrations":
+        return False
+    if not (ROOT / parts[0] / parts[1]).exists():
+        return False
+    return parts[2] in IGNORED_INTEGRATION_ARTIFACT_DIRS
+
+
+def should_scan_repo_file(path: Path) -> bool:
+    parts = repo_relative_parts(path)
+    if path.name == "ORIGINAL.md":
+        return False
+    if "archive" in parts:
+        return False
+    if is_ignored_integration_artifact(parts):
+        return False
+    return True
+
+
 def repo_files() -> list[Path]:
     files: list[Path] = []
     for target in SCAN_TARGETS:
         if target.is_file():
-            files.append(target)
+            if should_scan_repo_file(target):
+                files.append(target)
             continue
         for path in target.rglob("*.md"):
-            if path.name == "ORIGINAL.md":
-                continue
-            if "archive" in path.parts:
+            if not should_scan_repo_file(path):
                 continue
             files.append(path)
     return sorted(files)
@@ -64,6 +96,8 @@ def repo_files() -> list[Path]:
 
 def check_repo_reference(path_text: str) -> bool:
     if should_skip(path_text):
+        return True
+    if is_ignored_integration_artifact(repo_relative_parts(path_text)):
         return True
     if path_text.startswith("tmp/peer-dispatch/"):
         return True

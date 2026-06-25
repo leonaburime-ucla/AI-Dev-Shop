@@ -22,6 +22,7 @@ GAP_TOKENS = frozenset(
     {"n/a", "none", "gap", "missing", "needs declaration", "not yet available", "not yet configured"}
 )
 PLACEHOLDER_TOKENS = frozenset({"todo", "tbd", "unknown", "fixme"})
+ANGLE_PLACEHOLDER_RE = re.compile(r"<[A-Z][A-Z0-9_]*>")
 
 
 @dataclass(frozen=True)
@@ -202,14 +203,24 @@ def slot_has_content(text: str, slot_heading: str) -> bool:
         if in_slot:
             if re.match(r"^#{1,4}\s+", line):
                 break
-            stripped = line.strip().lower()
+            stripped = line.strip()
             if not stripped or stripped.startswith("<!--"):
                 continue
             value = stripped.split(":", 1)[-1].strip() if ":" in stripped else stripped
             value = value.strip("` ")
-            if value and value not in PLACEHOLDER_TOKENS and value not in GAP_TOKENS:
+            if field_value_has_content(value):
                 return True
     return False
+
+
+def field_value_has_content(value: str) -> bool:
+    value = value.strip().strip("` ")
+    value_lower = value.lower()
+    if not value or value_lower in PLACEHOLDER_TOKENS or value_lower in GAP_TOKENS:
+        return False
+    if ANGLE_PLACEHOLDER_RE.search(value):
+        return False
+    return True
 
 
 def field_has_content(text: str, field_label: str) -> bool:
@@ -228,9 +239,7 @@ def field_has_content(text: str, field_label: str) -> bool:
         label, value = stripped.split(":", 1)
         if normalize_field_label(label) != target:
             continue
-        value = value.strip().strip("` ")
-        value_lower = value.lower()
-        return bool(value and value_lower not in PLACEHOLDER_TOKENS and value_lower not in GAP_TOKENS)
+        return field_value_has_content(value)
     return False
 
 

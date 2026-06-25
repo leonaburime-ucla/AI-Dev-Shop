@@ -25,6 +25,7 @@ REQUIRED_COMPONENT_CONTRACTS = (
     "side-effects.yaml",
     "functions.yaml",
 )
+ALLOWED_STATUS_VALUES = frozenset({"generated", "hybrid", "stale", "rewriting"})
 
 
 @dataclass(frozen=True)
@@ -252,6 +253,12 @@ def validate_metadata_file(path: Path, source_root: Path) -> list[Finding]:
         return findings
     if not artifact_type and not scope and path.name != "_meta.yaml":
         return findings
+
+    if status and status not in ALLOWED_STATUS_VALUES:
+        findings.append(Finding(
+            "WARN", path, "INVALID_STATUS_VALUE",
+            f"status '{status}' is not one of: {', '.join(sorted(ALLOWED_STATUS_VALUES))}",
+        ))
 
     if path.name == "_meta.yaml" and not scope:
         findings.append(Finding(
