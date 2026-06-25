@@ -23,11 +23,17 @@ Do not commit bulky upstream repositories, dependency installs, build outputs,
 or generated run artifacts in this folder.
 
 Runtime outputs from integration tools should go under the project knowledge
-reports tree when they are meant to be retained. For Graphify, the canonical
-output location is:
+tree when they are meant to be retained. For Graphify, the canonical output
+location is:
 
 ```text
-ADS-project-knowledge/reports/graphify-out/
+<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/
+```
+
+For Codebase Memory MCP, keep the local cache home out of source control:
+
+```text
+<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home/
 ```
 
 ## Graphify
@@ -69,6 +75,49 @@ GRAPHIFY_OUT="$(python3 harness-engineering/validators/check_graphify_freshness.
 
 For Graphify-specific update and sync commands, see
 `integrations/graphify/README.md`.
+
+## Codebase Memory MCP
+
+Codebase Memory MCP is intentionally not included as a committed upstream source
+checkout. The lightweight integration files can live in
+`codebase-memory-mcp/`, but the full upstream repository belongs in the ignored
+local path:
+
+```bash
+integrations/codebase-memory-mcp/upstream/
+```
+
+Download it only when you need to inspect, update, validate, or use the local
+Codebase Memory MCP integration. From the AI Dev Shop root, run:
+
+```bash
+bash harness-engineering/validators/check_codebase_memory_capability.sh --download
+```
+
+The checkout comes from:
+
+```text
+https://github.com/DeusData/codebase-memory-mcp.git
+```
+
+Install its local binary only after the checkout exists:
+
+```bash
+bash harness-engineering/validators/check_codebase_memory_capability.sh --install-binary
+```
+
+The installer command above passes `--skip-config` to the upstream installer so
+it does not mutate agent MCP configuration. Indexing should use a project-owned
+local home under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`, for example:
+
+```bash
+HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+  <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
+  cli index_repository '{"repo_path":"<TARGET_REPO>"}'
+```
+
+For Codebase Memory MCP-specific setup and query commands, see
+`integrations/codebase-memory-mcp/README.md`.
 
 ## Other Integrations
 

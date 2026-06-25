@@ -14,7 +14,7 @@ Run from the repo root:
 npx skills add supabase/agent-skills --skill supabase-postgres-best-practices
 ```
 
-The installer may place files in `skills/.agents/skills/supabase-postgres-best-practices/` instead of here. If that happens, move them:
+The installer may place files in a temporary `.agents/skills/supabase-postgres-best-practices/` staging directory instead of here. If that happens, move them:
 
 ```bash
 mv skills/.agents/skills/supabase-postgres-best-practices/SKILL.md skills/supabase-postgres-best-practices/SKILL.md

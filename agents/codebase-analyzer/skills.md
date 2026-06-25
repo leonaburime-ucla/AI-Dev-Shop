@@ -1,10 +1,10 @@
 # CodeBase Analyzer Agent
-- Version: 1.1.0
-- Last Updated: 2026-06-06
+- Version: 1.2.0
+- Last Updated: 2026-06-25
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md` — phased analysis protocol, token budget strategy, findings report format, flaw categories and severity
-- `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed repo mapping, stale graph checks, and query-first architecture discovery
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — optional Graphify and Codebase Memory MCP repo mapping, stale graph checks, and query-first architecture discovery
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — current state classification, target pattern selection, phase plan format, migration principles
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog, system drivers analysis, DDD vocabulary, tradeoff framework
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern details and implementation guidance for the recommended target architecture
@@ -25,30 +25,67 @@ Use this agent when:
 
 ## Workflow
 
-### Phase 0: Graphify Gate
+### Phase 0: Codebase Graph Backend Gate
 
-Graphify provides a zero-token structural code graph (AST extraction, dependency mapping, community detection, hotspot analysis). It is most valuable for large or unfamiliar codebases.
+AI Dev Shop supports optional local graph backends for codebase discovery:
+
+- **Codebase Memory MCP**: persistent local knowledge graph exposed through CLI/MCP tools for architecture summaries, symbol/file search, source snippets, change impact, and structural queries.
+- **Graphify**: structural graph extraction, dependency/community mapping, and query-first architecture discovery.
+
+These tools are most valuable for large or unfamiliar codebases. Direct `rg` and file reads remain the fallback and the validation path for important conclusions.
 
 **Decision logic:**
 
 1. Count files in target: `find <TARGET_REPO> -type f | wc -l`
-2. If **<500 files**: skip Graphify, proceed directly to Analysis Only.
-3. If **500–4,999 files**: ask the user — "This codebase has N files. We have Graphify available, which builds a structural dependency graph for navigating architecture, finding hotspots, and detecting cycles — without burning tokens reading files. Want to use it, or proceed with direct exploration?"
-4. If **≥5,000 files**: recommend Graphify — "This codebase has N files. We recommend using Graphify to build a structural map before analysis — it's zero-token AST extraction and will save significant exploration cost at this scale. Proceed with Graphify?"
-5. If the user declines, skip to Analysis Only (no graph).
+2. Check Codebase Memory MCP: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codebase_memory_capability.sh`
+3. Check Graphify: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh`
+4. If **<500 files**: direct exploration is acceptable by default. Use an enabled graph backend only if the user asks for persistent repo memory, impact analysis, or query-first navigation.
+5. If **500–4,999 files**: if either backend is `enabled`, ask whether to use graph-assisted discovery or direct exploration. Prefer Codebase Memory MCP for file/symbol lookup and snippets; prefer Graphify when its community report or Graphify-specific queries are useful.
+6. If **≥5,000 files**: recommend graph-assisted discovery. If no backend is enabled, explain both options and ask whether the user wants to download/install one before analysis.
+7. If neither backend is available and the user declines setup, proceed with direct exploration and record that graph assistance was unavailable or declined.
+
+Suggested prompt when neither backend is available:
+
+> This codebase has N files. AI Dev Shop can optionally use a local graph backend before broad source reading. Codebase Memory MCP builds a persistent local knowledge graph with MCP/CLI tools for file search, symbol lookup, source snippets, architecture summaries, and change impact. Graphify builds a structural dependency/community graph and report. Do you want me to set up one of these, or should I proceed with direct `rg` and file reads?
+
+**Codebase Memory MCP Bootstrap (when proceeding):**
+
+1. Run capability check: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codebase_memory_capability.sh`
+2. If `unavailable`: ask before downloading or installing; do not pipe remote installers into the shell. Use the integration README for the audited setup path.
+3. If `unverified`: explain what is present and what is missing, then ask whether to complete binary setup or proceed without it.
+4. If `enabled`: run or refresh the index. Use the local integration binary when
+   the capability report says `Local binary: enabled`; otherwise use
+   `codebase-memory-mcp` from `PATH` when the report says `PATH binary: enabled`.
+
+Set `<CODEBASE_MEMORY_COMMAND>` based on the capability report:
+
+```bash
+HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+  <CODEBASE_MEMORY_COMMAND> \
+  cli index_repository '{"repo_path":"<TARGET_REPO>"}'
+```
+
+5. Prefer Codebase Memory MCP tools for initial architecture/file discovery:
+   - `list_projects`
+   - `get_architecture`
+   - `get_graph_schema`
+   - `search_graph`
+   - `search_code`
+   - `detect_changes`
+   - `get_code_snippet`
 
 **Graphify Bootstrap (when proceeding):**
 
 1. Run capability check: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh`
-2. If `unavailable` or `unverified`: install graphify — run `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh --download`, then activate the venv or confirm the CLI is on PATH
+2. If `unavailable` or `unverified`: ask before downloading or installing Graphify. Do not silently clone or pull third-party code during ordinary analysis.
 3. If capability is `enabled`: check freshness — `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO>`
-4. If stale or missing: run `GRAPHIFY_OUT="$(python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO> --prepare-output --print-output-path)" graphify update <TARGET_REPO> --force` (--force prevents duplicate edges on incremental runs)
+4. If stale or missing: run a code-only structural update using the current Graphify wrapper guidance in `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md`
 5. Write freshness metadata: `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO> --write --mode code_update`
 
-Once the graph is fresh, prefer graph queries over broad file reads for discovery and architecture questions. Fall back to raw source sampling only when graph evidence is insufficient.
+Once a graph backend is available, prefer graph queries over broad file reads for discovery and architecture questions. Fall back to raw source sampling when graph evidence is insufficient, surprising, stale, or too coarse.
 
 ### Analysis Only
-1. If graph available: query for architecture structure, dependency hotspots, and entry points
+1. If a graph backend is available: query for architecture structure, dependency hotspots, entry points, file/symbol lookup, and recent-change impact
 2. Run Phase 1: Discovery — directory structure, package files, README (use graph communities to prioritize if available)
 3. Run Phase 2: Architecture Scan — entry points, layer structure, dependency direction (validate graph paths against source if available)
 4. Run Phase 3: Code Sampling — quality indicators, test coverage signal, security surface

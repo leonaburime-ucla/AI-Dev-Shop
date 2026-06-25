@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.25
-last_updated: 2026-06-08
+version: 1.2.26
+last_updated: 2026-06-25
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -38,7 +38,9 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/non-functional-requirements-discovery/SKILL.md` | System Design Agent, Spec Agent, Software Architect (targeted deepening) |
 | `skills/system-blueprint/SKILL.md` | System Design Agent, Coordinator |
 | `skills/system-design/SKILL.md` | System Design Agent, Software Architect (shared macro-topology and architecture-spec reference) |
+| `skills/advanced-frontend-architecture/SKILL.md` | Software Architect (frontend architecture selection and validation), Code Review Agent (frontend architecture drift checks) |
 | `skills/feature-slice-design/SKILL.md` | Programmer (frontend applications — React, Vue, Svelte, Angular, plain TS) |
+| `skills/frontend-react-orcbash/SKILL.md` | Programmer (conditional React Orc-BASH implementation), Software Architect (React frontend hexagonal pattern reference), Code Review Agent (React Orc-BASH adherence checks) |
 | `skills/testable-design-patterns/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Review Agent (child layer for testability and coverage-friendly structure; always load alongside `coding-foundations`) |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Review Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Review Agent (React component API patterns) |
@@ -90,6 +92,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/gstack-release/SKILL.md` | Manual/user-invoked via `/gstack-release`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/security-review/SKILL.md` | Software Architect (design-time threat surface only), Security, Code Review, DevOps |
 | `skills/performance-engineering/SKILL.md` | TestRunner Agent, Software Architect |
+| `skills/memory-regression/SKILL.md` | QA/E2E Agent, TestRunner Agent, Programmer, Software Architect (conditional memory/resource leak prevention and bounded-growth verification) |
 | `skills/api-contracts/SKILL.md` | Spec Agent, Code Review Agent, Docs Agent |
 | `skills/api-design/SKILL.md` | Spec Agent, Software Architect, Code Review Agent, Docs Agent |
 | `skills/frontend-accessibility/SKILL.md` | UX/UI Designer Agent, Search Visibility, Code Review Agent, QA/E2E Agent |

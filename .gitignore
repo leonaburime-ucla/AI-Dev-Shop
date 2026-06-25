@@ -12,8 +12,12 @@ tmp/
 coverage/
 dist/
 build/
+/cache/
 project-knowledge-template/.local-artifacts/
 ADS-project-knowledge/
 integrations/graphify/upstream/
+integrations/codebase-memory-mcp/upstream/
+integrations/codebase-memory-mcp/bin/
 graphify-out/
+.codebase-memory/
 .github/workflows/

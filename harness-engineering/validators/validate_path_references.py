@@ -65,6 +65,8 @@ def repo_files() -> list[Path]:
 def check_repo_reference(path_text: str) -> bool:
     if should_skip(path_text):
         return True
+    if path_text.startswith("tmp/peer-dispatch/"):
+        return True
     if path_text.startswith("specs/"):
         return True
     if path_text.startswith("project-knowledge-template/reports/"):

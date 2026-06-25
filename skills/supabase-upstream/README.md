@@ -14,7 +14,7 @@ Run from the repo root:
 npx skills add supabase/agent-skills --skill supabase
 ```
 
-The installer may place files in `skills/.agents/skills/supabase/` instead of here. If that happens, move them:
+The installer may place files in a temporary `.agents/skills/supabase/` staging directory instead of here. If that happens, move them:
 
 ```bash
 mv skills/.agents/skills/supabase/SKILL.md skills/supabase-upstream/SKILL.md

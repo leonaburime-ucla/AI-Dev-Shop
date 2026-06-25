@@ -112,6 +112,12 @@ Use `<AI_DEV_SHOP_ROOT>/framework/operations/pipeline-quickstart.md` as the sour
 
 The minimum startup rule still holds: confirm `<AI_DEV_SHOP_ROOT>`, start existing codebases with CodeBase Analyzer when needed, and do not send work past Spec or ADR approval gates without the required human checkpoint.
 
+For existing-codebase analysis, CodeBase Analyzer checks optional graph backends under `<AI_DEV_SHOP_ROOT>/integrations/` before broad source reading:
+- Graphify: `<AI_DEV_SHOP_ROOT>/integrations/graphify/`
+- Codebase Memory MCP: `<AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/`
+
+If neither backend is available and the target is large or unfamiliar, explain that these local tools can build a reusable codebase map for faster architecture discovery and ask whether the user wants to download or install one. Do not silently clone, install, or configure third-party tools. When a backend is available, prefer it for initial repo mapping, file/symbol lookup, impact checks, and architecture discovery; validate important findings against actual source files and fall back to direct `rg`/file reads whenever graph evidence is weak.
+
 ---
 
 ## Invoking the Pipeline

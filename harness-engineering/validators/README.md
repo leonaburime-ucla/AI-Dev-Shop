@@ -51,6 +51,10 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks whether Graphify is installed, whether the managed upstream checkout exists, and which installer path (`uv`, `pipx`, or local Python) is available
   - read-only by default; clones into `integrations/graphify/upstream/` only with `--download`, updates only with `--update`, and refreshes copied skill references only with `--sync-skill`
   - used by Coordinator and CodeBase Analyzer before relying on Graphify-backed repo maps
+- `check_codebase_memory_capability.sh`
+  - checks whether Codebase Memory MCP is installed, whether the managed upstream checkout exists, and whether the local binary under `integrations/codebase-memory-mcp/bin/` is usable
+  - read-only by default; clones into `integrations/codebase-memory-mcp/upstream/` only with `--download`, updates only with `--update`, and installs the local binary only with `--install-binary`
+  - used by Coordinator and CodeBase Analyzer before relying on Codebase Memory MCP-backed repo maps
 - `check_graphify_freshness.py`
   - prepares reports-backed Graphify output under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/`
   - prints the path to use as `GRAPHIFY_OUT` so Graphify writes directly into the reports location
@@ -90,6 +94,12 @@ Check whether Graphify is available for repo mapping:
 
 ```bash
 bash harness-engineering/validators/check_graphify_capability.sh
+```
+
+Check whether Codebase Memory MCP is available for repo mapping:
+
+```bash
+bash harness-engineering/validators/check_codebase_memory_capability.sh
 ```
 
 Download or update the managed Graphify checkout inside AI Dev Shop:
