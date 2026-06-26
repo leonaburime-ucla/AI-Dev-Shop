@@ -1,11 +1,43 @@
 ---
 name: skills-registry
-version: 1.2.26
-last_updated: 2026-06-25
+version: 1.2.27
+last_updated: 2026-06-26
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
 # Skills Registry
+
+This is the **single source of truth** for all skills in the toolkit.
+
+## What Is a Skill?
+
+A skill is a reusable capability module that agents load at dispatch time. Skills are not agents — they have no persona, no routing identity, and no reserved name. An agent composes one or more skills to do its work.
+
+## Convention
+
+Every skill lives at: `<AI_DEV_SHOP_ROOT>/skills/<skill-name>/SKILL.md`
+
+`SKILL.md` is the entrypoint. Some skills have additional files (templates, schemas, examples) alongside it.
+
+## How Skills Are Used
+
+1. The Coordinator resolves which agent handles a task.
+2. That agent's `agents/<name>/skills.md` lists which skills it loads.
+3. The agent reads each skill's `SKILL.md` before starting work.
+
+Skills can be conditionally activated — loaded only when a specific task type triggers them.
+
+## Adding or Removing a Skill
+
+1. Create (or delete) `skills/<skill-name>/SKILL.md`.
+2. Add (or remove) the mapping row in the table below.
+3. Update the consuming agent's `agents/<name>/skills.md`.
+
+Do NOT maintain a duplicate skill list anywhere else. This file is the only inventory.
+
+---
+
+## Skill → Agent Mapping
 
 All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill content in agent files — reference the skill file instead.
 

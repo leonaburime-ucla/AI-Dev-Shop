@@ -126,6 +126,7 @@ Operator entrypoints live in `<AI_DEV_SHOP_ROOT>/framework/operations/pipeline-q
 
 - Claude Code: slash commands are the preferred entrypoint.
 - Codex CLI, Gemini CLI, Claude.ai, and generic LLM hosts use the matching `framework/slash-commands/*.md` template content manually.
+- **Command registry:** Read `<AI_DEV_SHOP_ROOT>/framework/slash-commands/README.md` for the full list of available slash commands and dispatch instructions. When the user types `/command`, look it up there and read the corresponding file.
 - Keep the command surface thin at the root; expand details in the quickstart doc instead of here.
 
 ---
