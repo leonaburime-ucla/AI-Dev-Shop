@@ -19,7 +19,7 @@
     "future": "Planned: a pre-push / CI hook on branch/main that rebuilds the index and regenerates+commits the shared summaries, keeping committed graphs current automatically."
   },
   "recommendation_tiers": {
-    "basis": "real-code head-to-head on github.com/nexu-io/open-design, see harness-engineering/retrieval-evals/real-code-comparison-open-design.md",
+    "basis": "real-code head-to-head on a ~2,300-file TS/Electron monorepo (github.com/nexu-io/open-design), clean-state; see the capability matrix at skills/code-navigation/reference/analyzer-capability-matrix.md",
     "tier_1": ["codegraph", "understand-anything"],
     "tier_1_rationale": "the lightweight, low-friction defaults: fast structural callers+impact with the smallest index (codegraph, ~3x source on disk), and natural-language/semantic search with a tiny shareable summary (understand-anything).",
     "tier_2": ["graphify", "codebase-memory-mcp", "code-review-graph"],

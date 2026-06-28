@@ -162,7 +162,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - A retained eval report compares direct discovery, Graphify-assisted discovery, and MCP-assisted discovery.
 - Coordinator has a clear adoption decision: reject, manual-only, keep Graphify as incumbent, conditional CodeBase Analyzer backend, or default verified backend.
 **Status (2026-06-28):**
-- Benchmark suite built at `harness-engineering/retrieval-evals/benchmark-suite/` (untracked; fixture is an embedded git repo pending a submodule/de-git decision before commit).
+- Benchmark suite built and **committed** at `harness-engineering/retrieval-evals/benchmark-suite/` (the `fixtures/` dir — an embedded clone-able git repo — and `graphify-out/`/`__pycache__` are gitignored as local inputs; suite code + docs are tracked). **Still need to actually RUN the retrieval-evals** — see the 42-cell TODO below.
 - Smoke run done on `fixtures/tier2-medium`: 6 backends (rg-control, codegraph, crg-full, graphify, ua-tree, cm-mcp-full) × 7 queries × 2 states (84 cells). Raw TSV: `/tmp/eval-full-2026-06-27.tsv`. Fixed a cm-mcp callers bug (qualified_name → file resolution) so its callers queries resolve to files.
 - **TODO (only when a large token budget is available): run the full 42-cell suite** — current pass is a single-fixture slice; expand to the full query/backend matrix and retain the report. Token-expensive (LLM-executor + UA enrichment across all backends/states), so gate it on having plenty of tokens to spare — do not kick it off opportunistically.
 
@@ -175,13 +175,13 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
   - `architecture` (Q7/Q8): rg best (0.67/0.80); others mixed; codegraph/graphify drop to 0.00 on Q8.
   - `config` (Q9): rg 0.86, codegraph 0.80, everything else 0.00 (markdown/literal targets invisible to graph tools).
 - Informal real-repo arm — `real-repo-comparison-results.md` (run on AI-Dev-Shop itself, markdown/prose-heavy). rg won/tied 6 of 7; graph tools only matched on pure code-symbol queries; graphify uniquely won "no transitive path" (Q3). **Cross-repo takeaway:** graph tools are competitive only on code-symbol queries in code-heavy repos; on prose/markdown/config-heavy repos rg dominates.
-- Real-code arm — `real-code-comparison-open-design.md` (7 backends on `nexu-io/open-design`, ~2,300-file TS/Electron monorepo). The picture **inverts**: every graph tool crushes rg on the structural callers query (rg misses re-export bridge callers; cm-mcp finds 90 across 3 hops). Lands the "route by query class, fan out in parallel" facade design. Clean-state only — staleness untested (that's the 42-cell harness gap).
+- Real-code arm (local-only notes, not committed) — 7 backends on `nexu-io/open-design`, ~2,300-file TS/Electron monorepo. The picture **inverts**: every graph tool crushes rg on the structural callers query (rg misses re-export bridge callers; cm-mcp finds 90 across 3 hops). Lands the "route by query class, fan out in parallel" facade design (distilled into `skills/code-navigation/reference/analyzer-capability-matrix.md`). Clean-state only — staleness untested (that's the 42-cell harness gap).
 
 **Open questions to dig into later:**
 1. **crg-full clean = 0.58 here vs 0.87 reported last session; ua-tree 0.38 vs 0.53.** Reconcile: different query subset, grading change, or a real regression? Compare against the prior `/tmp/eval-crg*.tsv` / `/tmp/eval-ua*.tsv` rows.
 2. **Q3 (dependency_path) is 0.00 for all 6 backends.** Almost certainly a fixture/grader/oracle problem, not a true universal miss — verify the expected set and `_response_files` extraction for that query.
 3. **Dirty-state F1 is not directly comparable** — a stateful index legitimately returns stale results after edits, so dirty F1 vs *fresh* ground truth penalizes correct staleness. Score staleness separately (the preflight dirty-edit gate already does this) instead of folding it into F1.
-4. **cm-mcp callers fix (qualified_name → file) is local-only and uncommitted** — lands with the retrieval-evals commit once the embedded-fixture decision is made.
+4. **cm-mcp callers fix (qualified_name → file)** — landed with the retrieval-evals commit (fixture gitignored).
 
 ### Codebase-Search Routing + Cross-LLM Analyzer Distribution **[OPEN / DESIGNED]**
 **Source:** 2-round Swarm debate (Claude Opus 4.8 + Codex GPT-5.5 xhigh; Gemini 3.1 Pro unavailable), 2026-06-28. Retained report: `ADS-project-knowledge/reports/swarm-consensus/runs/20260628T151500Z-consensus-report.md`. ~100% agreement both rounds.

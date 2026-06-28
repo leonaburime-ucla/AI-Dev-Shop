@@ -35,3 +35,7 @@ graphify-out/
 .serena/
 .codebase-memory/
 .github/workflows/
+# Retrieval-eval: private local-only results + clone-able fixtures (fixture is an
+# embedded git repo; both are local inputs, never shared/committed)
+harness-engineering/retrieval-evals/real-code-comparison-open-design.md
+harness-engineering/retrieval-evals/benchmark-suite/fixtures/
