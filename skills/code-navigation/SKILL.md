@@ -2,7 +2,7 @@
 name: code-navigation
 version: 0.1.0
 last_updated: 2026-06-28
-description: Route a codebase search or understanding task to the right retrieval backend. Use when you need to read the code, find where X is, who calls Y, what does Z call, trace the call chain, find references to a symbol, check if something is used anywhere, measure the impact of changing something, understand the architecture, explore the codebase, or find the feature that does X. Chooses between rg and the graph analyzers (codegraph, codebase-memory-mcp, graphify, serena, understand-anything) by query class, with rg as the always-available fallback.
+description: Route a codebase search or understanding task to the right retrieval backend. Use when you need to read the code, find where X is, who calls Y, what does Z call, trace the call chain, find references to a symbol, check if something is used anywhere, measure the impact of changing something, understand the architecture, explore the codebase, or find the feature that does X. Chooses between rg and the graph analyzers (codegraph, code-review-graph, codebase-memory-mcp, graphify, serena, understand-anything) by query class, with rg as the always-available fallback.
 ---
 
 # Skill: Code Navigation
@@ -42,9 +42,9 @@ every agent carries.
 |---|---|---|
 | literal / config / markdown / prose / exact-string / always-fresh | `rg` | direct file reads |
 | direct callers / references | `codegraph` or `serena` | `rg` sanity check |
-| transitive callers / multi-hop impact / change-impact | `codebase-memory-mcp` | `codegraph` → `rg` |
+| transitive callers / multi-hop impact / change-impact | `code-review-graph` or `codebase-memory-mcp` | `codegraph` → `rg` |
 | reachability / path / "prove no path" / community | `graphify` | `codebase-memory-mcp` → `rg` |
-| architecture / dependency clusters / "what depends on what" | `codebase-memory-mcp` or `graphify` | `rg` + manual reads |
+| architecture / hubs / blast-radius / dependency clusters | `code-review-graph` or `codebase-memory-mcp` | `graphify` → `rg` + manual reads |
 | LSP-exact declaration/reference (overloaded or aliased names) | `serena` | `codegraph` → `rg` |
 | natural-language "find the feature that does X" (no literal keyword) | `understand-anything` | `rg` keyword expansion + reads |
 

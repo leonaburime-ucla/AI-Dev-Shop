@@ -46,22 +46,38 @@ These tools are most valuable for large or unfamiliar codebases. Direct `rg` and
 6. If **≥5,000 files**: recommend graph-assisted discovery. If no backend is enabled, explain both options and ask whether the user wants to download/install one before analysis.
 7. If neither backend is available and the user declines setup, proceed with direct exploration and record that graph assistance was unavailable or declined.
 
-**Presenting the offer.** When recommending setup, do not dump a flat list — explain what each backend is *good at* (about two sentences each, sourced from the `recommendation.good_at` field in `<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json`) so the user can pick a subset rather than installing everything. Lead with the recommended tier-1 trio (different paradigms, lowest operating cost) and offer tier-2 as specialized add-ons. State the install cost (deps / API key / build time) for each so the choice is informed. Install only what the user approves; never install the whole set by default.
+**Presenting the offer.** When recommending setup, do not dump a flat list — for each backend give what it is *good at* plus a concrete *use case* (sourced from the `recommendation.good_at` and `recommendation.use_cases` fields in `<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json`) so the user can pick a subset rather than installing everything. Group by tier (1 → 2 → 3) as bullets, state install ease, and install only what the user approves — never the whole set by default. If the user wants to compare backends by query type before choosing, offer the capability matrix at `<AI_DEV_SHOP_ROOT>/skills/code-navigation/reference/analyzer-capability-matrix.md` (which tool owns which query class) — read it on request, do not inline it by default.
 
-One-command installable today (have a validator + guided installer): **Codebase Memory MCP**, **Graphify**, **codegraph**. **understand-anything** and **serena** are recommended but their installers are pending (Phase 3 / Phase 2) — name them, explain their strength, and note they need manual setup for now.
+One-command installable today (have a validator + guided installer): **codegraph**, **Codebase Memory MCP**, **Graphify**. **code-review-graph** installs cleanly via `uv tool install` (validator Phase 4). **understand-anything** and **serena** are recommended but their installers are pending (Phase 3 / Phase 2) — name them, explain their strength, and note they need manual setup for now.
+
+**Where things get stored (tell the user before installing — see the manifest `storage` block). Split by artifact, do not blanket-ignore:**
+- **Installed tools** go under `<AI_DEV_SHOP_ROOT>/integrations/<tool>/upstream/` (clone-build) or user-level `~/.local` (uv/pipx tools like code-review-graph). Ask the user to confirm the location; default is the `integrations/` folder, **not** `ADS-project-knowledge/`. Gitignored / reinstallable.
+- **Heavy regenerable indexes** (code-review-graph SQLite ~600MB, Codebase Memory MCP cache, serena LSP cache, codegraph DB) stay **local and gitignored** under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/analyzers/<tool>/<target>/` where the tool supports an external data dir (graphify `GRAPHIFY_OUT`, cbm `HOME`, code-review-graph `--data-dir`). Never committed — GitHub hard-rejects files >100MB. Rebuild on demand.
+- **Shareable summaries are COMMITTED** so a team builds once and everyone pulls the latest without rebuilding. Prime case: **understand-anything's `knowledge-graph.json` (~2.6MB)** — regenerating it costs LLM calls, so committing it saves money/time (graphify `graph.json` ~9MB also qualifies). Size-gate: only commit artifacts comfortably under ~50MB.
+- **In-target hardcoders:** codegraph/understand-anything/serena write their index into the **codebase root** (the root that contains the AI-Dev-Shop folder — not AI-Dev-Shop or ADS-project-knowledge). For the heavy ones, offer to add `.codegraph/`/`.serena/` to the **target repo's** `.gitignore`; for UA's shareable summary, commit it (or copy it into a tracked folder).
+- **Symlinks:** usable only for *local* centralization. Git commits a symlink as a pointer, but a symlink into the gitignored `ADS-project-knowledge/` tree is a **dangling link** on a teammate's checkout — so for sharing, commit the real file, do not symlink into a gitignored dir.
+- **Future:** a pre-push / CI hook on branch/main that rebuilds the index and regenerates+commits the shared summaries (keeps committed graphs current).
 
 Suggested prompt when no backend is available (adapt N, and trim to what fits the repo):
 
-> This codebase has N files. AI Dev Shop can optionally build a local analysis backend before broad source reading — they barely overlap, so pick what matches your questions (I'll only install what you approve):
+> This codebase has N files. AI Dev Shop can optionally build a local analysis backend before broad source reading — they barely overlap, so pick what matches your questions (I'll only install what you approve). `rg` (plain text/grep) is always available with no setup.
 >
-> **Recommended (tier 1 — one of each kind):**
-> - **codegraph** — fastest, lowest-friction structural tool: exact "who calls this" and "what breaks if I change it", no API key. Best first pick. *(node build, one command.)*
-> - **Codebase Memory MCP** — the deepest: transitive call chains across hops plus architecture/cluster discovery. Most capable, already session-integrated. *(local, one command.)*
-> - **understand-anything** — natural-language search: finds "the feature that does X" by meaning when you don't know the symbol name. Needs a one-time LLM enrichment pass (any capable model — no specific vendor). *(manual setup for now.)*
+> **Tier 1 — recommended (lightweight defaults):**
+> - ◆ **codegraph** — fastest structural tool: exact direct callers and change-impact, no API key, the smallest index (~3x source). *Use it when:* "who calls this function?" or "what breaks if I change this?" *(one-click install.)*
+> - ★ **understand-anything** — semantic search: finds the file by meaning. *Use it when:* "What file does X?" and you don't know the symbol name. Needs another LLM to write the summaries and slightly more setup. *(manual setup for now.)*
 >
-> **Specialized (tier 2 — add if you need them):**
-> - **Graphify** — whole-repo reachability, shortest-path, and community/cluster reports; heavier, minutes to build. *(local, one command.)*
-> - **serena** — highest precision via real LSP (exact even with overloaded/aliased names); heaviest to operate. *(manual setup for now.)*
+> **Tier 2 — deeper / specialized, heavier on disk (add if you need it):**
+> - ★ **Graphify** — whole-repo reachability, shortest-path, community/cluster reports. *Use it when:* "is there any path from A to B?", "prove there's no path / find dead regions", or "show dependency clusters". *(one-click install.)*
+> - ◆ **Codebase Memory MCP** — deepest multi-hop call chains + architecture clusters (Cypher). *Use it when:* you need to trace a call chain several hops deep or query the graph directly. ⚠️ ~6x-source index (~250MB). *(one-click install.)*
+> - ◆ **code-review-graph** — strongest all-around: callers/impact **plus** architecture health (god-component/hub detection, blast-radius, bridge nodes). *Use it when:* "blast radius of this change?" or "which files are over-connected hubs?" ⚠️ Best capability, but tier 2 for its footprint — index balloons ~13x source (~600MB on a 2.5k-file repo). *(one-click `uv tool install`.)*
+>
+> **Tier 3 — highest precision, heaviest (add only if you need it):**
+> - ◆ **serena** — real LSP: compiler-exact references even with overloaded, aliased, or re-exported names. *Use it when:* grep is ambiguous because a name is reused and you need exact go-to-definition. Heavier because it runs a Language Server per language plus a one-time project onboarding. *(manual setup for now.)*
+>
+> ★ **shareable** — its summary is small (≤ ~50MB), so it can be committed and your whole team pulls the latest without rebuilding (understand-anything's `knowledge-graph.json` ~2.6MB, Graphify's `graph.json` ~9MB). understand-anything is the big win: re-enriching it costs LLM calls, so sharing it saves real money.
+> ◆ **local-only** — build & maintain it on your machine. Its index is large or binary (e.g. code-review-graph's ~600MB SQLite DB) and GitHub rejects files >100MB, so it can't be committed — but it's regenerable on demand.
+>
+> Want to see the capability matrix comparing all the tools by query type before you choose? I can show it.
 >
 > Or I can proceed with direct `rg` and file reads (always fresh, no setup). Which would you like?
 

@@ -27,7 +27,8 @@ MANIFEST = ROOT / "integrations/backends.manifest.json"
 CODEGRAPH_VALIDATOR = ROOT / "harness-engineering/validators/check_codegraph_capability.sh"
 
 REQUIRED_FIELDS = {"id", "tier", "paradigm", "query_classes", "upstream_url",
-                   "requirements", "cost", "managed_dir", "status_check"}
+                   "requirements", "cost", "managed_dir", "index_location",
+                   "status_check"}
 VALID_TIERS = {"blessed", "candidate"}
 
 failures: list[str] = []
@@ -57,6 +58,11 @@ def check_manifest() -> list[dict]:
     if not isinstance(backends, list) or not backends:
         fail("manifest has no 'backends' list")
         return []
+
+    # The storage model must be documented (install vs index split is load-bearing).
+    storage = data.get("storage")
+    if not isinstance(storage, dict) or "installed_backend" not in storage or "index_data" not in storage:
+        fail("manifest 'storage' must document installed_backend and index_data locations")
 
     ids = [b.get("id") for b in backends]
     if len(ids) != len(set(ids)):

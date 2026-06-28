@@ -2,7 +2,7 @@
 name: codebase-graph
 version: 0.3.0
 last_updated: 2026-06-28
-description: Use when Coordinator or CodeBase Analyzer needs an optional local codebase graph backend, stale graph detection, or query-first codebase navigation. Owns the deep per-backend mechanics for Graphify and Codebase Memory MCP (blessed, validator-gated) and for codegraph, serena, and understand-anything (candidate, not blessed) with AI Dev Shop capability checks and human checkpoints.
+description: Use when Coordinator or CodeBase Analyzer needs an optional local codebase graph backend, stale graph detection, or query-first codebase navigation. Owns the deep per-backend mechanics for Graphify and Codebase Memory MCP (blessed, validator-gated) and for codegraph, code-review-graph, serena, and understand-anything (candidate, not blessed) with AI Dev Shop capability checks and human checkpoints.
 ---
 
 # Skill: Codebase Graph
@@ -338,9 +338,15 @@ and validator path — is
 guided-install choice for the user; never install from it automatically.
 
 **codegraph** now has a capability validator and guided installer (use the flow in
-its section below). **serena** and **understand-anything** do not yet — for those,
-verify the integration path exists directly, and on any failure fall back down the
-chain to `rg` without blocking.
+its section below). **code-review-graph**, **serena**, and **understand-anything**
+do not yet — for those, verify presence directly (the tool's binary / server /
+script path), and on any failure fall back down the chain to `rg` without blocking.
+
+**Where indexes go** (manifest `storage` block): point a tool's index at
+`<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/analyzers/<tool>/<target>/` whenever
+it supports an external data dir — graphify (`GRAPHIFY_OUT`), Codebase Memory MCP
+(`HOME`), code-review-graph (`--data-dir`). codegraph / understand-anything /
+serena write into the target repo instead; offer to gitignore those in the target.
 
 Shared rules for all three:
 
@@ -412,6 +418,28 @@ Use for the `callers` and `change_impact` classes when Codebase Memory MCP is
 unavailable; `--json` everywhere for parseable output. Re-run `init` after edits —
 the index is not auto-refreshed.
 
+### code-review-graph (all-in-one structural + architecture)
+
+Strongest all-in-one: callers/impact plus architecture-health analytics (hub/
+god-component detection, blast-radius, bridge nodes). Installs cleanly user-level
+via `uv tool install` (no validator yet — verify `code-review-graph --version`
+runs; else treat as unavailable and fall back). It is an MCP server, queried like
+serena through the stdio probe. **Store its DB outside the target** with
+`--data-dir`:
+
+```bash
+CRG_DATA="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/analyzers/code-review-graph/<target-name>"
+code-review-graph build  --repo <TARGET_REPO> --data-dir "$CRG_DATA"
+code-review-graph status --repo <TARGET_REPO> --data-dir "$CRG_DATA"
+# query tools (query_graph, get_impact_radius, semantic_search_nodes, hub nodes)
+# via the stdio probe against: code-review-graph serve --repo <TARGET_REPO>
+```
+
+Semantic search needs the heavy `[embeddings]` extra (sentence-transformers/torch)
+or a cloud embedding key — gated, not bundled; use understand-anything for NL
+instead. Treat structural/architecture output as a hypothesis; validate against
+source.
+
 ### serena (LSP-exact, via MCP stdio)
 
 LSP server, not a graph — best for exact declarations/references of overloaded or
@@ -461,8 +489,8 @@ The raw `build-graph` output is structural only. For good natural-language recal
 run the LLM enrichment pass before searching:
 
 ```bash
-# batched enrichment — provider-agnostic: any capable LLM (local or hosted);
-# the eval used Gemini 3.1 Pro. Batched = ~15x faster than per-node.
+# batched enrichment — needs another LLM to write the summaries
+# (provider-agnostic: any capable model, local or hosted). Batched = ~15x faster.
 node "$UA/enrich-graph-batch.mjs"
 ```
 
