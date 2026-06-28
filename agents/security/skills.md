@@ -3,6 +3,7 @@
 - Last Updated: 2026-03-12
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — threat surface analysis, review dimensions, severity classification, finding report format, what security review is not
 - `<AI_DEV_SHOP_ROOT>/skills/secure-input-handling/SKILL.md` — prescriptive companion to security-review; sink-specific patterns for input validation and output encoding; use when verifying implementation correctness or recommending specific fix patterns for input validation findings
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog and module/layer boundary definitions; trust boundaries differ by architecture pattern (hexagonal adapters, clean architecture rings, modular monolith module APIs) — required to correctly identify where trust boundaries are and what constitutes a boundary violation

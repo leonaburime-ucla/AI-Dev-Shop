@@ -4,6 +4,7 @@
 
 ## Base Skills
 
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — system drivers analysis, research trigger, ADR workflow, tradeoff framework, quality-attribute scorecard, DDD vocabulary, Adaptability First principle, Pattern Evaluation Format, and directory structure decision
 - `<AI_DEV_SHOP_ROOT>/skills/system-design/SKILL.md` — macro-topology and architecture-spec reference when translating Blueprint constraints into ADR-level decisions
 - `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` — article-by-article constitution gate, exception handling, blocking escalation rules

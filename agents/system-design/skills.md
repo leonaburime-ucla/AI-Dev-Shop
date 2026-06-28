@@ -3,6 +3,7 @@
 - Last Updated: 2026-05-30
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — macro-level system planning and decomposition
 - `<AI_DEV_SHOP_ROOT>/skills/system-design/SKILL.md` — shared macro-topology and architecture-spec vocabulary for blueprint structure
 - `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — run the light pass during blueprint; trigger targeted deepening only when risk signals are found

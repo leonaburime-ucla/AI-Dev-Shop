@@ -4,6 +4,7 @@
 
 ## Base Skills
 
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/developer-documentation/SKILL.md` — README structure, tutorial flow, migration-guide rules, changelog discipline, and executable documentation standards
 
 ## Conditional Skills

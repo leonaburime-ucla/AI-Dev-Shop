@@ -3,6 +3,7 @@
 - Last Updated: 2026-05-12
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — requirement-to-test matrix, test types, certification protocol, drift detection, anti-patterns, coverage targets
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer defining micro-level testability contracts to enforce in tests (stable outputs, seams, thin orchestrators, coverage-friendly structure)

@@ -3,6 +3,7 @@
 - Last Updated: 2026-04-26
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md` — review dimensions, what tests cannot catch, finding classification, report format, anti-patterns
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — what architectural boundaries to enforce
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — security surface changes to flag for the Security Agent

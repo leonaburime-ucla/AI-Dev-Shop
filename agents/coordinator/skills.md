@@ -3,6 +3,7 @@
 - Last Updated: 2026-06-14
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md` — multi-model swarm consensus (opt-in only via Coordinator)
 - `<AI_DEV_SHOP_ROOT>/skills/external-audit/SKILL.md` — one-external-model audit of current work with Coordinator synthesis
 - `<AI_DEV_SHOP_ROOT>/skills/experimental-validation/SKILL.md` — empirical comparison protocol when the runtime disclosure mandate fires and user approves

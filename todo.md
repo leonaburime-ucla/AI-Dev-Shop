@@ -26,6 +26,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Garry Tan gstack Intake: **OPEN / PARTIAL** (design/iOS/release domain skills extracted; skill testing and remaining stripping/adaptation still pending)
 - Anthropic Cybersecurity Skills Intake: **OPEN** (Security-owned install, consolidation into one skill, eval gate before default wiring)
 - Codebase Memory MCP Intake: **OPEN** (audit/install MCP code graph server, benchmark against Graphify and current codebase-analysis workflow)
+- Codebase-Search Routing + Cross-LLM Analyzer Distribution: **OPEN / DESIGNED** (2026-06-28 swarm debate: router-facade-first, `code-navigation` conditional skill + `codebase-graph` table, split install via `ads-router`, behavioral eval complements backend harness; see detailed item + retained consensus report)
 - Matt Pocock Skills Re-Intake: **OPEN** (rerun engineering-skill review, dedupe against existing pipeline and imported skills)
 - NVIDIA SkillSpector Intake: **OPEN** (evaluate AI-agent skill scanner as import/install guardrail)
 - Init Hook — Audit Convergence Follow-Through: **OPEN / PARTIAL** (TM-INIT-SU-01 round-1 converged, R1-1 fixed; 3 decisions open — round-2 re-audit / commit / report retention. See `init-hook-audit-HANDOFF.md`)
@@ -163,7 +164,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **Status (2026-06-28):**
 - Benchmark suite built at `harness-engineering/retrieval-evals/benchmark-suite/` (untracked; fixture is an embedded git repo pending a submodule/de-git decision before commit).
 - Smoke run done on `fixtures/tier2-medium`: 6 backends (rg-control, codegraph, crg-full, graphify, ua-tree, cm-mcp-full) × 7 queries × 2 states (84 cells). Raw TSV: `/tmp/eval-full-2026-06-27.tsv`. Fixed a cm-mcp callers bug (qualified_name → file resolution) so its callers queries resolve to files.
-- **TODO (later): run the full 42-cell suite** — current pass is a single-fixture slice; expand to the full query/backend matrix and retain the report.
+- **TODO (only when a large token budget is available): run the full 42-cell suite** — current pass is a single-fixture slice; expand to the full query/backend matrix and retain the report. Token-expensive (LLM-executor + UA enrichment across all backends/states), so gate it on having plenty of tokens to spare — do not kick it off opportunistically.
 
 **Where the data lives (which tool is good at what):**
 - Synthetic scored harness (this run) — `tier2-medium` fixture (code-heavy TS). Clean-state avg F1: rg 0.76, codegraph 0.61, crg 0.58, cm-mcp 0.46, graphify 0.39, ua-tree 0.38.
@@ -181,6 +182,34 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 2. **Q3 (dependency_path) is 0.00 for all 6 backends.** Almost certainly a fixture/grader/oracle problem, not a true universal miss — verify the expected set and `_response_files` extraction for that query.
 3. **Dirty-state F1 is not directly comparable** — a stateful index legitimately returns stale results after edits, so dirty F1 vs *fresh* ground truth penalizes correct staleness. Score staleness separately (the preflight dirty-edit gate already does this) instead of folding it into F1.
 4. **cm-mcp callers fix (qualified_name → file) is local-only and uncommitted** — lands with the retrieval-evals commit once the embedded-fixture decision is made.
+
+### Codebase-Search Routing + Cross-LLM Analyzer Distribution **[OPEN / DESIGNED]**
+**Source:** 2-round Swarm debate (Claude Opus 4.8 + Codex GPT-5.5 xhigh; Gemini 3.1 Pro unavailable), 2026-06-28. Retained report: `ADS-project-knowledge/reports/swarm-consensus/runs/20260628T151500Z-consensus-report.md`. ~100% agreement both rounds.
+**Throughline (strongest signal):** a deterministic **router facade** (`ads-router` / `search_codebase()`) unifies all three topics. It surfaced unprompted as a Round-1 blind spot from BOTH models and became the load-bearing answer in Round 2. **Design the router contract/schema FIRST** (query classes, JSON I/O, error normalization, freshness metadata, confidence); the routing skill, install facade, and behavioral eval all bind to it.
+
+**Topic 1 — Where routing lives (decided):**
+- Put a per-query-class routing table in the shared `skills/codebase-graph/SKILL.md` (rg = terminal fallback; "graph output is a hypothesis until validated; verify critical findings with file reads/rg").
+- Realign `codebase-analyzer` Phase 0 from size-only gating to the same query-class table.
+- Full per-query-class routing (callers→codegraph/serena, transitive+architecture→cm-mcp, reachability→graphify, LSP-exact→serena, NL→understand-anything, literal/config/markdown/fresh→rg), NOT a binary code/markdown split.
+- **Reject the global SessionStart/PreToolUse hook** (context tax + empirically wrong + can't classify NL pre-tool).
+
+**General-behavior skill question (OPEN decision — from user):** Add a thin, CONDITIONAL (trigger-activated) `code-navigation` general skill that every agent references and that delegates deep mechanics to `codebase-graph`. Benefits: single source of truth (no per-agent drift), future agents inherit it automatically. HARD CAVEAT: must stay trigger-activated on search intent — never statically injected into every agent's base context (that recreates the removed context tax). Work = broad trigger phrasing covering how each agent phrases "look at the code"; per-agent pointer shrinks to listing `code-navigation` in each skills.md. Skill = advice (interim); router facade = enforcement (end-state) — the skill should point at the facade once it exists.
+
+**Topic 2 — Behavioral validation eval (designed):**
+- COMPLEMENTS (does not replace) the scored retrieval-evals backend harness. Backend harness = answer key (which backend wins each class); behavioral eval = did the agent select/use it.
+- Spawn a subagent loaded with the routing mechanism; run a 7-class matrix (direct callers / transitive+reachability / architecture / LSP-exact / NL-semantic / literal-config / stale-index trap) against a PINNED `nexu-io/open-design` commit.
+- Score DETERMINISTICALLY from the agent's tool-call trace: backend_selected, target_found (reuse `graders.py` set grader), correct_fallback (with ideal backend disabled), false_confidence, tokens/time. LLM-judge only for secondary explanation quality, never pass/fail.
+- Targets from an offline oracle run where the expected backend UNIQUELY wins and the wrong tool has a documented miss. Checked-in target manifest.
+
+**Topic 3 — Install & cross-LLM distribution (designed):**
+- **SPLIT install:** shared user-level binaries (`~/.local/share/ads/analyzers/`, env-overridable `ADS_ANALYZER_HOME`, project-local fallback when home unwritable) + per-repo indexes under `ADS-project-knowledge/` + an `analyzers.lock.json` manifest (versions, build params, repo fingerprint).
+- **One canonical `ads-router` CLI facade** wraps `mcp_probe.py` so Codex/agy/Claude invoke MCP analyzers (cm-mcp, serena) identically as shell calls; native Claude MCP stays optional, NEVER canonical (that is what makes it cross-host).
+- **Tiered profiles framed as a latency/storage/privacy BUDGET:** Minimal (rg) / Standard (+codegraph) / Graph (+cm-mcp) / Advanced (+graphify/serena/UA) / Custom. rg-only default for markdown/prose repos. Repo-profile-detected first, audited + capability-checked + reversible; no piped remote installers.
+
+**Open forks (not yet decided):**
+1. Router facade vs skill-layer prose — prototype both; if agents don't follow prose reliably (the main risk both models raised), the facade wins.
+2. The "complete enough" recall contract (triage vs proof vs refactor-safety vs review) — changes both routing and eval pass/fail thresholds. Must be an input to the router schema.
+3. Whether the heavy analyzers (serena LSP, crg torch, UA enrichment) are justified at all, or whether to ship rg+codegraph and make the rest documented manual opt-in.
 
 ### Anthropic Cybersecurity Skills Intake and Consolidation **[OPEN]**
 **Owner:** Security Agent

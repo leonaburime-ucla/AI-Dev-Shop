@@ -4,6 +4,7 @@
 
 ## Base Skills
 
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/seo-geo/SKILL.md` - search visibility, SEO/GEO/AEO indexability, source-ledger freshness, and quantitative audit metrics
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` - accessibility overlap for semantic structure and extractable content
 

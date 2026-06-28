@@ -3,6 +3,7 @@
 - Last Updated: 2026-06-08
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/skills-inbox/skills-librarian-policy.md` — ownership model, hard rules, and ingestion governance
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/skills-inbox/skills-librarian-sop.md` — inbox workflow, output template, and guardrails
 - `<AI_DEV_SHOP_ROOT>/framework/routing/skills-registry.md` — canonical skill map and ownership context

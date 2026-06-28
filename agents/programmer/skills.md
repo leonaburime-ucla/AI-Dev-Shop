@@ -5,6 +5,7 @@
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
 
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/systematic-debugging/SKILL.md` — mandatory root-cause-first debugging workflow when tests fail or unexpected behavior appears
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — boundaries and contracts to stay within
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units

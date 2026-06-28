@@ -3,6 +3,7 @@
 - Last Updated: 2026-04-26
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed dependency mapping, hotspot detection, and blast-radius analysis before proposing changes
 - `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md` — tech debt taxonomy, refactor proposal format, rules of safe refactoring, what not to refactor
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — architectural boundary rules and ADR format; needed when a finding reveals a boundary violation to escalate to Architect

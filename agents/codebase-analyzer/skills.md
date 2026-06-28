@@ -3,6 +3,7 @@
 - Last Updated: 2026-06-25
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md` — phased analysis protocol, token budget strategy, findings report format, flaw categories and severity
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — optional Graphify and Codebase Memory MCP repo mapping, stale graph checks, and query-first architecture discovery
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — current state classification, target pattern selection, phase plan format, migration principles

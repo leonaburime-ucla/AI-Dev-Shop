@@ -10,6 +10,13 @@ description: Use when Coordinator or CodeBase Analyzer needs an optional local c
 This skill lets AI Dev Shop use optional local graph backends as reusable repo
 maps without letting third-party tools bypass harness policy.
 
+**Entry point:** Agents reach this skill via
+`<AI_DEV_SHOP_ROOT>/skills/code-navigation/SKILL.md`, which classifies the query
+and routes here when Codebase Memory MCP or Graphify is the selected backend.
+That skill owns the cross-backend routing table; this skill owns those two
+backends' capability checks, freshness checks, safety policy, and invocation
+guidance.
+
 Supported backends:
 
 - **Codebase Memory MCP**: persistent local knowledge graph exposed through CLI

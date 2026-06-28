@@ -3,6 +3,7 @@
 - Last Updated: 2026-05-13
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy, versioning, hashing, acceptance criteria, invariants, edge cases, failure modes, what belongs where
 - `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — preserve/refine blueprint NFRs; run compact light self-check when no blueprint exists
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md` — for validating api.spec.md completeness per the contract checklist

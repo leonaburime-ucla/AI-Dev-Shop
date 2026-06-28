@@ -3,6 +3,7 @@
 - Last Updated: 2026-03-22
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — project knowledge file governance, skills.md versioning, context rot detection
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — memory layer definitions, project knowledge file governance, invalidate-don't-discard policy, consolidation rules, retrieval strategies; required for all memory operations (FAILURE/DECISION/FACT/TRACE/QUALITY/CONSTITUTION entries) and for governing memory-store.md health over time
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic and convergence policy (to detect when Coordinator is making suboptimal routing decisions)

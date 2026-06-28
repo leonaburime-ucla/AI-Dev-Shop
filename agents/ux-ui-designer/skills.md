@@ -3,6 +3,7 @@
 - Last Updated: 2026-03-13
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/ux-design/SKILL.md` — design system creation, visual direction, component/state specs, responsive behavior, and implementation-ready design handoff
 - `<AI_DEV_SHOP_ROOT>/skills/vercel-web-design-guidelines/SKILL.md` — practical UI/layout quality audits for existing UI code or screenshots
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — WCAG 2.1 AA requirements

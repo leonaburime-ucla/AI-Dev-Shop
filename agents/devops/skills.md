@@ -30,6 +30,7 @@ Circuit breaker authority to halt automation when safety thresholds are breached
 
 ## Base Skills
 
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/devops-delivery/SKILL.md` — CI/CD pipeline patterns, Docker build standards, deployment strategies
 - `<AI_DEV_SHOP_ROOT>/skills/infrastructure-as-code/SKILL.md` — IaC declaration patterns
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — Boundaries and contracts to stay within

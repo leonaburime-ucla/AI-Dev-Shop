@@ -3,6 +3,7 @@
 - Last Updated: 2026-03-12
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/spec-writing/SKILL.md` — spec anatomy, AC format, invariants, edge cases, quality standards; required to recognize when a requirement is vague, incomplete, or missing a required element
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — testability criteria, what makes an assertion deterministic and automatable, behavior vs implementation distinction; required for untestability probes
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog and system drivers; required for scope creep probes involving architectural assumptions, and for constitution pre-flight (identifying requirements that force custom complexity where a standard pattern or library exists)

@@ -3,6 +3,7 @@
 - Last Updated: 2026-03-12
 
 ## Skills
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-brainstorming/SKILL.md` — structured idea refinement before prototype implementation
 - `<AI_DEV_SHOP_ROOT>/skills/vibe-coding/SKILL.md` — fast exploratory prototyping with minimal ceremony
 - `<AI_DEV_SHOP_ROOT>/skills/tool-design/SKILL.md` — quick scaffolding/tooling decisions when needed

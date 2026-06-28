@@ -6,6 +6,7 @@
 
 Base skills are the default standing context for every Database task.
 
+- `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/sql-data-modeling/SKILL.md` — ERD design, normalization, primary/foreign keys, constraint types, index strategy, migration planning, naming conventions, soft delete, timestamp conventions, data type selection, and engine-specific design references for PostgreSQL/MySQL/MariaDB when the target engine is known
 - `<AI_DEV_SHOP_ROOT>/skills/postgresql/SKILL.md` — CTEs, window functions, JSONB, triggers, stored functions, extensions, full-text search, partitioning, EXPLAIN ANALYZE, performance patterns; load when platform is Postgres-based
 
