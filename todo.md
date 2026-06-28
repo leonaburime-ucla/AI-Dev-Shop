@@ -160,6 +160,27 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - At least one isolated install/index run has completed.
 - A retained eval report compares direct discovery, Graphify-assisted discovery, and MCP-assisted discovery.
 - Coordinator has a clear adoption decision: reject, manual-only, keep Graphify as incumbent, conditional CodeBase Analyzer backend, or default verified backend.
+**Status (2026-06-28):**
+- Benchmark suite built at `harness-engineering/retrieval-evals/benchmark-suite/` (untracked; fixture is an embedded git repo pending a submodule/de-git decision before commit).
+- Smoke run done on `fixtures/tier2-medium`: 6 backends (rg-control, codegraph, crg-full, graphify, ua-tree, cm-mcp-full) × 7 queries × 2 states (84 cells). Raw TSV: `/tmp/eval-full-2026-06-27.tsv`. Fixed a cm-mcp callers bug (qualified_name → file resolution) so its callers queries resolve to files.
+- **TODO (later): run the full 42-cell suite** — current pass is a single-fixture slice; expand to the full query/backend matrix and retain the report.
+
+**Where the data lives (which tool is good at what):**
+- Synthetic scored harness (this run) — `tier2-medium` fixture (code-heavy TS). Clean-state avg F1: rg 0.76, codegraph 0.61, crg 0.58, cm-mcp 0.46, graphify 0.39, ua-tree 0.38.
+- Per-query-class winners (clean F1, `tier2-medium`):
+  - `callers` (Q2): rg/codegraph/crg = 1.00; cm-mcp 0.89 (post-fix); graphify 0.33; ua-tree 0.00.
+  - `change_impact` (Q14): rg/crg 1.00; graphify 0.89; codegraph 0.80; ua-tree 0.40; cm-mcp 0.00.
+  - `dependency_path`: Q5 all = 1.00; **Q3 all = 0.00** (whole row zero — likely a "no path"/grader issue to investigate, not 6 independent misses).
+  - `architecture` (Q7/Q8): rg best (0.67/0.80); others mixed; codegraph/graphify drop to 0.00 on Q8.
+  - `config` (Q9): rg 0.86, codegraph 0.80, everything else 0.00 (markdown/literal targets invisible to graph tools).
+- Informal real-repo arm — `real-repo-comparison-results.md` (run on AI-Dev-Shop itself, markdown/prose-heavy). rg won/tied 6 of 7; graph tools only matched on pure code-symbol queries; graphify uniquely won "no transitive path" (Q3). **Cross-repo takeaway:** graph tools are competitive only on code-symbol queries in code-heavy repos; on prose/markdown/config-heavy repos rg dominates.
+- Real-code arm — `real-code-comparison-open-design.md` (7 backends on `nexu-io/open-design`, ~2,300-file TS/Electron monorepo). The picture **inverts**: every graph tool crushes rg on the structural callers query (rg misses re-export bridge callers; cm-mcp finds 90 across 3 hops). Lands the "route by query class, fan out in parallel" facade design. Clean-state only — staleness untested (that's the 42-cell harness gap).
+
+**Open questions to dig into later:**
+1. **crg-full clean = 0.58 here vs 0.87 reported last session; ua-tree 0.38 vs 0.53.** Reconcile: different query subset, grading change, or a real regression? Compare against the prior `/tmp/eval-crg*.tsv` / `/tmp/eval-ua*.tsv` rows.
+2. **Q3 (dependency_path) is 0.00 for all 6 backends.** Almost certainly a fixture/grader/oracle problem, not a true universal miss — verify the expected set and `_response_files` extraction for that query.
+3. **Dirty-state F1 is not directly comparable** — a stateful index legitimately returns stale results after edits, so dirty F1 vs *fresh* ground truth penalizes correct staleness. Score staleness separately (the preflight dirty-edit gate already does this) instead of folding it into F1.
+4. **cm-mcp callers fix (qualified_name → file) is local-only and uncommitted** — lands with the retrieval-evals commit once the embedded-fixture decision is made.
 
 ### Anthropic Cybersecurity Skills Intake and Consolidation **[OPEN]**
 **Owner:** Security Agent
