@@ -13,7 +13,8 @@ Options:
   -h, --help         Show this help.
 
 Default workspace:
-  ../ADS-project-knowledge relative to AI-Dev-Shop-speckit/
+  <host-project-root>/ADS-project-knowledge
+  (host root resolved via $ADS_HOST_DIR, $CLAUDE_PROJECT_DIR, or git toplevel)
 USAGE
 }
 
@@ -48,7 +49,24 @@ done
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ads_root="$(cd "$script_dir/../../.." && pwd)"
-host_root="$(cd "$ads_root/.." && pwd)"
+
+# Resolve the host project root the same name-agnostic way ads-initialization.sh
+# does, so the default workspace lands at the host root regardless of layout
+# (dev = toolkit is the repo root; subfolder = toolkit inside a host repo).
+resolve_host_dir() {
+  if [ -n "${ADS_HOST_DIR:-}" ]; then printf '%s' "$ADS_HOST_DIR"; return; fi
+  if [ -n "${CLAUDE_PROJECT_DIR:-}" ] && [ -d "${CLAUDE_PROJECT_DIR}" ]; then
+    printf '%s' "$CLAUDE_PROJECT_DIR"; return
+  fi
+  local top
+  top="$(git -C "$ads_root" rev-parse --show-toplevel 2>/dev/null || true)"
+  if [ -n "$top" ] && [ -d "$top" ]; then printf '%s' "$top"; return; fi
+  # Layout undeterminable (no git, no env): treat the toolkit itself as the host
+  # root rather than its parent, so a dev-layout archive does not create a junk
+  # sibling. Pass --workspace explicitly to override.
+  printf '%s' "$ads_root"
+}
+host_root="$(resolve_host_dir)"
 
 if [ -n "$workspace_override" ]; then
   workspace_root="$workspace_override"

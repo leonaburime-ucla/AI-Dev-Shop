@@ -39,6 +39,7 @@ On the first user message in this repository (including greetings), before any r
 3. If the file is missing or unreadable, state that explicitly and stop.
 4. Read `<AI_DEV_SHOP_ROOT>/framework/operations/reminders.md`. For each reminder NOT listed under Dismissed, show a short prompt inside the startup block after the startup notices and before `------------End of Startup Info------------`.
 5. When Bash is available, detect the current host and resolve subagent mode with `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/resolve_subagent_mode.sh`. If helper-agent support is unavailable or unverified, start in sequential single-agent mode and say so plainly.
+6. When Bash is available, ensure first-time initialization by running `bash <AI_DEV_SHOP_ROOT>/framework/operations/scripts/ads-initialization.sh` (idempotent; creates the `ADS-project-knowledge/` workspace and writes a one-time flag, then no-ops on later sessions). On Claude Code this also runs automatically via the `SessionStart` hook in `.claude/settings.json`, so it is usually already done; on Codex CLI, Gemini CLI, and other shell hosts there is no such hook, so run it here. This step never installs slash commands — that is opt-in via the `slash-commands-setup` reminder below.
 **slash-commands-setup** (skip if dismissed):
 Show: "Would you like to enable slash commands (`/spec`, `/plan`, `/debate`, `/consensus`, `/cowork`, and more)? Say **yes** and I'll walk you through it."
 If the user says yes: read the `## slash-commands-setup` section in `reminders.md`, detect the host, and follow the instructions there.
@@ -80,7 +81,7 @@ Translate internal terms on first meaningful use, then keep the explanation conc
 ## Subfolder Install Shim
 
 If this toolkit is a subfolder and the session starts at the parent project root:
-- Toolkit root placeholder: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (default: `AI-Dev-Shop-speckit/`)
+- Toolkit root placeholder: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (default: `AI-Dev-Shop/`)
 - Project workspace placeholder: `<ADS_PROJECT_KNOWLEDGE_ROOT>` means the sibling project-owned workspace folder (default: `ADS-project-knowledge/` next to the toolkit folder inside the host project)
 - Legacy note: older docs may mention a previous root placeholder; treat that as equivalent to `<AI_DEV_SHOP_ROOT>`.
 - All path references in this file use `<AI_DEV_SHOP_ROOT>`. If the folder is renamed, update `<AI_DEV_SHOP_ROOT>` in `CLAUDE.md` (or your tool's entry-point file) to match the new name.
@@ -201,6 +202,7 @@ Apply the detailed delegated naming and validity guard in `<AI_DEV_SHOP_ROOT>/sk
 - **Classify artifact intent before saving.** Required pipeline artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` automatically. Optional retained reports require an explicit user save choice. Scratch prompts, raw logs, temporary captures, and other session-only artifacts go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` by default.
 - **Fix upstream intent, not downstream drift.** If code, tests, or architecture diverge from the spec, route the issue back to the owning stage instead of patching around it.
 - **Evidence over invention.** Do not present guesses or memory as fact; if a claim is not grounded in inspected artifacts, tool output, or cited sources, mark uncertainty or say you do not know. See `<AI_DEV_SHOP_ROOT>/framework/governance/anti-hallucination-policy.md`.
+- **When operationally stuck, escalate to information — don't thrash.** Two linked rules: **(a) Never re-run a byte-identical invocation of a failed command expecting a different result** — that is the canonical waste. A verbatim retry is justified ONLY for a clearly transient capacity signal (HTTP 429/503, rate-limit, explicit "overloaded"). For a crash, hang, timeout, or unknown error, you must **change one variable** (a flag, output mode, input size, transport) or **diagnose**, not repeat. **(b)** If an external tool, CLI, service, or environment step fails and the cause isn't obvious, STOP after the first failure and diagnose before *varying*: run a minimal probe to confirm the dependency is healthy in isolation (isolates "tool broken" vs "misused" vs "auth/input"), check memory/prior runs, then **search the web + the tool's upstream docs/issue tracker** for the exact failure signature — the missing fact (a known bug, version quirk, or documented flag) usually lives outside your own reasoning. Record the fix in memory. Applies to whichever LLM drives the session. See the Web Escalation Gate in `<AI_DEV_SHOP_ROOT>/skills/systematic-debugging/SKILL.md`. (Claude Code auto-enforces via a PostToolUse hook; other hosts honor it as an operating rule.)
 - **Debug mode exists.** Toggle with `debug on` / `debug off`; see `<AI_DEV_SHOP_ROOT>/framework/workflows/trace-schema.md`.
 
 ---

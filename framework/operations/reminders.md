@@ -18,16 +18,34 @@ or delete the line from the Dismissed section.
 
 Available template commands: `/spec` `/plan` `/tasks` `/implement` `/code-review` `/clarify` `/agent` `/consensus` `/debate` `/audit-work` `/cowork` `/handoff`
 Note: `/agent` works only after the template is installed into a host that supports custom slash commands. In Claude, use natural language such as "talk to architect" or "switch to programmer" if `/agent <name>` errors.
-Placeholder note: `<AI_DEV_SHOP_ROOT>` means the toolkit folder path (usually `AI-Dev-Shop-speckit/`).
+Placeholder note: `<AI_DEV_SHOP_ROOT>` means the toolkit folder path (usually `AI-Dev-Shop/`).
 
 ### Claude Code
 
-If the user says "yes" or "set up slash commands", run this via Bash:
-```bash
-cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
-```
-Confirm success, then offer to dismiss the reminder.
-After setup, `/spec`, `/plan`, `/code-review`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, `/handoff`, etc. work directly in chat.
+Never bulk-copy the templates blindly — a plain `cp -r` would silently overwrite
+any same-named command the host already has (for example an existing `/code-review`).
+Always run the collision check first and show the user the result before installing.
+
+If the user says "yes" or "set up slash commands":
+
+1. Run the collision check (read-only, no writes):
+   ```bash
+   bash <AI_DEV_SHOP_ROOT>/framework/operations/scripts/install-slash-commands.sh --check
+   ```
+   This classifies every command as NEW / IDENTICAL / CONFLICT and flags any that
+   also exist at user level (`~/.claude/commands`) or are project-specific (`gstack-*`).
+2. Show the user the summary. If there are CONFLICTs, name them and ask whether to
+   keep the host's existing command (default) or replace it. Do not decide for them.
+3. Install:
+   ```bash
+   bash <AI_DEV_SHOP_ROOT>/framework/operations/scripts/install-slash-commands.sh --install
+   ```
+   This installs NEW commands, skips IDENTICAL, and SKIPS conflicts. Add `--overwrite`
+   only for conflicts the user agreed to replace (originals are backed up to `*.ads-bak`);
+   add `--include-project` to also install the `gstack-*` commands.
+4. Confirm what was installed/skipped, then offer to dismiss the reminder.
+
+After setup, `/spec`, `/plan`, `/code-review`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, `/handoff`, etc. work directly in chat (except any you chose not to install).
 
 ### Gemini CLI
 

@@ -91,69 +91,17 @@ Some peer CLIs perform expensive startup work (reading project docs, running boo
 
 ### Codex Peer Dispatch
 
-Codex reads repo instruction files (AGENTS.md, `.rules`) and performs mandatory startup on the first turn of every new session unless `--ignore-rules` is used. The AGENTS.md Mandatory Startup section explicitly excludes peer/subagent contexts.
-
-**Two modes:**
-
-#### Single-shot dispatch (default for `/debate`, `/consensus`, `/audit-work`)
-
-Use `--ignore-rules --ephemeral` for one-off prompts where no session continuity is needed.
-
-**CRITICAL: Always pipe prompts via stdin with the `-` flag.** Codex hangs on long inline prompts and cannot read arbitrary file paths in read-only sandbox mode. The only reliable transport for prompts longer than ~200 words is stdin:
-
-```bash
-echo "Your task prompt here.
-
-$(cat "$PACKET_PATH")" | codex exec --ignore-rules --ephemeral --json -s read-only -m "$MODEL" -C "$REPO" - \
-  > "$RUN_DIR/codex-output.json" 2>"$RUN_DIR/codex-output.stderr"
-```
-
-**Failure modes that require stdin transport:**
-- Inline prompt without stdin (`codex exec "long prompt"`) → hangs with "Reading additional input from stdin..."
-- File-read instruction in read-only mode (`codex exec "Read /tmp/file.md"`) → sandbox blocks access, process hangs indefinitely
-- Very long inline prompt with `--json` → process starts but never completes (no `item.completed` event)
-
-**The `-` flag is mandatory for all debate/consensus/audit Codex dispatches.** Do not attempt inline prompts or file-read instructions for Codex. Always pipe via stdin.
-
-Legacy inline pattern (DO NOT USE for prompts > 200 words):
-
-```bash
-codex exec --ignore-rules --ephemeral --json -C "$REPO" "Short task only..." \
-  > "$RUN_DIR/codex-output.json" 2>"$RUN_DIR/codex-output.stderr"
-```
+Use `skills/llm-operations/references/codex-dispatch.md` for Codex-specific
+transport, peer-marker, version-quarantine, and crash-handling rules. Keep this
+shared peer-dispatch file focused on cross-CLI behavior.
 
 #### Multi-phase dispatch (for `/cowork` with diagnosis → correction)
 
-Omit `--ephemeral` when you need session reuse across phases. Use `--ignore-rules` alone to prevent startup loops while preserving session persistence:
+For Codex multi-phase session reuse, use the canonical patterns in
+`skills/llm-operations/references/codex-dispatch.md`.
 
-```bash
-# Phase 1 — first dispatch, captures session ID
-codex exec --ignore-rules --json -C "$REPO" "Your task..." \
-  > "$RUN_DIR/codex-phase1.json" 2>"$RUN_DIR/codex-phase1.stderr"
-
-# Extract session ID from JSON stream
-SESSION_ID=$(python3 -c "
-import json, sys
-for line in open('$RUN_DIR/codex-phase1.json'):
-    try:
-        obj = json.loads(line.strip())
-        if obj.get('type') == 'thread.started':
-            print(obj['thread_id']); break
-    except: pass
-")
-
-# Phase 2+ — resume existing session
-codex exec resume "$SESSION_ID" --json "Next task..." \
-  > "$RUN_DIR/codex-phase2.json" 2>"$RUN_DIR/codex-phase2.stderr"
-```
-
-**Rules:**
-- Capture `thread_id` from the `thread.started` JSON event on the first dispatch.
-- Store the session ID in the run folder for the duration of the workflow.
-- All subsequent dispatches to the same Codex peer use `codex exec resume <SESSION_ID>`.
-- The resumed session retains full context from prior turns — no need to re-send the context packet.
-- If `resume` fails (e.g., session expired or corrupted), classify as `malformed_or_no_output` and start a fresh session.
-- Session reuse is scoped to one workflow run. Do not reuse Codex sessions across different `/cowork`, `/consensus`, or `/audit-work` runs.
+Session reuse remains scoped to one workflow run. Do not reuse Codex sessions
+across different `/cowork`, `/consensus`, or `/audit-work` runs.
 
 ### agy (Gemini via agy CLI) Session Reuse
 

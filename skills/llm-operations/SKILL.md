@@ -42,3 +42,4 @@ Use this for operating AI features in production after prompt or retrieval desig
 - Prompt versioning and eval loops: `references/evaluation-and-prompt-versioning.md`
 - Cost controls and abuse guardrails: `references/ai-finops-and-guardrails.md`
 - Cross-host peer-LLM packet, transport, and capability rules: `references/peer-llm-dispatch.md`
+- Codex peer subprocess transport, version quarantine, and crash handling: `references/codex-dispatch.md`

@@ -28,10 +28,30 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Codebase Memory MCP Intake: **OPEN** (audit/install MCP code graph server, benchmark against Graphify and current codebase-analysis workflow)
 - Matt Pocock Skills Re-Intake: **OPEN** (rerun engineering-skill review, dedupe against existing pipeline and imported skills)
 - NVIDIA SkillSpector Intake: **OPEN** (evaluate AI-agent skill scanner as import/install guardrail)
+- Init Hook — Audit Convergence Follow-Through: **OPEN / PARTIAL** (TM-INIT-SU-01 round-1 converged, R1-1 fixed; 3 decisions open — round-2 re-audit / commit / report retention. See `init-hook-audit-HANDOFF.md`)
+- Web Escalation Gate (getting-unstuck): **OPEN / NEEDS-AUDIT** (first-pass: AGENTS.md rule + Claude PostToolUse hook landed; needs `/audit-work` — see detailed item below)
 
 ---
 
 ## De-Noise and Effectiveness
+
+### Web Escalation Gate / Getting-Unstuck Enforcement **[OPEN / NEEDS-AUDIT]**
+**What it is:** A cross-host operating rule + enforcement so that when an agent is operationally blocked (a tool/CLI/service fails the same way ~2×), it STOPS guessing invocations and escalates to information — minimal probe → memory/prior-runs → web + upstream docs/issues — before retrying. Born from an `agy --print` hang where ~6 blind attempts were burned before one web search found the known non-TTY bug (Antigravity #76) and the `script` pty fix.
+**Shipped (first pass):**
+- Portable rule in `AGENTS.md` → Shared Rules (All Agents): "When operationally stuck, escalate to information — don't thrash." Read by all hosts (Claude/Gemini/Codex via AGENTS.md).
+- Web Escalation Gate section + red flags/rationalizations added to `skills/systematic-debugging/SKILL.md` (for dependency-bug-during-coding cases).
+- Claude-Code enforcement: PostToolUse(Bash) hook `framework/operations/scripts/unstuck_escalation_hook.py`, registered in `.claude/settings.json`. Keys failure counts on the external **binary** (not full command, since flags vary), nudges on 2nd failure within a 30m window, fails open.
+**Why it needs `/audit-work`:**
+- Hook output semantics: confirm `hookSpecificOutput.additionalContext` from PostToolUse actually reaches the model in the current Claude Code version (vs needing exit-2/stderr).
+- Failure-detection heuristic (`FAIL_RE`) and binary-extraction regex are approximate — risk of false positives (nudging on benign "error" strings) and false negatives. Needs adversarial fixtures.
+- **Cross-host enforcement gap:** only Claude Code auto-enforces. Codex (`config.toml` hooks) and agy/Antigravity have no equivalent wired — they rely on the advisory AGENTS.md rule only. Decide whether to add per-host hooks or accept advisory-only for non-Claude primaries.
+- Threshold/window (2 failures / 1800s) and the STOPLIST are guesses; validate against real transcripts.
+- Decide whether the original per-agent `skills/getting-unstuck/SKILL.md` (rejected in favor of harness placement) should still exist as a loadable reference, or whether the AGENTS.md rule + systematic-debugging gate suffice.
+**Acceptance:**
+- Audit confirms the hook surfaces to the model, fires on true repeat-failures, and stays quiet on benign output (fixture-backed).
+- A clear decision recorded on cross-host enforcement (per-host hooks vs advisory-only).
+
+### AGENTS.md Map Reduction **[DONE / MONITORED]**
 
 ### AGENTS.md Map Reduction **[DONE / MONITORED]**
 **What it is:** Shrink `AGENTS.md` into a tighter runtime map so the root instruction surface routes agents instead of re-explaining the whole framework.
@@ -924,6 +944,20 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 - Crawlee is installed and a working crawler exists
 - factory.ai is fully crawled at all responsive breakpoints (fullscreen → mobile)
 - Output per page/size is saved in a structured format ready for reproduction
+
+---
+
+## First-Run Init Hook + Slash-Command Installer
+
+### Init Hook — Audit Convergence Follow-Through **[PARTIAL]**
+**What it is:** A first-run bootstrap (`ads-initialization.sh` workspace+sentinel, opt-in collision-checked `install-slash-commands.sh`, `.claude/settings.json` SessionStart hook) plus its external-audit convergence. Full context + resume steps live in **`init-hook-audit-HANDOFF.md`** (see its `RESUME 2026-06-27` section). **Note:** this item involves code, unlike most todo.md entries.
+**Source:** 2026-06-27 — pinned single-user threat model `TM-INIT-SU-01` and re-audited. Convergence achieved (escalation stopped): internal verifier PASS 9.0, Gemini 3.1 Pro PASS 10, Codex GPT-5.5 xhigh 8.2 (1 blocker R1-1). R1-1 (unanchored `grep` sentinel decoy → I4) fixed + locally verified. 5 code fixes applied (V3-5, F13, F15, V3-11, R1-1).
+**What's still needed (3 open decisions, also tracked as session Task #5):**
+- **Round-2 diff-only re-audit** of the R1-1 `sentinel_valid` fix (expected Codex PASS → fully converged) — OR accept the local decoy/duplicate exploit-test evidence.
+- **Commit?** Nothing committed; branch off `main` if yes (3 new artifacts + the 5 fixes).
+- **Report retention:** keep in `.local-artifacts/external-audit/` (default) or move to `reports/external-audit/`.
+**Done when:** the 3 decisions above are resolved and (if chosen) round-2 confirms PASS.
+**Key refs:** handoff `init-hook-audit-HANDOFF.md`; frozen packet `ADS-project-knowledge/.local-artifacts/external-audit/packets/20260627T161208Z-audit-packet.md` (hash `sha256:323997c16e404de9`); working Codex dispatch `codex exec --json -c features.multi_agent=false -c 'hooks.SessionStart=[]'` (memory `codex-exec-empty-output`).
 
 ---
 

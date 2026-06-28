@@ -37,6 +37,7 @@ Use for ANY technical issue:
 - You've already tried multiple fixes
 - Previous fix didn't work
 - You don't fully understand the issue
+- **A third-party tool, CLI, library, or API behaves unexpectedly** (the root cause is often a known upstream bug — see the Web Escalation Gate)
 
 **Don't skip when:**
 - Issue seems simple (simple bugs have root causes too)
@@ -212,6 +213,49 @@ You MUST complete each phase before proceeding to the next.
 
    This is NOT a failed hypothesis - this is a wrong architecture.
 
+## The Web Escalation Gate (External Dependencies)
+
+```
+WHEN THE FAILING COMPONENT IS NOT YOUR CODE,
+SEARCH UPSTREAM DOCS + ISSUES BEFORE A THIRD LOCAL ATTEMPT.
+```
+
+The architecture-questioning escalation in Phase 4.5 assumes the broken thing is
+*yours*. When it is a third-party tool, CLI, library, SDK, or API, the root cause
+is frequently a **known upstream bug, version quirk, or documented flag** you cannot
+deduce by guessing — but can find in seconds online.
+
+**Never repeat a byte-identical failed command.** Re-running the exact same invocation of a
+crashed/hung/errored external command expecting a different result is the canonical waste.
+A verbatim retry is justified ONLY for a clearly transient capacity signal (HTTP 429/503,
+rate-limit, "overloaded"). For a crash (e.g. SIGTRAP/exit 133), hang, timeout, or unknown
+error: **change one variable** (a flag, output mode, input size, transport) or **diagnose** —
+do not repeat. Each attempt must either test a new hypothesis or gather new evidence.
+
+**Trigger:** the same failure mode from an external dependency reproduces **twice** (across
+*different* attempts, not a verbatim re-run), and the cause is not obvious from its error output.
+
+**Then, BEFORE another local variation:**
+
+1. Capture the exact, reproducible failure signature (command, version, symptom — e.g.
+   "tool X v1.2 `--print` emits zero bytes under redirect, empty stderr").
+2. Confirm the dependency itself is healthy in isolation (a minimal call that *should*
+   work — this separates "tool is broken/misused" from "auth/network/input is wrong").
+3. **Search the web and the upstream issue tracker / docs** for that signature:
+   `<tool> <version> <symptom>`, `<tool> <flag> hangs/empty/headless`, GitHub issues,
+   release notes, changelog.
+4. Apply the documented fix or workaround. If none exists, *then* return to local
+   hypotheses with the new knowledge.
+
+**Why this is a hard gate:** guessing N invocations of an opaque external tool burns
+time and tokens and rarely converges, because the missing fact lives in someone else's
+repo, not in your reasoning. One search often replaces a dozen blind attempts. The cost
+of one web lookup is trivial against the cost of a guessing spiral.
+
+**Do this early, not as a last resort.** "Look online" is cheap; reproduction-thrashing
+is expensive. If a tool is third-party and the symptom is weird, the web is Phase 1, not
+Phase 5.
+
 ## Red Flags - STOP and Follow Process
 
 If you catch yourself thinking:
@@ -226,8 +270,9 @@ If you catch yourself thinking:
 - Proposing solutions before tracing data flow
 - **"One more fix attempt" (when already tried 2+)**
 - **Each fix reveals new problem in different place**
+- **"Let me try another flag/invocation" on a third-party tool (without having searched its docs/issues)**
 
-**ALL of these mean: STOP. Return to Phase 1.**
+**ALL of these mean: STOP. Return to Phase 1.** (For external-tool failures, Phase 1 includes the Web Escalation Gate.)
 
 **If 3+ fixes failed:** Question the architecture (see Phase 4.5)
 
@@ -253,6 +298,7 @@ If you catch yourself thinking:
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
+| "I'll figure out this tool's behavior by trying invocations" | If it's third-party and failed twice, the answer is in its docs/issues. Search first (Web Escalation Gate). |
 | "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
 
 ## Quick Reference

@@ -9,13 +9,13 @@ Drop this toolkit into a project and point your coding agent at `AGENTS.md`.
 Copy the toolkit into your project root:
 
 ```bash
-cp -r AI-Dev-Shop-speckit/ your-project/AI-Dev-Shop-speckit/
+cp -r AI-Dev-Shop/ your-project/AI-Dev-Shop/
 ```
 
 Add this line to the startup file your tool reads at the project root:
 
 ```md
-Read `AI-Dev-Shop-speckit/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
+Read `AI-Dev-Shop/AGENTS.md` for the AI Dev Shop multi-agent pipeline.
 ```
 
 Common entry points:
@@ -76,7 +76,7 @@ Most agent workflows are strong at generating code but weak at preserving intent
 ## How It Works
 
 1. Install the toolkit into your repository.
-2. Point your coding tool at `AI-Dev-Shop-speckit/AGENTS.md`.
+2. Point your coding tool at `AI-Dev-Shop/AGENTS.md`.
 3. Confirm or switch the active spec provider in `framework/spec-providers/active-provider.md`.
 4. Start in Coordinator mode or invoke a pipeline command.
 5. The framework routes work through the right agents and writes project-owned artifacts under a sibling `ADS-project-knowledge/` folder.
@@ -93,10 +93,15 @@ Idea/request
 
 ## Slash Commands
 
-Claude Code can load the built-in slash command templates:
+Claude Code can load the built-in slash command templates. Install is opt-in and
+collision-checked so it never overwrites a command your host already has (e.g. an
+existing `/code-review`):
 
 ```bash
-cp -r AI-Dev-Shop-speckit/framework/slash-commands/ .claude/commands/
+# Preview what would change (NEW / IDENTICAL / CONFLICT), no writes:
+bash AI-Dev-Shop/framework/operations/scripts/install-slash-commands.sh --check
+# Install the safe ones; conflicts are skipped unless you pass --overwrite:
+bash AI-Dev-Shop/framework/operations/scripts/install-slash-commands.sh --install
 ```
 
 Other hosts do not support native slash commands. For those, open the matching file in `framework/slash-commands/` and paste its contents manually.
@@ -123,14 +128,14 @@ You do not need to run the Bash commands yourself unless you prefer manual setup
 Manual fallback:
 
 ```bash
-bash AI-Dev-Shop-speckit/framework/operations/scripts/setup-project-knowledge.sh --dry-run
-bash AI-Dev-Shop-speckit/framework/operations/scripts/setup-project-knowledge.sh
+bash AI-Dev-Shop/framework/operations/scripts/setup-project-knowledge.sh --dry-run
+bash AI-Dev-Shop/framework/operations/scripts/setup-project-knowledge.sh
 ```
 
 The setup script:
 
 - Confirms the active provider from [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md).
-- Creates `ADS-project-knowledge/` as a sibling directory of `AI-Dev-Shop-speckit/`.
+- Creates `ADS-project-knowledge/` as a sibling directory of `AI-Dev-Shop/`.
 - Creates the shared workspace folders for specs, governance, memory, reports, metadata, and local scratch.
 - Copies [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-project-knowledge/.gitignore` so `.local-artifacts/` stays local by default.
 - Creates `ADS-project-knowledge/governance/constitution.md` from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) if no constitution exists.
@@ -181,7 +186,7 @@ This toolkit keeps its engine files grouped while preserving a clean split betwe
 - **The Workspace Template (Repo-Local):** `project-knowledge-template/` is the committed template for the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for specs, governance, memory, reports, metadata, local artifacts, and project-owned workflow notes.
 - **The Project Workspace (Writable):** `ADS-project-knowledge/` is the project-owned sibling workspace. Agents write forward specs to `ADS-project-knowledge/specs/`, retained artifacts to `ADS-project-knowledge/reports/`, memory to `ADS-project-knowledge/memory/`, the real constitution to `ADS-project-knowledge/governance/constitution.md`, local scratch to `ADS-project-knowledge/.local-artifacts/`, and future workspace metadata to `ADS-project-knowledge/meta/`.
 
-For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop-speckit/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.
+For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.
 
 ## Architecture Defaults
 

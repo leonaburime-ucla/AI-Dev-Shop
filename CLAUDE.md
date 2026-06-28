@@ -1,6 +1,6 @@
 # AI Dev Shop (speckit) — Claude Code Entry Point
 
-`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (typically `AI-Dev-Shop-speckit/`).
+`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (typically `AI-Dev-Shop/`).
 
 Read `<AI_DEV_SHOP_ROOT>/AGENTS.md` for full operating instructions: all agent definitions, pipeline stages, routing rules, convergence policy, dispatch protocol, slash commands, and human checkpoints.
 
@@ -8,15 +8,30 @@ Read `<AI_DEV_SHOP_ROOT>/AGENTS.md` for full operating instructions: all agent d
 
 Use the **Task tool** to dispatch each specialized agent. Include their `<AI_DEV_SHOP_ROOT>/agents/<name>/skills.md`, the relevant `<AI_DEV_SHOP_ROOT>/skills/*/SKILL.md` files listed in their Skills section, the active spec with hash, and the specific task directive.
 
+## Claude Code: First-Time Initialization
+
+On the first session in this repo, the `SessionStart` hook in `.claude/settings.json`
+runs `framework/operations/scripts/ads-initialization.sh` once: it creates the
+`ADS-project-knowledge/` workspace and writes a `.claude/.ads-initialized` flag so
+later sessions no-op. It does **not** install slash commands.
+
 ## Claude Code: Slash Command Setup
 
-To activate slash commands, copy the command files once:
+Slash-command install is opt-in and collision-checked — it is never copied
+automatically, so it can't clobber a command the host already has (e.g. an existing
+`/code-review`). When asked to enable slash commands, preview then install:
 
 ```bash
-cp -r <AI_DEV_SHOP_ROOT>/framework/slash-commands/ .claude/commands/
+bash <AI_DEV_SHOP_ROOT>/framework/operations/scripts/install-slash-commands.sh --check
+bash <AI_DEV_SHOP_ROOT>/framework/operations/scripts/install-slash-commands.sh --install
 ```
 
-Then type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, or `/handoff` directly in chat. If you haven't done the copy yet, use Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md` — paste the template contents directly as a prompt.
+`--check` reports each command as NEW / IDENTICAL / CONFLICT; `--install` installs the
+safe ones and skips conflicts (add `--overwrite` to replace agreed conflicts — originals
+are backed up to `*.ads-bak`; `--include-project` adds the `gstack-*` commands). Then
+type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`,
+`/debate`, `/audit-work`, `/cowork`, or `/handoff` in chat. On non-Claude hosts, use
+Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md` — paste the template contents as a prompt.
 
 ## Tmp Space
 

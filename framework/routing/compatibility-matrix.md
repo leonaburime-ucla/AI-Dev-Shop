@@ -5,7 +5,7 @@ Maps AI Dev Shop host capabilities to host environments. Use this before adoptin
 Provider-specific planning behavior is not defined here. Resolve that from `framework/spec-providers/active-provider.md` and the matching provider profile.
 
 **Hosts covered:** Claude Code · Claude.ai (web) · Codex CLI · Gemini CLI · Generic LLM (prompt-only)
-Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
+Placeholder note: `<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop/`).
 
 Local verification:
 

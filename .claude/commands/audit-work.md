@@ -38,6 +38,8 @@ Act as an External Audit Coordinator.
    - Save packets to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/external-audit/packets/<timestamp>-audit-packet.md` by default.
    - If the user explicitly asks to retain the packet, save it to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/packets/` instead.
    - Record the effective `suggest_changes` mode in the packet.
+   - **Author the frozen Threat Model & Scope Contract** in the packet (see the template's `Threat Model & Scope Contract` section). Define scope as a positive ALLOWLIST of in-scope blocking failure domains plus allowed actors/capabilities and mandatory invariants — never an open-ended out-of-scope denylist (auditors route around denylists by renaming the excluded class). Assign a `TM-<id>`, freeze it, and record its hash. Author the threat model from the spec/intended-use and deployment context, not to guarantee a pass; the auditor's handshake gate (step 10) will reject an under-specified adversary.
+   - **Detect the audit round.** Round 1 = no prior disposition ledger for this `TM-<id>`. Round N = a prior audit exists under the same `TM-<id>`: carry forward the `Prior-Round Disposition Ledger` with each prior finding's disposition (`fixed`/`out-of-scope`/`accepted-risk`/`wontfix`) and set `Audit round: N` so auditors run diff-only compliance, not a fresh full re-audit. If the threat model changed materially since the last round, mint a NEW `TM-<id>` and treat it as round 1 — scores across TM versions are not comparable.
    - Prefer serving the packet to the peer as a self-contained `stdin` payload when the bounded work log fits cleanly in one prompt.
    - If the peer still needs to read the packet from disk, follow the shared transport fallback rules in `skills/llm-operations/references/peer-llm-dispatch.md` and record both the authoring and dispatch paths in the packet.
 6. Run external-auditor preflight:
@@ -72,8 +74,9 @@ Act as an External Audit Coordinator.
 
 9c. Exclude all author-side rationale from the evidence packet. Do not provide implementation reasoning, decision justification, confidence claims, "why I chose this," dismissed alternatives, or self-assessments from the authoring agent. The verifier must evaluate the work on observable requirements, artifacts, and evidence only. This exclusion prevents rationalization bias and forces evaluation entirely on the merits.
 
-9d. Spawn the verifier with adversarial framing:
-   > "Assume defects exist. Your job is to find them, not confirm correctness. Evaluate this work strictly against the provided specs, contracts, and evidence."
+9d. Spawn the verifier with falsification framing (not forced-defect framing, which manufactures speculative findings):
+   > "Attempt to falsify every mandatory invariant in the threat-model contract. A zero-findings result is valid if the evidence supports it. Do not assume defects exist and do not invent speculative ones; evaluate strictly against the provided specs, contracts, and evidence."
+   The internal verifier is bound by the SAME convergence contract as external auditors (step 10): same frozen threat-model allowlist and round detection, round-aware scope (full pass on round 1; diff + minimum necessary context with diff-causality on round N), semantic ledger matching, allowlist mapping of blockers, the out-of-scope escape valve, and the independent dual gate recomputed by the coordinator. This prevents the internal verifier from escalating unchanged work on a fresh full pass before the protected external-audit phase is reached.
    Require the verifier to read the supplied rubric and domain skill before review. Default persona selection (priority order — when work matches multiple categories, use the highest-priority persona): Security agent for security-sensitive work > Code Review agent for implementation work > TDD agent for test-design work. If no specific persona applies, use a generic adversarial verifier without agent-specific bootstrapping. If using a reserved pipeline agent persona, bootstrap it from `<AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md` and require confirmation that the persona file was loaded.
 
 9e. The verifier must inspect the curated packet against the active spec, contracts, tests, and review rubric. To maximize first-pass coverage, the verifier must work through these explicit dimensions in order before reporting:
@@ -107,7 +110,7 @@ Act as an External Audit Coordinator.
    - **Escalation:** requires owner, architect, security, database, or external peer review before proceeding
    - **Advisory:** useful improvement but not blocking
    - **No issue:** checked area passed with no actionable defect
-   The internal verifier must also produce a numerical score (1-10) with one-sentence rationale, using the same risk-tiered score floor as external auditors (low risk = 7, medium/high risk = 8.5). A score below the applicable floor is treated as a blocking finding that prevents proceeding to external dispatch.
+   The internal verifier must also produce a numerical score (1-10) with one-sentence rationale, using the same risk-tiered score floor as external auditors (low risk = 7, medium/high risk = 8.5). Consistent with the external dual gate, the verifier blocks on EITHER condition independently: a hard-blocker finding OR a below-floor score prevents proceeding to external dispatch. The blocker must be classified before the score so the two cannot be traded, but the below-floor score remains an independent automatic block.
 
 9i. If the verifier reports zero findings, it must still provide:
    - **Checks performed:** concise list of concrete areas reviewed
@@ -139,6 +142,15 @@ Act as an External Audit Coordinator.
    - run the mandatory Heartbeat Monitor from `skills/llm-operations/references/peer-llm-dispatch.md` while any auditor process is alive
    - run a cheap readability probe first when using file-based transport: ask the peer to read the dispatch packet and echo the first Markdown heading
    - require the auditor to begin with an `Auditor Scope Check` that states what it believes it is auditing, the scope and target it used, which files or artifacts it reviewed, and any mismatch or uncertainty it noticed before giving findings
+   - **Convergence protocol (mandatory — prevents threat-model escalation across rounds):**
+     - **Threat-model handshake first:** require the auditor to compute threat-model acceptance FIRST and report it ONLY as the `threat_model_accepted`/`rejection_reason` fields inside the single structured JSON object defined in the packet template — never as a separate JSON block (a standalone first object reintroduces multi-object parse brittleness). If it rejects the contract as under-specified for the artifact, it returns that object with empty `findings` and no score, and the coordinator surfaces the rejection to the user instead of scoring — do not patch the threat model after seeing findings to force acceptance.
+     - **Round-aware persona:** on round 1 the auditor runs a full threat-model pass; on round N it acts as a Compliance Inspector that (a) reconciles each `Prior-Round Disposition Ledger` entry and (b) audits the unified diff PLUS the minimum unchanged context needed to judge the diff's behavioral effects (callers, consumers, config, invariants it touches) for new contract violations. This catches fix-introduced regressions in unchanged integrations without re-auditing unrelated untouched code; every round-N finding must state its causal link to the diff.
+     - **Semantic ledger matching:** match findings to prior ledger entries by underlying causal claim and affected surface, NOT by ID or wording — an excluded concern cannot re-enter under a new label. A ledger entry that cannot be verified as genuinely resolved (e.g. a `fixed` claim with no corresponding diff change) is itself a blocker in the gate-evasion/non-convergence domain. A non-diff late finding is admissible only with materially new evidence unavailable in round 1, and is flagged for human adjudication rather than auto-escalated.
+     - **Allowlist mapping:** every blocking finding must map to exactly one in-scope blocking failure domain from the contract allowlist; an unmappable finding is advisory, not blocking. An excluded concern may not be re-raised by renaming its class — only by proving it occurs during normal in-scope operation.
+     - **Classify blocker before scoring:** the auditor must decide blocking status by the fixed blocker rule before computing any 1-10 score, so the score floor cannot drive a blocker to be downgraded to advisory (or vice versa).
+     - **Escape valve:** instruct the auditor that a catastrophic issue outside the pinned threat model goes in `out_of_scope_fatal_warnings` (surfaced to the human) rather than lowering the score or blocking the gate — this preserves convergence without causing false negatives.
+     - **Late-finding honesty:** on round N, a new finding caused by the diff states its diff-causal link; a finding NOT caused by the diff is admissible only under the Semantic ledger matching rule above (materially new evidence unavailable in round 1 + human adjudication) and must carry a `round_1_miss_justification` — a justification alone does not make it admissible.
+     - **Structured + deterministic:** require the structured JSON object from the packet template's Auditor Instructions, and request `temperature=0` (or the host's nearest deterministic setting) for re-audits so ledger evaluation is stable.
    - prefer a short prompt that points to the dispatch packet over embedding the full packet body inline when the peer can read files directly
    - if the packet already names the relevant files, prefer a bounded sectioned prompt over an open-ended repo-audit prompt
    - if an auditor is Claude, apply the Claude Code reference and prefer its dedicated runner when available
@@ -164,13 +176,14 @@ Act as an External Audit Coordinator.
      - `Why it matters:` user, correctness, security, maintainability, or workflow impact
      - `Recommended fix:` the smallest actionable fix or the decision needed
      - `Confidence:` high, medium, or low, with the main uncertainty if not high
-   - **Scoring Gate (mandatory):** Every auditor dispatch prompt must require a numerical score (1-10) with:
+   - **Independent dual gate (blocker OR below-floor):** the binding gate is `blocking_gate = FAIL` if EITHER any validated blocker (allowed actor violates a mandatory invariant, mapped to an in-scope allowlist domain, above the impact threshold) is unresolved, OR the score is below the risk-tiered floor. These two conditions are evaluated independently and neither can rescue the other: the blocker must be classified BEFORE the score is assigned, so a high score cannot bury a validated blocker and a below-floor score still blocks even with zero blockers. The decoupling (not the removal of the floor) is what prevents the auditor from trading classification for score.
+   - **Coordinator recomputes the gate:** the packet's frozen contract carries the `risk_tier`, `score_floor`, and the exact gate formula, so the auditor and coordinator apply the same numbers. The coordinator MUST recompute `blocking_gate` from the returned validated blockers and numeric score and reject (retry once, then degrade) any auditor-supplied gate that disagrees — do not trust a returned `PASS` that contradicts the formula.
+   - **Scoring Gate (mandatory):** Every auditor dispatch prompt must still require a numerical score (1-10) with:
      - The score and one-sentence rationale (required even for a 10)
      - Top issues that reduced the score (if < 10)
-     - What specifically would raise the score to 10 (if < 10)
-   - **Risk-tiered score floor:** low risk = 7, medium/high risk = 8.5. A score below the applicable floor is treated as a blocking finding.
-   - Score bands: below floor = blocking finding; at/above floor to 9 = pass with advisory "path to 10" items surfaced in `Decision Points For User`; 10 = clean pass.
-   - The coordinator must surface the "what would make it a 10" items as action items in `Decision Points For User`.
+     - What specifically would raise the score to 10 (if < 10) — `path to 10` items are ALWAYS advisory and never become blockers via the score. A below-floor score independently fails the score gate on its own (see dual gate), but it does not promote any `path to 10` item to blocker status.
+   - **Risk-tiered score floor:** low risk = 7, medium/high risk = 8.5. A score below the applicable floor is an independent blocking condition (see dual gate above), evaluated separately from blocker classification.
+   - The coordinator must surface the "what would make it a 10" items as advisory action items in `Decision Points For User`.
    - If an auditor omits a score, returns a non-numeric value, or provides an out-of-range number, retry once with an explicit score reminder. If still missing, classify as `degraded coverage` and note the omission in the report.
    - An auditor's stated blocker findings are always binding regardless of score — a score of 8 does not override explicitly flagged blockers.
    - **Escalation ceiling (hard cap):** Total scoring attempts (initial + retries) must not exceed 3 per auditor. On hitting the ceiling: do NOT discard findings or block indefinitely. Record all unresolved blockers in a `## Human Escalation` section with the remaining blocker text, which auditor raised it, the score delta from the floor, and what was already attempted. Mark the audit status as `ESCALATED — requires human decision`. The human decides whether to accept, fix, or revert.
@@ -180,7 +193,15 @@ Act as an External Audit Coordinator.
    - Retained save path only when the user explicitly asks: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/external-audit/proposed-fixes/<timestamp>/`
    - Always save the raw extracted proposal bundle to `proposed-fixes.md`, grouped by auditor.
    - If an auditor returned grounded unified diffs, split them into `patches/<auditor>-<nnnn>-<slug>.diff` files when practical; otherwise keep them inline in `proposed-fixes.md`.
-   - Treat these artifacts as suggestions only. Do not apply them automatically.
+   - Treat these artifacts as suggestions only. Do not apply them automatically — but do not silently drop them either (see the Proposed-Fix Disposition Gate below).
+
+11a. **Proposed-Fix Disposition Gate (mandatory PROCESS-COMPLETENESS gate — distinct from the threat-model `blocking_gate`).** This gate enforces that no auditor critique is silently dropped. It is NOT a third blocking condition on the deterministic dual gate (which stays `validated blocker OR below-floor score`): an undispositioned proposed fix makes the audit's reporting STATE `INCOMPLETE`, it is not itself a threat-model blocker and does not flip `blocking_gate`. Enumerate EVERY proposed fix and EVERY per-finding `recommended_fix` from EVERY auditor as a checklist. For each one, the coordinator MUST record exactly one explicit disposition with a one-line rationale:
+   - `agree-implement` — the coordinator agrees and sees no issue → it MUST be implemented this session OR converted to `agree-defer` with a stated reason. "Agree but silently skip" is not a permitted state. (Implementing an advisory/`path to 10` suggestion is NOT a prerequisite for reporting the threat-model PASS/FAIL outcome — but it still must be dispositioned and either done or explicitly deferred.)
+   - `agree-defer` — the coordinator agrees but cannot safely implement now → record the concrete reason and the tracked follow-up (file/ticket). Deferral requires a stated blocker, not convenience.
+   - `disagree` — the coordinator rejects it → requires an evidence-backed rationale tied to the spec, contract, or threat-model contract. If two or more auditors independently converged on the fix, a `disagree` must additionally be surfaced as a `Decision Points For User` item (it cannot be unilaterally buried).
+   - The audit may not be reported as COMPLETE (cannot advance to a final `Audit Outcome` of done) while any proposed fix lacks a disposition — but this is a process-state requirement, separate from and not folded into the threat-model `blocking_gate` result.
+   - After implementing the `agree-implement` set, re-verify (sync checks, `bash -n`/lint where applicable, and a residual-consistency scan for contradictions the edits may have introduced) before declaring the gate satisfied.
+   - Write the completed disposition table into `proposed-fixes.md` and mirror it in the final report's `Coordinator Response -> Proposed Fix Handling` section.
 12. Synthesize the result back to the user. The final answer must include:
    - the exact report structure from `skills/external-audit/references/external-audit-report-template.md`
    - the exact auditor model version used (`Resolved Model`) and the auditor CLI version for each planned auditor
@@ -196,7 +217,7 @@ Act as an External Audit Coordinator.
    - `Coordinator Response -> Agree`
    - `Coordinator Response -> Change`
    - `Coordinator Response -> Disagree`
-   - `Coordinator Response -> Proposed Fix Handling`
+   - `Coordinator Response -> Proposed Fix Handling` — MUST contain the completed Proposed-Fix Disposition Gate table from step 11a: every auditor proposed fix / `recommended_fix` with its disposition (`agree-implement` / `agree-defer` / `disagree`), one-line rationale, and — for `agree-implement` — confirmation it was actually implemented and re-verified this session. The audit cannot reach `Audit Outcome` while any proposed fix is missing a disposition.
    - `Audit Outcome`
    - `Decision Points For User` (must include "what would make it a 10" items from any auditor scoring < 10)
    - if any exact model version cannot be proven, do not run the audit; ask for pinned model(s) instead

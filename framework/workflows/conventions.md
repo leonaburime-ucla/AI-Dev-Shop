@@ -9,7 +9,7 @@ description: Output root, spec folder structure, and reports folder structure fo
 
 ## Output Root
 
-`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop-speckit/`).
+`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (usually `AI-Dev-Shop/`).
 `<ADS_PROJECT_KNOWLEDGE_ROOT>` means the sibling project-owned workspace folder where AI Dev Shop writes durable project state (default: `ADS-project-knowledge/` next to the toolkit folder inside the host repo).
 Resolve the active planning provider from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` before assuming planning filenames or folder structure.
 Provider-native forward specs and planning artifacts are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default so project planning state stays durable with the host project and outside the updateable toolkit. Use another durable project-owned location only when the user explicitly asks for that override. Pipeline artifacts retained by AI Dev Shop core (ADR, research, tasks, test-certification, red-team findings, pipeline state) are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Reports (analysis, test runs, code review, security, observer, consensus, external audit) live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` subfolders.

@@ -4,7 +4,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Integrate four concepts from GitHub's spec-kit into AI-Dev-Shop-speckit: constitution framework, richer templates, slash commands, and a research artifact.
+**Goal:** Integrate four concepts from GitHub's spec-kit into AI-Dev-Shop: constitution framework, richer templates, slash commands, and a research artifact.
 
 **Architecture:** All changes are to markdown files — no code. The constitution becomes a hard gate in the Architect agent's workflow. Four new files are created; eight existing files are modified. No existing pipeline stages, handoff contracts, or skills are removed.
 

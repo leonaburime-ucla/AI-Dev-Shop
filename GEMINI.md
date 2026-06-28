@@ -1,6 +1,6 @@
 # AI Dev Shop (speckit) — Gemini CLI Entry Point
 
-`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (typically `AI-Dev-Shop-speckit/`).
+`<AI_DEV_SHOP_ROOT>` means the path to this toolkit folder (typically `AI-Dev-Shop/`).
 
 **CRITICAL INSTRUCTION:** Read `<AI_DEV_SHOP_ROOT>/AGENTS.md` on startup for full operating instructions: all agent definitions, pipeline stages, routing rules, convergence policy, dispatch protocol, slash commands, and human checkpoints.
 

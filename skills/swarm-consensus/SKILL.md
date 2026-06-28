@@ -60,8 +60,8 @@ Supported peer CLIs:
 | CLI | Invocation | Notes |
 |---|---|---|
 | `claude` | `claude -p --output-format json "<prompt>"` | Claude Code CLI. Prefer structured output when available. |
-| `agy` | `agy --model "Gemini 3.1 Pro (High)" --print "<prompt>"` | Gemini peer via agy CLI (replaces sunsetted `gemini` CLI). **Must run with `cwd=/tmp`** — no `--ignore-rules` flag; running from repo root loads AGENTS.md. Default model: `Gemini 3.1 Pro (High)`. Plain-text output only, no JSON mode. Use full stdout (stripped) as answer. |
-| `codex` | `codex exec --ignore-rules --ephemeral --json "<prompt>"` | OpenAI Codex CLI. `--ignore-rules` prevents repo instruction files from triggering mandatory startup loops in peer mode. `--ephemeral` avoids session persistence. For long prompts, pipe via stdin: `cat prompt.md \| codex exec --ignore-rules --ephemeral -s read-only -`. |
+| `agy` | `cd /tmp && script -q /dev/null agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions --print "<<PEER_DISPATCH>>\n<prompt>"` | Gemini peer via agy CLI (replaces sunsetted `gemini` CLI). **MUST wrap in a pseudo-TTY (`script -q /dev/null ...`)** — known agy bug (Antigravity #76): `--print` checks isatty() and, under a file/pipe/subprocess redirect (non-TTY), hangs forever waiting for an approval prompt that never renders, emitting zero bytes until the 5m `--print-timeout`. The `script` pty defeats this. Also lead the prompt with `<<PEER_DISPATCH>>` (bypasses AGENTS.md interactive startup) and pass `--dangerously-skip-permissions`. **Run with `cwd=/tmp`**. Output carries ANSI/spinner codes — strip with `perl -pe 's/\e\[[0-9;?]*[a-zA-Z]//g; s/\r//g'`. Default model: `Gemini 3.1 Pro (High)`. No JSON mode. Diagnostic: `agy models` returns instantly when auth is healthy, so a `--print` hang is the TTY bug, not auth. Newer agy may add native `--headless`/`--output`/`--format json` flags that replace the pty wrapper. |
+| `codex` | See `skills/llm-operations/references/codex-dispatch.md` | OpenAI Codex CLI. Use the dedicated Codex dispatch reference for peer-marker, stdin transport, version quarantine, `--ignore-user-config`, and exit-133/tool-use crash handling. |
 
 If you are Claude Code, you dispatch to `agy` and `codex`. If you are running via `agy` (Gemini), you dispatch to `claude` and `codex`. The skill works identically regardless of who is primary.
 
@@ -235,6 +235,16 @@ Rules:
 6. If the user explicitly asks to validate a specific proposal, still ask peers to provide the strongest case against it before giving a verdict.
 7. If the packet cannot be made neutral because required context is itself a proposal, include a `Bias Risk` note in the packet and ask the user to approve that framing before dispatch.
 
+#### Blind-Spot Probe (hard requirement)
+
+The Round 1 prompt MUST require every peer to return a dedicated `Blind Spots` section naming:
+
+- (a) any viable option the packet failed to list,
+- (b) a question we should be asking but aren't (a reframe of the problem, not just a new answer to the stated questions),
+- (c) the single assumption baked into the framing that is most likely to be wrong, and why.
+
+This is distinct from the "something else" option and the failure-mode critique in rules 3-4: those probe for a missing *answer*; this probes for a missing *question* or framing error. Do not omit it because the option set looks complete — the point is to surface what the Coordinator did not think to ask. Carry these blind-spot responses into synthesis; a surfaced reframe or broken assumption that 2+ peers raise is a strong signal and must appear in the Decision Ledger or Unresolved Deltas.
+
 Recommended Round 1 shape:
 
 ```text
@@ -242,6 +252,7 @@ Need: <what we need>
 Constraints: <what must be preserved or avoided>
 Options to evaluate: <candidate A, B, C, including "something else">
 Adversarial task: identify the best design, reject weak options, and explain what evidence would change your answer.
+Blind Spots (required): name (a) an option we did not list, (b) a question we should be asking but aren't, (c) the framing assumption most likely to be wrong.
 ```
 
 ### Shared Context Packet Protocol
@@ -396,11 +407,12 @@ Do not rely on subjective "looks abrupt" checks alone.
 # Example patterns — adapt to actual CLI support
 # Prefer structured output and keep stderr separate from the peer answer
 claude --output-format json -p "$(cat .swarm-prompt.txt)" 2>peer-claude.stderr
-agy --model "Gemini 3.1 Pro (High)" --print "$(cat "$(pwd)/.swarm-prompt.txt")" > peer-agy.txt 2>peer-agy.stderr  # run with cwd=/tmp via subprocess, not shell cd
-codex exec --ignore-rules --ephemeral --json -m <resolved-model> --cd <dispatch-dir> --skip-git-repo-check "$(cat .swarm-prompt.txt)" 2>peer-codex.stderr
+script -q /dev/null agy --model "Gemini 3.1 Pro (High)" --dangerously-skip-permissions --print "$(printf '<<PEER_DISPATCH>>\n\n'; cat "$(pwd)/.swarm-prompt.txt")" > peer-agy.raw 2>&1  # cwd=/tmp; `script` pty defeats agy's non-TTY hang; then strip ANSI: perl -pe 's/\e\[[0-9;?]*[a-zA-Z]//g; s/\r//g' peer-agy.raw > peer-agy.txt
+{ printf '<<PEER_DISPATCH>>\n\n'; cat .swarm-prompt.txt; } | codex exec --ignore-rules --ephemeral --json -m <resolved-model> -C <repo> - >peer-codex.jsonl 2>peer-codex.stderr
 ```
 
 If a peer CLI returns a non-zero exit code or empty output, mark it as failed in the report and exclude it from synthesis.
+For Codex, use `skills/llm-operations/references/codex-dispatch.md` instead of improvising retry flags. If Codex exits `133`/`SIGTRAP`, follow that file's version-quarantine and withdrawal rules.
 
 ### Resource Fetch Failure — Peer Withdrawal Protocol
 

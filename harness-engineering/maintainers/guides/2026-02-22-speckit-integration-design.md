@@ -1,4 +1,4 @@
-# Design: spec-kit Integration into AI-Dev-Shop-speckit
+# Design: spec-kit Integration into AI-Dev-Shop
 
 > Historical note: This guide predates the sibling workspace split. Live project-owned files now live under `<ADS_PROJECT_KNOWLEDGE_ROOT>/`, and `project-knowledge-template/` inside ADS is the repo-local template. Interpret any project-state path below with that split in mind.
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Integrate four concepts from GitHub's spec-kit toolkit into AI-Dev-Shop-speckit:
+Integrate four concepts from GitHub's spec-kit toolkit into AI-Dev-Shop:
 
 1. **Constitution framework** — a governance document that gates the Architect before writing any ADR
 2. **Richer templates** — spec-template enhanced, ADR augmented, two new templates (tasks, research)

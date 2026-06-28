@@ -7,7 +7,7 @@ A project needs this shared workspace so multiple people or agents can see the d
 ## How To Use This Template
 
 - Keep `project-knowledge-template/` pristine and committed. Treat it as the shipped template and example surface for downstream users.
-- Create a writable `ADS-project-knowledge/` workspace from this template when using the toolkit in a real repo. `ADS-project-knowledge/` will then be a sibling directory of `AI-Dev-Shop-speckit/`.
+- Create a writable `ADS-project-knowledge/` workspace from this template when using the toolkit in a real repo. `ADS-project-knowledge/` will then be a sibling directory of `AI-Dev-Shop/`.
 - In exceptional local setups, a repo-root `ADS-project-knowledge/` is acceptable as long as it stays ignored by git.
 - Use `ADS-project-knowledge/` for retained project-owned specs, artifacts, memory, and workflow notes. Only edit this committed template when you intentionally want to change the default scaffold for future workspaces.
 

@@ -15,9 +15,20 @@ build/
 /cache/
 project-knowledge-template/.local-artifacts/
 ADS-project-knowledge/
+.claude/.ads-initialized
 integrations/graphify/upstream/
 integrations/codebase-memory-mcp/upstream/
 integrations/codebase-memory-mcp/bin/
+# Generalized: no third-party upstream source or built binaries are committed
+integrations/*/upstream/
+integrations/*/bin/
+# Candidate analyzers under evaluation (clone/audit only, not vendored)
+integrations/serena/
+integrations/codegraph/
+integrations/understand-anything/
 graphify-out/
+.codegraph/
+.understand-anything/
+.serena/
 .codebase-memory/
 .github/workflows/
