@@ -40,14 +40,30 @@ These tools are most valuable for large or unfamiliar codebases. Direct `rg` and
 1. Count files in target: `find <TARGET_REPO> -type f | wc -l`
 2. Check Codebase Memory MCP: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codebase_memory_capability.sh`
 3. Check Graphify: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh`
+3b. Candidate backends (optional, not vendored): the full registry — tier, upstream URL, requirements, install cost, validator — is `<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json`. codegraph has a validator: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codegraph_capability.sh`. Treat candidates as opt-in extras to the blessed backends, never a silent install.
 4. If **<500 files**: direct exploration is acceptable by default. Use an enabled graph backend only if the user asks for persistent repo memory, impact analysis, or query-first navigation.
 5. If **500–4,999 files**: if either backend is `enabled`, ask whether to use graph-assisted discovery or direct exploration. Prefer Codebase Memory MCP for file/symbol lookup and snippets; prefer Graphify when its community report or Graphify-specific queries are useful.
 6. If **≥5,000 files**: recommend graph-assisted discovery. If no backend is enabled, explain both options and ask whether the user wants to download/install one before analysis.
 7. If neither backend is available and the user declines setup, proceed with direct exploration and record that graph assistance was unavailable or declined.
 
-Suggested prompt when neither backend is available:
+**Presenting the offer.** When recommending setup, do not dump a flat list — explain what each backend is *good at* (about two sentences each, sourced from the `recommendation.good_at` field in `<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json`) so the user can pick a subset rather than installing everything. Lead with the recommended tier-1 trio (different paradigms, lowest operating cost) and offer tier-2 as specialized add-ons. State the install cost (deps / API key / build time) for each so the choice is informed. Install only what the user approves; never install the whole set by default.
 
-> This codebase has N files. AI Dev Shop can optionally use a local graph backend before broad source reading. Codebase Memory MCP builds a persistent local knowledge graph with MCP/CLI tools for file search, symbol lookup, source snippets, architecture summaries, and change impact. Graphify builds a structural dependency/community graph and report. Do you want me to set up one of these, or should I proceed with direct `rg` and file reads?
+One-command installable today (have a validator + guided installer): **Codebase Memory MCP**, **Graphify**, **codegraph**. **understand-anything** and **serena** are recommended but their installers are pending (Phase 3 / Phase 2) — name them, explain their strength, and note they need manual setup for now.
+
+Suggested prompt when no backend is available (adapt N, and trim to what fits the repo):
+
+> This codebase has N files. AI Dev Shop can optionally build a local analysis backend before broad source reading — they barely overlap, so pick what matches your questions (I'll only install what you approve):
+>
+> **Recommended (tier 1 — one of each kind):**
+> - **codegraph** — fastest, lowest-friction structural tool: exact "who calls this" and "what breaks if I change it", no API key. Best first pick. *(node build, one command.)*
+> - **Codebase Memory MCP** — the deepest: transitive call chains across hops plus architecture/cluster discovery. Most capable, already session-integrated. *(local, one command.)*
+> - **understand-anything** — natural-language search: finds "the feature that does X" by meaning when you don't know the symbol name. Needs a one-time LLM enrichment pass (any capable model — no specific vendor). *(manual setup for now.)*
+>
+> **Specialized (tier 2 — add if you need them):**
+> - **Graphify** — whole-repo reachability, shortest-path, and community/cluster reports; heavier, minutes to build. *(local, one command.)*
+> - **serena** — highest precision via real LSP (exact even with overloaded/aliased names); heaviest to operate. *(manual setup for now.)*
+>
+> Or I can proceed with direct `rg` and file reads (always fresh, no setup). Which would you like?
 
 **Codebase Memory MCP Bootstrap (when proceeding):**
 
@@ -82,6 +98,13 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 3. If capability is `enabled`: check freshness — `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO>`
 4. If stale or missing: run a code-only structural update using the current Graphify wrapper guidance in `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md`
 5. Write freshness metadata: `python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py <TARGET_REPO> --write --mode code_update`
+
+**codegraph Bootstrap (candidate backend — when a graph backend for callers/impact is wanted and the blessed ones are unavailable):**
+
+1. Run capability check: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codegraph_capability.sh`
+2. If `unavailable` or `unverified`: present codegraph's cost from `<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json` (node >=20 <25, npm build, no API key, index under `<TARGET_REPO>/.codegraph/`) and ask before installing. On approval: `bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codegraph_capability.sh --download --build`. Never `--download`/`--build` silently.
+3. If `enabled`: query per the codegraph section of `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` (`callers` / `impact` / `explore` / `query`, all `--json`). Re-run `init` after edits; the index is not auto-refreshed.
+4. codegraph output is a hypothesis — validate important results against source; `rg` stays the terminal fallback.
 
 Once a graph backend is available, prefer graph queries over broad file reads for discovery and architecture questions. Fall back to raw source sampling when graph evidence is insufficient, surprising, stale, or too coarse.
 

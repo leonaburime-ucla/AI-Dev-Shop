@@ -74,9 +74,10 @@ metadata prove otherwise.
 - **Graphify** and **Codebase Memory MCP**: capability checks, freshness
   metadata, query-first commands, and the default safety policy are in
   `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md`.
-- **codegraph / serena / understand-anything**: not yet documented in
-  `codebase-graph/SKILL.md`. Until they are, use the host-provided tool only when
-  it is available in the current environment; if unavailable, stale, or
+- **codegraph / serena / understand-anything**: invocation, presence checks, and
+  caveats are in `codebase-graph/SKILL.md` under "Candidate Backends (optional,
+  not blessed)". These are clone/audit-only and have no capability validator —
+  verify the backend's path exists before use, and if it is unavailable, stale, or
   unsupported, move to the listed fallback without blocking.
 
 ## Future: the `ads-router` facade

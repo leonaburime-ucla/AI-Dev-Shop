@@ -57,6 +57,8 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
 | `skills/agent-evaluation/SKILL.md` | Observer |
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
+| `skills/general-behavior/SKILL.md` | All agents (universal cross-cutting dispatcher; thin pointer layer to independent behavior skills) |
+| `skills/code-navigation/SKILL.md` | All agents (via general-behavior; per-query-class routing across rg and graph backends) |
 | `skills/codebase-graph/SKILL.md` | Coordinator, CodeBase Analyzer, Refactor Agent |
 | `skills/architecture-migration/SKILL.md` | CodeBase Analyzer |
 | `skills/reverse-spec/SKILL.md` | Coordinator, Spec Agent, CodeBase Analyzer, Software Architect (brownfield and rewrite workflows) |

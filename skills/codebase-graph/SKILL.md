@@ -1,8 +1,8 @@
 ---
 name: codebase-graph
-version: 0.2.0
-last_updated: 2026-06-25
-description: Use when Coordinator or CodeBase Analyzer needs an optional local codebase graph backend, stale graph detection, or query-first codebase navigation. Wraps Graphify and Codebase Memory MCP with AI Dev Shop capability checks and human checkpoints.
+version: 0.3.0
+last_updated: 2026-06-28
+description: Use when Coordinator or CodeBase Analyzer needs an optional local codebase graph backend, stale graph detection, or query-first codebase navigation. Owns the deep per-backend mechanics for Graphify and Codebase Memory MCP (blessed, validator-gated) and for codegraph, serena, and understand-anything (candidate, not blessed) with AI Dev Shop capability checks and human checkpoints.
 ---
 
 # Skill: Codebase Graph
@@ -17,7 +17,14 @@ That skill owns the cross-backend routing table; this skill owns those two
 backends' capability checks, freshness checks, safety policy, and invocation
 guidance.
 
-Supported backends:
+Backends fall into two tiers. **Blessed** backends are vendored under
+`integrations/` and gated by a capability validator under
+`harness-engineering/validators/`; prefer these. **Candidate** backends are
+clone/audit-only (their `integrations/` checkouts are `.gitignored`), have **no
+capability validator**, and are documented for evaluation and opportunistic use —
+treat them as optional and unverified.
+
+Blessed backends:
 
 - **Codebase Memory MCP**: persistent local knowledge graph exposed through CLI
   and MCP tools. Best first choice for file/symbol lookup, source snippets,
@@ -26,8 +33,15 @@ Supported backends:
   graph reports, and query/path/explain commands. Best when community reports or
   Graphify-specific traversal are useful.
 
+Candidate backends (optional, not blessed — see "Candidate Backends" below):
+
+- **codegraph**: CLI graph backend (callers / impact / explore / query).
+- **serena**: LSP-exact declarations and references via MCP (stdio).
+- **understand-anything**: tree-sitter + LLM-enriched semantic / natural-language
+  search.
+
 Direct `rg` and file reads remain the mandatory fallback and the validation path
-for important conclusions.
+for important conclusions — doubly so for candidate backends.
 
 ## Ownership
 
@@ -43,6 +57,14 @@ for important conclusions.
 - Codebase Memory MCP capability check: `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codebase_memory_capability.sh`
 - Codebase Memory MCP local cache home: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home/`
 - Codebase Memory MCP setup docs: `<AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/README.md`
+
+Candidate-backend ownership (clone/audit-only, `.gitignored`, no validator):
+
+- codegraph CLI: `<AI_DEV_SHOP_ROOT>/integrations/codegraph/upstream/dist/bin/codegraph.js` (run with `node`)
+- serena MCP server: `<AI_DEV_SHOP_ROOT>/integrations/serena/upstream/scripts/mcp_server.py`
+- understand-anything scripts: `<AI_DEV_SHOP_ROOT>/integrations/understand-anything/{build-graph,search-graph,enrich-graph-batch}.mjs`
+- understand-anything upstream skills: `<AI_DEV_SHOP_ROOT>/integrations/understand-anything/upstream/understand-anything-plugin/skills/`
+- MCP stdio probe (wraps serena, and any MCP backend, as a shell call): `<AI_DEV_SHOP_ROOT>/harness-engineering/retrieval-evals/benchmark-suite/tools/mcp_probe.py`
 
 Target-named folders under `reports/graphify-out/` are storage namespaces, not
 target-local output. For example, `reports/graphify-out/harness-engineering/`
@@ -302,6 +324,155 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 For direct fallback, use `rg`, `rg --files`, `sed`, and focused file reads.
 Record that the result came from direct source inspection rather than graph
 evidence.
+
+## Candidate Backends (optional, not blessed)
+
+These three are routed to by name in
+`<AI_DEV_SHOP_ROOT>/skills/code-navigation/SKILL.md` but are **not blessed**: their
+heavy source is `.gitignored` (clone/audit-only, not vendored), so a fresh clone
+does not contain them.
+
+The registry of every backend — tier, upstream URL, requirements, install cost,
+and validator path — is
+`<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json`. Read it to render a
+guided-install choice for the user; never install from it automatically.
+
+**codegraph** now has a capability validator and guided installer (use the flow in
+its section below). **serena** and **understand-anything** do not yet — for those,
+verify the integration path exists directly, and on any failure fall back down the
+chain to `rg` without blocking.
+
+Shared rules for all three:
+
+1. **Verify presence first.** The backend is usable only if its script/server
+   path under `integrations/` exists. If the path is missing, treat the backend as
+   `unavailable` and move to the next item in the routing table's fallback chain.
+2. **Never auto-install.** Do not clone, pull, `npm install`, or fetch upstream to
+   obtain a candidate backend — that is a human-approved action, same policy as the
+   blessed backends.
+3. **Output is a hypothesis.** Graph / LSP / semantic results must be validated
+   against direct source reads before you act on anything that matters.
+4. **Index pollution.** codegraph and understand-anything write their index
+   *inside the target repo* (`<TARGET_REPO>/.codegraph/`,
+   `<TARGET_REPO>/.understand-anything/`). Add these to the target's ignore set or
+   clean them up; do not commit them into the target.
+
+### codegraph (CLI graph backend)
+
+Graph backend for callers / change-impact / explore / structural query. Index dir
+`<TARGET_REPO>/.codegraph/`. **codegraph has a capability validator and a guided
+installer** (unlike serena / understand-anything below), so for codegraph use this
+flow instead of a bare path check.
+
+**Step 1 — capability check (read-only, always safe):**
+
+```bash
+bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codegraph_capability.sh
+```
+
+Read `Overall:` from the report (or `overall_status` with `--json <path>`):
+
+- `enabled` — built and runnable; go to Step 3.
+- `unverified` — checkout exists but not built; finish with `--build` (Step 2).
+- `unavailable` — not installed; offer guided install (Step 2) or fall back to the
+  routing table's chain (`codegraph` → `rg`) without blocking.
+
+**Step 2 — guided install (human-approved only):** present the cost from
+`<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json` (codegraph: `node` >=20
+<25, npm build, **no API key**, index under `<TARGET_REPO>/.codegraph/`) and ask
+before installing. On approval:
+
+```bash
+bash <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codegraph_capability.sh --download --build
+```
+
+Never run `--download`/`--build` without explicit approval — same policy as the
+blessed backends.
+
+**Step 3 — query.** Let `CG=<AI_DEV_SHOP_ROOT>/integrations/codegraph/upstream/dist/bin/codegraph.js`.
+
+```bash
+# one-time index (skip if .codegraph/ already exists and is fresh)
+node "$CG" init <TARGET_REPO>
+
+# direct callers / references of a symbol
+node "$CG" callers <SYMBOL> -p <TARGET_REPO> --json
+
+# change-impact set for a symbol
+node "$CG" impact <SYMBOL> -p <TARGET_REPO> --json
+
+# natural-language / dependency-path exploration
+node "$CG" explore "<QUERY>" -p <TARGET_REPO> --json
+
+# structural pattern query (architecture / config class)
+node "$CG" query "<PATTERN>" -p <TARGET_REPO> --json
+```
+
+Use for the `callers` and `change_impact` classes when Codebase Memory MCP is
+unavailable; `--json` everywhere for parseable output. Re-run `init` after edits —
+the index is not auto-refreshed.
+
+### serena (LSP-exact, via MCP stdio)
+
+LSP server, not a graph — best for exact declarations/references of overloaded or
+aliased symbols. Reachable on any host by wrapping the stdio MCP server in the
+probe (no MCP client config needed). Let
+`SERENA=<AI_DEV_SHOP_ROOT>/integrations/serena/upstream/scripts/mcp_server.py` and
+`PROBE=<AI_DEV_SHOP_ROOT>/harness-engineering/retrieval-evals/benchmark-suite/tools/mcp_probe.py`.
+
+```bash
+# server command (reused below)
+SERVER=(python3 "$SERENA" start-mcp-server --project <TARGET_REPO> --transport stdio)
+
+# confirm the LSP is up and which tools exist (look for find_symbol)
+python3 "$PROBE" --list -- "${SERVER[@]}"
+
+# resolve a definition
+python3 "$PROBE" --call find_symbol \
+  --args '{"name_path_pattern":"<SYMBOL>","relative_path":"<REL_PATH>","include_body":false,"depth":1}' \
+  -- "${SERVER[@]}"
+
+# find references / callers (LSP-exact)
+python3 "$PROBE" --call find_referencing_symbols \
+  --args '{"name_path":"<NAME_PATH>","relative_path":"<REL_PATH>","max_answer_chars":20000}' \
+  -- "${SERVER[@]}"
+```
+
+Use for the LSP-exact class (and as a `callers` fallback) when name overloading
+makes `rg`/codegraph ambiguous. The probe runs the server per call; expect cold
+LSP start latency on the first query.
+
+### understand-anything (semantic / natural-language)
+
+tree-sitter structural graph plus optional LLM enrichment — best for "find the
+feature that does X" with no literal keyword. Graph at
+`<TARGET_REPO>/.understand-anything/knowledge-graph.json`. Let
+`UA=<AI_DEV_SHOP_ROOT>/integrations/understand-anything`.
+
+```bash
+# build the structural graph (writes .understand-anything/knowledge-graph.json)
+node "$UA/build-graph.mjs" <TARGET_REPO>
+
+# semantic search; output lines: [score] type: name — path
+node "$UA/search-graph.mjs" <TARGET_REPO> "<NL_QUERY>"
+```
+
+The raw `build-graph` output is structural only. For good natural-language recall
+run the LLM enrichment pass before searching:
+
+```bash
+# batched enrichment — provider-agnostic: any capable LLM (local or hosted);
+# the eval used Gemini 3.1 Pro. Batched = ~15x faster than per-node.
+node "$UA/enrich-graph-batch.mjs"
+```
+
+Enrichment makes LLM calls (to whichever provider you configure — no specific
+vendor required) and rewrites the graph — run it only when the task needs semantic
+recall, and prefer it over the unenriched graph for NL queries. Richer per-task workflows live in the upstream skills under
+`integrations/understand-anything/upstream/understand-anything-plugin/skills/`
+(`understand-explain`, `understand-onboard`, `understand-knowledge`, etc.). For a
+plain keyword that exists in source, prefer `rg` — UA's value is conceptual, not
+literal, lookup.
 
 ## Agent Usage
 

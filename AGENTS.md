@@ -113,11 +113,12 @@ Use `<AI_DEV_SHOP_ROOT>/framework/operations/pipeline-quickstart.md` as the sour
 
 The minimum startup rule still holds: confirm `<AI_DEV_SHOP_ROOT>`, start existing codebases with CodeBase Analyzer when needed, and do not send work past Spec or ADR approval gates without the required human checkpoint.
 
-For existing-codebase analysis, CodeBase Analyzer checks optional graph backends under `<AI_DEV_SHOP_ROOT>/integrations/` before broad source reading:
-- Graphify: `<AI_DEV_SHOP_ROOT>/integrations/graphify/`
-- Codebase Memory MCP: `<AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/`
+For existing-codebase analysis, CodeBase Analyzer checks optional analysis backends under `<AI_DEV_SHOP_ROOT>/integrations/` before broad source reading. The full registry — tier, upstream URL, requirements, install cost, and validator — is `<AI_DEV_SHOP_ROOT>/integrations/backends.manifest.json`. Backends are two tiers:
 
-If neither backend is available and the target is large or unfamiliar, explain that these local tools can build a reusable codebase map for faster architecture discovery and ask whether the user wants to download or install one. Do not silently clone, install, or configure third-party tools. When a backend is available, prefer it for initial repo mapping, file/symbol lookup, impact checks, and architecture discovery; validate important findings against actual source files and fall back to direct `rg`/file reads whenever graph evidence is weak.
+- **Blessed** (vendored stub + capability validator, preferred): Graphify (`integrations/graphify/`), Codebase Memory MCP (`integrations/codebase-memory-mcp/`).
+- **Candidate** (clone/audit-only, `.gitignored`, opt-in, absent from a fresh clone): codegraph (`integrations/codegraph/` — has a validator + guided installer), serena and understand-anything (validators planned).
+
+Nothing is vendored heavy or installed automatically. If a wanted backend is unavailable, CodeBase Analyzer surfaces its cost from the manifest and asks before any download/build/install — never silently clone, install, build, or configure third-party tools. When a backend is available, prefer it for initial repo mapping, file/symbol lookup, impact checks, and architecture discovery; validate important findings against actual source files and fall back to direct `rg`/file reads whenever graph evidence is weak. Routing across backends lives in `<AI_DEV_SHOP_ROOT>/skills/code-navigation/SKILL.md`; per-backend mechanics in `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md`.
 
 ---
 

@@ -22,10 +22,13 @@ integrations/codebase-memory-mcp/bin/
 # Generalized: no third-party upstream source or built binaries are committed
 integrations/*/upstream/
 integrations/*/bin/
-# Candidate analyzers under evaluation (clone/audit only, not vendored)
+# Candidate analyzers under evaluation (clone/audit only, not vendored).
+# Heavy source lives under */upstream/ and */bin/ (ignored by the rules above);
+# tracked stubs (README, manifest) at the integration root SHIP in a clone so the
+# guided installer knows the backend exists and where to fetch it.
 integrations/serena/
-integrations/codegraph/
 integrations/understand-anything/
+# codegraph: stub tracked; clone+build lands in integrations/codegraph/upstream/ (ignored).
 graphify-out/
 .codegraph/
 .understand-anything/

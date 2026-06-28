@@ -23,6 +23,7 @@ run_hard_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_debate_routing_guard.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_swarm_model_identity_guard.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_specs_as_built_freshness.py"
+  python3 "$ROOT_DIR/harness-engineering/validators/validate_backend_manifest.py"
 }
 
 run_advisory_checks() {
@@ -33,6 +34,7 @@ run_advisory_checks() {
   bash "$ROOT_DIR/harness-engineering/validators/probe_host_capabilities.sh"
   bash "$ROOT_DIR/harness-engineering/validators/check_graphify_capability.sh"
   bash "$ROOT_DIR/harness-engineering/validators/check_codebase_memory_capability.sh"
+  bash "$ROOT_DIR/harness-engineering/validators/check_codegraph_capability.sh"
 }
 
 run_precommit_checks() {
