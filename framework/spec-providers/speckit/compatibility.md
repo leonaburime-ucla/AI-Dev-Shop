@@ -15,7 +15,7 @@ It is not upstream Spec Kit documentation.
 
 ## Strict Package Files
 
-All files below are created in the provider-owned feature spec folder. AI Dev Shop defaults that folder to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/`. Template files live under `templates/spec-system/`.
+All files below are created in the provider-owned feature spec folder. AI Dev Shop defaults that folder to `<ADS_MEMORY_ROOT>/specs/<NNN>-<feature-name>/`. Template files live under `templates/spec-system/`.
 
 | File | Required? | Notes |
 |---|---|---|
@@ -34,7 +34,7 @@ All files below are created in the provider-owned feature spec folder. AI Dev Sh
 
 When `speckit` is the active provider:
 
-1. Use the target folder supplied by the Coordinator or Spec Agent. If no explicit user override exists, default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/`.
+1. Use the target folder supplied by the Coordinator or Spec Agent. If no explicit user override exists, default to `<ADS_MEMORY_ROOT>/specs/<NNN>-<feature-name>/`.
 2. Ask whether spec files should use `prefixed` or `standard` naming.
 3. Create the feature folder and the matching pipeline report folder.
 4. Record `spec_provider`, `provider_native_root: specs/`, `provider_output_root` (the actual feature spec folder), `spec_path`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and `spec_naming` in `pipeline-state.md`.

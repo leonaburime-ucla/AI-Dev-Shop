@@ -7,7 +7,7 @@ Centralize skill discovery and curation through one owner agent to keep canonica
 - Inbox: `harness-engineering/skills-inbox/`
 - Inbox archive: `harness-engineering/skills-inbox/archive/`
 - Canonical skills: `skills/`
-- Audit reports: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/skills-audit/`
+- Audit reports: `<ADS_MEMORY_ROOT>/reports/skills-audit/`
 
 ## Daily Operation
 1. Intake requests from Coordinator only.

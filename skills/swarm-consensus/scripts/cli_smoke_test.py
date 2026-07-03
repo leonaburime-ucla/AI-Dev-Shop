@@ -29,11 +29,11 @@ MODEL_CANDIDATE_LADDERS_PATH = (
 
 
 def resolve_workspace_root() -> Path:
-    for key in ("ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
+    for key in ("ADS_MEMORY_ROOT", "ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
         raw = os.environ.get(key)
         if raw:
             return Path(raw).expanduser().resolve()
-    return HOST_ROOT / "ADS-project-knowledge"
+    return HOST_ROOT / "ADS-memory"
 
 
 def display_path(path: Path) -> str:
@@ -246,7 +246,7 @@ def unique_paths(paths: list[Path]) -> list[Path]:
 
 def model_memory_roots() -> list[Path]:
     roots: list[Path] = []
-    for key in ("ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
+    for key in ("ADS_MEMORY_ROOT", "ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
         raw = os.environ.get(key)
         if raw:
             roots.append(Path(raw))

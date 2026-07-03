@@ -5,8 +5,8 @@
   "mechanics": "skills/codebase-graph/SKILL.md",
   "storage": {
     "principle": "Split by artifact, do NOT blanket-ignore. Three classes: (1) installed tool, (2) heavy regenerable index = local + gitignored, (3) shareable summary = COMMITTED so a team builds once and everyone pulls the latest without rebuilding/re-enriching.",
-    "installed_backend": "The tool's source/binary. Clone-build backends -> AI-Dev-Shop/integrations/<tool>/upstream/ (gitignored via integrations/*/upstream/). uv/pipx backends (code-review-graph, graphify CLI, codebase-memory-mcp binary) install user-level (~/.local), outside the repo. NOT in ADS-project-knowledge. Reinstallable via the validator, so losing it is cheap.",
-    "heavy_local_index": "Large regenerable indexes/DBs/caches stay LOCAL and gitignored — never committed (GitHub hard-rejects files >100MB). Home: ADS-project-knowledge/.local-artifacts/analyzers/<tool>/<target>/ wherever the tool supports an external data dir: graphify (GRAPHIFY_OUT), codebase-memory-mcp (HOME), code-review-graph (--data-dir). Examples too big to commit: code-review-graph SQLite (~600MB), codebase-memory-mcp cache, serena LSP cache.",
+    "installed_backend": "The tool's source/binary. Clone-build backends -> AI-Dev-Shop/integrations/<tool>/upstream/ (gitignored via integrations/*/upstream/). uv/pipx backends (code-review-graph, graphify CLI, codebase-memory-mcp binary) install user-level (~/.local), outside the repo. NOT in ADS-memory. Reinstallable via the validator, so losing it is cheap.",
+    "heavy_local_index": "Large regenerable indexes/DBs/caches stay LOCAL and gitignored — never committed (GitHub hard-rejects files >100MB). Home: ADS-memory/.local-artifacts/analyzers/<tool>/<target>/ wherever the tool supports an external data dir: graphify (GRAPHIFY_OUT), codebase-memory-mcp (HOME), code-review-graph (--data-dir). Examples too big to commit: code-review-graph SQLite (~600MB), codebase-memory-mcp cache, serena LSP cache.",
     "index_data": "Alias for heavy_local_index (kept for back-compat).",
     "shared_summary": "Small, expensive-to-produce summaries ARE committed to a tracked folder so teammates share them without rebuilding. Prime case: understand-anything's LLM-enriched knowledge-graph.json (~2.6MB) — regenerating it costs LLM calls, so committing it saves real money/time. Size-gate: only commit artifacts comfortably under ~50MB (GitHub warns at 50MB, hard-rejects at 100MB).",
     "shareable_artifacts": {
@@ -14,8 +14,8 @@
       "graphify": "graph.json (~9MB, committable)",
       "others": "code-review-graph / codebase-memory-mcp / serena / codegraph produce heavy or binary local indexes — rebuild rather than commit"
     },
-    "in_target_index_note": "codegraph (.codegraph/), understand-anything (.understand-anything/), and serena (.serena/) hardcode their index into the PROJECT/CODEBASE root (the root that contains the AI-Dev-Shop folder — NOT the AI-Dev-Shop or ADS-project-knowledge root) and offer no relocation flag. To centralize: relocate where a flag exists, else copy the shareable summary into the tracked shared folder after build. The analyzer offers to gitignore the heavy in-target dirs in the target repo.",
-    "symlink_caveat": "Git commits a symlink as a pointer (mode 120000), so it IS uploadable — but it only carries DATA to a teammate if the symlink target is ALSO tracked. A symlink into the gitignored ADS-project-knowledge tree is a DANGLING link on their checkout (verified). Absolute-path targets break across machines; Windows symlink support is unreliable. Use symlinks only for local centralization; COMMIT actual files (or copy them) for team sharing.",
+    "in_target_index_note": "codegraph (.codegraph/), understand-anything (.understand-anything/), and serena (.serena/) hardcode their index into the PROJECT/CODEBASE root (the root that contains the AI-Dev-Shop folder — NOT the AI-Dev-Shop or ADS-memory root) and offer no relocation flag. To centralize: relocate where a flag exists, else copy the shareable summary into the tracked shared folder after build. The analyzer offers to gitignore the heavy in-target dirs in the target repo.",
+    "symlink_caveat": "Git commits a symlink as a pointer (mode 120000), so it IS uploadable — but it only carries DATA to a teammate if the symlink target is ALSO tracked. A symlink into the gitignored ADS-memory tree is a DANGLING link on their checkout (verified). Absolute-path targets break across machines; Windows symlink support is unreliable. Use symlinks only for local centralization; COMMIT actual files (or copy them) for team sharing.",
     "future": "Planned: a pre-push / CI hook on branch/main that rebuilds the index and regenerates+commits the shared summaries, keeping committed graphs current automatically."
   },
   "recommendation_tiers": {
@@ -63,7 +63,7 @@
       "validator": null,
       "install": "uv tool install (see upstream); validator planned (Phase 4)",
       "managed_dir": "user-level (~/.local/bin via uv tool)",
-      "index_location": "ADS-project-knowledge/.local-artifacts/analyzers/code-review-graph/<target>/ (via --data-dir)",
+      "index_location": "ADS-memory/.local-artifacts/analyzers/code-review-graph/<target>/ (via --data-dir)",
       "status_check": "validator not yet built; verify `code-review-graph --version` runs, else treat as unavailable"
     },
     {
@@ -95,7 +95,7 @@
       "validator": "harness-engineering/validators/check_graphify_capability.sh",
       "install": "bash harness-engineering/validators/check_graphify_capability.sh --download",
       "managed_dir": "integrations/graphify/upstream/",
-      "index_location": "ADS-project-knowledge/reports/graphify-out/<target>/ (via GRAPHIFY_OUT)",
+      "index_location": "ADS-memory/reports/graphify-out/<target>/ (via GRAPHIFY_OUT)",
       "status_check": "run the validator (overall_status: enabled|unverified|unavailable)"
     },
     {
@@ -111,7 +111,7 @@
       "validator": "harness-engineering/validators/check_codebase_memory_capability.sh",
       "install": "bash harness-engineering/validators/check_codebase_memory_capability.sh --download --install-binary",
       "managed_dir": "integrations/codebase-memory-mcp/upstream/",
-      "index_location": "ADS-project-knowledge/.local-artifacts/codebase-memory-mcp-home/ (via HOME)",
+      "index_location": "ADS-memory/.local-artifacts/codebase-memory-mcp-home/ (via HOME)",
       "status_check": "run the validator (overall_status: enabled|unverified|unavailable)"
     },
     {

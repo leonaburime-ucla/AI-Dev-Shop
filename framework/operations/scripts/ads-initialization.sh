@@ -3,7 +3,7 @@
 #
 # Runs once when the toolkit is first loaded into a host repo. It only does the
 # safe, project-owned part:
-#   - creates the ADS-project-knowledge/ workspace at the host project root
+#   - creates the ADS-memory/ workspace at the host project root
 #   - writes a sentinel flag so subsequent sessions short-circuit instantly
 #
 # It deliberately does NOT install slash commands (see install-slash-commands.sh).
@@ -84,7 +84,7 @@ done
 
 claude_dir="$host_dir/.claude"
 flag_file="$claude_dir/.ads-initialized"
-workspace_root="$host_dir/ADS-project-knowledge"
+workspace_root="$host_dir/ADS-memory"
 setup_script="$ads_root/framework/operations/scripts/setup-project-knowledge.sh"
 install_cmds="$ads_root/framework/operations/scripts/install-slash-commands.sh"
 

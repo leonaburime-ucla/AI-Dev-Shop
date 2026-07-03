@@ -21,7 +21,7 @@ If subagent support is unavailable, unverified, disabled, or the delegated boots
 
 Implementation has reached the convergence threshold only when the Coordinator
 verification packet is PASS for the active spec hash. Build or update it at
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
+`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
 using `<AI_DEV_SHOP_ROOT>/framework/templates/verification-packet-template.md`.
 Before dispatch, verify:
 
@@ -42,18 +42,18 @@ When the gate passes, run Code Review and Security in parallel when the Subagent
 
 **Code Review Agent** — dispatch with:
 - Full diff of changed files
-- Spec: path from `spec_entrypoint_path` in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md` (for alignment check)
-- ADR: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (for architecture compliance)
-- Test certification: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+- Spec: path from `spec_entrypoint_path` in `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md` (for alignment check)
+- ADR: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (for architecture compliance)
+- Test certification: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 - Test file source code for every path in the test-certification inventory that
   maps to changed behavior or P1/invariant coverage, so Code Review can perform
   semantic assertion review instead of trusting test names
 - Programmer's most recent handoff table, including Function Quality Assessment
   summary
-- Progress ledger: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md`
+- Progress ledger: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md`
   if present, especially when a debt-band fix cycle is claimed
 - Coordinator verification packet:
-  `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
+  `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
   with active spec hash, executed vs expected count, test-file hash status,
   required-suite status, coverage status, and flaky-test status
 - Skills: `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md`, `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md`
@@ -72,6 +72,6 @@ When the gate passes, run Code Review and Security in parallel when the Subagent
 - Required test-quality/certification/hash/coverage-evidence findings → TDD Agent
 - Recommended Code Review findings → Refactor Agent (non-blocking proposals only)
 - Critical/High Security findings → surface to human for sign-off before merge (hard gate)
-- Medium/Low Security findings → log in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md`, continue
+- Medium/Low Security findings → log in `<ADS_MEMORY_ROOT>/knowledge/learnings.md`, continue
 
 Human must explicitly approve any Critical/High security finding before shipping.

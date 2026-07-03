@@ -1,7 +1,7 @@
 # Specs-As-Built Freshness
 
 - Enforcement: advisory
-- Artifact root: `ADS-project-knowledge/specs_as_built/`
+- Artifact root: `ADS-memory/specs_as_built/`
 - Source root: `<HOST_PROJECT_ROOT>`
 - Validator: `python3 AI-Dev-Shop/harness-engineering/validators/validate_specs_as_built_freshness.py`
 

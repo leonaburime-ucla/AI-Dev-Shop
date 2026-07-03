@@ -134,6 +134,14 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Any adoption candidates have a concrete target file, expected behavioral improvement, and eval path.
 - Coordinator can decide whether this repo contributes new material, confirms existing coverage, or should be kept as reference-only.
 
+**Status (2026-06-30):**
+- Installed `improve-codebase-architecture` into this repo at `skills/improve-codebase-architecture/` (`SKILL.md` + `HTML-REPORT.md`).
+- Recommendation: keep it as useful imported reference material for now, but do not register it as a first-class AI Dev Shop skill yet.
+- Overlap: substantial overlap with existing `codebase-analysis`, `codebase-graph`, `architecture-decisions`, `architecture-migration`, and `refactor-patterns` skills.
+- Unique value: the "deep vs shallow module" framing, "deepening opportunities", deletion-test language, and visual HTML candidate report workflow.
+- Adaptation gaps before operational use: upstream assumes `/codebase-design`, `/grilling`, `/domain-modeling`, and `subagent_type=Explore`; map those to AI Dev Shop-native skills/agents or remove the dependency before wiring it into the default skill registry.
+- Likely best integration path: extract the visual report/deepening-candidate workflow into CodeBase Analyzer or Refactor Agent guidance rather than adding another standalone architecture-analysis route.
+
 ### Codebase Memory MCP Install and Eval **[OPEN]**
 **Owner:** CodeBase Analyzer Agent with Coordinator routing oversight; Security Agent reviews installer/config-write risk before enablement.
 **Source repo:** `https://github.com/DeusData/codebase-memory-mcp`
@@ -184,7 +192,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 4. **cm-mcp callers fix (qualified_name → file)** — landed with the retrieval-evals commit (fixture gitignored).
 
 ### Codebase-Search Routing + Cross-LLM Analyzer Distribution **[OPEN / DESIGNED]**
-**Source:** 2-round Swarm debate (Claude Opus 4.8 + Codex GPT-5.5 xhigh; Gemini 3.1 Pro unavailable), 2026-06-28. Retained report: `ADS-project-knowledge/reports/swarm-consensus/runs/20260628T151500Z-consensus-report.md`. ~100% agreement both rounds.
+**Source:** 2-round Swarm debate (Claude Opus 4.8 + Codex GPT-5.5 xhigh; Gemini 3.1 Pro unavailable), 2026-06-28. Retained report: `ADS-memory/reports/swarm-consensus/runs/20260628T151500Z-consensus-report.md`. ~100% agreement both rounds.
 **Throughline (strongest signal):** a deterministic **router facade** (`ads-router` / `search_codebase()`) unifies all three topics. It surfaced unprompted as a Round-1 blind spot from BOTH models and became the load-bearing answer in Round 2. **Design the router contract/schema FIRST** (query classes, JSON I/O, error normalization, freshness metadata, confidence); the routing skill, install facade, and behavioral eval all bind to it.
 
 **Topic 1 — Where routing lives (decided):**
@@ -202,7 +210,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Targets from an offline oracle run where the expected backend UNIQUELY wins and the wrong tool has a documented miss. Checked-in target manifest.
 
 **Topic 3 — Install & cross-LLM distribution (designed):**
-- **SPLIT install:** shared user-level binaries (`~/.local/share/ads/analyzers/`, env-overridable `ADS_ANALYZER_HOME`, project-local fallback when home unwritable) + per-repo indexes under `ADS-project-knowledge/` + an `analyzers.lock.json` manifest (versions, build params, repo fingerprint).
+- **SPLIT install:** shared user-level binaries (`~/.local/share/ads/analyzers/`, env-overridable `ADS_ANALYZER_HOME`, project-local fallback when home unwritable) + per-repo indexes under `ADS-memory/` + an `analyzers.lock.json` manifest (versions, build params, repo fingerprint).
 - **One canonical `ads-router` CLI facade** wraps `mcp_probe.py` so Codex/agy/Claude invoke MCP analyzers (cm-mcp, serena) identically as shell calls; native Claude MCP stays optional, NEVER canonical (that is what makes it cross-host).
 - **Tiered profiles framed as a latency/storage/privacy BUDGET:** Minimal (rg) / Standard (+codegraph) / Graph (+cm-mcp) / Advanced (+graphify/serena/UA) / Custom. rg-only default for markdown/prose repos. Repo-profile-detected first, audited + capability-checked + reversible; no piped remote installers.
 
@@ -338,7 +346,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **Source:** 3-model debate (Claude Opus 4.6, Gemini 3.1 Pro, Codex GPT-5.5 xhigh) on 2026-06-20.
 **Paper:** "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement" (Jin et al., Renmin University + Microsoft Research, arXiv:2606.11926, June 2026).
 **Local paper copy:** `/Users/la/Downloads/arbor htr.pdf`
-**Debate report:** `ADS-project-knowledge/reports/swarm-consensus/runs/20260620-arbor-htr-mode-debate.md`
+**Debate report:** `ADS-memory/reports/swarm-consensus/runs/20260620-arbor-htr-mode-debate.md`
 **What it is:** Add an opt-in "Arbor HTR Mode" to the Coordinator — a persistent hypothesis-tree-driven optimization loop that achieves 2.5x verified gains over flat coding agents on autonomous optimization tasks.
 **Why it matters:** The existing linear pipeline is excellent for spec→implement→review, but has no mechanism for iterative, multi-hypothesis optimization of an existing artifact (e.g., improving a RAG pipeline, tuning a prompt suite, evolving a harness). Arbor fills that gap with structured exploration, cumulative learning, and held-out validation.
 **Debate consensus (3/3):**
@@ -365,7 +373,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - `harness-engineering/harness-evals/arbor-htr/` — eval suite
 - `AGENTS.md` update — add Arbor HTR Mode to Coordinator mode table
 - `framework/routing/agent-index.md` — reserve `Optimizer` and `Optimization Executor` names
-**Artifact layout per run:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/optimization/<run-slug>/` with `htr-tree.jsonl`, per-node dirs, budget ledger, merge-gate reports.
+**Artifact layout per run:** `<ADS_MEMORY_ROOT>/reports/optimization/<run-slug>/` with `htr-tree.jsonl`, per-node dirs, budget ledger, merge-gate reports.
 **Eval targets:** merge-gate integrity, attribution purity, repeat-failure suppression, token efficiency, resume fidelity, zero main-worktree contamination, cross-task transfer, insight quality, convergence behavior.
 **Risks to monitor:** insight hallucination poisoning, worktree I/O bottlenecks on local machines, paradigm-shift prompt effectiveness, token budget governance (paper reports 20M–43M tokens/run).
 **Done when:**
@@ -439,7 +447,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
   - Likely value here: idea source for trend analysis, market-sensing agents, or multi-agent forecasting patterns.
 - `Impeccable` (exact repo name to confirm from transcript)
   - Why it is useful: frontend-design-oriented command/skill set focused on simplifying and improving AI-generated UI.
-  - Likely value here: possible source material for VibeCoder, UX/UI Designer, or frontend quality skills, especially around simplification and visual polish.
+  - Likely value here: possible source material for VibeCoder, Web Design, or frontend quality skills, especially around simplification and visual polish.
 - `Open Viking` (exact repo name to confirm from transcript)
   - Why it is useful: described as an AI-agent memory/context database organized around filesystem-based resources, skills, and tiered loading.
   - Likely value here: directly relevant to context hygiene, tiered loading, token reduction, and long-term memory organization for agents.
@@ -459,7 +467,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ## Pipeline Gaps
 
 ### Graphify `--agent-cache` RFC **[OPEN]**
-**What it is:** Add `--agent-cache` flag to graphify that produces a greppable JSONL of chunk-level summaries with namespace inheritance and line pointers — precomputed cache so agents skip the grep/read/assess/repeat loop. Debate consensus (3/3): no vector DB, no BM25 for MVP, no community rollups — just chunked summaries + grep. See `ADS-project-knowledge/.local-artifacts/swarm-consensus/runs/20260609T-agent-cache-debate-report.md` for full spec. PR branch exists on fork: `leonaburime-ucla/graphify` (`docs/node-summaries-rfc`); upstream PR #1166 covers file-level summaries; this extends to chunk-level.
+**What it is:** Add `--agent-cache` flag to graphify that produces a greppable JSONL of chunk-level summaries with namespace inheritance and line pointers — precomputed cache so agents skip the grep/read/assess/repeat loop. Debate consensus (3/3): no vector DB, no BM25 for MVP, no community rollups — just chunked summaries + grep. See `ADS-memory/.local-artifacts/swarm-consensus/runs/20260609T-agent-cache-debate-report.md` for full spec. PR branch exists on fork: `leonaburime-ucla/graphify` (`docs/node-summaries-rfc`); upstream PR #1166 covers file-level summaries; this extends to chunk-level.
 
 ### Temporal Durable Workflow Skill **[OPEN]**
 **What it is:** Add a dedicated skill for Temporal-style durable workflow systems and related durable orchestration patterns.
@@ -488,10 +496,10 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Items 9-10 closed (existing surfaces sufficient, terminology already correct)
 
 ### Claude Audit Follow-Ups: `audit-work` + `specs_as_built` Patch Set **[OPEN]**
-**Source:** Claude external audit on 2026-05-25, raw result at `ADS-project-knowledge/.local-artifacts/external-audit/offloads/20260525T040204Z-needed-audit/claude/claude-audit.result.md`.
+**Source:** Claude external audit on 2026-05-25, raw result at `ADS-memory/.local-artifacts/external-audit/offloads/20260525T040204Z-needed-audit/claude/claude-audit.result.md`.
 **Audit outcome:** No blockers or high-risk fixes. Claude marked both findings as medium and non-blocking.
 **What to add:**
-- `harness-engineering/validators/validate_contracts.py`: reject angle-bracket template placeholders in live host declarations. `field_has_content()` should treat values like `<HOST_PROJECT_ROOT>` and `<ADS_PROJECT_KNOWLEDGE_ROOT>` as unfilled placeholders, matching the placeholder behavior in `validate_specs_as_built_freshness.py`.
+- `harness-engineering/validators/validate_contracts.py`: reject angle-bracket template placeholders in live host declarations. `field_has_content()` should treat values like `<HOST_PROJECT_ROOT>` and `<ADS_MEMORY_ROOT>` as unfilled placeholders, matching the placeholder behavior in `validate_specs_as_built_freshness.py`.
 - `harness-engineering/validators/validate_specs_as_built_freshness.py`: validate `status` against the allowed enum: `generated`, `hybrid`, `stale`, `rewriting`. Emit a clear warning such as `INVALID_STATUS_VALUE` when metadata uses an unknown status.
 **Done when:**
 - Targeted validator tests or fixtures prove placeholder host declarations are rejected.
@@ -1007,7 +1015,7 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 - **Commit?** Nothing committed; branch off `main` if yes (3 new artifacts + the 5 fixes).
 - **Report retention:** keep in `.local-artifacts/external-audit/` (default) or move to `reports/external-audit/`.
 **Done when:** the 3 decisions above are resolved and (if chosen) round-2 confirms PASS.
-**Key refs:** handoff `init-hook-audit-HANDOFF.md`; frozen packet `ADS-project-knowledge/.local-artifacts/external-audit/packets/20260627T161208Z-audit-packet.md` (hash `sha256:323997c16e404de9`); working Codex dispatch `codex exec --json -c features.multi_agent=false -c 'hooks.SessionStart=[]'` (memory `codex-exec-empty-output`).
+**Key refs:** handoff `init-hook-audit-HANDOFF.md`; frozen packet `ADS-memory/.local-artifacts/external-audit/packets/20260627T161208Z-audit-packet.md` (hash `sha256:323997c16e404de9`); working Codex dispatch `codex exec --json -c features.multi_agent=false -c 'hooks.SessionStart=[]'` (memory `codex-exec-empty-output`).
 
 ---
 

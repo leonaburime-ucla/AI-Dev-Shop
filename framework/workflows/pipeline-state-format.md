@@ -2,7 +2,7 @@
 
 Every pipeline run writes a `pipeline-state.md` file to the active feature's canonical pipeline folder in the project-owned sibling workspace. The Coordinator reads this file at the start of every session to detect and resume incomplete runs.
 
-**Location:** `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
+**Location:** `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
 
 Status and confidence labels follow
 `<AI_DEV_SHOP_ROOT>/framework/workflows/status-confidence-taxonomy.md`. Pipeline
@@ -24,7 +24,7 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - debug_mode: on | off
 - spec_provider: <speckit | openspec | bmad | other>
 - provider_native_root: <upstream-native conceptual root, e.g. specs/ | openspec/ | _bmad-output/>
-- provider_output_root: <actual durable output root for this run, default under ADS-project-knowledge/specs/>
+- provider_output_root: <actual durable output root for this run, default under ADS-memory/specs/>
 - spec_version: <version>
 - spec_hash: <sha256>
 - spec_entrypoint_path: <provider-defined planning entrypoint path>
@@ -65,7 +65,7 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - code_review_gate_status: NOT_READY | READY | WAIVED
 - started_at: <ISO-8601 UTC>
 - last_updated_at: <ISO-8601 UTC>
-- progress_ledger_path: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/.../progress-ledger.md or <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/continuity/.../progress-ledger.md
+- progress_ledger_path: <ADS_MEMORY_ROOT>/reports/pipeline/.../progress-ledger.md or <ADS_MEMORY_ROOT>/reports/continuity/.../progress-ledger.md
 - current_stage: <stage name — see Stages below>
 - status: IN_PROGRESS | WAITING_FOR_HUMAN | COMPLETE | FAILED | CANCELLED | ABORTED
 
@@ -74,8 +74,8 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 | Stage | Completed At | Output Artifact | Output Hash |
 |-------|-------------|-----------------|-------------|
 | spec | 2026-02-22T14:32:00Z | <provider-defined spec entrypoint> | sha256:abc... |
-| architect | 2026-02-22T15:10:00Z | ADS-project-knowledge/reports/pipeline/001-feature/adr.md | sha256:def... |
-| tasks | 2026-02-22T15:12:00Z | ADS-project-knowledge/reports/pipeline/001-feature/tasks.md | sha256:ghi... |
+| architect | 2026-02-22T15:10:00Z | ADS-memory/reports/pipeline/001-feature/adr.md | sha256:def... |
+| tasks | 2026-02-22T15:12:00Z | ADS-memory/reports/pipeline/001-feature/tasks.md | sha256:ghi... |
 
 ## Current Stage Detail
 
@@ -134,7 +134,7 @@ single owner.
 ### `progress_ledger_path` (required for resumable or long-running work)
 
 ```markdown
-progress_ledger_path: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md
+progress_ledger_path: <ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md
 ```
 
 Points to the human/agent-readable resume surface defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/session-continuity.md`.
@@ -180,7 +180,7 @@ provider_output_root: <actual durable output root>
 ```
 
 - `provider_native_root` records the upstream provider's conceptual surface, such as `specs/`, `openspec/`, or `_bmad-output/`
-- `provider_output_root` records the actual path AI Dev Shop wrote for this run; the default root is under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`
+- `provider_output_root` records the actual path AI Dev Shop wrote for this run; the default root is under `<ADS_MEMORY_ROOT>/specs/`
 - downstream agents must use recorded actual paths, not infer write targets from upstream-native examples
 
 ### `spec_entrypoint_path` and `spec_readiness_artifact` (required for new runs)
@@ -193,7 +193,7 @@ spec_readiness_artifact: <provider-defined readiness artifact>
 - `spec_entrypoint_path` is the file used for drift detection and resume hashing
 - `spec_readiness_artifact` is the file or artifact used to prove the planning surface is ready for architecture work
 - for the default Speckit provider, these typically map to `feature.spec.md` and `spec-dod.md`
-- new AI Dev Shop runs should normally place these paths under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/`
+- new AI Dev Shop runs should normally place these paths under `<ADS_MEMORY_ROOT>/specs/`
 
 ### Planning preflight fields (required before Software Architect dispatch)
 
@@ -304,7 +304,7 @@ scope, reason, and remaining risk in Notes.
 
 ## Read Rules
 
-- At session start, the Coordinator checks for `pipeline-state.md` in the active feature folder under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`.
+- At session start, the Coordinator checks for `pipeline-state.md` in the active feature folder under `<ADS_MEMORY_ROOT>/reports/pipeline/`.
 - If found and status is `IN_PROGRESS` or `WAITING_FOR_HUMAN`, follow the Recovery Playbook (`<AI_DEV_SHOP_ROOT>/framework/workflows/recovery-playbook.md`).
 - If found and status is `ABORTED`, treat as resumable — follow the Recovery Playbook.
 - If `progress_ledger_path` is present, read the ledger before resuming or retrying.
@@ -327,15 +327,15 @@ scope, reason, and remaining risk in Notes.
 - spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
 - started_at: 2026-02-22T14:30:00Z
 - last_updated_at: 2026-02-22T17:45:00Z
-- progress_ledger_path: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/progress-ledger.md
+- progress_ledger_path: ADS-memory/reports/pipeline/003-csv-invoice-export/progress-ledger.md
 - current_stage: programmer
 - spec_provider: speckit
 - provider_native_root: specs/
-- provider_output_root: ADS-project-knowledge/specs/003-csv-invoice-export/
+- provider_output_root: ADS-memory/specs/003-csv-invoice-export/
 - status: IN_PROGRESS
-- spec_entrypoint_path: ADS-project-knowledge/specs/003-csv-invoice-export/feature.spec.md
-- spec_readiness_artifact: ADS-project-knowledge/specs/003-csv-invoice-export/spec-dod.md
-- spec_support_paths: ADS-project-knowledge/specs/003-csv-invoice-export/api.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/state.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/orchestrator.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/ui.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/errors.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/behavior.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/traceability.spec.md, ADS-project-knowledge/specs/003-csv-invoice-export/spec-manifest.md
+- spec_entrypoint_path: ADS-memory/specs/003-csv-invoice-export/feature.spec.md
+- spec_readiness_artifact: ADS-memory/specs/003-csv-invoice-export/spec-dod.md
+- spec_support_paths: ADS-memory/specs/003-csv-invoice-export/api.spec.md, ADS-memory/specs/003-csv-invoice-export/state.spec.md, ADS-memory/specs/003-csv-invoice-export/orchestrator.spec.md, ADS-memory/specs/003-csv-invoice-export/ui.spec.md, ADS-memory/specs/003-csv-invoice-export/errors.spec.md, ADS-memory/specs/003-csv-invoice-export/behavior.spec.md, ADS-memory/specs/003-csv-invoice-export/traceability.spec.md, ADS-memory/specs/003-csv-invoice-export/spec-manifest.md
 - spec_mode: greenfield
 - provider_mode: compatibility
 - validator_result: PASS
@@ -347,7 +347,7 @@ scope, reason, and remaining risk in Notes.
 - planning_preflight_failures: N/A
 - red_team_status: PASS
 - red_team_spec_hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
-- red_team_artifact: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/red-team-findings.md
+- red_team_artifact: ADS-memory/reports/pipeline/003-csv-invoice-export/red-team-findings.md
 - red_team_completed_at: 2026-02-22T14:55:00Z
 - red_team_human_decision: N/A
 - system_blueprint_path: N/A
@@ -355,8 +355,8 @@ scope, reason, and remaining risk in Notes.
 - codebase_analysis_reports: N/A
 - reverse_spec_artifacts: N/A
 - reverse_spec_review_status: NOT_APPLICABLE
-- tasks_artifact: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/tasks.md
-- test_certification_artifact: ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/test-certification.md
+- tasks_artifact: ADS-memory/reports/pipeline/003-csv-invoice-export/tasks.md
+- test_certification_artifact: ADS-memory/reports/pipeline/003-csv-invoice-export/test-certification.md
 - test_certification_hash: sha256:c1d4e7f2a9b5083f74ce05a3b216d9f4e8a3072c6d9f4183b7e0a2d5f8c1b4e
 - verification_packet_artifact: N/A
 - verification_packet_hash: N/A
@@ -375,10 +375,10 @@ scope, reason, and remaining risk in Notes.
 | Stage | Completed At | Output Artifact | Output Hash |
 |-------|-------------|-----------------|-------------|
 | spec | 2026-02-22T14:32:00Z | specs/003-csv-invoice-export/feature.spec.md | sha256:a3f8... |
-| red-team | 2026-02-22T14:55:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/red-team-findings.md | sha256:b1c4... |
-| architect | 2026-02-22T15:30:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/adr.md | sha256:b9e2... |
-| tasks | 2026-02-22T15:32:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/tasks.md | sha256:c7d3... |
-| tdd | 2026-02-22T16:10:00Z | ADS-project-knowledge/reports/pipeline/003-csv-invoice-export/test-certification.md | sha256:c1d4... |
+| red-team | 2026-02-22T14:55:00Z | ADS-memory/reports/pipeline/003-csv-invoice-export/red-team-findings.md | sha256:b1c4... |
+| architect | 2026-02-22T15:30:00Z | ADS-memory/reports/pipeline/003-csv-invoice-export/adr.md | sha256:b9e2... |
+| tasks | 2026-02-22T15:32:00Z | ADS-memory/reports/pipeline/003-csv-invoice-export/tasks.md | sha256:c7d3... |
+| tdd | 2026-02-22T16:10:00Z | ADS-memory/reports/pipeline/003-csv-invoice-export/test-certification.md | sha256:c1d4... |
 
 ## Current Stage Detail
 

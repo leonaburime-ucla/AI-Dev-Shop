@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.27
-last_updated: 2026-06-26
+version: 1.2.29
+last_updated: 2026-06-29
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -57,7 +57,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
 | `skills/agent-evaluation/SKILL.md` | Observer |
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
-| `skills/general-behavior/SKILL.md` | All agents (universal cross-cutting dispatcher; thin pointer layer to independent behavior skills) |
+| `skills/general-behavior/SKILL.md` | All agents (universal cross-cutting dispatcher; thin pointer layer to lightweight behavior references and larger shared skills) |
 | `skills/code-navigation/SKILL.md` | All agents (via general-behavior; per-query-class routing across rg and graph backends) |
 | `skills/codebase-graph/SKILL.md` | Coordinator, CodeBase Analyzer, Refactor Agent |
 | `skills/architecture-migration/SKILL.md` | CodeBase Analyzer |
@@ -78,10 +78,11 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/testable-design-patterns/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Review Agent (child layer for testability and coverage-friendly structure; always load alongside `coding-foundations`) |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Review Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Review Agent (React component API patterns) |
-| `skills/ux-design/SKILL.md` | UX/UI Designer Agent (design system creation, visual direction, component/state design, implementation-ready handoff) |
-| `skills/interface-design/SKILL.md` | UX/UI Designer Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
+| `skills/ux-design/SKILL.md` | Web Design Agent (design system creation, visual direction, component/state design, implementation-ready handoff) |
+| `skills/premium-ui/SKILL.md` | Web Design Agent (premium website polish, first-impression design, conversion hierarchy, and reference routing) |
+| `skills/interface-design/SKILL.md` | Web Design Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
 | `skills/gstack-design/SKILL.md` | Manual/user-invoked via `/gstack-design`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
-| `skills/vercel-web-design-guidelines/SKILL.md` | UX/UI Designer Agent, Code Review Agent, QA/E2E Agent (UI/UX guideline audits) |
+| `skills/vercel-web-design-guidelines/SKILL.md` | Web Design Agent, Code Review Agent, QA/E2E Agent (UI/UX guideline audits) |
 | `skills/vercel-react-native-skills/SKILL.md` | Programmer, QA/E2E Agent, Code Review Agent (React Native/Expo tactical guidance) |
 | `skills/expo-react-native/SKILL.md` | Programmer, Software Architect, Code Review Agent, QA/E2E Agent, DevOps Agent (progressive-disclosure router for official Expo skills and React Native tactical rules) |
 | `skills/expo/skills/*/SKILL.md` | Loaded only through `skills/expo-react-native/SKILL.md` (vendored official Expo plugin subskills for UI, data fetching, API routes, native modules, EAS, deployment, upgrades, and update insights) |
@@ -104,9 +105,9 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/superpowers-requesting-code-review/SKILL.md` | Programmer |
 | `skills/superpowers-dispatching-parallel-agents/SKILL.md` | Coordinator |
 | `skills/superpowers-writing-plans/SKILL.md` | Coordinator |
-| `skills/shadcn-ui/SKILL.md` | Skills Librarian, Programmer, UX/UI Designer Agent (frontend component integration reference) |
+| `skills/shadcn-ui/SKILL.md` | Skills Librarian, Web Design Agent, Programmer (frontend component integration reference) |
 | `skills/seo-geo/SKILL.md` | Search Visibility (primary), Skills Librarian (refresh/maintenance). Do not load as standing context for delivery agents; route through the optional Search Visibility module when explicitly triggered. |
-| `skills/web-compliance/SKILL.md` | UX/UI Designer Agent, Search Visibility, Code Review Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
+| `skills/web-compliance/SKILL.md` | Web Design Agent, Search Visibility, Code Review Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
 | `skills/find-skills/SKILL.md` | Skills Librarian only (external discovery) |
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
@@ -129,7 +130,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/memory-regression/SKILL.md` | QA/E2E Agent, TestRunner Agent, Programmer, Software Architect (conditional memory/resource leak prevention and bounded-growth verification) |
 | `skills/api-contracts/SKILL.md` | Spec Agent, Code Review Agent, Docs Agent |
 | `skills/api-design/SKILL.md` | Spec Agent, Software Architect, Code Review Agent, Docs Agent |
-| `skills/frontend-accessibility/SKILL.md` | UX/UI Designer Agent, Search Visibility, Code Review Agent, QA/E2E Agent |
+| `skills/frontend-accessibility/SKILL.md` | Web Design Agent, Search Visibility, Code Review Agent, QA/E2E Agent |
 | `skills/e2e-test-architecture/SKILL.md` | QA/E2E Agent, TDD Agent |
 | `skills/rag-ai-integration/SKILL.md` | Software Architect, Programmer, Database Agent |
 | `skills/change-management/SKILL.md` | Programmer, DevOps Agent, Software Architect, Database Agent |

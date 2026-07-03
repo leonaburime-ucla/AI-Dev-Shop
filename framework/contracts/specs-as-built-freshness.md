@@ -4,13 +4,13 @@ Host projects declare how generated and hybrid `specs_as_built/` artifacts stay 
 
 ## Host Declaration Location
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/specs-as-built-freshness.md`
+`<ADS_MEMORY_ROOT>/governance/contracts/specs-as-built-freshness.md`
 
 ## Required Fields
 
 ### artifact_root
 
-- **Path**: default `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`
+- **Path**: default `<ADS_MEMORY_ROOT>/specs_as_built/`
 - **Required**: yes when specs-as-built is enabled
 - **Purpose**: curated current-state documentation root
 
@@ -68,7 +68,7 @@ source_scope:
 source_fingerprint: sha256:<hash>
 last_verified_at: 2026-05-24T19:43:39Z
 last_verified_commit: <git-sha>
-reverse_spec_run: ADS-project-knowledge/reports/reverse-spec/<run-id>/
+reverse_spec_run: ADS-memory/reports/reverse-spec/<run-id>/
 ```
 
 ## Behavior When Contract Is Missing
@@ -98,7 +98,7 @@ Summary:
 
 ## Waiver Protocol
 
-Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/waivers.md`.
+Use `<ADS_MEMORY_ROOT>/governance/contracts/waivers.md`.
 
 Waivers must include:
 

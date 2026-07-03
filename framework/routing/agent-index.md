@@ -12,7 +12,7 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | Software Architect | Selects patterns, defines boundaries, produces ADR | `agents/software-architect/skills.md` |
 | TDD | Writes certified test suite before implementation | `agents/tdd/skills.md` |
 | Programmer | Implements code to satisfy certified tests | `agents/programmer/skills.md` |
-| UX/UI Designer (optional) | Defines visual direction, UI style system, and implementation-ready design specs for frontend work | `agents/ux-ui-designer/skills.md` |
+| Web Design (optional) | Defines premium website direction, product UI/UX, visual polish, conversion flow, and implementation-ready design specs | `agents/web-design/skills.md` |
 | Search Visibility (optional) | Audits public surfaces for search, AI answer, and chatbot discoverability; produces metrics and routes fixes | `agents/search-visibility/skills.md` |
 | QA/E2E | Writes browser-level tests that validate user journeys and frontend ACs | `agents/qa-e2e/skills.md` |
 | TestRunner | Executes test suite, reports pass/fail evidence | `agents/testrunner/skills.md` |
@@ -43,7 +43,7 @@ The following names are the canonical reserved agent names for response prefixes
 - `Supabase Sub-Agent`
 - `TDD`
 - `Programmer`
-- `UX/UI Designer`
+- `Web Design`
 - `Search Visibility`
 - `QA/E2E`
 - `TestRunner`

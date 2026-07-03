@@ -24,17 +24,17 @@ Not all memory serves the same purpose. Match the layer to the need.
 In our pipeline:
 - **Working memory** = agent's in-context reasoning during a task
 - **Short-term memory** = cycle summary passed between pipeline stages
-- **Long-term memory** = the three `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/` files
+- **Long-term memory** = the three `<ADS_MEMORY_ROOT>/knowledge/` files
 - **Entity memory** = individual spec files, ADRs, agent output artifacts
 - **Temporal knowledge** = learnings.md entries with dated context
 
 ## The Three Project Knowledge Files as Long-Term Memory
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` — Stable facts about this project that do not change unless a convention is revised. Read by the Coordinator when injecting context per agent. No size limit but entries should be self-contained facts, not essays.
+`<ADS_MEMORY_ROOT>/knowledge/project_memory.md` — Stable facts about this project that do not change unless a convention is revised. Read by the Coordinator when injecting context per agent. No size limit but entries should be self-contained facts, not essays.
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` — Failure log. Past mistakes and what to do instead. Append-only. Entries grow the system's "negative space" — what not to do. The most valuable entries are the ones that correct a mistake that happened more than once.
+`<ADS_MEMORY_ROOT>/knowledge/learnings.md` — Failure log. Past mistakes and what to do instead. Append-only. Entries grow the system's "negative space" — what not to do. The most valuable entries are the ones that correct a mistake that happened more than once.
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_notes.md` — Live working memory for the project: open questions, deferred decisions, in-progress thinking. Items graduate to `project_memory.md` when they become conventions, or are marked `[RESOLVED]` when answered.
+`<ADS_MEMORY_ROOT>/knowledge/project_notes.md` — Live working memory for the project: open questions, deferred decisions, in-progress thinking. Items graduate to `project_memory.md` when they become conventions, or are marked `[RESOLVED]` when answered.
 
 ## Invalidate, Don't Discard
 

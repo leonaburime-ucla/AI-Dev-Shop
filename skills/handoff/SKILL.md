@@ -12,7 +12,7 @@ Create a short handoff that lets a fresh agent continue without rereading the wh
 1. Resolve the handoff target and focus from the user request. If unspecified, target a fresh agent on the same machine and focus on the current workstream.
 2. Gather only durable evidence: changed files, relevant diffs, specs, ADRs, tasks, test output summaries, report paths, and unresolved decisions. Do not rely on memory for facts that can be checked.
 3. Choose the save target:
-   - Use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/handoff/` when AI Dev Shop project knowledge is available and writable.
+   - Use `<ADS_MEMORY_ROOT>/.local-artifacts/handoff/` when AI Dev Shop project knowledge is available and writable.
    - Use the OS temp directory when project knowledge is unavailable, the user asks for temp storage, or the handoff is intentionally outside the workspace.
    - Return inline only when filesystem writes are unavailable or the user asks for inline output.
 4. Redact secrets and sensitive personal data. Never include API keys, tokens, passwords, private keys, raw `.env` values, or unnecessary personal information.

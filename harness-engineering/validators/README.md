@@ -24,7 +24,7 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks that Swarm Consensus preflight shows peer model identity first
   - fails when CLI version strings can be presented as model names or model versions
 - `validate_specs_as_built_freshness.py`
-  - checks `ADS-project-knowledge/specs_as_built/` metadata when present
+  - checks `ADS-memory/specs_as_built/` metadata when present
   - recomputes source-scope fingerprints and fails on concrete stale generated/hybrid artifacts
   - checks the generation manifest scaffold and minimum component folder shape when components are present
   - no-ops for projects that have not adopted specs-as-built yet
@@ -56,7 +56,7 @@ These validators are the first mechanical enforcement layer for this repo.
   - read-only by default; clones into `integrations/codebase-memory-mcp/upstream/` only with `--download`, updates only with `--update`, and installs the local binary only with `--install-binary`
   - used by Coordinator and CodeBase Analyzer before relying on Codebase Memory MCP-backed repo maps
 - `check_graphify_freshness.py`
-  - prepares reports-backed Graphify output under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/`
+  - prepares reports-backed Graphify output under `<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/`
   - prints the path to use as `GRAPHIFY_OUT` so Graphify writes directly into the reports location
   - writes and checks `.ads-graphify-status.json` beside the reports-backed graph output
   - records generation time, target git state, source mtime, Graphify version, mode, and semantic-pass approval

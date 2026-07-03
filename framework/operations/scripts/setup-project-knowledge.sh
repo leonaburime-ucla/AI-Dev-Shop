@@ -5,15 +5,15 @@ usage() {
   cat <<'USAGE'
 Usage: setup-project-knowledge.sh [--dry-run] [--workspace PATH]
 
-Creates the sibling ADS-project-knowledge/ workspace used by AI Dev Shop.
+Creates the sibling ADS-memory/ workspace used by AI Dev Shop.
 
 Options:
   --dry-run          Show planned actions without writing files.
-  --workspace PATH   Use a custom ADS-project-knowledge path.
+  --workspace PATH   Use a custom ADS-memory path.
   -h, --help         Show this help.
 
 Default workspace:
-  <host-project-root>/ADS-project-knowledge
+  <host-project-root>/ADS-memory
   (host root resolved via $ADS_HOST_DIR, $CLAUDE_PROJECT_DIR, or git toplevel)
 USAGE
 }
@@ -71,7 +71,7 @@ host_root="$(resolve_host_dir)"
 if [ -n "$workspace_override" ]; then
   workspace_root="$workspace_override"
 else
-  workspace_root="$host_root/ADS-project-knowledge"
+  workspace_root="$host_root/ADS-memory"
 fi
 
 provider_file="$ads_root/framework/spec-providers/active-provider.md"
@@ -143,12 +143,13 @@ copy_file_if_missing() {
   fi
 }
 
-workspace_readme='# ADS Project Knowledge
+workspace_readme='# ADS Memory
 
 This is the project-owned AI Dev Shop workspace. Commit retained project artifacts here so teammates and future agents can see the same durable context.
 
 - `governance/`: project rules and the live constitution
-- `memory/`: stable project memory, learnings, notes, and memory-store entries
+- `knowledge/`: stable project memory, learnings, notes, and memory-store entries
+- `sessions/`: session summaries (date, participants, models, Q&A, decisions)
 - `specs/`: provider-native forward specs and planning artifacts
 - `reports/`: retained ADRs, reviews, benchmarks, audits, and pipeline outputs
 - `specs_as_built/`: curated current-state implementation knowledge generated from reverse-spec and post-implementation capture
@@ -163,9 +164,9 @@ Project-owned governance files live here.
 
 The main runtime file is `constitution.md`. AI Dev Shop planning and architecture stages read it to understand project-specific constraints, principles, and exception rules.'
 
-memory_readme='# Memory
+memory_readme='# Knowledge
 
-Project-owned memory files live here.
+Project-owned knowledge files live here.
 
 - `project_memory.md`: stable project conventions, constraints, and gotchas
 - `learnings.md`: lessons learned, postmortems, and repeated failure patterns
@@ -183,6 +184,27 @@ meta_readme='# Meta
 Workspace metadata and project-owned operating notes live here.
 
 Use this folder for workflow notes, migration state, version markers, and other bookkeeping that should travel with the project.'
+
+sessions_readme='# Sessions
+
+One file per conversation: what was discussed, learned, asked, and answered.
+
+## File naming
+`YYYY-MM-DD-HHmmSS-<topic>.md` — UTC timestamp of when the session started.
+The in-progress record is `CURRENT-SESSION.md` until it is finalized.
+
+## Contents (each file)
+- Date and time (UTC), and the user
+- Model(s) used (e.g. Claude Opus 4.8, Codex 5.5 xhigh — several if more than one participated)
+- Summary of what was accomplished
+- Questions & Answers
+- Decisions & Learnings
+
+## How it works
+`harness-engineering/hooks/session-record.sh` maintains the record. On Claude Code it runs
+automatically (Stop refreshes it, SessionEnd archives it). On other hosts the AI runs it
+directly. Ask the AI to "save this session" and it writes the summary and model list.
+See `harness-engineering/hooks/README.md`.'
 
 project_memory='# Project Memory
 
@@ -225,7 +247,8 @@ ensure_dir "$workspace_root"
 ensure_dir "$workspace_root/governance"
 ensure_dir "$workspace_root/governance/adrs"
 ensure_dir "$workspace_root/governance/contracts"
-ensure_dir "$workspace_root/memory"
+ensure_dir "$workspace_root/knowledge"
+ensure_dir "$workspace_root/sessions"
 ensure_dir "$workspace_root/specs"
 ensure_dir "$workspace_root/reports"
 ensure_dir "$workspace_root/specs_as_built"
@@ -277,7 +300,7 @@ copy_file_if_missing \
 
 write_file_if_missing "$workspace_root/README.md" "$workspace_readme"
 write_file_if_missing "$workspace_root/governance/README.md" "$governance_readme"
-write_file_if_missing "$workspace_root/memory/README.md" "$memory_readme"
+write_file_if_missing "$workspace_root/knowledge/README.md" "$memory_readme"
 copy_file_if_missing \
   "$ads_root/project-knowledge-template/specs/README.md" \
   "$workspace_root/specs/README.md"
@@ -318,10 +341,11 @@ copy_file_if_missing \
   "$ads_root/project-knowledge-template/specs_as_built/_meta/generation-manifest.yaml" \
   "$workspace_root/specs_as_built/_meta/generation-manifest.yaml"
 write_file_if_missing "$workspace_root/meta/README.md" "$meta_readme"
-write_file_if_missing "$workspace_root/memory/project_memory.md" "$project_memory"
-write_file_if_missing "$workspace_root/memory/learnings.md" "$learnings"
-write_file_if_missing "$workspace_root/memory/project_notes.md" "$project_notes"
-write_file_if_missing "$workspace_root/memory/memory-store.md" "$memory_store"
+write_file_if_missing "$workspace_root/sessions/README.md" "$sessions_readme"
+write_file_if_missing "$workspace_root/knowledge/project_memory.md" "$project_memory"
+write_file_if_missing "$workspace_root/knowledge/learnings.md" "$learnings"
+write_file_if_missing "$workspace_root/knowledge/project_notes.md" "$project_notes"
+write_file_if_missing "$workspace_root/knowledge/memory-store.md" "$memory_store"
 
 log ""
 if [ "$dry_run" = true ]; then
@@ -332,6 +356,6 @@ fi
 
 log "Next steps:"
 log "- Review and customize: $workspace_root/governance/constitution.md"
-log "- Fill in stable project facts: $workspace_root/memory/project_memory.md"
-log "- For team projects, commit ADS-project-knowledge/ so teammates share the same context."
+log "- Fill in stable project facts: $workspace_root/knowledge/project_memory.md"
+log "- For team projects, commit ADS-memory/ so teammates share the same context."
 log "- Do not commit .local-artifacts/; $workspace_root/.gitignore keeps it local."

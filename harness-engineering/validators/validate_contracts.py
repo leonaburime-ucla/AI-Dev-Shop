@@ -174,19 +174,21 @@ def extract_markdown_links(text: str) -> Iterable[tuple[int, str]]:
 
 
 def default_knowledge_root() -> Path:
-    env = os.environ.get("ADS_PROJECT_KNOWLEDGE_ROOT") or os.environ.get("ADS_WORKSPACE_ROOT")
+    env = os.environ.get("ADS_MEMORY_ROOT") or os.environ.get("ADS_PROJECT_KNOWLEDGE_ROOT") or os.environ.get("ADS_WORKSPACE_ROOT")
     if env:
         return Path(env).expanduser().resolve()
 
-    local = ROOT / "ADS-project-knowledge"
-    if local.exists():
-        return local
+    # Prefer the current workspace name; fall back to the legacy name for
+    # un-migrated checkouts. `ADS-memory` local is the default when none exist.
+    for name in ("ADS-memory", "ADS-project-knowledge"):
+        local = ROOT / name
+        if local.exists():
+            return local
+        sibling = ROOT.parent / name
+        if sibling.exists():
+            return sibling
 
-    sibling = ROOT.parent / "ADS-project-knowledge"
-    if sibling.exists():
-        return sibling
-
-    return local
+    return ROOT / "ADS-memory"
 
 
 def normalize_field_label(value: str) -> str:

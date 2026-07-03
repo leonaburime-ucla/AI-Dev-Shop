@@ -5,8 +5,8 @@
 - Spec Version: 1.1.0
 - Spec Hash: sha256:a3f8c2d1e4b7091f56ac83e29d047b5f1c6e82a4d9f3071b2c5e8d4a7f1b6c9
 - Spec Hash Verification: `sha256sum specs/001-csv-export/feature.spec.md` matched pipeline-state hash
-- ADR: `ADS-project-knowledge/reports/pipeline/001-csv-export/adr.md` (sha256:b9e2d4f7a1c8053e67bd94f2a105c8e3d7f2093a5b8e4162c9d7f3b0e2a5c8f)
-- Tasks: `ADS-project-knowledge/reports/pipeline/001-csv-export/tasks.md`
+- ADR: `ADS-memory/reports/pipeline/001-csv-export/adr.md` (sha256:b9e2d4f7a1c8053e67bd94f2a105c8e3d7f2093a5b8e4162c9d7f3b0e2a5c8f)
+- Tasks: `ADS-memory/reports/pipeline/001-csv-export/tasks.md`
 - Certified At: 2026-02-22T04:00:00Z
 - Certified By: TDD Agent
 

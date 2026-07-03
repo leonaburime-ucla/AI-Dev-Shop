@@ -24,13 +24,13 @@ SCAN_TARGETS = [
     ROOT / "integrations",
     ROOT / "project-knowledge-template/README.md",
     ROOT / "project-knowledge-template/governance",
-    ROOT / "project-knowledge-template/memory",
+    ROOT / "project-knowledge-template/knowledge",
     ROOT / "project-knowledge-template/meta",
     ROOT / "harness-engineering",
 ]
 
 AI_DEV_SHOP_ROOT_RE = re.compile(r"<AI_DEV_SHOP_ROOT>/([A-Za-z0-9_./-]+)")
-ADS_PROJECT_KNOWLEDGE_ROOT_RE = re.compile(r"<ADS_PROJECT_KNOWLEDGE_ROOT>/([A-Za-z0-9_./-]+)")
+ADS_MEMORY_ROOT_RE = re.compile(r"<ADS_MEMORY_ROOT>/([A-Za-z0-9_./-]+)")
 BACKTICK_PATH_RE = re.compile(
     rf"`((?:AGENTS|CLAUDE|GEMINI|README|todo)\.md|{REPO_PATH_PREFIX_RE}/[A-Za-z0-9_./-]+(?:\.[A-Za-z0-9_-]+)?)`"
 )
@@ -116,6 +116,10 @@ def check_repo_reference(path_text: str) -> bool:
 def check_workspace_reference(path_text: str) -> bool:
     if path_text.startswith(".local-artifacts/"):
         return True
+    # sessions/ holds runtime records (CURRENT-SESSION.md and dated files) that
+    # never live in the committed template, same as .local-artifacts/.
+    if path_text.startswith("sessions/"):
+        return True
     return check_repo_reference(str(Path("project-knowledge-template") / path_text))
 
 
@@ -129,7 +133,7 @@ def find_violations() -> list[Violation]:
             workspace_candidates: set[str] = set()
             for match in AI_DEV_SHOP_ROOT_RE.finditer(line):
                 repo_candidates.add(match.group(1))
-            for match in ADS_PROJECT_KNOWLEDGE_ROOT_RE.finditer(line):
+            for match in ADS_MEMORY_ROOT_RE.finditer(line):
                 workspace_candidates.add(match.group(1))
             for match in BACKTICK_PATH_RE.finditer(line):
                 repo_candidates.add(match.group(1))
@@ -146,7 +150,7 @@ def find_violations() -> list[Violation]:
                 violations.append(Violation(file_path, line_number, candidate))
 
             for candidate in sorted(workspace_candidates):
-                reference = f"<ADS_PROJECT_KNOWLEDGE_ROOT>/{candidate}"
+                reference = f"<ADS_MEMORY_ROOT>/{candidate}"
                 if check_workspace_reference(candidate):
                     continue
                 key = (file_path, line_number, reference)

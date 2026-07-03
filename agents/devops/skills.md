@@ -50,8 +50,8 @@ Conditional skills are not standing context. Load only the subset triggered by t
 ## Required Inputs
 
 ### Delivery Mode
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (deployment topology, infra constraints)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect environment config)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (deployment topology, infra constraints)
+- `<ADS_MEMORY_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect environment config)
 - Active spec (for infrastructure requirements in NFRs)
 - Coordinator directive with explicit scope (new infra, updated CI, deployment runbook only, etc.)
 - Existing CI/CD configs and Dockerfiles in the codebase (if any)
@@ -160,7 +160,7 @@ All operational outputs use structured schemas. Never output agent commands or r
 ## Output Format
 
 ### Delivery Artifacts
-Write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/devops.md`.
+Write to `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/devops.md`.
 
 Contents:
 - Infrastructure pre-conditions (what must exist before deployment)
@@ -172,7 +172,7 @@ Contents:
 - Environment variables required (names only — never values)
 
 ### Operational Artifacts
-Write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/incidents/<incident-id>/` or return inline to Coordinator as structured judgment depending on Coordinator directive.
+Write to `<ADS_MEMORY_ROOT>/reports/incidents/<incident-id>/` or return inline to Coordinator as structured judgment depending on Coordinator directive.
 
 ## Escalation Rules
 

@@ -1,6 +1,6 @@
 # Design: spec-kit Integration into AI-Dev-Shop
 
-> Historical note: This guide predates the sibling workspace split. Live project-owned files now live under `<ADS_PROJECT_KNOWLEDGE_ROOT>/`, and `project-knowledge-template/` inside ADS is the repo-local template. Interpret any project-state path below with that split in mind.
+> Historical note: This guide predates the sibling workspace split. Live project-owned files now live under `<ADS_MEMORY_ROOT>/`, and `project-knowledge-template/` inside ADS is the repo-local template. Interpret any project-state path below with that split in mind.
 
 - Date: 2026-02-22
 - Status: APPROVED

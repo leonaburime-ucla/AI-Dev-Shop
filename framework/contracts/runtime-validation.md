@@ -6,7 +6,7 @@ This contract defines **what** the host project declares. For **how** agents exe
 
 ## Host Declaration Location
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/runtime-validation.md`
+`<ADS_MEMORY_ROOT>/governance/contracts/runtime-validation.md`
 
 ## Required Fields
 
@@ -46,7 +46,7 @@ One verification that a failure mode is handled correctly.
 
 Where to save evidence when something fails.
 
-- **Path**: e.g., `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/self-validation/artifacts/`
+- **Path**: e.g., `<ADS_MEMORY_ROOT>/reports/self-validation/artifacts/`
 - **What to capture**: logs, screenshots, network traces, DOM dumps — whatever is relevant to the stack
 
 ### teardown_command

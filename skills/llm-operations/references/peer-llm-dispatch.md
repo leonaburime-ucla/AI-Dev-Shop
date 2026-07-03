@@ -195,20 +195,20 @@ This section is the source of truth for the temporary dispatch fallback location
 
 Do not assume every peer CLI can read every local path.
 
-- Ignored repo paths such as `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` may be invisible to some tool layers.
+- Ignored repo paths such as `<ADS_MEMORY_ROOT>/.local-artifacts/` may be invisible to some tool layers.
 - Generic OS temp paths such as `/tmp` may be outside the peer's allowed workspace.
 - Default pattern:
-  - write the authoring packet to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
+  - write the authoring packet to `<ADS_MEMORY_ROOT>/.local-artifacts/`
   - if the peer can be served with a self-contained `stdin` payload, use that instead of any file path
   - if the peer can read the authoring path and still needs file-based transport, use it directly
-  - if the peer cannot read it because the path is ignored, unreadable, or out of workspace, tell the user briefly and create a temporary peer-readable dispatch copy under `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/peer-dispatch/<workflow>/`
+  - if the peer cannot read it because the path is ignored, unreadable, or out of workspace, tell the user briefly and create a temporary peer-readable dispatch copy under `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/`
   - give the peer the dispatch copy path, not the authoring path
 - If needed, create a dispatch copy inside:
-  - `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/peer-dispatch/<workflow>/` inside the workspace root for local-only runs, or
-  - `<AI_DEV_SHOP_ROOT>/tmp/peer-dispatch/<workflow>/` when the toolkit is a subfolder install and `<ADS_PROJECT_KNOWLEDGE_ROOT>` is a sibling path outside the peer CLI's allowed workspace,
-  - a retained `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/...` path only when the user explicitly wants a repo-kept artifact or the workflow itself is already being retained
+  - `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/` inside the workspace root for local-only runs, or
+  - `<AI_DEV_SHOP_ROOT>/tmp/peer-dispatch/<workflow>/` when the toolkit is a subfolder install and `<ADS_MEMORY_ROOT>` is a sibling path outside the peer CLI's allowed workspace,
+  - a retained `<ADS_MEMORY_ROOT>/reports/...` path only when the user explicitly wants a repo-kept artifact or the workflow itself is already being retained
 - Do not put the dispatch copy under a gitignored or tool-ignored path if the peer needs to read it with file tools.
-- Do not promote a local-only packet into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` just to satisfy peer readability. Use the workspace `tmp/` fallback first.
+- Do not promote a local-only packet into `<ADS_MEMORY_ROOT>/reports/` just to satisfy peer readability. Use the workspace `tmp/` fallback first.
 
 If the packet is copied for dispatch, record both:
 
@@ -223,7 +223,7 @@ Before the full peer review or debate call, run a cheap readability probe agains
   `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
 - If that probe fails because the path is ignored, unreadable, or out of workspace, classify it as `path_or_permission_failure`.
 - Tell the user briefly which path failed.
-- Fix the dispatch path, prefer `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/peer-dispatch/<workflow>/`, and retry once before spending tokens on the real task.
+- Fix the dispatch path, prefer `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/`, and retry once before spending tokens on the real task.
 - Do not treat a failed readability probe as model disagreement or reasoning failure.
 
 ### Transport Observability Classification
@@ -329,9 +329,9 @@ Keep it to one short line. Don't add stall warnings or recommendations — the u
 
 Dispatch copies are transport artifacts, not primary evidence.
 
-- Keep the authoring packet in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` or `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` according to the user's retention choice.
+- Keep the authoring packet in `<ADS_MEMORY_ROOT>/.local-artifacts/` or `<ADS_MEMORY_ROOT>/reports/` according to the user's retention choice.
 - Delete temporary dispatch copies after the peer run finishes unless the user explicitly asks to retain them.
-- If a local-only dispatch copy in `tmp/` should be kept after the run, move it into `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` instead of leaving it in the workspace `tmp/`.
+- If a local-only dispatch copy in `tmp/` should be kept after the run, move it into `<ADS_MEMORY_ROOT>/.local-artifacts/` instead of leaving it in the workspace `tmp/`.
 - If the dispatch copy is retained temporarily for troubleshooting, say so and clean it up before closing the task when feasible.
 
 ## Failure Classification
@@ -362,7 +362,7 @@ If that retry falls back to plain text, keep the fallback on a shorter bounded t
 - If a requested Claude model is unproven locally or the CLI rejects it, run `skills/swarm-consensus/scripts/cli_smoke_test.py` in discovery mode before asking the user for another model. Do not keep guessing manually when the smoke harness already exists.
 - If Claude rejects an alias and prints `Try --model to switch to ...`, treat that suggestion as a discovery candidate only. Do not switch to a different family/version until the Model Memory Map has been checked for an exact saved preference or model-plan `command_model`.
 - For Claude consensus flows, use discovery with `--claude-require json`. For Claude audit flows that may need plain-text fallback, use `--claude-require both`.
-- A valid Claude proof is any one of: an exact environment cache hit from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, an exact-model `session_success` earlier in the current session on the same host/CLI, or a fresh discovery run that writes a new artifact.
+- A valid Claude proof is any one of: an exact environment cache hit from `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` with a real artifact path, an exact-model `session_success` earlier in the current session on the same host/CLI, or a fresh discovery run that writes a new artifact.
 - If discovery finds a working exact model in the same requested family/version, use that exact model and say it was smoke-proven on this host. If discovery only finds a different family/version, stop and ask the user before switching.
 - Keep the ask explicit: what to inspect, what to ignore, what output shape to return.
 - Require strengths as well as findings so the user sees what should stay unchanged.
@@ -374,7 +374,7 @@ Use this checklist for `/consensus`, `/debate`, `/audit-work`, `/cowork`, and an
 Check model sources in this order:
 
 1. Per-run controls: `claude_model=...`, `gemini_model=...`, `codex_model=...`.
-2. Project knowledge root evidence: resolve `<ADS_PROJECT_KNOWLEDGE_ROOT>` from `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-project-knowledge/`, then inspect retained and local smoke-test caches, discovery reports, and consensus reports there.
+2. Project knowledge root evidence: resolve `<ADS_MEMORY_ROOT>` from `ADS_MEMORY_ROOT`, `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-memory/`, then inspect retained and local smoke-test caches, discovery reports, and consensus reports there.
 3. AI Dev Shop repo evidence: inspect repo `.local-artifacts/`, repo `reports/`, and bounded peer-dispatch packets under `tmp/peer-dispatch/`.
 4. Workspace and home CLI config files that expose model defaults. Workspace config (`.gemini/settings.json` in repo root) takes precedence over home config (`~/.gemini/settings.json`). Claude CLI uses `~/.claude/settings.json`; Gemini CLI uses `model.name` in settings; Codex reports its model in the session startup header (`model: <id>`). These are fallback preferences such as `us.anthropic.claude-opus-4-6-v1[1m]` or `gemini-3.1-pro-preview`.
 5. Candidate ladders: `skills/swarm-consensus/references/model-candidate-ladders.json`. These are discovery candidates, not proof by themselves.

@@ -1,6 +1,6 @@
 # spec-kit Integration Implementation Plan
 
-> Historical note: This guide predates the sibling workspace split. Live project-owned files now live under `<ADS_PROJECT_KNOWLEDGE_ROOT>/`, and `project-knowledge-template/` inside ADS is the repo-local template. Interpret any project-state path below with that split in mind.
+> Historical note: This guide predates the sibling workspace split. Live project-owned files now live under `<ADS_MEMORY_ROOT>/`, and `project-knowledge-template/` inside ADS is the repo-local template. Interpret any project-state path below with that split in mind.
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -948,8 +948,8 @@ Find:
 ```
 ### Spec Agent
 - Product intent from human (verbatim)
-- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` (domain conventions)
-- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` (recent failure patterns)
+- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/knowledge/project_memory.md` (domain conventions)
+- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/knowledge/learnings.md` (recent failure patterns)
 - Existing specs in `<AI_DEV_SHOP_ROOT>/specs/` (to avoid ID collisions and detect overlap)
 ```
 
@@ -958,8 +958,8 @@ Replace with:
 ### Spec Agent
 - Product intent from human (verbatim)
 - `<AI_DEV_SHOP_ROOT>/project-knowledge-template/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
-- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/project_memory.md` (domain conventions)
-- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/memory/learnings.md` (recent failure patterns)
+- Relevant entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/knowledge/project_memory.md` (domain conventions)
+- Last 3 entries from `<AI_DEV_SHOP_ROOT>/project-knowledge-template/knowledge/learnings.md` (recent failure patterns)
 - Existing specs in `<AI_DEV_SHOP_ROOT>/specs/` (to avoid ID collisions, detect overlap, assign next FEAT number)
 ```
 

@@ -31,7 +31,7 @@ Valid reasons to deviate:
 - A newer technology or pattern makes the rule obsolete here (cite evidence)
 - The rule conflicts with a MANDATORY governance ADR (cite which)
 
-Exception record goes in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-EXCEPTIONS.md`.
+Exception record goes in `<ADS_MEMORY_ROOT>/governance/adrs/ADR-EXCEPTIONS.md`.
 
 3+ exceptions against this ADR within 90 days triggers mandatory re-evaluation.
 
@@ -47,6 +47,6 @@ Exception record goes in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-EXCEP
 
 ## Related
 
-- Origin: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature>/adr.md` (if promoted from pipeline)
+- Origin: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature>/adr.md` (if promoted from pipeline)
 - Supersedes: GOV-ADR-<id> (if any)
 - See also: <related governance ADRs>

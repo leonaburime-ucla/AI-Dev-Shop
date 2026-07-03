@@ -270,8 +270,8 @@ The requirement format in `references/extraction-layers.md` is an intermediate e
 
 Reverse-spec extraction produces two durable surfaces:
 
-1. Raw evidence and intermediate artifacts under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/<run-or-module>/`
-2. Curated current-state documentation under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`
+1. Raw evidence and intermediate artifacts under `<ADS_MEMORY_ROOT>/reports/reverse-spec/<run-or-module>/`
+2. Curated current-state documentation under `<ADS_MEMORY_ROOT>/specs_as_built/`
 
 The `specs_as_built/` surface is the readable rebuild/migration entrypoint. It summarizes the implemented system by current component, not by historical feature folder. Use:
 

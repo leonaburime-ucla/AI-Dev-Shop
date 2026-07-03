@@ -11,7 +11,7 @@ Follow the `Coordinator Planning Preflight` section in
 `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`.
 
 1. Identify the active feature from `$ARGUMENTS` or the most recently updated
-   `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
+   `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
    folder.
 2. Read `pipeline-state.md`. For legacy runs only, fall back from
    `spec_entrypoint_path` to `spec_path`.
@@ -62,7 +62,7 @@ Only after the preflight passes, dispatch the Software Architect Agent with:
 - `<AI_DEV_SHOP_ROOT>/agents/software-architect/skills.md`
 - the active provider-defined planning surface and full Software Architect read set from
   the compatibility contract
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`
+- `<ADS_MEMORY_ROOT>/governance/constitution.md`
 - approved `system-blueprint.md` if produced
 - Red-Team findings, including advisory findings to acknowledge in the ADR
 - relevant CodeBase Analyzer / migration / testability reports

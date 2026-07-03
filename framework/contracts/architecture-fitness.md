@@ -4,7 +4,7 @@ Host projects declare their architectural boundaries here so agents can enforce 
 
 ## Host Declaration Location
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/architecture-fitness.md`
+`<ADS_MEMORY_ROOT>/governance/contracts/architecture-fitness.md`
 
 ## Rule Format
 

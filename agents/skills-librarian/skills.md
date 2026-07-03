@@ -36,7 +36,7 @@ Own external skill ingestion end to end. Discover candidate skills, audit them a
 4. Decide: `adopt`, `partial-adopt`, or `reject`.
 5. For adoption, apply surgical merge into canonical skill language/style. Do not overwrite canonical file wholesale.
 6. Move staged artifacts to `harness-engineering/skills-inbox/archive/`.
-7. Publish `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/skills-audit/<YYYY-MM-DD>-<domain>.md` with rationale and outcomes.
+7. Publish `<ADS_MEMORY_ROOT>/reports/skills-audit/<YYYY-MM-DD>-<domain>.md` with rationale and outcomes.
 
 ## Output Format
 - Domain

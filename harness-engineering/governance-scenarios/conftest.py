@@ -28,7 +28,7 @@ def toolkit_root() -> Path:
 
 @pytest.fixture
 def workspace(tmp_path: Path) -> Path:
-    """Create a temporary ADS-project-knowledge workspace with minimal structure."""
+    """Create a temporary ADS-memory workspace with minimal structure."""
     gov = tmp_path / "governance"
     gov.mkdir()
     (gov / "constitution.md").write_text("# Constitution\n\nPlaceholder.\n")

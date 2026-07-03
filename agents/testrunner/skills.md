@@ -77,7 +77,7 @@ Execute the full verification suite after implementation and report trustworthy 
      - Tool error or unsupported stack → Advisory (sensor degraded)
      - Survived mutants in critical-path code (auth/payment/data-integrity) → Escalation regardless of overall score
    - On first run for a project (no baseline exists): record initial scores to
-     `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-baseline.json`,
+     `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-baseline.json`,
      report advisory only, do not block. Recording baseline is evidence capture,
      not test authoring — consistent with TestRunner's verification role.
    - Include survived mutant details in the run report under a
@@ -96,7 +96,7 @@ Execute the full verification suite after implementation and report trustworthy 
 
 ## Output Format
 
-Write run report to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`. Never overwrite a prior report — timestamp ensures each run is a separate artifact for the audit trail.
+Write run report to `<ADS_MEMORY_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`. Never overwrite a prior report — timestamp ensures each run is a separate artifact for the audit trail.
 
 Report contents:
 - Suite-by-suite results (unit / integration / E2E / acceptance)
@@ -110,7 +110,7 @@ Report contents:
   - Test names and spec references they cover
   - Likely failure owner (Programmer, Software Architect, Spec)
   - Flaky/non-deterministic test notes. Flaky tests block advancement unless
-    already listed in `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/known-flaky-tests.md`
+    already listed in `<ADS_MEMORY_ROOT>/knowledge/known-flaky-tests.md`
     with `test_id`, `approved_by`, `approved_at`, `reason`,
     `stabilization_owner`, `stabilization_ticket`, and `expires_at` fields.
     Malformed or expired registry entries do not count. Accepted known-flaky
@@ -160,5 +160,5 @@ Report contents:
 - Report exact failure output, not a summary, when a suite fails
 - Do not flood active context with routine passing output
 - Large failure outputs over 500 lines should be written to
-  `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/test-failures/<feature-id>-<suite>-<YYYY-MM-DD-HHmm>.log`
+  `<ADS_MEMORY_ROOT>/.local-artifacts/test-failures/<feature-id>-<suite>-<YYYY-MM-DD-HHmm>.log`
   and referenced from the report as `Full output: <path>`.

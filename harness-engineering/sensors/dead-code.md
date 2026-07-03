@@ -7,7 +7,7 @@ Finds unused exports, unreachable code, and orphaned files that accumulate as th
 - **Class**: `computational`
 - **Timing**: PR (incremental, modified-file scope) + scheduled (weekly, full repository)
 - **Owner**: Observer → routes to Refactor agent
-- **Artifact location**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/dead-code-<timestamp>.md`
+- **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/dead-code-<timestamp>.md`
 
 ## Tools by Stack
 
@@ -35,7 +35,7 @@ Dead code is never a hard blocker on its own — it's a quality signal, not a sa
 
 1. **PR context**: Programmer receives advisory note before handoff. Code Review mentions it if the dead code is in modified files.
 2. **Scheduled context**: Observer reads the weekly scan artifact. If findings exceed threshold:
-   - Creates a maintenance entry in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/maintenance/`
+   - Creates a maintenance entry in `<ADS_MEMORY_ROOT>/reports/maintenance/`
    - Routes to Refactor agent with specific file paths and dead-code evidence
    - Adds to `harness-engineering/maintenance/tech-debt-tracker.md`
 

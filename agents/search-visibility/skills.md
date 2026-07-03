@@ -53,8 +53,8 @@ Run as an optional post-implementation audit only when the trigger conditions ab
 10. Check answerability: answer-first summaries, extractable sections, factual sourcing, and useful chunk boundaries.
 11. Compute quantitative metrics from available evidence.
 12. Classify findings as Required, Recommended, or Advisory.
-13. Route fixes to Programmer, Docs, UX/UI Designer, Software Architect, DevOps, Security, or human decision.
-14. Write the retained report under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/search-visibility/`.
+13. Route fixes to Programmer, Docs, Web Design, Software Architect, DevOps, Security, or human decision.
+14. Write the retained report under `<ADS_MEMORY_ROOT>/reports/search-visibility/`.
 
 ## Finding Severity
 
@@ -70,7 +70,7 @@ Run as an optional post-implementation audit only when the trigger conditions ab
 | Rendering strategy, SSR/SSG/ISR vs CSR, route topology | Software Architect |
 | Metadata, JSON-LD, semantic HTML, links, page components | Programmer |
 | Public docs structure, answer-first content, factual sourcing | Docs |
-| Information architecture, navigation, visible content layout | UX/UI Designer |
+| Information architecture, navigation, visible content layout | Web Design |
 | `robots.txt`, sitemap serving, redirects, CDN, WAF, crawler allow/deny rules | DevOps |
 | Bot abuse, scraper policy, privacy, consent, claims, compliance conflict | Security or human |
 
@@ -89,7 +89,7 @@ Run as an optional post-implementation audit only when the trigger conditions ab
 
 ## Output Format
 
-Write to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/search-visibility/SV-<feature-id>-<YYYY-MM-DD>.md`.
+Write to `<ADS_MEMORY_ROOT>/reports/search-visibility/SV-<feature-id>-<YYYY-MM-DD>.md`.
 
 Report contents:
 

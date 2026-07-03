@@ -31,7 +31,7 @@ Nothing gets patched without human approval.
 
 ## Output Format
 
-Write findings to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md`.
+Write findings to `<ADS_MEMORY_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md`.
 
 Report contents:
 - Findings ordered by severity (Critical → High → Medium → Low)

@@ -4,7 +4,7 @@ Host projects declare their executable quality checks here so agents can run the
 
 ## Host Declaration Location
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/computational-controls.md`
+`<ADS_MEMORY_ROOT>/governance/contracts/computational-controls.md`
 
 ## Named Command Slots
 
@@ -65,7 +65,7 @@ Every host project should declare as many of these as apply. Each slot is a sing
 - **Timeout**: default 600 (mutation testing is expensive; projects may increase)
 - **Success criteria**: exit code 0 (gate behavior beyond exit code — including absolute thresholds, regression checks, and first-run baseline — is defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`)
 - **Scope placeholder**: `{touched_files}` is replaced at runtime with the list of modified source files that have corresponding test files (mutating untested files produces no meaningful signal). Format per tool syntax (comma-separated glob for Stryker, space-separated for mutmut, etc.)
-- **Baseline location**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-baseline.json`
+- **Baseline location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-baseline.json`
 - **Notes**: triggered by TestRunner after green suite + coverage evaluation. If this slot is not declared, the mutation quality sensor is inactive (advisory note only).
 
 ### static_analysis

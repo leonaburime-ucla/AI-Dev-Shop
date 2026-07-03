@@ -96,7 +96,7 @@ Rules:
 - Advice-only by default; no scope transfer unless explicitly routed by Coordinator.
 - Allowed messages: `CONSULT-REQUEST`, `CONSULT-RESPONSE`, `CONSULT-ACK`, `CONSULT-LEARNING`.
 - Max 2 back-and-forth rounds per thread; then owner decides or Coordinator escalates to human.
-- Log thread summary to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`.
+- Log thread summary to `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/consultation-log.md`.
 
 ## Coverage Profile Prompt (Before Test Execution)
 
@@ -117,7 +117,7 @@ human-approved threshold and reason are recorded in `tasks.md`.
 ## Known-Flaky Registry Initialization
 
 When TestRunner reports a flaky test and
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/known-flaky-tests.md` does not exist, the
+`<ADS_MEMORY_ROOT>/knowledge/known-flaky-tests.md` does not exist, the
 Coordinator creates it from
 `<AI_DEV_SHOP_ROOT>/framework/templates/known-flaky-tests-template.md` and
 escalates to the human. The human must either approve a temporary exclusion with
@@ -128,12 +128,12 @@ before advancement. Specialist agents may not self-approve registry entries.
 
 When the current task is about producing a report or artifact that is not required by the delivery pipeline:
 
-- If the artifact is required by the workflow, save it to the canonical `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` path without asking.
+- If the artifact is required by the workflow, save it to the canonical `<ADS_MEMORY_ROOT>/reports/` path without asking.
 - If the artifact is optional and the user has not already said to save it, ask whether it should be:
-  - `retained` in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`
-  - `local only` in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
+  - `retained` in `<ADS_MEMORY_ROOT>/reports/`
+  - `local only` in `<ADS_MEMORY_ROOT>/.local-artifacts/`
   - `inline only` with no file written
-- If the artifact is raw evidence, temporary prompts, or intermediate captures, default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/` unless the user explicitly asks to retain it.
+- If the artifact is raw evidence, temporary prompts, or intermediate captures, default to `<ADS_MEMORY_ROOT>/.local-artifacts/` unless the user explicitly asks to retain it.
 
 This is a retention decision, not a content-approval checkpoint. Do not block required pipeline writes on this prompt.
 
@@ -309,7 +309,7 @@ Agent output received
 │             re-dispatch Programmer if seam changes needed, then re-run TestRunner
 │         (b) Gap has no spec mapping (dead code or untestable coupling) → TDD flags to Coordinator
 │             → Route to: Refactor Agent
-│                 Context: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`,
+│                 Context: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`,
 │                          Coverage Gap List, specific uncovered files and line ranges, ADR constraints
 │                 After Refactor proposes seam extraction and human approves: dispatch Programmer,
 │                 then dispatch TDD to cover the newly testable units, then re-run TestRunner

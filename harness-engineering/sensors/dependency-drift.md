@@ -7,7 +7,7 @@ Detects outdated dependencies, known vulnerabilities, and license compliance iss
 - **Class**: `computational`
 - **Timing**: daily scheduled + on lockfile change (PR trigger)
 - **Owner**: Observer → routes to Security agent or DevOps agent
-- **Artifact location**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/dependency-drift-<timestamp>.md`
+- **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/dependency-drift-<timestamp>.md`
 
 ## Tools by Stack
 
@@ -41,7 +41,7 @@ The host project declares which tool applies. If no tool is declared, the sensor
    - Programmer applies the fix in a dedicated maintenance run
 
 2. **Routine outdated dependencies**:
-   - Observer batches into `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/maintenance/dependency-drift-<date>.md`
+   - Observer batches into `<ADS_MEMORY_ROOT>/reports/maintenance/dependency-drift-<date>.md`
    - Adds to `harness-engineering/maintenance/tech-debt-tracker.md`
    - Presented to user at next Observer maintenance pass
 

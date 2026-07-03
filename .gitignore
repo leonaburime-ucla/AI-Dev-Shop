@@ -14,7 +14,7 @@ dist/
 build/
 /cache/
 project-knowledge-template/.local-artifacts/
-ADS-project-knowledge/
+ADS-memory/
 .claude/.ads-initialized
 integrations/graphify/upstream/
 integrations/codebase-memory-mcp/upstream/

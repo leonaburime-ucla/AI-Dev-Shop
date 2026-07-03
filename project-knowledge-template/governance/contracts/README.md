@@ -1,6 +1,6 @@
 # Host Contract Declarations
 
-This directory is copied into `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/`
+This directory is copied into `<ADS_MEMORY_ROOT>/governance/contracts/`
 when a host project bootstraps AI Dev Shop project knowledge.
 
 Fill these files with project-specific commands and enforcement choices before

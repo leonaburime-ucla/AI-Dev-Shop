@@ -5,9 +5,9 @@ Project / feature intent: $ARGUMENTS
 Follow `<AI_DEV_SHOP_ROOT>/agents/system-design/skills.md` and `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md`.
 
 Workflow:
-1. Identify active feature folder from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` if present; otherwise assign next `<NNN>-<feature-name>` folder.
+1. Identify active feature folder from `<ADS_MEMORY_ROOT>/reports/pipeline/` if present; otherwise assign next `<NNN>-<feature-name>` folder.
 2. Read any available VibeCoder output, discovery notes, constraints, and existing architecture context.
-3. If this is an existing-codebase extension, read relevant CodeBase Analyzer reports from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/` when present:
+3. If this is an existing-codebase extension, read relevant CodeBase Analyzer reports from `<ADS_MEMORY_ROOT>/reports/codebase-analysis/` when present:
    - `ANALYSIS-*`
    - `MIGRATION-*`
    - `TESTABILITY-*`
@@ -25,7 +25,7 @@ Workflow:
    - Ask what the user prefers or wants to avoid.
 6. Produce macro component/domain boundaries, ownership map, integration map, high-level topology, and spec decomposition plan.
 7. Write output to:
-   `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md`
+   `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md`
    using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md`.
 8. Mark unresolved ownership/integration items with `[OWNERSHIP UNCLEAR]`.
 9. Set `Status: DRAFT` until human review approves the blueprint. Only set `APPROVED` after the human accepts boundaries, decomposition, and safe assumptions.

@@ -5,14 +5,14 @@ Step-by-step guide for setting up host-project contracts. Works for both new pro
 ## Prerequisites
 
 - AI Dev Shop toolkit is installed in the repo
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/` directory exists (created during workspace bootstrap)
+- `<ADS_MEMORY_ROOT>/governance/` directory exists (created during workspace bootstrap)
 
 ## Quick Start
 
 Create the contracts directory:
 
 ```bash
-mkdir -p <ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/
+mkdir -p <ADS_MEMORY_ROOT>/governance/contracts/
 ```
 
 Then follow the path that matches your situation:
@@ -25,7 +25,7 @@ For new projects, set up all contracts before the first Programmer dispatch.
 
 ### Step 1: Computational Controls
 
-Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/computational-controls.md`:
+Create `<ADS_MEMORY_ROOT>/governance/contracts/computational-controls.md`:
 
 ```markdown
 # Computational Controls
@@ -65,7 +65,7 @@ At minimum, fill in `build` and one test slot. Leave others as documented gaps i
 
 ### Step 2: Runtime Validation
 
-Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/runtime-validation.md`:
+Create `<ADS_MEMORY_ROOT>/governance/contracts/runtime-validation.md`:
 
 ```markdown
 # Runtime Validation
@@ -90,7 +90,7 @@ Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/runtime-validation.md`
 - Expected result: <correct error handling behavior>
 
 ## artifact_capture_path
-- Path: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/self-validation/artifacts/
+- Path: <ADS_MEMORY_ROOT>/reports/self-validation/artifacts/
 
 ## teardown_command
 - Command: <how to stop the service>
@@ -103,7 +103,7 @@ Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/runtime-validation.md`
 
 ### Step 3: Architecture Fitness (when needed)
 
-Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/architecture-fitness.md` when your project has meaningful architectural boundaries:
+Create `<ADS_MEMORY_ROOT>/governance/contracts/architecture-fitness.md` when your project has meaningful architectural boundaries:
 
 ```markdown
 # Architecture Fitness Rules
@@ -120,13 +120,13 @@ This contract is optional at project start. Add it when complexity warrants boun
 
 ### Step 4: Specs-As-Built Freshness (when enabled)
 
-Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/specs-as-built-freshness.md` when the project treats `specs_as_built/` as current-state implementation documentation:
+Create `<ADS_MEMORY_ROOT>/governance/contracts/specs-as-built-freshness.md` when the project treats `specs_as_built/` as current-state implementation documentation:
 
 ```markdown
 # Specs-As-Built Freshness
 
 - Enforcement: advisory
-- Artifact root: <ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/
+- Artifact root: <ADS_MEMORY_ROOT>/specs_as_built/
 - Source root: <HOST_PROJECT_ROOT>
 - Validator: python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/validate_specs_as_built_freshness.py
 
@@ -155,7 +155,7 @@ Start with `advisory` for brownfield extraction. Promote to `touched-scope` or `
 
 ### Step 5: Waivers
 
-Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/waivers.md` for human-approved temporary exceptions:
+Create `<ADS_MEMORY_ROOT>/governance/contracts/waivers.md` for human-approved temporary exceptions:
 
 ```markdown
 # Contract Waivers

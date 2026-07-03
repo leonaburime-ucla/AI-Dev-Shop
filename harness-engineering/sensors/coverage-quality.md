@@ -7,7 +7,7 @@ Tracks test coverage trends, identifies critical-path gaps, and detects coverage
 - **Class**: `computational` (coverage numbers) + `inferential` (critical-path judgment)
 - **Timing**: PR (coverage diff) + scheduled (weekly trend analysis)
 - **Owner**: Observer → routes to TDD agent or Programmer
-- **Artifact location**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/coverage-quality-<timestamp>.md`
+- **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/coverage-quality-<timestamp>.md`
 
 ## Tools by Stack
 

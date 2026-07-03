@@ -52,7 +52,7 @@ Core collaboration invariant:
    - Resolve exact model identity for each selected peer using per-run pins first, then project knowledge and AI Dev Shop repo-local evidence, then home CLI defaults, and finally fresh smoke-test proof where required.
    - Project/repo evidence includes retained or local smoke-test caches, recent smoke-test reports, retained or local consensus reports, and bounded peer-dispatch packets under `tmp/peer-dispatch/`.
    - For Gemini, inspect the saved local preference in `~/.gemini/settings.json` at `model.name` before asking the user to pin `gemini_model=...`.
-   - For Claude, inspect `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` and the legacy local cache before asking the user to pin `claude_model=...`; if only stale exact evidence is found, report the saved preference and the staleness reason instead of saying the model is unknown.
+   - For Claude, inspect `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` and the legacy local cache before asking the user to pin `claude_model=...`; if only stale exact evidence is found, report the saved preference and the staleness reason instead of saying the model is unknown.
    - If Claude rejects an alias, do not accept a lower-version `Try --model ...` suggestion until the Model Memory Map and `--model-plan-only` have been checked for an exact saved `command_model`.
    - If a selected peer's exact model cannot be proven, print a model confirmation gate before dispatch:
      `Planned cowork peers: Claude=<resolved-or-inferred>, Gemini=<resolved-or-inferred>, Codex=<resolved-or-inferred>. Reply with "run" to proceed or override with claude_model=..., gemini_model=..., codex_model=....`
@@ -62,22 +62,22 @@ Core collaboration invariant:
 3. Protect the worktree before any writes.
    - Run `git status --short`.
    - Separate in-scope files from unrelated dirty worktree changes. Do not revert or overwrite unrelated changes.
-   - For every in-scope file, save a baseline copy and content hash under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/cowork/runs/<timestamp>/baseline/`.
+   - For every in-scope file, save a baseline copy and content hash under `<ADS_MEMORY_ROOT>/.local-artifacts/cowork/runs/<timestamp>/baseline/`.
    - Save the initial in-scope diff, if any, under the same run folder so pre-existing user edits can be restored on abort.
    - Before each write step, re-check the scoped file hashes. If a scoped file changed outside the cowork workflow, stop and ask the user how to proceed.
 
 4. Build the shared context packet.
    - Include the task, controls, selected peer models, risk assumptions, scoped file paths, baseline hashes, and full content of every scoped file.
    - Include relevant test files or commands when they are obvious from repo conventions.
-   - Save local-only context by default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/cowork/runs/<timestamp>/context.md`.
-   - If the user explicitly asks to retain the packet, save it under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/cowork/runs/<timestamp>/context.md`.
+   - Save local-only context by default to `<ADS_MEMORY_ROOT>/.local-artifacts/cowork/runs/<timestamp>/context.md`.
+   - If the user explicitly asks to retain the packet, save it under `<ADS_MEMORY_ROOT>/reports/cowork/runs/<timestamp>/context.md`.
    - Give every participant the same context packet. Do not let one model reason from hidden extra file content unless the Coordinator adds that content to the shared packet first.
    - Before expensive peer dispatch, run a cheap readability probe if a peer is asked to read the packet by path. The probe must ask for a deterministic value such as the first Markdown heading.
    - Treat that probe as the Peer Handshake Gate: require packet-bound ACK within 60 seconds by default, using `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
    - Start `cowork_timeout_seconds` only after peer handshakes succeed or failed peers are explicitly classified and excluded.
    - If the probe fails, classify it as `path_or_permission_failure`, fix transport, and retry once before spending the full task prompt.
    - Prefer self-contained `stdin` transport for small and medium packets. Do not force peer CLIs to read sibling project-knowledge paths that may be outside their workspace allowlist.
-   - In subfolder installs where `<ADS_PROJECT_KNOWLEDGE_ROOT>` is a sibling of `<AI_DEV_SHOP_ROOT>`, use an in-repo dispatch copy such as `<AI_DEV_SHOP_ROOT>/tmp/peer-dispatch/cowork/<timestamp>/context.md` when file transport is required.
+   - In subfolder installs where `<ADS_MEMORY_ROOT>` is a sibling of `<AI_DEV_SHOP_ROOT>`, use an in-repo dispatch copy such as `<AI_DEV_SHOP_ROOT>/tmp/peer-dispatch/cowork/<timestamp>/context.md` when file transport is required.
    - Gemini CLI requires an argument for `-p/--prompt`; when using stdin, provide a short `-p "<task prompt>"` and pipe the packet on stdin because stdin is appended to the prompt.
    - Record both the authoring packet path and the dispatch transport used in the final report.
    - Prefer structured output modes when available.

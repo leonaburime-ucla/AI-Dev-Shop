@@ -20,8 +20,8 @@ Owns user-facing documentation output for the feature. Generates OpenAPI specs f
 
 ## Required Inputs
 - Active provider-defined planning surface, plus any explicit API contract artifact if present
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (architectural decisions worth surfacing in release notes)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect user-facing behavior, e.g. new auth requirements)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (architectural decisions worth surfacing in release notes)
+- `<ADS_MEMORY_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md` (security findings that affect user-facing behavior, e.g. new auth requirements)
 - Existing `CHANGELOG.md` (to append correctly)
 - Coordinator directive specifying doc deliverables required for this feature
 
@@ -37,7 +37,7 @@ Owns user-facing documentation output for the feature. Generates OpenAPI specs f
 ## Output Format
 - `openapi.yaml` or appended section in existing OpenAPI file (path confirmed with Coordinator)
 - Updated `CHANGELOG.md` with new entry at top of Unreleased section
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/release-notes.md` (one paragraph release notes + full change summary)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/release-notes.md` (one paragraph release notes + full change summary)
 - User guide file(s) (path confirmed with Coordinator based on project's doc structure)
 
 ## Escalation Rules

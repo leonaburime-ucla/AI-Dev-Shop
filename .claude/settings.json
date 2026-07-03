@@ -35,6 +35,38 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/harness-engineering/hooks/session-record.sh\"; [ -f \"$f\" ] && bash \"$f\" finalize; true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/harness-engineering/hooks/session-record.sh\"; [ -f \"$f\" ] && bash \"$f\" update; true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/harness-engineering/hooks/session-record.sh\"; [ -f \"$f\" ] && bash \"$f\" finalize; true",
+            "timeout": 10
+          }
+        ]
       }
     ]
   }

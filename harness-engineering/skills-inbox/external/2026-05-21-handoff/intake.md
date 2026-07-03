@@ -18,6 +18,6 @@
 ## Local Adaptation Notes
 
 - Rewritten for AI Dev Shop artifact routing and handoff-contract requirements.
-- Defaults to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/handoff/` when available, with OS temp as a fallback.
+- Defaults to `<ADS_MEMORY_ROOT>/.local-artifacts/handoff/` when available, with OS temp as a fallback.
 - Adds slash-command controls for target host and save location.
 - Adds explicit next-agent prompt generation for Codex-to-Claude continuation.

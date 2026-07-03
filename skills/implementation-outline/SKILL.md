@@ -18,7 +18,7 @@ Use it when tests and task lists would otherwise have to infer cross-module stru
 - Producer: Software Architect.
 - Gate owner: Coordinator.
 - Consumers: TDD Agent and Programmer.
-- Artifact path: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`
+- Artifact path: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`
 - Template: `<AI_DEV_SHOP_ROOT>/framework/templates/implementation-outline-template.md`
 - Skip record, when no trigger applies: `Implementation Outline: SKIP - <reason and triggers checked>`
 

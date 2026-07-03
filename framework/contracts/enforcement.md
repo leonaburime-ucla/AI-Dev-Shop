@@ -14,7 +14,7 @@ How the framework behaves when contracts are present, missing, partial, or faili
 ## Greenfield vs Brownfield Detection
 
 A project is **greenfield** if any of these are true:
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>` was created during the current bootstrap (no prior pipeline reports exist)
+- `<ADS_MEMORY_ROOT>` was created during the current bootstrap (no prior pipeline reports exist)
 - The project metadata explicitly declares `adoption_mode: greenfield`
 - The user states the project is new when asked
 
@@ -82,7 +82,7 @@ When a blocking rule needs to be bypassed for a justified reason:
 - **Expiry**: when the waiver should be reviewed (default: 30 days)
 - **Remediation**: what the follow-up plan is to properly address the violation
 
-Waivers are recorded in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/waivers.md`.
+Waivers are recorded in `<ADS_MEMORY_ROOT>/governance/contracts/waivers.md`.
 
 Agents cannot self-grant waivers for blocking rules. Only explicit human approval can create a waiver. The Coordinator may propose and record a waiver, but it is not valid until the user confirms.
 

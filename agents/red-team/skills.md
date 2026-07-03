@@ -16,7 +16,7 @@ After human spec approval, before Software Architect dispatch. Coordinator dispa
 
 ## Required Inputs
 - Approved spec file (ID, version, hash) — human approval is required before Red-Team runs
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Software Architect encounters it
+- `<ADS_MEMORY_ROOT>/governance/constitution.md` — check whether any spec requirement forces a likely constitution exception before the Software Architect encounters it
 - Coordinator directive
 
 ## Attack Vectors
@@ -54,7 +54,7 @@ After human spec approval, before Software Architect dispatch. Coordinator dispa
 
 ## Output Format
 
-Write findings to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/red-team-template.md`.
+Write findings to `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/red-team-template.md`.
 
 Findings classified as:
 

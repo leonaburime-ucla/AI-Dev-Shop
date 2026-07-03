@@ -4,22 +4,22 @@
 
 ## Path Convention
 
-All project-owned pipeline artifacts are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>` — the sibling `ADS-project-knowledge/` folder next to the toolkit by default. `<AI_DEV_SHOP_ROOT>` remains the toolkit source tree.
+All project-owned pipeline artifacts are written under `<ADS_MEMORY_ROOT>` — the sibling `ADS-memory/` folder next to the toolkit by default. `<AI_DEV_SHOP_ROOT>` remains the toolkit source tree.
 
-- Provider-native forward specs and planning artifacts → `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default (only use another durable project-owned location when the user explicitly asks; active provider and entrypoint paths are recorded in pipeline state)
+- Provider-native forward specs and planning artifacts → `<ADS_MEMORY_ROOT>/specs/` by default (only use another durable project-owned location when the user explicitly asks; active provider and entrypoint paths are recorded in pipeline state)
 - Pipeline artifacts (ADR, research, implementation outline, tasks,
   red-team findings, test certification, verification packet, pipeline state)
-  → `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
-- Reports (analysis, test runs, code review, security) → `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/` subfolders
-- Local scratch, raw captures, exploratory prompts, and disposable session evidence → `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
-- Live project memory → `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`
-- Live constitution → `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`
+  → `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/`
+- Reports (analysis, test runs, code review, security) → `<ADS_MEMORY_ROOT>/reports/` subfolders
+- Local scratch, raw captures, exploratory prompts, and disposable session evidence → `<ADS_MEMORY_ROOT>/.local-artifacts/`
+- Live project memory → `<ADS_MEMORY_ROOT>/knowledge/`
+- Live constitution → `<ADS_MEMORY_ROOT>/governance/constitution.md`
 - **Read-only toolkit source:** `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, `framework/slash-commands/`, and the repo-local `project-knowledge-template/` workspace template
 
 Artifact-intent rule:
-- pipeline-required artifacts save directly to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`
+- pipeline-required artifacts save directly to `<ADS_MEMORY_ROOT>/reports/`
 - optional retained reports ask before becoming canonical
-- session-only scratch defaults to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
+- session-only scratch defaults to `<ADS_MEMORY_ROOT>/.local-artifacts/`
 
 ---
 
@@ -65,7 +65,7 @@ consequence in handoffs.
 
 At pipeline start and before each implementation stage, the Coordinator checks host-project contract status per `<AI_DEV_SHOP_ROOT>/framework/contracts/enforcement.md`:
 
-1. **Pipeline start**: check whether `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/` exists and which contracts are declared. Report status (active/partial/missing for each). Apply greenfield vs brownfield defaults.
+1. **Pipeline start**: check whether `<ADS_MEMORY_ROOT>/governance/contracts/` exists and which contracts are declared. Report status (active/partial/missing for each). Apply greenfield vs brownfield defaults.
 2. **Before Programmer dispatch**: include declared computational controls commands in Programmer context. If runtime-changing work, include runtime-validation contract. If required contracts are missing, escalate to user per enforcement tier (greenfield: ask user to declare; brownfield: note absence and proceed in advisory mode).
 3. **Before Programmer handoff**: verify all declared blocking computational checks pass on modified files.
 4. **Before TestRunner**: pass declared test commands from computational controls.
@@ -78,7 +78,7 @@ If a contract is missing and enforcement requires escalation, the Coordinator as
 
 ## Drift Sensor Checkpoint (Observer Duty)
 
-The Observer reads drift sensor artifacts from `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/` during maintenance passes per `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/README.md`.
+The Observer reads drift sensor artifacts from `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/` during maintenance passes per `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/README.md`.
 
 Sensor findings route into the pipeline as follows:
 - **Blocker findings** (critical vulnerability, license violation): Observer escalates immediately regardless of pipeline stage. Coordinator pauses pipeline until resolved.
@@ -119,7 +119,7 @@ Include in context:
 
 ### Using the Output
 
-The CodeBase Analyzer writes reports to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/`. Two ways to use them:
+The CodeBase Analyzer writes reports to `<ADS_MEMORY_ROOT>/reports/codebase-analysis/`. Two ways to use them:
 
 **Route A — Migration first, then build:**
 1. Review `MIGRATION-*.md` with human
@@ -141,9 +141,9 @@ reports as sampled evidence with caveats, not as exhaustive proof.
 ### Software Architect Agent Context When Analysis Exists
 
 When a codebase analysis report exists, include in Software Architect dispatch:
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>.md` executive summary
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<id>.md` (if generated)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>.md` (if generated)
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/ANALYSIS-<id>.md` executive summary
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/MIGRATION-<id>.md` (if generated)
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/TESTABILITY-<id>.md` (if generated)
 - Flag: "Existing code has [Critical/High] findings — ADR must acknowledge migration path"
 
 ---
@@ -171,7 +171,7 @@ After `system-blueprint.md` and the active spec package are approved, do not kee
 - `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md`
 
 Output:
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md`
 - Spec decomposition recommendation (which spec packages to create next and in what order)
 - Mandatory `Core/Foundation` package at `P0` to block parallel domain slices until shared shell/primitives are merged
 - `Critical User Journeys (Cross-Domain)` list for QA/E2E planning after slice convergence
@@ -186,11 +186,11 @@ Output:
   `[OWNERSHIP UNCLEAR]`, `Functional model status: BLOCKED`, or
   `NFR model status: BLOCKED`, route back to System Design or human review
   before final spec approval.
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
+- `<ADS_MEMORY_ROOT>/governance/constitution.md` (for constitution compliance check and [NEEDS CLARIFICATION] detection)
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` when the feature introduces or changes API style, pagination/filtering policy, error/lifecycle policy, webhook/event shape, or SDK-facing integration behavior
-- Relevant entries from `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` (domain conventions)
-- Last 3 entries from `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` (recent failure patterns)
-- Existing FEAT folders in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` (to avoid ID collisions, detect overlap, assign next FEAT number)
+- Relevant entries from `<ADS_MEMORY_ROOT>/knowledge/project_memory.md` (domain conventions)
+- Last 3 entries from `<ADS_MEMORY_ROOT>/knowledge/learnings.md` (recent failure patterns)
+- Existing FEAT folders in `<ADS_MEMORY_ROOT>/reports/pipeline/` (to avoid ID collisions, detect overlap, assign next FEAT number)
 - Reverse-spec normalization inputs when this spec is derived from extraction:
   `merged-requirements.md`, `review-digest.md`, `extraction-manifest.md`,
   `coverage-map.md`, `consumer-inventory.md`, `intentional-changes.md`, and
@@ -220,11 +220,11 @@ For the default Speckit provider, the existing `spec_path` convention remains va
 - The exact interface boundary: endpoint signatures, data shapes, or event names
 - Which ACs require the integration to be live
 
-The Coordinator records these dependencies in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`. When all referenced features reach Done, the Coordinator may trigger an optional Integration Verification run against the combined system.
+The Coordinator records these dependencies in `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`. When all referenced features reach Done, the Coordinator may trigger an optional Integration Verification run against the combined system.
 
 ### Red-Team Agent (runs after Spec approval, before Software Architect dispatch)
 - Active provider-defined planning surface (full content + hash) — must have zero unresolved clarification blockers
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` (for Constitution pre-flight)
+- `<ADS_MEMORY_ROOT>/governance/constitution.md` (for Constitution pre-flight)
 - `<AI_DEV_SHOP_ROOT>/agents/red-team/skills.md`
 
 **Routing after Red-Team output:**
@@ -338,25 +338,25 @@ Reference: `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/spec-definition-of-do
 - `framework/spec-providers/<active-provider>/provider.md`
 - Active provider-defined spec entrypoint (full content + hash) — must be human-approved, zero unresolved clarification blockers
 - For Speckit: apply the Software Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` before ADR work begins
-- Red-Team findings from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (all ADVISORY and CONSTITUTION_FLAG findings; BLOCKING findings mean spec is not yet ready for Software Architect)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md` (for Step 0 constitution check)
-- Current system boundaries (existing ADRs in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/`)
+- Red-Team findings from `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/red-team-findings.md` (all ADVISORY and CONSTITUTION_FLAG findings; BLOCKING findings mean spec is not yet ready for Software Architect)
+- `<ADS_MEMORY_ROOT>/governance/constitution.md` (for Step 0 constitution check)
+- Current system boundaries (existing ADRs in `<ADS_MEMORY_ROOT>/reports/pipeline/`)
 - Non-functional constraints from spec
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` when the feature exposes or changes an API surface, webhook/event contract, lifecycle policy, or SDK-facing integration boundary
 - Relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files (Coordinator selects based on system drivers in spec)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md` executive summary (if produced — treat findings as informed estimates, not guarantees)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as draft recommendation; validate or refine in ADR)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets before planning migrated modules)
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md` executive summary (if produced — treat findings as informed estimates, not guarantees)
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md` (if produced — treat as draft recommendation; validate or refine in ADR)
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets before planning migrated modules)
 - Reverse-spec artifacts when produced:
   `extraction-manifest.md`, `coverage-map.md`, `consumer-inventory.md`,
   `intentional-changes.md`, and characterization-test references. Treat them as
   source-of-truth preservation constraints for rewrites and migrations.
 
 **Software Architect outputs (in order):**
-1. `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` (if spec has technology choices) — using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md`
-2. `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` — using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md` (includes Constitution Check, Research Summary, Complexity Justification, and API interface decision with rejected alternatives when API design is in scope)
-3. `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md` (if triggered) — using `<AI_DEV_SHOP_ROOT>/framework/templates/implementation-outline-template.md`. If not triggered, write `Implementation Outline: SKIP - <reason and triggers checked>` to the ADR and Software Architect handoff.
+1. `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` (if spec has technology choices) — using `<AI_DEV_SHOP_ROOT>/framework/templates/research-template.md`
+2. `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` — using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md` (includes Constitution Check, Research Summary, Complexity Justification, and API interface decision with rejected alternatives when API design is in scope)
+3. `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md` (if triggered) — using `<AI_DEV_SHOP_ROOT>/framework/templates/implementation-outline-template.md`. If not triggered, write `Implementation Outline: SKIP - <reason and triggers checked>` to the ADR and Software Architect handoff.
 
 ### Database Agent (optional — dispatched alongside or immediately after Software Architect when spec involves data modeling)
 
@@ -372,7 +372,7 @@ When the spec involves data modeling or database operations:
 
 ### Coordinator: tasks.md Generation (after ADR human approval, before TDD dispatch)
 
-Coordinator generates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md`:
+Coordinator generates `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/tasks-template.md`:
 - Before generating `tasks.md`, verify Implementation Outline readiness using `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md`: if a trigger applied, `implementation-outline.md` exists; if no trigger applied, Software Architect recorded `Implementation Outline: SKIP - <reason and triggers checked>`. If neither is present, route back to Software Architect.
 - Phases and story order derived from the ADR's parallel delivery plan and AC priorities (P1 first)
 - If `implementation-outline.md` exists, derive phase boundaries, story order, and safe `[P]` markers from its Module Map and Wiring Map as well as the ADR.
@@ -392,14 +392,14 @@ Coordinator generates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feat
 
 ### TDD Agent
 - Active provider-defined planning surface (full content + hash) — **must be human-approved**
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` — generated by Coordinator after ADR approval; defines scope and parallelization for this TDD run
-- ADR for the module being tested (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`)
-- Implementation Outline (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or the recorded SKIP reason from `tasks.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md` — generated by Coordinator after ADR approval; defines scope and parallelization for this TDD run
+- ADR for the module being tested (`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`)
+- Implementation Outline (`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or the recorded SKIP reason from `tasks.md`
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`
-- Relevant entries from `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` for the domain
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets and seam candidates before writing tests for migrated modules)
+- Relevant entries from `<ADS_MEMORY_ROOT>/knowledge/project_memory.md` for the domain
+- `<ADS_MEMORY_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md` (if produced — consume characterization test targets and seam candidates before writing tests for migrated modules)
 
-TDD output must include `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+TDD output must include `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 with mechanically verified spec hash, test-file inventory with `sha256` hashes,
 expected runnable test count per file, semantic assertion summaries for P1
 acceptance criteria and invariants, Outcome Matrix, property/contract test
@@ -417,8 +417,8 @@ Repeat pattern priming when the task shifts to a materially different layer or c
 - Active provider-defined planning surface (hash must match TDD certification hash)
 - Certified test names and which ACs they cover
 - ADR for the module (architecture constraints)
-- Implementation Outline (`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or recorded SKIP in `tasks.md`
-- Relevant `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/project_memory.md` entries
+- Implementation Outline (`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or recorded SKIP in `tasks.md`
+- Relevant `<ADS_MEMORY_ROOT>/knowledge/project_memory.md` entries
 - Handoff output from TDD Agent (summary only, not full session)
 - Confirmed pattern-priming reference (from Pattern Priming step above)
 - `progress-ledger.md` when resuming long-running work or when programmer retry count is 2+
@@ -439,10 +439,10 @@ Programmer handoff must include an `Architecture Audit` section:
 - Spec hash certified by TDD Agent (to validate drift)
 - Active provider-defined planning surface path so TestRunner can mechanically
   hash the current spec file and compare it to the certified hash
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
   so TestRunner can verify test-file hashes and expected test count before
   execution
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/tasks.md`
   constraints for required suites, coverage profile, convergence threshold,
   coverage tool/artifacts, cleanup paths, and E2E requirement status
 - Previous cycle's failure clusters (to detect regressions)
@@ -464,7 +464,7 @@ Coordinator directive.
 Passing suites should be summarized briefly. Failing suites should include exact output or an offload path if the raw output is large.
 
 After accepting the TestRunner report, the Coordinator creates or updates
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
+`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
 from `<AI_DEV_SHOP_ROOT>/framework/templates/verification-packet-template.md`.
 Code Review receives this Coordinator-owned packet, not raw assumptions about
 stage readiness.
@@ -500,15 +500,15 @@ stage readiness.
 
 ### QA/E2E Agent (runs after Programmer)
 - Active provider-defined planning surface (full content + hash)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced; prioritize `Critical User Journeys (Cross-Domain)`)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced; prioritize `Critical User Journeys (Cross-Domain)`)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md`
 - Coordinator directive specifying which ACs require E2E coverage
 
 ### DevOps Agent (runs after Security, before Docs)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
+- `<ADS_MEMORY_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md`
 - Active provider-defined NFR section or equivalent planning constraint surface
 - `<AI_DEV_SHOP_ROOT>/skills/devops-delivery/SKILL.md`
 - `<AI_DEV_SHOP_ROOT>/skills/infrastructure-as-code/SKILL.md`
@@ -516,8 +516,8 @@ stage readiness.
 
 ### Docs Agent (runs after DevOps, before Done)
 - Active provider-defined planning surface, plus any explicit API contract artifact if present
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md`
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`
+- `<ADS_MEMORY_ROOT>/reports/security/SEC-<feature-id>-<YYYY-MM-DD>.md`
 - Existing `CHANGELOG.md`
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` when documenting API style decisions, lifecycle policy, webhook/event contracts, or integration ergonomics
 - `<AI_DEV_SHOP_ROOT>/skills/api-contracts/SKILL.md`
@@ -526,7 +526,7 @@ stage readiness.
 ### Observer Agent (runs alongside, not in sequence)
 - All agent outputs from the current cycle (summaries, not full sessions)
 - Previous Observer reports (for trend analysis)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/learnings.md` (to cross-reference new patterns against known ones)
+- `<ADS_MEMORY_ROOT>/knowledge/learnings.md` (to cross-reference new patterns against known ones)
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md` (for cadence triggers, doc-garden workflow, and benchmark refresh rules)
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md` (for mandatory promotion when failure classes recur)
 
@@ -556,7 +556,7 @@ stage readiness.
 | Test failures | Programmer | Failing test names, spec ACs, ADR constraints |
 | `[ARCHITECTURE_REVISION_REQUEST]` from downstream agent | Coordinator escalation flow | Blocking technical constraint, failed alternatives, impacted artifacts (spec/ADR/tasks/tests), requested revision scope |
 | Coverage gaps (any type) | TDD Agent (triage first) | Coverage Gap List (High-priority first), current % vs threshold per file, spec hash, test certification record — TDD classifies each gap as spec-traceable (writes tests) or no-spec-mapping (flags to Coordinator for Refactor dispatch) |
-| Coverage gaps — no spec mapping (flagged by TDD triage) | Refactor Agent | `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`, Coverage Gap List, uncovered files with line ranges, ADR constraints |
+| Coverage gaps — no spec mapping (flagged by TDD triage) | Refactor Agent | `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`, Coverage Gap List, uncovered files with line ranges, ADR constraints |
 | Touched-file coverage regression | Coordinator routing triage first — uses TestRunner/TDD evidence plus diff metadata, then routes to TDD (tests deleted) or Programmer (implementation removed covered path) | Regressed files, previous vs current %, diff metadata, latest coverage evidence |
 | Required test-quality, stale certification, test-file hash, semantic assertion, or required coverage-evidence finding from Code Review | TDD Agent | Code Review finding IDs, active spec hash, test certification, Coordinator verification packet, affected tests/spec refs |
 | Architecture violation | Software Architect | Specific violation, which ADR was breached |
@@ -600,7 +600,7 @@ stage readiness.
 A feature reaches **Done** when all of the following are true:
 1. All three human checkpoints cleared: spec approval, architecture sign-off, security sign-off
 2. All tests pass against the certified spec hash
-3. All Critical/High security findings are resolved, or accepted with documented rationale in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
+3. All Critical/High security findings are resolved, or accepted with documented rationale in `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/pipeline-state.md`
 4. Final TestRunner artifact shows current spec hash verification, certified
    test-file hash verification, executed test count greater than zero and at
    least the certified expected count, no unapproved flaky tests, and required

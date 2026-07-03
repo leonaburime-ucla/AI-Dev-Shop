@@ -14,7 +14,7 @@ Contracts are machine-actionable declarations that tell agents exactly what comm
 ## Where Contracts Live
 
 - **Framework specs** (what contracts must contain): `<AI_DEV_SHOP_ROOT>/framework/contracts/`
-- **Host declarations** (project-specific values): `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/`
+- **Host declarations** (project-specific values): `<ADS_MEMORY_ROOT>/governance/contracts/`
 
 ## Lifecycle
 

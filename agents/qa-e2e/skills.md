@@ -16,9 +16,9 @@ Owns the E2E test layer. Writes browser-level tests (Playwright) that validate a
 
 ## Required Inputs
 - Active spec (full content + hash) — user journeys and frontend ACs
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced — use `Critical User Journeys (Cross-Domain)` as primary E2E targets)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (module boundaries, auth patterns)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md` (TDD coverage map — to avoid duplicating what unit/integration tests already cover)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` (if produced — use `Critical User Journeys (Cross-Domain)` as primary E2E targets)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` (module boundaries, auth patterns)
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md` (TDD coverage map — to avoid duplicating what unit/integration tests already cover)
 - Coordinator directive specifying which ACs require E2E coverage
 
 ## Workflow
@@ -38,7 +38,7 @@ Owns the E2E test layer. Writes browser-level tests (Playwright) that validate a
 
 ## Output Format
 - E2E test files under `__tests__/e2e/` (or approved project override path confirmed with Coordinator)
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/e2e-strategy.md` containing:
+- `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/e2e-strategy.md` containing:
   - AC coverage map (which ACs have E2E tests, which do not and why)
   - Fixture strategy and setup/teardown approach
   - Flaky test risk assessment for each test

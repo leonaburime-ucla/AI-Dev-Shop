@@ -4,7 +4,7 @@ _Created mid-task before a context clear. Resume from here._
 
 ## Goal
 A first-time initialization hook for when someone loads the AI Dev Shop toolkit into their repo:
-1. On first session, create the `ADS-project-knowledge/` workspace + write a one-time flag so it does NOT re-run every startup.
+1. On first session, create the `ADS-memory/` workspace + write a one-time flag so it does NOT re-run every startup.
 2. Work for non-Claude hosts too (Codex/Gemini), not just Claude's SessionStart hook.
 3. Slash-command install is **opt-in** (agent asks the user) — never automatic.
 4. Before installing, **collision-check**: never clobber a same-named command the host already has (e.g. an existing `/code-review`).
@@ -20,7 +20,7 @@ User also required: fix the stale folder misname `AI-Dev-Shop-speckit` → `AI-D
 
 ## Key facts / gotchas
 - Runtime is **macOS bash 3.2** — arrays must be 3.2-safe (`${#arr[@]}` guards; no `${arr[@]}` on empty under `set -u`).
-- Workspace lands at `<host_root>/ADS-project-knowledge` (inside repo in dev layout; sibling-of-toolkit-inside-host in subfolder layout). `ADS-project-knowledge/` is gitignored.
+- Workspace lands at `<host_root>/ADS-memory` (inside repo in dev layout; sibling-of-toolkit-inside-host in subfolder layout). `ADS-memory/` is gitignored.
 - Two layouts: **dev** (toolkit IS the git repo root — this repo) and **subfolder** (toolkit copied into a host repo as `AI-Dev-Shop/`).
 
 ## External-auditor invocation gotchas (IMPORTANT — see also memory `reference_gemini-cli-dead-use-agy`)
@@ -70,7 +70,7 @@ Took the "pin single-user threat model + re-audit" path. **Convergence achieved*
 
 - **5 code fixes applied** (all verified, `bash -n` clean): V3-5 exact `--only` loop; F13 `ln`-failure return code; F15 reject non-dir `.claude`/`commands` component; V3-11 `ads_root`+installer control-char checks; **R1-1 sentinel_valid** now whole-line `grep -Fxc` exactly-once (closes the unanchored-grep decoy/transplant I4 gap — decoy + duplicate exploit tests pass).
 - **Round-1 scores:** internal verifier PASS 9.0 (0 blockers), Gemini 3.1 Pro PASS 10 (0 findings), Codex GPT-5.5 xhigh 8.2 FAIL (1 blocker R1-1, now fixed).
-- **Frozen packet:** `TM-INIT-SU-01` hash `sha256:323997c16e404de9` at `ADS-project-knowledge/.local-artifacts/external-audit/packets/20260627T161208Z-audit-packet.md`. Report + proposed-fixes under the sibling `runs/` and `proposed-fixes/` dirs.
+- **Frozen packet:** `TM-INIT-SU-01` hash `sha256:323997c16e404de9` at `ADS-memory/.local-artifacts/external-audit/packets/20260627T161208Z-audit-packet.md`. Report + proposed-fixes under the sibling `runs/` and `proposed-fixes/` dirs.
 - **Codex dispatch that works** (3 prior attempts returned empty — see memory `codex-exec-empty-output`): `codex exec --json -c features.multi_agent=false -c 'hooks.SessionStart=[]' "$P" < /dev/null`, parse the `agent_message` from JSONL.
 
 ### Open decisions (Task #5)

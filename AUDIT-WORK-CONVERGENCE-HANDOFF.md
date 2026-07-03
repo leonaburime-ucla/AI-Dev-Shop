@@ -16,12 +16,12 @@ Stop `/audit-work` external-audit scores from churning/escalating across fix→r
 **The 2 round-2 Codex blockers are already FIXED this session.** The ONLY validation gap: those 2 fixes (R2-F01 handshake unification, R2-F02 step-11a reframe) are themselves unaudited. So:
 1. **(Recommended) Run a round-3 re-audit** to confirm R2-F01/R2-F02 introduced no new contradiction. Use the same two auditors; build the packet exactly like round 2 (frozen TM-ADWORK-CONV-01, round=3, ledger = the round-2 entries G-F0x/C-F0x all `fixed` + R2-F01/R2-F02 `fixed`). Re-dispatch instructions below. If both PASS (≥8.5, 0 new blockers) → fully converged, done.
 2. Run any new round-3 proposed fixes through step 11a (agree-implement / agree-defer / disagree).
-3. Then ask the user the two still-open decisions: **(a) commit these changes?** and **(b) save the audit report** to `ADS-project-knowledge/reports/external-audit/runs/` vs local-only vs inline-only.
+3. Then ask the user the two still-open decisions: **(a) commit these changes?** and **(b) save the audit report** to `ADS-memory/reports/external-audit/runs/` vs local-only vs inline-only.
 
 ## Round-2 Codex findings — BOTH FIXED this session
 - **R2-F01 (gate evasion):** command step 10 still demanded a standalone first handshake JSON object while the template required it merged into the single object → cross-file contradiction (Codex marked ledger row G-F03 `verified:false`). FIX: command step 10 now says compute handshake first, report ONLY as `threat_model_accepted`/`rejection_reason` fields in the single object, never a separate block. APPLIED.
 - **R2-F02 (contradiction):** step 11a made disposition-incompleteness a THIRD blocking condition outside the frozen dual gate and made implementing advisories a completion prerequisite. FIX: step 11a is now a mandatory PROCESS-COMPLETENESS gate (audit reporting state `INCOMPLETE` until every fix dispositioned; forced evaluation + agree=implement-or-defer preserved per user's demand) but does NOT feed `blocking_gate` and does not make advisory implementation block PASS/FAIL. APPLIED.
-- Disposition artifact: `ADS-project-knowledge/.local-artifacts/external-audit/proposed-fixes/20260627T051728Z-round2/proposed-fixes.md`.
+- Disposition artifact: `ADS-memory/.local-artifacts/external-audit/proposed-fixes/20260627T051728Z-round2/proposed-fixes.md`.
 
 ## Files changed (working tree, NOTHING committed)
 - `framework/slash-commands/audit-work.md` — the command. Added: frozen allowlist threat-model contract authoring + round detection (step 5); falsification framing + internal-verifier binding (9d); blocker-driven independent **dual gate** + coordinator-recompute (step 10); **Convergence Protocol** block (handshake, round-aware persona, semantic ledger matching, escape valve, late-finding rule, structured+deterministic); `path to 10` always-advisory fix; **step 11a Proposed-Fix Disposition Gate (HARD BLOCKER)**; step-12 report contract wired to it.
@@ -47,7 +47,7 @@ Plus: dropped "assume defects exist" → "falsify every invariant; zero findings
 - Round-1 finding IDs and their fixes are enumerated in the round-2 ledger inside `<SP>/audit-fix-r2-packet.md` and in the two saved proposed-fixes artifacts (`20260627T050906Z` = round 1, `20260627T051728Z-round2` = round 2).
 
 ## Saved artifact (in repo, NOT scratchpad)
-`ADS-project-knowledge/.local-artifacts/external-audit/proposed-fixes/20260627T050906Z/proposed-fixes.md` — round-1 proposed-fix disposition table (all 10 APPLIED). This is the persisted record that step 11 requires.
+`ADS-memory/.local-artifacts/external-audit/proposed-fixes/20260627T050906Z/proposed-fixes.md` — round-1 proposed-fix disposition table (all 10 APPLIED). This is the persisted record that step 11 requires.
 
 ## Memories saved (auto-load next session)
 - `feedback_audit-convergence-design` — the 6-mechanism hardened design + dual-gate note (user wants below-floor auto-block kept).

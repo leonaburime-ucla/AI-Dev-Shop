@@ -7,11 +7,11 @@ Grades test effectiveness by deliberately injecting faults into modified code an
 - **Class**: `computational`
 - **Timing**: PR (after green suite confirmation) + scheduled (release gate, full-scope)
 - **Owner**: TestRunner triggers → Observer tracks trends → routes to TDD agent or Programmer
-- **Artifact location**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-quality-<timestamp>.md`
+- **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-quality-<timestamp>.md`
 
 ## Tools by Stack
 
-Resolved from the `mutation_tests` slot in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/computational-controls.md`. If no slot is declared, this sensor is inactive (advisory note only).
+Resolved from the `mutation_tests` slot in `<ADS_MEMORY_ROOT>/governance/contracts/computational-controls.md`. If no slot is declared, this sensor is inactive (advisory note only).
 
 | Stack | Mutation tool | Typical command |
 |-------|--------------|-----------------|
@@ -50,7 +50,7 @@ Mutation testing thresholds are progressive, not absolute from day one.
 On first run for a project:
 1. Record the initial mutation score per module as the baseline
 2. No enforcement on the first run — advisory only
-3. Baseline is stored in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-baseline.json`
+3. Baseline is stored in `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-baseline.json`
 
 ### Ongoing Enforcement
 
@@ -146,7 +146,7 @@ For each survived mutant:
 
 2. **Scheduled context (Observer)**:
    - Observer runs full-module mutation analysis weekly or at release gates
-   - Trends tracked in `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-trends.json`
+   - Trends tracked in `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-trends.json`
    - Sustained low scores → tech debt entry
    - Routes to TDD agent for test-plan recommendations
 

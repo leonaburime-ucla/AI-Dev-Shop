@@ -36,7 +36,7 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
 Model-plan-only lookup order:
 
 1. Per-run model flags.
-2. `<ADS_PROJECT_KNOWLEDGE_ROOT>` evidence, resolved from `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-project-knowledge/`.
+2. `<ADS_MEMORY_ROOT>` evidence, resolved from `ADS_MEMORY_ROOT`, `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-memory/`.
 3. AI Dev Shop repo-local evidence in repo `.local-artifacts/`, repo `reports/`, and `tmp/peer-dispatch/`.
 4. Home CLI defaults in `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`.
 
@@ -57,9 +57,9 @@ Interpret the discovery result this way:
 - if discovery finds only an older or different model family/version, stop and ask the user before switching
 - prefer `--claude-require json` for consensus runs that stay in structured-output mode
 - prefer `--claude-require both` for Claude audit flows that may need plain-text fallback
-- discovery mode auto-saves a dated artifact under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/`
-- discovery mode also updates `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`
-- each cache update also writes a dated snapshot under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/history/`
+- discovery mode auto-saves a dated artifact under `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/`
+- discovery mode also updates `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`
+- each cache update also writes a dated snapshot under `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/history/`
 - the script still falls back to the legacy `.local-artifacts/swarm-consensus/smoke-tests/last-known-good.json` cache if the retained cache is missing
 - cache hits are valid only for the same environment tuple: hostname, OS, machine, and transport requirement, and only when the cached artifact path still exists. Claude CLI version is recorded as diagnostics but does not invalidate model proof by itself.
 
@@ -76,8 +76,8 @@ Suggested operating pattern:
 
 - run a dated baseline once after setting up consensus on a host
 - rerun after CLI upgrades, major model-family changes, or parser regressions
-- save retained runs and discovery proof in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/` by default
-- use `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/` only when you explicitly want a transient local-only run
+- save retained runs and discovery proof in `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/` by default
+- use `<ADS_MEMORY_ROOT>/.local-artifacts/swarm-consensus/smoke-tests/` only when you explicitly want a transient local-only run
 - treat the saved artifact as evidence for updating saved model preferences or slash-command guidance
 - do not treat one machine's winning Claude model string as globally valid for other environments
 - treat dated snapshots as staleness indicators for human review, not as an automatic rerun trigger

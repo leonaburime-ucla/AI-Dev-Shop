@@ -1,45 +1,77 @@
 # Harness Hooks
 
-This folder is reserved for future harness hook integrations.
+Host- or harness-level lifecycle integration points that let the coding environment run
+extra logic automatically when specific events happen (session start/end, tool use,
+completion, handoff).
 
-Hooks are host- or harness-level lifecycle integration points that let the coding environment run extra logic automatically when specific events happen.
+Scripts here are **LLM-agnostic**: they are plain Bash and take their inputs from stdin
+JSON or CLI flags, so any host can use them. A host with a native hook system (Claude
+Code) wires them to lifecycle events; a host without one (Codex CLI, Gemini CLI) invokes
+them directly per an instruction in `AGENTS.md`.
 
-Examples:
+## Active hooks
 
-- before or after tool execution
-- before completion or handoff
-- on approval waits or other attention-needed states
-- on session startup, resume, or shutdown
+### `session-record.sh` — session summaries
 
-Why hooks matter:
+Writes one record per conversation to `<host>/ADS-memory/sessions/`, capturing date/time,
+the user, the AI model(s) used, and a space for the AI to fill in a summary, the questions
+asked, the answers given, and decisions.
 
-- they can enforce checks earlier than CI
-- they can surface build, lint, or type failures before an agent declares success
-- they can attach extra context at the moment a tool or workflow event occurs
-- they can notify maintainers when an agent needs attention or finishes work
+Subcommands:
 
-Why this folder exists now:
+- `update` — create or refresh `ADS-memory/sessions/CURRENT-SESSION.md`. Refreshes only the
+  metadata block; never overwrites the AI-written summary body.
+- `finalize` — archive `CURRENT-SESSION.md` to a dated file `YYYY-MM-DD-HHmmSS-<topic>.md`.
 
-- some hosts support hook-like lifecycle integrations today
-- other hosts do not, or do not expose a reliable local probe yet
-- host capabilities can change over time, so this repo should be ready to document and add hook support without pretending it already exists
+Options: `--models "A, B"`, `--user "Name"`, `--project-dir PATH`, `--topic "text"`.
+Run `bash session-record.sh --help` for the full contract.
 
-Current status in this repo:
+**Model detection.** Claude Code passes a JSON payload on stdin whose `transcript_path`
+records the model on every message, so the script reads it and captures every model used —
+including mid-session `/model` switches. There is intentionally **no** reliance on a
+`$CLAUDE_MODEL` env var: Claude Code does not set one (only `SessionStart` receives a
+conditional `model` field). Peer models the transcript cannot see (Codex/Gemini dispatched
+as peers) are supplied by the AI via `--models`; detected and supplied models are merged
+and de-duplicated. Automatic refreshes also merge in the models already recorded in the
+stub, so peer models supplied on an earlier update are preserved even though a later
+`Stop`-hook refresh runs without `--models` and the transcript cannot rediscover them.
 
-- this repo does **not** currently implement harness hooks as an active feature
-- `harness-engineering/` currently relies on validators, CI enforcement, scheduled maintenance, and capability verification instead
-- hook support should only be described as enabled when it is verified on the current host and wired into the framework
+**Never blocks.** It only reads stdin when stdin is a real pipe or file, and always exits 0,
+so it cannot hang or fail a session.
 
-Implementation rule:
+#### Claude Code wiring (`.claude/settings.json`)
 
-- do not claim hook support based on memory, vendor reputation, or another host's behavior
-- follow `harness-engineering/runtime/capability-verification.md`
-- add host-specific hook support only when there is a concrete integration point, a local or official verification path, and clear user-facing behavior
+- `Stop` → `session-record.sh update` (refresh the current record each turn)
+- `SessionEnd` → `session-record.sh finalize` (archive on session end)
+- `SessionStart` → `session-record.sh finalize` (archive any leftover stub from a session
+  that ended without firing `SessionEnd`, e.g. a crash)
 
-Possible future contents of this folder:
+#### Other hosts (Codex CLI, Gemini CLI, generic)
 
-- host-specific setup notes
-- example hook scripts
-- notification or attention-routing helpers
-- pre-completion or pre-handoff enforcement hooks
-- a hook capability matrix if support expands across hosts
+These hosts have no lifecycle hooks. The AI invokes the script directly, passing its own
+model (and any peer models) since there is no Claude transcript to read:
+
+```bash
+# during / at end of a session
+bash harness-engineering/hooks/session-record.sh update \
+  --models "Codex 5.5 xhigh" --user "<name>" --project-dir "<host-root>"
+bash harness-engineering/hooks/session-record.sh finalize --topic "<short topic>"
+```
+
+The authoritative summary content and model list are always written by the AI (only the AI
+knows the peer models and can summarize the Q&A); the hook guarantees a record exists and is
+archived even if the AI forgets.
+
+### `pre-commit` — see `install-hooks.sh`
+
+Git pre-commit integration installed via `install-hooks.sh`.
+
+## Adding new hooks
+
+- Keep scripts host-agnostic: read stdin JSON or CLI flags, resolve the project root from
+  `$CLAUDE_PROJECT_DIR` / `--project-dir` / stdin `cwd` / git toplevel, and never block on
+  stdin or fail the caller.
+- Wire Claude Code via `.claude/settings.json`; document the manual invocation for other
+  hosts in `AGENTS.md`.
+- Follow `harness-engineering/runtime/capability-verification.md`: only claim a host
+  integration once it is verified on that host.

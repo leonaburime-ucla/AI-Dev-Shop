@@ -162,7 +162,7 @@ For every new or materially changed function in scope:
    adversarial aggregate/cross-item behavior test or probe exists.
 9. Classify findings using the thresholds below.
 10. Add a Function Quality Assessment section to the saved code review report at
-   `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/code-review/CR-<feature-id>-<YYYY-MM-DD>.md`.
+   `<ADS_MEMORY_ROOT>/reports/code-review/CR-<feature-id>-<YYYY-MM-DD>.md`.
 
 Do not create a separate function-quality report by default. Code Review already
 owns the retained review artifact; this assessment belongs inside that report.

@@ -159,7 +159,7 @@ Discovery rules:
 
 Write one artifact using `<AI_DEV_SHOP_ROOT>/framework/templates/system-blueprint-template.md` to:
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<project-or-feature>/system-blueprint.md`
+`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<project-or-feature>/system-blueprint.md`
 
 The output must include:
 

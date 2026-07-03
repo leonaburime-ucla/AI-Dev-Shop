@@ -61,11 +61,11 @@ When the active provider is `bmad`:
 
 ## Common Workflow Steps (all providers)
 
-1. Read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`.
-2. Determine the next FEAT number by scanning `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` for existing feature folders (format: `NNN-feature-name/`). Use the next available three-digit number.
+1. Read `<ADS_MEMORY_ROOT>/governance/constitution.md`.
+2. Determine the next FEAT number by scanning `<ADS_MEMORY_ROOT>/reports/pipeline/` for existing feature folders (format: `NNN-feature-name/`). Use the next available three-digit number.
 3. Derive a short feature name (2-4 words, action-noun format, lowercase-hyphenated) from the description.
-4. Resolve the spec artifact target. Default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly specified another durable project-owned location.
-5. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Record `spec_provider`, `provider_native_root`, `provider_output_root`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_hash`, validator status, and any provider-specific fields in `pipeline-state.md`.
+4. Resolve the spec artifact target. Default to `<ADS_MEMORY_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly specified another durable project-owned location.
+5. Create `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/`. Record `spec_provider`, `provider_native_root`, `provider_output_root`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_hash`, validator status, and any provider-specific fields in `pipeline-state.md`.
 6. Follow the provider's compatibility contract for artifact creation, clarification, and validation.
 7. Once the provider's readiness gate passes: output the spec package path and readiness for `/plan`.
 

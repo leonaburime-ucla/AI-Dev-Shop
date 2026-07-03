@@ -190,7 +190,7 @@ Any EXCEPTION requires a justification row in the ADR's Complexity Justification
 This checklist must be fully checked before the spec is handed off to the Software Architect Agent.
 The Spec Agent completes this. The Coordinator verifies before routing.
 
-- [ ] spec_id assigned and unique (verified against existing `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` folders)
+- [ ] spec_id assigned and unique (verified against existing `<ADS_MEMORY_ROOT>/reports/pipeline/` folders)
 - [ ] version set to correct semver
 - [ ] status set to APPROVED (not DRAFT or REVIEW)
 - [ ] content_hash computed using the Speckit canonical hash rule and verified by the provider-local validator

@@ -33,7 +33,7 @@ using `--skip-config`. Agents may then call the binary directly through CLI
 mode, with `HOME` pointed at the project-owned local artifact directory:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli index_repository '{"repo_path":"<TARGET_REPO>"}'
 ```
@@ -72,7 +72,7 @@ bash harness-engineering/validators/check_codebase_memory_capability.sh --instal
 Resolve the generated project name after indexing:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli list_projects
 ```
@@ -80,7 +80,7 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 Inspect architecture:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli get_architecture '{"project":"<PROJECT_NAME>","aspects":["all"]}'
 ```
@@ -88,7 +88,7 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 Find graph nodes by name:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli search_graph '{"project":"<PROJECT_NAME>","name_pattern":".*Graphify.*","limit":20}'
 ```
@@ -96,7 +96,7 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 Search source text through the indexed graph:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli search_code '{"project":"<PROJECT_NAME>","pattern":"Graphify","limit":20}'
 ```
@@ -104,7 +104,7 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 Retrieve a source snippet:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli get_code_snippet '{"project":"<PROJECT_NAME>","qualified_name":"<QUALIFIED_NAME>"}'
 ```
@@ -112,7 +112,7 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 Detect changed files relative to the indexed state:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli detect_changes '{"project":"<PROJECT_NAME>"}'
 ```

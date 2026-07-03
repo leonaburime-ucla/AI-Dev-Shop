@@ -16,7 +16,7 @@ Convert product intent into precise, versioned, testable specifications that bec
 - Active provider context from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md` and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`
 - Problem statement and business outcome
 - Constraints (regulatory, performance, platform)
-- Approved `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Design was run. Draft or `REVISE` blueprints are inputs for revision only, not approval for `/plan`.
+- Approved `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/system-blueprint.md` when System Design was run. Draft or `REVISE` blueprints are inputs for revision only, not approval for `/plan`.
 - Relevant CodeBase Analyzer reports for brownfield features: `ANALYSIS-*`, `MIGRATION-*`, and `TESTABILITY-*`
 - Reverse-spec artifacts when normalizing extracted behavior: `merged-requirements.md`, `review-digest.md`, `extraction-manifest.md`, `coverage-map.md`, `consumer-inventory.md`, `intentional-changes.md`, and characterization-test references
 - Existing spec metadata (if updating — include current hash)
@@ -25,8 +25,8 @@ Convert product intent into precise, versioned, testable specifications that bec
 ## Workflow
 1. Read `<AI_DEV_SHOP_ROOT>/framework/spec-providers/active-provider.md`, `<AI_DEV_SHOP_ROOT>/framework/spec-providers/core/provider-contract.md`, and `<AI_DEV_SHOP_ROOT>/framework/spec-providers/<active-provider>/provider.md`.
 2. Normalize request into clear scope and explicit non-goals.
-3. Read `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text when the provider supports inline clarification markers.
-4. Assign FEAT number by scanning existing feature folders in `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
+3. Read `<ADS_MEMORY_ROOT>/governance/constitution.md`. For any requirement that conflicts with or is ambiguous against a constitution article, inline a `[NEEDS CLARIFICATION: Article <N> — <specific question>]` marker in the requirement text when the provider supports inline clarification markers.
+4. Assign FEAT number by scanning existing feature folders in `<ADS_MEMORY_ROOT>/reports/pipeline/` (format: `NNN-feature-name/`). Derive a short feature name (2-4 words, lowercase-hyphenated).
 5. Run the functional model completeness gate before writing detailed specs:
    - If System Design was run, read its Functional Discovery Model and Handoff to Spec sections.
    - If System Design was run and its status is not `APPROVED`, stop and route back to Coordinator for human blueprint review.
@@ -49,11 +49,11 @@ Convert product intent into precise, versioned, testable specifications that bec
    - For reverse-spec normalization, preserve source evidence, confidence labels, preservation decisions, consumer compatibility notes, coverage status, and intentional-change approvals. Do not collapse them into plain requirements with no provenance.
    - Carry every `[NEEDS CLARIFICATION]`, `[HUMAN DATA REQUEST]` marked blocking, `[CONTRACT VS IMPLEMENTATION]`, `[DISTRIBUTED TRANSACTION RISK]`, and blocking review-digest item forward as a blocker until human review resolves it.
    - Require `reverse_spec_review_status: APPROVED` in `pipeline-state.md` before recommending `/plan`.
-8. Resolve the spec artifact target. Default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly specified another durable project-owned location. If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
+8. Resolve the spec artifact target. Default to `<ADS_MEMORY_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly specified another durable project-owned location. If the active provider is `speckit`, also ask about file naming convention (prefixed vs standard) per the speckit compatibility contract. Other providers use their own native naming — do not ask about prefixed/standard naming for openspec or bmad.
 
-   Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `provider_native_root`, `provider_output_root`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
+   Create the appropriate output structure per the active provider's compatibility contract. Create `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/` and record `spec_provider`, `provider_native_root`, `provider_output_root`, `spec_entrypoint_path`, `spec_readiness_artifact`, `spec_support_paths`, and any provider-specific fields in `pipeline-state.md`.
 
-9. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly requested another durable location. Use `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
+9. Produce or revise the provider-defined planning surface. For the default Speckit provider, follow `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md` and write the strict package at `<ADS_MEMORY_ROOT>/specs/<NNN>-<feature-name>/` unless the user explicitly requested another durable location. Use `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/templates/spec-system/` templates for every applicable file, including `spec-manifest.md`.
 10. Complete any provider-defined constitution or readiness sections. For Speckit, complete the Constitution Compliance table in `feature.spec.md`, generate `spec-manifest.md`, seed `traceability.spec.md` from every REQ/AC/INV/EC and any error or behavior rules already defined, and fill `spec-dod.md`.
 11. Validate contract completeness when provider artifacts include explicit API contracts. If the design changes API style, pagination, errors, lifecycle, webhook/event shape, or SDK-facing behavior, apply `api-design` before handoff.
 12. If clarification markers remain: present them as structured questions (max 3, A/B/C options) and wait for human answers before finalizing. See `<AI_DEV_SHOP_ROOT>/framework/slash-commands/clarify.md` for the presentation format.
@@ -93,12 +93,12 @@ Before signaling handoff readiness:
 
 ## Spec Placement
 
-Specs are written under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default so forward planning state stays with the host project and outside the updateable toolkit.
+Specs are written under `<ADS_MEMORY_ROOT>/specs/` by default so forward planning state stays with the host project and outside the updateable toolkit.
 
 - If the user specifies another durable project-owned path, write there
-- If the user does not specify a path, default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<NNN>-<feature-name>/`
+- If the user does not specify a path, default to `<ADS_MEMORY_ROOT>/specs/<NNN>-<feature-name>/`
 - Follow the active provider's compatibility contract for output structure, subfolder conventions, and required artifacts
 - Do not write project-owned spec content under `<AI_DEV_SHOP_ROOT>`
 
 ## Output Path Rule
-Write spec artifacts to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default, or to the explicit durable project-owned location the user selected. During spec work, never modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/`.
+Write spec artifacts to `<ADS_MEMORY_ROOT>/specs/` by default, or to the explicit durable project-owned location the user selected. During spec work, never modify `agents/`, `skills/`, `framework/spec-providers/`, `framework/templates/`, `framework/workflows/`, or `framework/slash-commands/`.

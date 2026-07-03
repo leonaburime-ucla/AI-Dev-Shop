@@ -49,13 +49,13 @@ for important conclusions — doubly so for candidate backends.
 - Upstream skill reference: `<AI_DEV_SHOP_ROOT>/integrations/graphify/upstream-skill/codex/SKILL.md`
 - Capability check: `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_capability.sh`
 - Freshness check: `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshness.py`
-- Per-target Graphify output: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/`
+- Per-target Graphify output: `<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/`
 - Graphify run path: set `GRAPHIFY_OUT` to the per-target reports directory before invoking the CLI
-- ADS freshness metadata: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/.ads-graphify-status.json`
+- ADS freshness metadata: `<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/.ads-graphify-status.json`
 - Codebase Memory MCP upstream checkout: `<AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/upstream/`
 - Codebase Memory MCP binary: `<AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp`
 - Codebase Memory MCP capability check: `<AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_codebase_memory_capability.sh`
-- Codebase Memory MCP local cache home: `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home/`
+- Codebase Memory MCP local cache home: `<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home/`
 - Codebase Memory MCP setup docs: `<AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/README.md`
 
 Candidate-backend ownership (clone/audit-only, `.gitignored`, no validator):
@@ -127,7 +127,7 @@ otherwise use `codebase-memory-mcp` from `PATH` when the report says
 `PATH binary: enabled`.
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli index_repository '{"repo_path":"<TARGET_REPO>"}'
 ```
@@ -135,15 +135,15 @@ HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
 Then query through CLI tools:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli get_architecture '{"project":"<PROJECT_NAME>","aspects":["all"]}'
 
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli search_graph '{"project":"<PROJECT_NAME>","name_pattern":".*Handler.*","limit":20}'
 
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli detect_changes '{"project":"<PROJECT_NAME>"}'
 ```
@@ -221,7 +221,7 @@ Graphify's `update` is pure AST extraction (zero tokens), so a full re-extract
 is cheap and correct.
 
 `--prepare-output --print-output-path` creates
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/` and prints
+`<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/` and prints
 that path for `GRAPHIFY_OUT`. Do not let Graphify create a real
 `<TARGET_REPO>/graphify-out/` directory. If an older non-empty
 `<TARGET_REPO>/graphify-out/` directory already exists, rerun the prepare step
@@ -251,14 +251,14 @@ python3 <AI_DEV_SHOP_ROOT>/harness-engineering/validators/check_graphify_freshne
 ```
 
 The metadata file is
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/.ads-graphify-status.json`
+`<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/.ads-graphify-status.json`
 and includes:
 
 ```json
 {
   "generated_at": "YYYY-MM-DDTHH:MM:SSZ",
   "target_root": "<absolute path>",
-  "graph_output_dir": "<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>",
+  "graph_output_dir": "<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>",
   "target_git_head": "<git sha or null>",
   "target_dirty": true,
   "latest_source_mtime": "YYYY-MM-DDTHH:MM:SSZ",
@@ -272,7 +272,7 @@ and includes:
 
 A graph is stale when any of these are true:
 
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/graph.json` is missing
+- `<ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/graph.json` is missing
 - status metadata is missing
 - `target_git_head` differs from the current target repo `HEAD`
 - the target repo is dirty and the graph was generated before the changed files
@@ -295,9 +295,9 @@ When a fresh graph exists and the user asks a codebase or architecture question,
 query the graph before broad raw-file discovery:
 
 ```bash
-graphify query "<question>" --graph <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/graph.json
-graphify path "<A>" "<B>" --graph <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/graph.json
-graphify explain "<concept>" --graph <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/<target-name>/graph.json
+graphify query "<question>" --graph <ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/graph.json
+graphify path "<A>" "<B>" --graph <ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/graph.json
+graphify explain "<concept>" --graph <ADS_MEMORY_ROOT>/reports/graphify-out/<target-name>/graph.json
 ```
 
 If the query result is insufficient, say so and fall back to targeted source
@@ -308,15 +308,15 @@ For Codebase Memory MCP, prefer exact structural searches first, then retrieve
 source snippets:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli search_graph '{"project":"<PROJECT_NAME>","name_pattern":".*Graphify.*","limit":20}'
 
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli get_code_snippet '{"project":"<PROJECT_NAME>","qualified_name":"<QUALIFIED_NAME>"}'
 
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli search_code '{"project":"<PROJECT_NAME>","pattern":"literal text","limit":20}'
 ```
@@ -343,7 +343,7 @@ do not yet — for those, verify presence directly (the tool's binary / server /
 script path), and on any failure fall back down the chain to `rg` without blocking.
 
 **Where indexes go** (manifest `storage` block): point a tool's index at
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/analyzers/<tool>/<target>/` whenever
+`<ADS_MEMORY_ROOT>/.local-artifacts/analyzers/<tool>/<target>/` whenever
 it supports an external data dir — graphify (`GRAPHIFY_OUT`), Codebase Memory MCP
 (`HOME`), code-review-graph (`--data-dir`). codegraph / understand-anything /
 serena write into the target repo instead; offer to gitignore those in the target.
@@ -428,7 +428,7 @@ serena through the stdio probe. **Store its DB outside the target** with
 `--data-dir`:
 
 ```bash
-CRG_DATA="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/analyzers/code-review-graph/<target-name>"
+CRG_DATA="<ADS_MEMORY_ROOT>/.local-artifacts/analyzers/code-review-graph/<target-name>"
 code-review-graph build  --repo <TARGET_REPO> --data-dir "$CRG_DATA"
 code-review-graph status --repo <TARGET_REPO> --data-dir "$CRG_DATA"
 # query tools (query_graph, get_impact_radius, semantic_search_nodes, hub nodes)

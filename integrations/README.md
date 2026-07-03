@@ -27,13 +27,13 @@ tree when they are meant to be retained. For Graphify, the canonical output
 location is:
 
 ```text
-<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out/
+<ADS_MEMORY_ROOT>/reports/graphify-out/
 ```
 
 For Codebase Memory MCP, keep the local cache home out of source control:
 
 ```text
-<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home/
+<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home/
 ```
 
 ## Graphify
@@ -108,10 +108,10 @@ bash harness-engineering/validators/check_codebase_memory_capability.sh --instal
 
 The installer command above passes `--skip-config` to the upstream installer so
 it does not mutate agent MCP configuration. Indexing should use a project-owned
-local home under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`, for example:
+local home under `<ADS_MEMORY_ROOT>/.local-artifacts/`, for example:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <AI_DEV_SHOP_ROOT>/integrations/codebase-memory-mcp/bin/codebase-memory-mcp \
   cli index_repository '{"repo_path":"<TARGET_REPO>"}'
 ```

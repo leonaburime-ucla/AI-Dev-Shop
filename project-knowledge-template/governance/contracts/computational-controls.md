@@ -37,7 +37,7 @@ Declare the host project's executable quality commands here.
 - Timeout: 600
 - Success criteria: exit code 0 (full gate logic in sensor)
 - Scope placeholder: {touched_files}
-- Baseline location: <ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/mutation-baseline.json
+- Baseline location: <ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-baseline.json
 - Notes: triggered by TestRunner after green suite + coverage evaluation
 
 ## static_analysis

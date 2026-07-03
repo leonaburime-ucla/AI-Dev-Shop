@@ -62,7 +62,7 @@ Current status:
 - **For**: teams and solo builders who want coding agents to work through a defined software-delivery process instead of improvising
 - **Does**: routes work through specialized agents like Coordinator, Spec, Software Architect, TDD, Programmer, Code Review, and Security
 - **Produces**: durable artifacts such as specs, ADRs, task lists, test certifications, review findings, and project memory
-- **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it, while project-owned state lives in a sibling `ADS-project-knowledge/` folder
+- **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it, while project-owned state lives in a sibling `ADS-memory/` folder
 
 ## Why It Exists
 
@@ -79,7 +79,7 @@ Most agent workflows are strong at generating code but weak at preserving intent
 2. Point your coding tool at `AI-Dev-Shop/AGENTS.md`.
 3. Confirm or switch the active spec provider in `framework/spec-providers/active-provider.md`.
 4. Start in Coordinator mode or invoke a pipeline command.
-5. The framework routes work through the right agents and writes project-owned artifacts under a sibling `ADS-project-knowledge/` folder.
+5. The framework routes work through the right agents and writes project-owned artifacts under a sibling `ADS-memory/` folder.
 
 ## At A Glance
 
@@ -135,24 +135,24 @@ bash AI-Dev-Shop/framework/operations/scripts/setup-project-knowledge.sh
 The setup script:
 
 - Confirms the active provider from [framework/spec-providers/active-provider.md](framework/spec-providers/active-provider.md).
-- Creates `ADS-project-knowledge/` as a sibling directory of `AI-Dev-Shop/`.
+- Creates `ADS-memory/` as a sibling directory of `AI-Dev-Shop/`.
 - Creates the shared workspace folders for specs, governance, memory, reports, metadata, and local scratch.
-- Copies [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-project-knowledge/.gitignore` so `.local-artifacts/` stays local by default.
-- Creates `ADS-project-knowledge/governance/constitution.md` from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) if no constitution exists.
-- Creates starter project memory files under `ADS-project-knowledge/memory/` without overwriting existing files.
+- Copies [framework/templates/bootstrap/workspace-gitignore.template](framework/templates/bootstrap/workspace-gitignore.template) to `ADS-memory/.gitignore` so `.local-artifacts/` stays local by default.
+- Creates `ADS-memory/governance/constitution.md` from [framework/templates/bootstrap/constitution-template.md](framework/templates/bootstrap/constitution-template.md) if no constitution exists.
+- Creates starter project memory files under `ADS-memory/knowledge/` without overwriting existing files.
 
 After setup, customize and approve:
 
-- `ADS-project-knowledge/governance/constitution.md`
-- `ADS-project-knowledge/memory/project_memory.md`
+- `ADS-memory/governance/constitution.md`
+- `ADS-memory/knowledge/project_memory.md`
 
-For team projects, commit `ADS-project-knowledge/` to the host repo so other programmers and agents can see the same durable project context: specs, architecture decisions, review findings, reports, workflow notes, and memory. Do not commit `ADS-project-knowledge/.local-artifacts/`; it is local scratch space.
+For team projects, commit `ADS-memory/` to the host repo so other programmers and agents can see the same durable project context: specs, architecture decisions, review findings, reports, workflow notes, and memory. Do not commit `ADS-memory/.local-artifacts/`; it is local scratch space.
 
 Optional for live website debugging: follow [framework/templates/bootstrap/playwright-mcp-setup.md](framework/templates/bootstrap/playwright-mcp-setup.md) to register the current browser-automation provider with your client. This is host setup, not a repo dependency.
 
 After setup, start with the Coordinator in Review Mode, or run `/spec` once slash commands are installed.
 
-Forward spec packages go under `ADS-project-knowledge/specs/` by default. Retained pipeline artifacts go under `ADS-project-knowledge/reports/`. Local scratch goes under `ADS-project-knowledge/.local-artifacts/`.
+Forward spec packages go under `ADS-memory/specs/` by default. Retained pipeline artifacts go under `ADS-memory/reports/`. Local scratch goes under `ADS-memory/.local-artifacts/`.
 
 ## Optional Live Browser Analysis
 
@@ -184,9 +184,9 @@ This toolkit keeps its engine files grouped while preserving a clean split betwe
 
 - **The Engine (Read-Only):** `agents/`, `skills/`, `framework/`, and `harness-engineering/` are the toolkit control surface. They stay read-only during normal host-project work so ADS can be updated independently without mixing framework logic with project state.
 - **The Workspace Template (Repo-Local):** `project-knowledge-template/` is the committed template for the writable workspace shape. It ships defaults, examples, and bootstrap-ready files for specs, governance, memory, reports, metadata, local artifacts, and project-owned workflow notes.
-- **The Project Workspace (Writable):** `ADS-project-knowledge/` is the project-owned sibling workspace. Agents write forward specs to `ADS-project-knowledge/specs/`, retained artifacts to `ADS-project-knowledge/reports/`, memory to `ADS-project-knowledge/memory/`, the real constitution to `ADS-project-knowledge/governance/constitution.md`, local scratch to `ADS-project-knowledge/.local-artifacts/`, and future workspace metadata to `ADS-project-knowledge/meta/`.
+- **The Project Workspace (Writable):** `ADS-memory/` is the project-owned sibling workspace. Agents write forward specs to `ADS-memory/specs/`, retained artifacts to `ADS-memory/reports/`, memory to `ADS-memory/knowledge/`, the real constitution to `ADS-memory/governance/constitution.md`, local scratch to `ADS-memory/.local-artifacts/`, and future workspace metadata to `ADS-memory/meta/`.
 
-For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop/` ships the engine and templates; `ADS-project-knowledge/` is where the toolkit stores project-owned state that should travel with the host repo.
+For the host application itself, keep app-specific product docs in the host repo, not in the toolkit internals. `AI-Dev-Shop/` ships the engine and templates; `ADS-memory/` is where the toolkit stores project-owned state that should travel with the host repo.
 
 ## Architecture Defaults
 

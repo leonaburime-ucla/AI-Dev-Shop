@@ -25,10 +25,10 @@ A scheduled or event-driven check that measures codebase health decay over time.
 ## Standard Artifact Location
 
 Sensor outputs are stored at:
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/sensors/<sensor-name>-<timestamp>.md`
+`<ADS_MEMORY_ROOT>/.local-artifacts/sensors/<sensor-name>-<timestamp>.md`
 
 Promoted findings (those that trigger action) are copied to:
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/maintenance/sensors/<sensor-name>-<timestamp>.md`
+`<ADS_MEMORY_ROOT>/reports/maintenance/sensors/<sensor-name>-<timestamp>.md`
 
 ## Standard Routing Protocol
 

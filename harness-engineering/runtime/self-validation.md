@@ -45,7 +45,7 @@ Start from the closest stack template under `<AI_DEV_SHOP_ROOT>/framework/templa
 
 This file defines the execution pattern and bounded retry rules for runtime validation. The **authoritative declaration contract** — what fields the host project must fill in and the formal outcome definitions — lives at `<AI_DEV_SHOP_ROOT>/framework/contracts/runtime-validation.md`.
 
-Host projects write their concrete declarations to `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/runtime-validation.md`. The outcome descriptions below (PASS/PARTIAL/BLOCKER) are kept consistent with the contract but the contract is the source of truth.
+Host projects write their concrete declarations to `<ADS_MEMORY_ROOT>/governance/contracts/runtime-validation.md`. The outcome descriptions below (PASS/PARTIAL/BLOCKER) are kept consistent with the contract but the contract is the source of truth.
 
 ## What The Host Project Must Define
 
@@ -122,7 +122,7 @@ Examples:
 
 Store the run result at:
 
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/self-validation/SV-<feature-or-workstream>-<YYYY-MM-DD-HHmm>.md`
+`<ADS_MEMORY_ROOT>/reports/self-validation/SV-<feature-or-workstream>-<YYYY-MM-DD-HHmm>.md`
 
 If long logs or DOM dumps are needed, offload them per `<AI_DEV_SHOP_ROOT>/harness-engineering/runtime/context-offloading.md`.
 

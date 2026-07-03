@@ -114,7 +114,7 @@ Use current ledger entries before applying these checks.
 5. Check crawlability: robots, sitemap, canonical URLs, noindex, redirects, internal links, and live crawler-style HTTP access when URLs are available.
 6. Check metadata, structured data, semantic outline, accessibility landmarks, and content extraction.
 7. Separate findings into Required, Recommended, and Advisory.
-8. Route fixes to the right owner: Programmer, Docs, UX/UI Designer, Software Architect, DevOps, or Security.
+8. Route fixes to the right owner: Programmer, Docs, Web Design, Software Architect, DevOps, or Security.
 9. Report quantitative metrics alongside qualitative findings.
 
 ## Live Verification Examples

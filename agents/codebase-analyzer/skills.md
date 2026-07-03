@@ -51,11 +51,11 @@ These tools are most valuable for large or unfamiliar codebases. Direct `rg` and
 One-command installable today (have a validator + guided installer): **codegraph**, **Codebase Memory MCP**, **Graphify**. **code-review-graph** installs cleanly via `uv tool install` (validator Phase 4). **understand-anything** and **serena** are recommended but their installers are pending (Phase 3 / Phase 2) — name them, explain their strength, and note they need manual setup for now.
 
 **Where things get stored (tell the user before installing — see the manifest `storage` block). Split by artifact, do not blanket-ignore:**
-- **Installed tools** go under `<AI_DEV_SHOP_ROOT>/integrations/<tool>/upstream/` (clone-build) or user-level `~/.local` (uv/pipx tools like code-review-graph). Ask the user to confirm the location; default is the `integrations/` folder, **not** `ADS-project-knowledge/`. Gitignored / reinstallable.
-- **Heavy regenerable indexes** (code-review-graph SQLite ~600MB, Codebase Memory MCP cache, serena LSP cache, codegraph DB) stay **local and gitignored** under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/analyzers/<tool>/<target>/` where the tool supports an external data dir (graphify `GRAPHIFY_OUT`, cbm `HOME`, code-review-graph `--data-dir`). Never committed — GitHub hard-rejects files >100MB. Rebuild on demand.
+- **Installed tools** go under `<AI_DEV_SHOP_ROOT>/integrations/<tool>/upstream/` (clone-build) or user-level `~/.local` (uv/pipx tools like code-review-graph). Ask the user to confirm the location; default is the `integrations/` folder, **not** `ADS-memory/`. Gitignored / reinstallable.
+- **Heavy regenerable indexes** (code-review-graph SQLite ~600MB, Codebase Memory MCP cache, serena LSP cache, codegraph DB) stay **local and gitignored** under `<ADS_MEMORY_ROOT>/.local-artifacts/analyzers/<tool>/<target>/` where the tool supports an external data dir (graphify `GRAPHIFY_OUT`, cbm `HOME`, code-review-graph `--data-dir`). Never committed — GitHub hard-rejects files >100MB. Rebuild on demand.
 - **Shareable summaries are COMMITTED** so a team builds once and everyone pulls the latest without rebuilding. Prime case: **understand-anything's `knowledge-graph.json` (~2.6MB)** — regenerating it costs LLM calls, so committing it saves money/time (graphify `graph.json` ~9MB also qualifies). Size-gate: only commit artifacts comfortably under ~50MB.
-- **In-target hardcoders:** codegraph/understand-anything/serena write their index into the **codebase root** (the root that contains the AI-Dev-Shop folder — not AI-Dev-Shop or ADS-project-knowledge). For the heavy ones, offer to add `.codegraph/`/`.serena/` to the **target repo's** `.gitignore`; for UA's shareable summary, commit it (or copy it into a tracked folder).
-- **Symlinks:** usable only for *local* centralization. Git commits a symlink as a pointer, but a symlink into the gitignored `ADS-project-knowledge/` tree is a **dangling link** on a teammate's checkout — so for sharing, commit the real file, do not symlink into a gitignored dir.
+- **In-target hardcoders:** codegraph/understand-anything/serena write their index into the **codebase root** (the root that contains the AI-Dev-Shop folder — not AI-Dev-Shop or ADS-memory). For the heavy ones, offer to add `.codegraph/`/`.serena/` to the **target repo's** `.gitignore`; for UA's shareable summary, commit it (or copy it into a tracked folder).
+- **Symlinks:** usable only for *local* centralization. Git commits a symlink as a pointer, but a symlink into the gitignored `ADS-memory/` tree is a **dangling link** on a teammate's checkout — so for sharing, commit the real file, do not symlink into a gitignored dir.
 - **Future:** a pre-push / CI hook on branch/main that rebuilds the index and regenerates+commits the shared summaries (keeps committed graphs current).
 
 Suggested prompt when no backend is available (adapt N, and trim to what fits the repo):
@@ -93,7 +93,7 @@ Suggested prompt when no backend is available (adapt N, and trim to what fits th
 Set `<CODEBASE_MEMORY_COMMAND>` based on the capability report:
 
 ```bash
-HOME="<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
+HOME="<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home" \
   <CODEBASE_MEMORY_COMMAND> \
   cli index_repository '{"repo_path":"<TARGET_REPO>"}'
 ```
@@ -129,7 +129,7 @@ Once a graph backend is available, prefer graph queries over broad file reads fo
 2. Run Phase 1: Discovery — directory structure, package files, README (use graph communities to prioritize if available)
 3. Run Phase 2: Architecture Scan — entry points, layer structure, dependency direction (validate graph paths against source if available)
 4. Run Phase 3: Code Sampling — quality indicators, test coverage signal, security surface
-5. Write findings report to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md`
+5. Write findings report to `<ADS_MEMORY_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<date>.md`
 6. Report to Coordinator: analysis complete, report location, severity summary
 
 ### Analysis + Migration Plan
@@ -138,7 +138,7 @@ Once a graph backend is available, prefer graph queries over broad file reads fo
 7. Classify current state using `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md`
 8. Select target architecture based on Critical flaw pattern and system drivers
 9. Identify migration seams and Phase 0 requirements
-10. Write phased migration plan to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md`
+10. Write phased migration plan to `<ADS_MEMORY_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<date>.md`
 11. Report to Coordinator: both files complete, recommended pipeline entry point
 
 ### Analysis + Testability Remediation Plan
@@ -149,25 +149,25 @@ Use when: one or more modules have zero test coverage and full architectural mig
 7. Rank seam candidates by risk × effort
 8. Identify characterization test targets (must be tested before any seam is introduced)
 9. Write ordered minimal change sequence
-10. Write testability remediation plan to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md`
+10. Write testability remediation plan to `<ADS_MEMORY_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<date>.md`
 11. Report to Coordinator: plan complete, characterization test targets listed, recommended first seam
 
 ## Output Format
 
-**Findings Report**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<YYYY-MM-DD>.md`
+**Findings Report**: `<ADS_MEMORY_ROOT>/reports/codebase-analysis/ANALYSIS-<id>-<YYYY-MM-DD>.md`
 See `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md` for the full format.
 
-**Migration Plan**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<YYYY-MM-DD>.md`
+**Migration Plan**: `<ADS_MEMORY_ROOT>/reports/codebase-analysis/MIGRATION-<id>-<YYYY-MM-DD>.md`
 See `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` for the full format.
 
-**Testability Remediation Plan**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<YYYY-MM-DD>.md`
+**Testability Remediation Plan**: `<ADS_MEMORY_ROOT>/reports/codebase-analysis/TESTABILITY-<id>-<YYYY-MM-DD>.md`
 See Testability Remediation Plan Format section in `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/SKILL.md`.
 
 **Coordinator Summary** (inline, not saved):
 ```
 CodeBase Analyzer complete.
-Report: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/ANALYSIS-001-2026-02-22.md
-Migration plan: <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/codebase-analysis/MIGRATION-001-2026-02-22.md
+Report: <ADS_MEMORY_ROOT>/reports/codebase-analysis/ANALYSIS-001-2026-02-22.md
+Migration plan: <ADS_MEMORY_ROOT>/reports/codebase-analysis/MIGRATION-001-2026-02-22.md
 
 Severity summary: Critical: 2 | High: 5 | Medium: 8 | Low: 4
 Current state: Layered (degraded)

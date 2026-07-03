@@ -9,24 +9,24 @@ description: Artifact contract for curated post-implementation and brownfield as
 
 `specs_as_built/` is the curated current-state documentation surface generated from implemented code and reverse-spec evidence. It exists for maintainers, migration work, and LLM agents that need to understand or rebuild an existing system without rediscovering behavior directly from source every time.
 
-It is not the provider-native forward spec surface. AI Dev Shop stores provider-native forward specs and planning artifacts under `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` by default. Upstream providers may describe roots such as `<repo>/specs/<feature-id>/`, but AI Dev Shop maps durable project-owned planning output into `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/` unless the user explicitly chooses another durable location.
+It is not the provider-native forward spec surface. AI Dev Shop stores provider-native forward specs and planning artifacts under `<ADS_MEMORY_ROOT>/specs/` by default. Upstream providers may describe roots such as `<repo>/specs/<feature-id>/`, but AI Dev Shop maps durable project-owned planning output into `<ADS_MEMORY_ROOT>/specs/` unless the user explicitly chooses another durable location.
 
 ## Canonical Location
 
 ```text
-<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/
+<ADS_MEMORY_ROOT>/specs_as_built/
 ```
 
 Raw extraction evidence stays separate:
 
 ```text
-<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/<run-or-module>/
+<ADS_MEMORY_ROOT>/reports/reverse-spec/<run-or-module>/
 ```
 
 ## Folder Contract
 
 ```text
-<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/
+<ADS_MEMORY_ROOT>/specs_as_built/
   README.md
   system-overview.md
   architecture.md
@@ -198,7 +198,7 @@ source_scope:
 source_fingerprint: sha256:<hash>
 last_verified_at: 2026-05-25T03:15:27Z
 last_verified_commit: <git-sha>
-reverse_spec_run: ADS-project-knowledge/reports/reverse-spec/<run-id>/
+reverse_spec_run: ADS-memory/reports/reverse-spec/<run-id>/
 ```
 
 Allowed `status` values:
@@ -254,12 +254,12 @@ Changelog entries are append-only history. They must not claim to be current sys
 Provider-native feature folders may include a thin bridge file:
 
 ```text
-<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/<feature-id>/as-built-impact.md
+<ADS_MEMORY_ROOT>/specs/<feature-id>/as-built-impact.md
 ```
 
 This file links to:
 
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/changelog/<feature-id>-impact.md`
+- `<ADS_MEMORY_ROOT>/specs_as_built/changelog/<feature-id>-impact.md`
 - affected component folders
 - relevant raw reverse-spec report(s)
 
@@ -270,7 +270,7 @@ It must not duplicate component contracts or become another source of implementa
 ### Brownfield
 
 1. Run reverse-spec extraction on bounded code scopes.
-2. Save raw evidence to `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/reverse-spec/<run-or-module>/`.
+2. Save raw evidence to `<ADS_MEMORY_ROOT>/reports/reverse-spec/<run-or-module>/`.
 3. Curate the extracted evidence into `specs_as_built/components/`.
 4. Populate root overview, architecture, and migration notes.
 5. Record source scope and freshness metadata for every generated or hybrid component artifact.
@@ -301,7 +301,7 @@ source_scope:
 source_fingerprint: sha256:<hash>
 last_verified_at: 2026-05-24T19:43:39Z
 last_verified_commit: <git-sha>
-reverse_spec_run: ADS-project-knowledge/reports/reverse-spec/<run-id>/
+reverse_spec_run: ADS-memory/reports/reverse-spec/<run-id>/
 ```
 
 Use `status: stale` only as an explicit temporary marker when the project accepts a known freshness gap. Stale markers should link to an owner and follow-up date in the relevant drift or waiver record.
@@ -336,4 +336,4 @@ Advisory changes:
 - test-only or doc-only changes
 - dependency bumps with no behavior change
 
-Waivers follow the host-project contract waiver protocol in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/contracts/waivers.md`.
+Waivers follow the host-project contract waiver protocol in `<ADS_MEMORY_ROOT>/governance/contracts/waivers.md`.

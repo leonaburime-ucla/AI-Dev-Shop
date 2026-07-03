@@ -4,8 +4,8 @@
 - Spec ID: <SPEC-id>
 - Spec Hash: <sha256 — must match active spec>
 - Spec Hash Verification: <command/tool output used before triage>
-- TestRunner Report: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`
-- Test Certification: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+- TestRunner Report: `<ADS_MEMORY_ROOT>/reports/test-runs/TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md`
+- Test Certification: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 - Triaged At: <ISO-8601 UTC>
 - Triaged By: TDD Agent
 
@@ -52,7 +52,7 @@ One row per file in the Coverage Gap List. Every file must be classified — no 
 ## Updated Certification Record
 
 After gap fill tests are written, update the certification record at:
-`<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
+`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/test-certification.md`
 
 - Do not change the original certified spec hash
 - Refuse gap fill if the active spec hash no longer matches the certification

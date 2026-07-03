@@ -27,6 +27,7 @@ SKIP_DIRS = {
     "venv",
     "__pycache__",
     ".pytest_cache",
+    "ADS-memory",
     "ADS-project-knowledge",
 }
 
@@ -38,10 +39,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def project_knowledge_root() -> Path:
-    configured = os.environ.get("ADS_PROJECT_KNOWLEDGE_ROOT") or os.environ.get("ADS_WORKSPACE_ROOT")
+    configured = os.environ.get("ADS_MEMORY_ROOT") or os.environ.get("ADS_PROJECT_KNOWLEDGE_ROOT") or os.environ.get("ADS_WORKSPACE_ROOT")
     if configured:
         return Path(configured).expanduser().resolve()
-    return REPO_ROOT / "ADS-project-knowledge"
+    return REPO_ROOT / "ADS-memory"
 
 
 def graphify_output_root(args: argparse.Namespace) -> Path:
@@ -281,7 +282,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--graphify-output-root",
-        help="override the default Graphify reports root; defaults to <ADS_PROJECT_KNOWLEDGE_ROOT>/reports/graphify-out",
+        help="override the default Graphify reports root; defaults to <ADS_MEMORY_ROOT>/reports/graphify-out",
     )
     parser.add_argument(
         "--print-output-path",

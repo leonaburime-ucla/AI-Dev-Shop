@@ -8,7 +8,7 @@ How the pipeline interacts with git workflow — when to branch, how to name bra
 feature/<NNN>-<feature-slug>
 ```
 
-- `<NNN>` is the pipeline feature number (from `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
+- `<NNN>` is the pipeline feature number (from `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
 - `<feature-slug>` is a short kebab-case name derived from the feature
 - Examples: `feature/201-team-chat-platform`, `feature/305-payment-webhooks`
 
@@ -52,8 +52,8 @@ The Coordinator does not push or create the PR automatically. It signals readine
 
 ## Spec Traceability
 - **Spec**: `<spec-entrypoint-path>` (hash: `<spec-hash>`)
-- **ADR**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature>/adr.md`
-- **Tasks**: `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature>/tasks.md`
+- **ADR**: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature>/adr.md`
+- **Tasks**: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature>/tasks.md`
 
 ## Quality Gates
 - [ ] Test certification: `<path-to-test-certification.md>`

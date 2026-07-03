@@ -47,15 +47,15 @@ This is a collaborative implementation workflow, not Swarm Consensus debate and 
 3. Protect the worktree before any writes.
    - Run `git status --short`.
    - Separate in-scope files from unrelated dirty worktree changes. Do not revert or overwrite unrelated changes.
-   - For every in-scope file, save a baseline copy and content hash under `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/cowork/runs/<timestamp>/baseline/`.
+   - For every in-scope file, save a baseline copy and content hash under `<ADS_MEMORY_ROOT>/.local-artifacts/cowork/runs/<timestamp>/baseline/`.
    - Save the initial in-scope diff, if any, under the same run folder so pre-existing user edits can be restored on abort.
    - Before each write step, re-check the scoped file hashes. If a scoped file changed outside the cowork workflow, stop and ask the user how to proceed.
 
 4. Build the shared context packet.
    - Include the task, controls, selected peer models, risk assumptions, scoped file paths, baseline hashes, and full content of every scoped file.
    - Include relevant test files or commands when they are obvious from repo conventions.
-   - Save local-only context by default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/cowork/runs/<timestamp>/context.md`.
-   - If the user explicitly asks to retain the packet, save it under `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/cowork/runs/<timestamp>/context.md`.
+   - Save local-only context by default to `<ADS_MEMORY_ROOT>/.local-artifacts/cowork/runs/<timestamp>/context.md`.
+   - If the user explicitly asks to retain the packet, save it under `<ADS_MEMORY_ROOT>/reports/cowork/runs/<timestamp>/context.md`.
    - Give every participant the same context packet. Do not let one model reason from hidden extra file content unless the Coordinator adds that content to the shared packet first.
 
 5. Independent diagnosis phase, read-only.

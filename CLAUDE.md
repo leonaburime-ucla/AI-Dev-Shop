@@ -12,8 +12,18 @@ Use the **Task tool** to dispatch each specialized agent. Include their `<AI_DEV
 
 On the first session in this repo, the `SessionStart` hook in `.claude/settings.json`
 runs `framework/operations/scripts/ads-initialization.sh` once: it creates the
-`ADS-project-knowledge/` workspace and writes a `.claude/.ads-initialized` flag so
+`ADS-memory/` workspace and writes a `.claude/.ads-initialized` flag so
 later sessions no-op. It does **not** install slash commands.
+
+## Claude Code: Session Records
+
+`.claude/settings.json` also wires `harness-engineering/hooks/session-record.sh` to
+lifecycle events: `Stop` refreshes `ADS-memory/sessions/CURRENT-SESSION.md` (detecting the
+model(s) from the transcript), and `SessionEnd`/`SessionStart` archive it to a dated
+`ADS-memory/sessions/YYYY-MM-DD-HHmmSS-<topic>.md`. When the user asks to "save this
+session" or is wrapping up, write the Summary, Questions & Answers, and Decisions into
+`CURRENT-SESSION.md` (leave the auto metadata block intact) and record any peer models the
+transcript can't see. See the Session Records section in `<AI_DEV_SHOP_ROOT>/AGENTS.md`.
 
 ## Claude Code: Slash Command Setup
 

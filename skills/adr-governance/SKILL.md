@@ -7,7 +7,7 @@ description: Just-in-time governance ADR lookup and enforcement for cross-cuttin
 
 # Skill: ADR Governance
 
-Focused loop skill for enforcing cross-cutting Governance ADRs during implementation. Governance ADRs are durable rules that outlive individual features — they live in `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/` and are indexed for path-based lookup.
+Focused loop skill for enforcing cross-cutting Governance ADRs during implementation. Governance ADRs are durable rules that outlive individual features — they live in `<ADS_MEMORY_ROOT>/governance/adrs/` and are indexed for path-based lookup.
 
 ## When to Use
 
@@ -25,7 +25,7 @@ Focused loop skill for enforcing cross-cutting Governance ADRs during implementa
 ## Workflow: Just-in-Time Lookup (Implementation Agents)
 
 1. **Identify target files.** Before implementation, list the files you will create or modify.
-2. **Read the index.** Load `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md`. If the file does not exist or the table is empty, no governance ADRs apply — skip the rest of this workflow. Match your target file paths against the `Scope Globs` column for rows with Status = `ACCEPTED` only. Ignore `PROPOSED`, `SUPERSEDED`, and `DEPRECATED` rows.
+2. **Read the index.** Load `<ADS_MEMORY_ROOT>/governance/adrs/ADR-INDEX.md`. If the file does not exist or the table is empty, no governance ADRs apply — skip the rest of this workflow. Match your target file paths against the `Scope Globs` column for rows with Status = `ACCEPTED` only. Ignore `PROPOSED`, `SUPERSEDED`, and `DEPRECATED` rows.
 3. **Load only matching ADRs.** Read only the governance ADR files whose scope matches your working set. Do not load unrelated ADRs.
 4. **Evaluate compliance.** For each matching ADR:
    - If you can comply: do so. No further action needed.
@@ -45,19 +45,19 @@ When a linter, CI check, or code review flags a governance ADR violation:
 
 ## Workflow: Promotion (Software Architect)
 
-After writing a pipeline ADR at `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`:
+After writing a pipeline ADR at `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md`:
 
 1. **Evaluate cross-cutting scope.** Does this ADR establish rules, boundaries, or patterns that apply beyond the current feature? Examples: module import restrictions, shared service contracts, data access patterns, security boundaries.
 2. **If yes — promote:**
    - Extract the durable rule using `<AI_DEV_SHOP_ROOT>/framework/templates/governance-adr-template.md`.
-   - Save to `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/GOV-ADR-<NNN>-<slug>.md`.
-   - Update `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-INDEX.md` with the new entry.
+   - Save to `<ADS_MEMORY_ROOT>/governance/adrs/GOV-ADR-<NNN>-<slug>.md`.
+   - Update `<ADS_MEMORY_ROOT>/governance/adrs/ADR-INDEX.md` with the new entry.
    - Link back to the originating pipeline ADR in the `Related` field.
 3. **If no:** No promotion needed. The pipeline ADR remains feature-scoped.
 
 ## Exception Recording
 
-When an agent takes a DEFAULT exception, append a record to `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/adrs/ADR-EXCEPTIONS.md`:
+When an agent takes a DEFAULT exception, append a record to `<ADS_MEMORY_ROOT>/governance/adrs/ADR-EXCEPTIONS.md`:
 
 ```
 | <date> | <GOV-ADR-id> | <agent> | <file(s)> | <reason for deviation> | <what was done instead> |

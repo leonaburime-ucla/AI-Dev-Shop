@@ -33,7 +33,7 @@ class TestHostDeclarationPlaceholders:
 
     def test_angle_bracket_workspace_placeholder_path_is_not_content(self) -> None:
         validator = load_contract_validator()
-        text = "- Artifact root: `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`\n"
+        text = "- Artifact root: `<ADS_MEMORY_ROOT>/specs_as_built/`\n"
 
         assert not validator.field_has_content(text, "Artifact root")
 
@@ -62,7 +62,7 @@ class TestHostDeclarationPlaceholders:
         (host_dir / "specs-as-built-freshness.md").write_text(
             "# Specs-As-Built Freshness\n\n"
             "- Enforcement: strict\n"
-            "- Artifact root: `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs_as_built/`\n"
+            "- Artifact root: `<ADS_MEMORY_ROOT>/specs_as_built/`\n"
             "- Source root: `<HOST_PROJECT_ROOT>`\n"
             "- Validator: python3 harness-engineering/validators/validate_specs_as_built_freshness.py\n"
             "- Hard Blocking Change Types: source\n"

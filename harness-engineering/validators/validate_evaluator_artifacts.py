@@ -13,11 +13,11 @@ REPO_WORKSPACE_ROOT = ROOT / "project-knowledge-template"
 
 
 def resolve_workspace_root() -> Path:
-    for key in ("ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
+    for key in ("ADS_MEMORY_ROOT", "ADS_PROJECT_KNOWLEDGE_ROOT", "ADS_WORKSPACE_ROOT"):
         raw = os.environ.get(key)
         if raw:
             return Path(raw).expanduser().resolve()
-    sibling = HOST_ROOT / "ADS-project-knowledge"
+    sibling = HOST_ROOT / "ADS-memory"
     if sibling.exists():
         return sibling
     return REPO_WORKSPACE_ROOT

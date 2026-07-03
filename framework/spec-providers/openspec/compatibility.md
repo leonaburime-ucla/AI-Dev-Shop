@@ -15,7 +15,7 @@ It is not upstream OpenSpec documentation.
 
 ## Change Folder Files
 
-All files below are created within a change folder under the AI Dev Shop OpenSpec root, default `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/openspec/changes/<change-name>/`. Template files live under `templates/`.
+All files below are created within a change folder under the AI Dev Shop OpenSpec root, default `<ADS_MEMORY_ROOT>/specs/openspec/changes/<change-name>/`. Template files live under `templates/`.
 
 | File | Required? | Notes |
 |---|---|---|
@@ -29,7 +29,7 @@ All files below are created within a change folder under the AI Dev Shop OpenSpe
 
 When `openspec` is the active provider:
 
-1. Resolve the OpenSpec root: use the user's explicit durable project-owned location when provided, otherwise default to `<ADS_PROJECT_KNOWLEDGE_ROOT>/specs/openspec/`. Read `<resolved-openspec-root>/config.yaml` for project context if it exists.
+1. Resolve the OpenSpec root: use the user's explicit durable project-owned location when provided, otherwise default to `<ADS_MEMORY_ROOT>/specs/openspec/`. Read `<resolved-openspec-root>/config.yaml` for project context if it exists.
 2. Determine the change name from the feature description (kebab-case, e.g., `add-user-auth`).
 3. Create the change folder: `<resolved-openspec-root>/changes/<change-name>/` and `<resolved-openspec-root>/changes/<change-name>/specs/`.
 4. Record `spec_provider: openspec`, `provider_native_root: openspec/`, `provider_output_root` (the resolved OpenSpec root), `spec_entrypoint_path` (pointing to `proposal.md`), `spec_readiness_artifact: all apply-required artifacts present`, `provider_change_id: <change-name>`, and `spec_support_paths` in `pipeline-state.md`.

@@ -27,7 +27,7 @@ REQUIRED_MARKERS = {
         "Apply the `Model Memory Map`",
         "do not rely on CLI version output alone",
         "For Gemini, inspect the saved local preference in `~/.gemini/settings.json` at `model.name`",
-        "For Claude, inspect `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`",
+        "For Claude, inspect `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`",
         "CLI version strings are diagnostics only. Do not present CLI versions as model identities.",
     ],
     "skills/llm-operations/references/peer-llm-dispatch.md": [

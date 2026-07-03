@@ -37,5 +37,5 @@ Eval results for the `understand-anything` condition MUST note that Gemini was u
 ## Provenance
 
 - Design source: `/cowork` run 20260627T193650Z (Claude Opus 4.6 + Codex GPT-5.5 xhigh + Gemini 3.1 Pro High)
-- Strategy source: `/debate` consensus report `ADS-project-knowledge/reports/swarm-consensus/runs/20260627T181138Z-consensus-report.md`
+- Strategy source: `/debate` consensus report `ADS-memory/reports/swarm-consensus/runs/20260627T181138Z-consensus-report.md`
 - Binding constraints from debate (do not re-litigate): benchmark-first, branch-on-repo-size, lazy freshness, one portable facade, no new storage now, split-by-artifact install

@@ -21,17 +21,17 @@ If a file changes per host project or should be committed with the host project'
 
 That project-owned state belongs in the external sibling workspace:
 
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/governance/`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/memory/`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/reports/`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/meta/`
-- `<ADS_PROJECT_KNOWLEDGE_ROOT>/tmp/`
+- `<ADS_MEMORY_ROOT>/governance/`
+- `<ADS_MEMORY_ROOT>/knowledge/`
+- `<ADS_MEMORY_ROOT>/reports/`
+- `<ADS_MEMORY_ROOT>/.local-artifacts/`
+- `<ADS_MEMORY_ROOT>/meta/`
+- `<ADS_MEMORY_ROOT>/tmp/`
 
 Inside ADS itself, `project-knowledge-template/` is the repo-local template for that workspace shape.
 
 ## Write Rules
 
 - Treat everything under `framework/` as read-only during normal host-project feature work unless the user is explicitly maintaining ADS itself.
-- During normal project work, project-specific writes go to `<ADS_PROJECT_KNOWLEDGE_ROOT>/...`, not `framework/`.
+- During normal project work, project-specific writes go to `<ADS_MEMORY_ROOT>/...`, not `framework/`.
 - During ADS maintenance, use the repo-local `project-knowledge-template/` template surface for retained artifacts, scratch output, and other workspace-shaped test data.

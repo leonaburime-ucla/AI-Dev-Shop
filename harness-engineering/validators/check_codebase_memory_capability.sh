@@ -170,7 +170,7 @@ OVERALL_STATUS="unavailable"
 RECOMMENDATION="Ask before downloading Codebase Memory MCP; then run this script with --download."
 if [[ "$LOCAL_BIN_STATUS" == "enabled" ]]; then
   OVERALL_STATUS="enabled"
-  RECOMMENDATION="Use local binary at $LOCAL_BIN. Index with HOME=<ADS_PROJECT_KNOWLEDGE_ROOT>/.local-artifacts/codebase-memory-mcp-home $LOCAL_BIN cli index_repository '{\"repo_path\":\"<target>\"}'."
+  RECOMMENDATION="Use local binary at $LOCAL_BIN. Index with HOME=<ADS_MEMORY_ROOT>/.local-artifacts/codebase-memory-mcp-home $LOCAL_BIN cli index_repository '{\"repo_path\":\"<target>\"}'."
 elif [[ "$PATH_BIN_STATUS" == "enabled" ]]; then
   OVERALL_STATUS="enabled"
   RECOMMENDATION="Use codebase-memory-mcp on PATH at $PATH_BIN_PATH."
