@@ -16,7 +16,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - React Component Testing Policy: **DONE** (enforced via TDD routing)
 - Execution Topology Default: **REMOVED** (toolkit already implements justified exception pattern)
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
-- Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy + CR regen + Architect catalog/schema reconciliation done 2026-07-03; remaining: run the suites with retained results, expand architect to scenarios 2-6)
+- Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy + CR regen + Architect catalog/schema reconciliation + first retained architect run done 2026-07-03; remaining: run CR suite, expand architect to scenarios 2-6)
+- Architect Agent + Suite Gaps (2026-07-03 ablation): **OPEN** (3 capability gaps SEED-17/31/34 missed even with full skills; brief-gameable process-compliance seeds; skills add only +1.5–4.5pts over the brief — see "Architect Agent + Suite — Confirmed Gaps" under Agent Eval Depth)
 - Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
 - System Design Skill Coverage: **DONE** (all 14 depth topics in `operational-depth-patterns.md`)
@@ -725,6 +726,23 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Per-complexity-category catch rates are reported in eval summaries
 - Category-level misses directly inform which skills to build next
 - The eval creation protocol structurally prevents future suites from being all-textbook
+
+### Architect Agent + Suite — Confirmed Gaps From 2026-07-03 Ablation **[OPEN]**
+**Source:** 3-arm Opus 4.8 skills ablation on `arch-eval-1-billing-ledger-migration` (bare / brief-only / brief+skills), dual-graded self + blind Opus judge (94.9% agreement). Report: `harness-engineering/agent-evals/architect-evals/ABLATION-2026-07-03-opus48-3arm.md`. Scores self 78.8 / 90.9 / 95.5%, judge 80.3 / 92.4 / 93.9%.
+
+**A. Capability gaps — seeds missed even with full skills loaded (skill-gap candidates):**
+- `SEED-ARCH-17` — performance/scalability confidence must DOWNGRADE for an unproven new schema; all three arms kept "measured" confidence + score 4 because 12K/sec was measured on the OLD schema. The measured→analogical confidence-transfer discipline isn't induced even by the full skills.
+- `SEED-ARCH-31` — actor identity must PROPAGATE through migration-introduced boundaries (outbox/relay/strangler hops), not just be "present on every event." All arms treated actor-id as native to events but none addressed forwarding it through the new integration seams.
+- `SEED-ARCH-34` — current monolith state must be formally scored as a Rejected BASELINE (to quantify migration ROI); all arms discussed root cause narratively but none produced a formal baseline evaluation.
+- Next step: write/extend a skill targeting these three (evidence-scope confidence calibration; identity propagation across migration boundaries; current-state baseline scoring), then RE-ABLATE the full arm to confirm lift. This closes the eval-driven-development loop.
+
+**B. Eval-design gap — brief-gameable process-compliance seeds:**
+- The entire +12.1-pt brief lift (bare→format) landed on seeds where the brief NAMED the category/mechanism: `SEED-ARCH-06` (don't-mark-assumed — a literal brief rule), `SEED-ARCH-07` (adaptability-within-band — a literal brief rule), `SEED-ARCH-03` / `SEED-ARCH-16` (operability score calibration — only scoreable because the brief forces a scorecard), `SEED-ARCH-20` (retention tiering), `SEED-ARCH-10` (report conditional skills — a brief rule). These test FORMAT-COMPLIANCE, not architecture judgment, and are handed to the agent by the brief.
+- The genuine-judgment seeds (04 reject-microservices, 14 Kafka, 19 compensating-entry rollback, 24 connection-exhaustion, 29 write-authority, 33 constitution-exception) were caught by the BARE arm with no prompting — real signal.
+- Implication: some architect seeds should be redesigned so the invariant is NOT named in the brief (per eval-design-playbook "never name the invariant"), or reclassified as process-compliance vs judgment so scoring separates them. This is the architect-suite instance of the known "evals over-test process compliance" problem.
+
+**C. Skills-vs-model finding (context-budget candidate):**
+- On this fixture the software-architect skill FILES add only +1.5–4.5 pts beyond the brief, for ~2× the tokens (full arm 88K vs 43K bare / 49K format). Core pattern judgment is native to Opus 4.8; the skills act mainly as a conditional-skill router + org-specific checklist (their unique adds were SEED-10 routing, SEED-30 cohort rollout, SEED-32 HIPAA-infra). Candidate for the Context De-Noise work: move scorecard discipline into the brief/template and slim the base skills to routing + org-specific checklists. **Caveat: n=1 fixture, 1 sample/arm — needs variance repeats + a conditional-skill-heavy fixture (e.g. arch-eval-4 RAG) before acting, since this migration fixture rewards raw reasoning and may under-measure the skills.**
 
 ### Agent Eval Skill Coverage Mapper **[OPEN]**
 **Source:** 2026-05-31 `/debate` on whether skill-specific evals are needed in addition to `agent-evals`.
