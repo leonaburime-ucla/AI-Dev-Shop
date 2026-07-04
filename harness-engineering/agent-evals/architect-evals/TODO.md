@@ -2,10 +2,28 @@
 
 ## Current State
 
-- Canary eval complete: `arch-eval-1-billing-ledger-migration` (34 seeds, validated)
-- Agent (Claude Opus subagent) scored 94% — strong performance, 4 partials on subtle T3/T4 seeds
+- Canary eval complete: `arch-eval-1-billing-ledger-migration` (33 seeds —
+  SEED-ARCH-13 was removed in the post-canary audit; earlier "34" claims are
+  off by one)
+- Agent (Claude Opus subagent) scored 94% — strong performance, 4 partials on
+  subtle T3/T4 seeds. NOTE: no per-seed run record was retained for that run;
+  future runs must persist run-manifest.tsv / run-results.tsv rows.
 - Seed-ledger audited by Gemini 3.1 Pro and GPT-5.5, corrections applied
-- Fixture docs grounded with all necessary signals for 34 seeds
+- Fixture docs grounded with all necessary signals for the 33 seeds
+- 2026-07-03: suite migrated to the standard eval schema — seed-catalog.tsv
+  backfilled with all 33 seeds + depth columns (domain_complexity,
+  complexity_category, engineering_concepts), coverage-matrix.tsv rebuilt,
+  suite-level seed-ledger.md added with structured staff+ entries.
+  `validate_eval_suite.py` passes (pilot label; needs 3+ benchmark_full runs
+  and 36+ seeds for benchmark label).
+- 2026-07-03: **first retained runs** — 3-arm Opus 4.8 skills ablation
+  (bare / format / full). Self-scores 78.8 / 90.9 / 95.5%; blind Opus judge
+  80.3 / 92.4 / 93.9% (94.9% grader agreement). Brief lift +12.1 pts, skills
+  lift beyond brief only +1.5–4.5 pts. `run-manifest.tsv` (3 rows) +
+  `run-results.tsv` (99 rows) persisted; ADR run dirs are gitignored.
+  Full writeup: `ABLATION-2026-07-03-opus48-3arm.md`.
+  Discriminating seeds (missed even by full arm): SEED-ARCH-17, -31, -34 →
+  skill-gap candidates.
 
 ## Next: Multi-Scenario Expansion
 

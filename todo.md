@@ -16,7 +16,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - React Component Testing Policy: **DONE** (enforced via TDD routing)
 - Execution Topology Default: **REMOVED** (toolkit already implements justified exception pattern)
 - Multi-LLM Consensus Modes and Guardrails: **OPEN / PARTIAL** (consensus + preflight exists; strict model/version normalization still open)
-- Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy done; need to regenerate Architect/CR seeds at staff+ complexity)
+- Agent Eval Depth: **OPEN / PARTIAL** (framework + taxonomy + CR regen + Architect catalog/schema reconciliation done 2026-07-03; remaining: run the suites with retained results, expand architect to scenarios 2-6)
 - Protocol Split: MCP + A2A: **OPEN** (MCP practical now; A2A defer)
 - Spec-Kit Command Contract Parity: **OPEN / PARTIAL** (command templates exist; frontmatter contracts still missing)
 - System Design Skill Coverage: **DONE** (all 14 depth topics in `operational-depth-patterns.md`)
@@ -31,6 +31,7 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - NVIDIA SkillSpector Intake: **OPEN** (evaluate AI-agent skill scanner as import/install guardrail)
 - Init Hook — Audit Convergence Follow-Through: **OPEN / PARTIAL** (TM-INIT-SU-01 round-1 converged, R1-1 fixed; 3 decisions open — round-2 re-audit / commit / report retention. See `init-hook-audit-HANDOFF.md`)
 - Web Escalation Gate (getting-unstuck): **OPEN / NEEDS-AUDIT** (first-pass: AGENTS.md rule + Claude PostToolUse hook landed; needs `/audit-work` — see detailed item below)
+- Critical Internal Constraints (CIC) Skill Eval: **OPEN** (skill v1.1.0 shipped: debate-designed, 3-round `/audit-work` PASS, Fable amendments landed; needs a behavioral eval before the pipeline relies on it — see detailed item below)
 
 ---
 
@@ -469,6 +470,37 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 ### Graphify `--agent-cache` RFC **[OPEN]**
 **What it is:** Add `--agent-cache` flag to graphify that produces a greppable JSONL of chunk-level summaries with namespace inheritance and line pointers — precomputed cache so agents skip the grep/read/assess/repeat loop. Debate consensus (3/3): no vector DB, no BM25 for MVP, no community rollups — just chunked summaries + grep. See `ADS-memory/.local-artifacts/swarm-consensus/runs/20260609T-agent-cache-debate-report.md` for full spec. PR branch exists on fork: `leonaburime-ucla/graphify` (`docs/node-summaries-rfc`); upstream PR #1166 covers file-level summaries; this extends to chunk-level.
 
+### Critical Internal Constraints (CIC) Skill Eval **[OPEN]**
+**Owner:** Coordinator with Software Architect/TDD/Programmer personas as eval subjects.
+**Mandatory pre-reads (per CLAUDE.md, before any fixture/seed/scoring work):** `harness-engineering/agent-evals/bug-taxonomy.md`, `harness-engineering/agent-evals/eval-design-playbook.md`, `harness-engineering/agent-evals/README.md`.
+**What it is:** Behavioral eval suite for the new `skills/critical-internal-constraints/` skill (v1.1.0) and its wiring — does the Software Architect designate the right units (and only those), does the combined Design Readiness gate behave, do TDD/Programmer honor Binding constraints and the `[CIC_*]` protocol, and does the anti-scope-creep design actually hold under realistic pressure.
+**Why it matters:** The skill was debate-designed (Codex+Gemini consensus 2026-07-03), passed a 3-round `/audit-work` (TM-CIC-001, converged 9.6/10.0), and absorbed a same-family Fable review's six amendments (incl. cross-feature persistence) — but every check so far was static/textual. No agent has ever produced a real `critical-internal-constraints.md`, and the known residual risk is exactly behavioral: over-designation (classic-LLD creep), lazy NOT TRIGGERED lines, TDD writing mock-order tests anyway, `[CIC_PROPOSED]` becoming an "I'm stuck" button. These were the debate's explicit watch items; the eval is how they get measured instead of assumed.
+**Suggested location:** `harness-engineering/agent-evals/cic-evals/benchmark-suite/` (follow existing agent-evals conventions).
+**Seed classes (positive + negative controls + traps):**
+- One positive seed per trigger (7): a spec/ADR fixture where exactly one unit genuinely warrants designation under that trigger, with an oracle designation (unit, plausible wrong implementation, broken property, required constraint).
+- Negative controls: plain CRUD/glue features where the correct output is a NOT TRIGGERED record — score evidence quality (candidate units + surfaces + why), not just presence of the line.
+- Over-designation traps: "complex-looking" units (nested config mapping, long switch, big DTO transforms) with no breakable property — any designation = scope-creep failure.
+- Default-marker traps: a security-sequencing unit where `ESCALATE_SECURITY` must be applied by default (or a reason recorded); a money-movement recovery unit for `ESCALATE_IRREVERSIBLE`.
+- Under-designation escalation: artifact produced but a triggering unit omitted — does TDD/Programmer raise a well-formed `[CIC_REQUESTED]` (exact 6-field format, deterministic regex check)?
+- TDD verification-surface compliance: a designated unit with a state machine — does TDD test observable outcomes/persisted state, or assert mock call order / private structure (fail)?
+- Programmer deviation protocol: a Binding constraint that implementation evidence genuinely invalidates — recorded `[CIC_DEVIATION]` vs silent deviation; pause-for-`[CIC_DEVIATION_APPROVED]` on escalation-marked constraints.
+- Cross-feature persistence: a prior feature's CIC artifact designates a unit the current feature touches — does the architect's reverse lookup find and re-affirm/supersede/promote it?
+- Gate seeds: STALE detection (renamed outline `C-xxx` ID), an outline file with `Status: SKIPPED` present (must not pass as PRODUCED), NOT TRIGGERED mirrored into tasks.md.
+**Scoring:**
+- Designation precision/recall vs oracle — over-designation rate is the primary metric (the skill's central promise is restraint).
+- Four-part-test completeness and trace validity (deterministic field checks).
+- Protocol-format compliance for all `[CIC_*]` tokens (regex; no LLM judge).
+- Gate correctness per seed (pass / route-back decisions vs expected).
+- TDD structural-test violations (count of private-structure assertions).
+- Token/ceremony cost per condition (skill loaded vs baseline) so the context tax is measured, not assumed.
+- LLM-judge only for secondary quality (constraint usefulness), never pass/fail.
+**Ablation:** run at least the architect-designation seeds baseline-vs-skill-loaded to prove the skill changes behavior rather than just adding tokens.
+**Done when:**
+- Suite exists with fixtures, oracle manifests, deterministic graders, and a run harness following agent-evals conventions.
+- At least one full run is retained with per-seed-class scores.
+- Each debate watch item (over-designation, NOT TRIGGERED laziness, mock-order tests, `[CIC_PROPOSED]` abuse) maps to a measured metric.
+- Coordinator has evidence to decide: keep CIC wired as-is, tighten triggers/wording, or downgrade to manual-only.
+
 ### Temporal Durable Workflow Skill **[OPEN]**
 **What it is:** Add a dedicated skill for Temporal-style durable workflow systems and related durable orchestration patterns.
 **Why it matters:** Existing skills cover queues, async jobs, outbox, saga, retries, idempotency, and orchestration, but they do not provide focused guidance for when a workflow engine is the right abstraction, how to model durable workflow state, how to version workflows, or how to test/resume long-running executions.
@@ -675,12 +707,13 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - **Eval-driven development** available as optional human-initiated workflow: write seeds → verify failure → build skill → re-eval
 - Minimum seed count for Architect/CR/Security: **72+ seeds**
 **What still needs to happen:**
-- Regenerate Architect eval seeds with emergent-tier defects (current 59 seeds are all textbook/production process compliance)
-- Regenerate Code Review eval seeds with production and emergent defects (current 21 seeds are mostly textbook)
-- Add `domain_complexity` and `complexity_category` columns to existing seed-catalog TSVs
-- Update the scorer (`score_eval_suite.py`) to compute per-complexity-category catch rates
-- Update the validator (`validate_eval_suite.py`) to enforce the depth floors
-- Run the new suites and use the category-level miss data to prioritize new skills
+- ~~Regenerate Architect eval seeds with emergent-tier defects~~ **DONE 2026-07-03** — the "59 textbook seeds" claim was stale; the real suite was 33 judgment-focused seeds whose catalog was out of sync (10 rows, pre-depth schema). Catalog backfilled with all 33 seeds at staff+ depth (92.9% staff+), coverage-matrix rebuilt on the standard schema, suite-level seed-ledger.md added with structured staff+ entries, 5 NCs + 2 regression controls designated. Validator passes (pilot label).
+- ~~Regenerate Code Review eval seeds with production and emergent defects~~ **DONE** (earlier session) — 91 seeds across 14 evals with depth columns at staff/principal tiers.
+- ~~Add `domain_complexity` and `complexity_category` columns to existing seed-catalog TSVs~~ **DONE** for CR + Architect suites.
+- ~~Update the scorer (`score_eval_suite.py`) to compute per-complexity-category catch rates~~ **DONE** (earlier session).
+- ~~Update the validator (`validate_eval_suite.py`) to enforce the depth floors~~ **DONE** (earlier session; 2026-07-03 fix: `is_architect_or_code_review()` in both scorer and validator now recognizes `software-architect`, so the stricter 85% Architect/CR floors actually apply to the architect suite).
+- Run the new suites and use the category-level miss data to prioritize new skills — **ARCHITECT DONE 2026-07-03; CR still open.** Ran a 3-arm Opus 4.8 skills ablation on arch-eval-1 (bare / brief-only / brief+skills): self 78.8 / 90.9 / 95.5%, blind Opus judge 80.3 / 92.4 / 93.9% (94.9% grader agreement). Key result: the structured brief is the dominant lever (+12.1 pts, identical for both graders); the heavy skill files add only +1.5–4.5 pts beyond the brief. Raw Opus 4.8 already ~79%. Skill-gap candidates (missed even with full skills): actor-identity-through-migration-boundaries (SEED-31), current-state-baseline (SEED-34), new-schema perf-confidence calibration (SEED-17). First retained `run-manifest.tsv`/`run-results.tsv`; report at `harness-engineering/agent-evals/architect-evals/ABLATION-2026-07-03-opus48-3arm.md`. CR suite still has 0 retained runs.
+- Expand architect suite per its TODO roadmap: arch-eval-2 flash-sale ticketing through arch-eval-6 (~40 seeds each). arch-eval-1 needs ~3 more seeds to cross the 36-seed benchmark-label floor.
 **Likely files to inspect/update first:**
 - `harness-engineering/agent-evals/architect-evals/benchmark-suite/seed-catalog.tsv`
 - `harness-engineering/agent-evals/code-review-evals/benchmark-suite/seed-catalog.tsv`

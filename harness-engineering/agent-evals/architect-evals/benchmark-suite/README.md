@@ -27,13 +27,28 @@ Purpose:
 
 ## Coverage (Canary — 1 scenario)
 
-- `10` seeds in 1 scenario
-- `2` fatal (gated at 60%)
-- `1` negative control
-- `7` standard seeds
-- 8 judgment categories covered: axis activation, score calibration,
-  blocking rules, adaptability, confidence, tradeoff credibility,
-  migration safety, conditional skills
+- `33` seeds in 1 scenario (SEED-ARCH-13 removed in post-canary audit;
+  older docs saying "34" are off by one)
+- `2` positive controls / fatal invariants (gated at 60%)
+- `5` negative controls (false-positive restraint)
+- `2` regression controls (canary-tightened under-blocking traps)
+- `24` standard seeds
+- 3 agent dimensions (standard schema): Scorecard & Evidence Judgment,
+  Blocking & Selection Judgment, Migration Safety Judgment — the original
+  8 judgment categories (axis activation, score calibration, blocking
+  rules, adaptability, confidence, tradeoff credibility, migration safety,
+  conditional skills) are preserved in the per-eval seed-ledger narratives
+- Depth: 26/28 depth-eligible seeds staff+ (92.9%) — staff 9, principal
+  10, distinguished 7; passes the Architect/CR depth floors in
+  `validate_eval_suite.py`
+
+Schema note (2026-07-03): `seed-catalog.tsv` and `coverage-matrix.tsv`
+were migrated to the standard eval schema (same columns as the Code
+Review suite: `domain_complexity`, `complexity_category`,
+`engineering_concepts`, etc.), and the suite-level `seed-ledger.md` now
+carries the structured 9-field staff+ entries required by the validator.
+The per-eval `arch-eval-1-billing-ledger-migration/seed-ledger.md`
+remains the scoring oracle.
 
 ## Multi-Scenario Expansion Plan
 

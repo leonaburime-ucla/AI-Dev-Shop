@@ -241,8 +241,8 @@ def parse_csv_list(value: str) -> list[str]:
 
 
 def is_architect_or_code_review(agent: str) -> bool:
-    normalized = agent.strip().lower().replace("_", "-")
-    return normalized in {"architect", "code-review"} or normalized.replace("-", " ") == "code review"
+    normalized = agent.strip().lower().replace("_", "-").replace(" ", "-")
+    return normalized in {"architect", "software-architect", "code-review"}
 
 
 def depth_floors_for_agents(rows: list[dict[str, str]]) -> dict[str, float]:
