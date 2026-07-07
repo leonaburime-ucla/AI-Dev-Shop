@@ -744,6 +744,20 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 **C. Skills-vs-model finding (context-budget candidate):**
 - On this fixture the software-architect skill FILES add only +1.5–4.5 pts beyond the brief, for ~2× the tokens (full arm 88K vs 43K bare / 49K format). Core pattern judgment is native to Opus 4.8; the skills act mainly as a conditional-skill router + org-specific checklist (their unique adds were SEED-10 routing, SEED-30 cohort rollout, SEED-32 HIPAA-infra). Candidate for the Context De-Noise work: move scorecard discipline into the brief/template and slim the base skills to routing + org-specific checklists. **Caveat: n=1 fixture, 1 sample/arm — needs variance repeats + a conditional-skill-heavy fixture (e.g. arch-eval-4 RAG) before acting, since this migration fixture rewards raw reasoning and may under-measure the skills.**
 
+### Architect Eval-2 — Flash-Sale Ticketing Fixture Build **[OPEN / NOT STARTED]**
+**Source:** 2026-07-04 — confirmed arch-eval-2 does NOT exist. The `architect-evals/` suite has only `arch-eval-1-billing-ledger-migration/`; no flash-sale/ticketing fixture, no seed-state docs, no seeds in the catalogs. Both the suite README expansion plan and `architect-evals/TODO.md` (row 2) list it as PLANNED / NOT STARTED.
+**What it is:** A full second architect eval fixture (same shape as arch-eval-1) for a **greenfield flash-sale ticketing system** — dominant drivers: performance, scalability, "no double-sell" consistency, reliability. This is a content-generation task, not a run.
+**What to build:**
+- 6 seed-state docs: `feature-spec`, `system-blueprint`, `team-and-operations`, `constitution`, `constraints-and-nfrs`, `pattern-candidates`.
+- `project-brief.md` — the ADR task directive.
+- A seed-ledger (hidden oracle) with ~40 seeds at staff+ depth, plus rows added to the suite `seed-catalog.tsv` and `coverage-matrix.tsv`, honoring the eval-design-playbook.
+**Design learnings to bake in (from the arch-eval-1 ablation — this fixture is the natural place to fix them):**
+- **Invariants NOT named in the brief** — the whole point of the arch-eval-1 "eval-design gap" (item B above). Design seeds so the invariant is discovered, not handed over by the brief; separate genuine-judgment seeds from format-compliance seeds.
+- **Conditional-skill-activation traps** — a greenfield/flash-sale fixture can test the routing behavior where the skills actually earned their keep (SEED-10/30/32-style). This also feeds the n=1 caveat in item C (needs a conditional-skill-heavy fixture before acting on the skills-vs-model finding).
+**Mandatory pre-reads (per CLAUDE.md):** `bug-taxonomy.md`, `eval-design-playbook.md`, `agent-evals/README.md`, and the architect's `skills.md` (read FIRST, before designing seeds).
+**Process:** write one scenario's worth (~40 seeds), then validate with multiple models; HOLD OFF running until scope is confirmed (same as arch-eval-1 canary discipline). Persist run-manifest / run-results rows on any eventual run.
+**Done when:** the fixture exists, `validate_eval_suite.py` passes on it, the seed-ledger is multi-model audited, and `architect-evals/TODO.md` row 2 flips to DONE.
+
 ### Agent Eval Skill Coverage Mapper **[OPEN]**
 **Source:** 2026-05-31 `/debate` on whether skill-specific evals are needed in addition to `agent-evals`.
 **What it is:** Add an `agent-evals`-native mapper that shows which eval seeds test which skills, which skills should activate or stay silent, and whether agents actually used them during runs. Do not create a separate `skills-evals/` fixture hierarchy yet; keep canonical benchmark fixtures under the owning `harness-engineering/agent-evals/<agent>-evals/` suites.
