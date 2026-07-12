@@ -20,6 +20,11 @@ These validators are the first mechanical enforcement layer for this repo.
 - `validate_debate_routing_guard.py`
   - checks that debate requests default to Swarm Consensus with external peer LLMs
   - fails when the guard against silent platform-subagent fallback is removed from root, Coordinator, slash-command, or Swarm Consensus docs
+- `validate_slash_command_parity.py`
+  - detects STALE installed slash commands: `.claude/commands/<cmd>.md` present but differing from the canonical `framework/slash-commands/<cmd>.md` source
+  - fails (VIOLATION) only on divergence (stale content); MISSING (opt-in / not installed) and EXTRA copies are informational notes, not failures
+  - project-scoped `gstack-*` commands are opt-in (`--include-project`); a MISSING one is never a failure
+  - FIX telemetry points at `install-slash-commands.sh --install --overwrite`
 - `validate_swarm_model_identity_guard.py`
   - checks that Swarm Consensus preflight shows peer model identity first
   - fails when CLI version strings can be presented as model names or model versions

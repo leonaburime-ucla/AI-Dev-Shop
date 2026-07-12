@@ -21,6 +21,7 @@ run_hard_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_evaluator_artifacts.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_load_bearing_audits.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_debate_routing_guard.py"
+  python3 "$ROOT_DIR/harness-engineering/validators/validate_slash_command_parity.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_swarm_model_identity_guard.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_specs_as_built_freshness.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_backend_manifest.py"
@@ -42,6 +43,7 @@ run_precommit_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_path_references.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_registry_integrity.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_contracts.py"
+  python3 "$ROOT_DIR/harness-engineering/validators/validate_slash_command_parity.py"
 }
 
 run_governance_scenarios() {
