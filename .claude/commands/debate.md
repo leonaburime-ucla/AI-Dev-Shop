@@ -5,7 +5,7 @@ Shortcut for `/consensus debate` when the user clearly wants the debate mode of 
 
 ## Debate Routing Guard
 
-`/debate` always means Swarm Consensus debate with external peer LLM CLIs. External peers are mandatory: a run that drops them and uses only in-host subagents is invalid. Do not, on your own initiative, substitute platform subagents, current-LLM helper agents, or repo-persona consultation for the external peers.
+`/debate` always means Swarm Consensus debate with external peer LLM CLIs. External peers are mandatory by default: absent an explicit user request to do otherwise (the Replacement exception below), a run that drops them and uses only in-host subagents is invalid. Do not, on your own initiative, substitute platform subagents, current-LLM helper agents, or repo-persona consultation for the external peers.
 
 Two explicit-request exceptions:
 - **Replacement** — the user asks for current-LLM subagents or repo-persona consultation *instead of* Swarm Consensus. Then run that mode and skip external dispatch.

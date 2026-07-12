@@ -15,5 +15,14 @@ The ADR has been human-approved. Generate the task list:
    - Phase 2+: One phase per user story, ordered P1 first
    - Phase N: Polish
    - Mark tasks [P] that touch different files with no shared mutable state
+   - Add a `## Constraints` section declaring required suites, coverage profile
+     for lines/branches/functions/statements, coverage tool, machine-readable
+     artifact paths, cleanup paths, E2E requirement status, and convergence
+     threshold. Default convergence before Code Review is `100%` of P1
+     acceptance tests and invariants passing; any lower threshold requires a
+     human-approved value and reason.
+   - State that task checkboxes are Coordinator-owned and specialist agents
+     treat `tasks.md` as read-only unless the Coordinator explicitly delegates a
+     task-list update.
    - Add checkpoint annotations after Phase 1 and after each story phase
 7. Output: tasks.md path, total task count, parallelizable task count, phase structure summary, explicit coverage summary against the provider's acceptance criteria and requirements, recommended next command (`/implement`).
