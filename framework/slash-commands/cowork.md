@@ -121,6 +121,7 @@ Core collaboration invariant:
    - If a participant fails, times out, or reports a resource failure during a challenge round after contributing an independent proposal, mark it as `Withdrawn` for later rounds. Its frozen proposal remains in the ledger but do not invent its rebuttal.
    - Do not average votes. Weight convergence by grounded evidence, repo facts, validator constraints, and risk impact.
    - Synthesize the frozen proposals and challenge-round input into one plan.
+   - Apply the **Solution Slate Protocol** from `skills/llm-operations/references/peer-llm-dispatch.md`: present the reconciled options as a ranked correction/design slate (≥2 options where they exist, explicit ranking criteria, per-option trade-offs, a recommendation + cheapest de-risking step) BEFORE any correction is applied to the worktree.
    - Reconcile the whole-task proposals before assigning the writer or file leases. The plan must reflect the best shared design, not a collage of isolated model-owned parts.
    - Do not use leases to let one model own the design of a suite, subsystem, trap set, coverage matrix, or other semantic slice unless every participant has first reviewed and shaped that slice as part of the whole plan.
    - The plan must include:

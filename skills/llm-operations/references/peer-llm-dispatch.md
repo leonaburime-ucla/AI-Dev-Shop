@@ -76,6 +76,24 @@ For most toolkit-maintenance work, the packet should lead with:
 
 Use commit or diff references only when they materially help the auditor inspect details.
 
+## Solution Slate Protocol (output requirement, not transport)
+
+For any actionable fix, audit finding, or issue resolution, both the peer-facing prompt and the Coordinator's synthesis must produce a **ranked slate of solutions**, never a single take-it-or-leave-it answer. Applies to `/debate` (synthesis / Round 2+ only), `/audit-work`, `/cowork`, and `/consensus` single-pass. Require this in the peer prompt, and reconcile the peers' slates into one Coordinator slate.
+
+Every slate must contain:
+
+1. **≥2 candidate solutions.** If only one is genuinely viable, still name the rejected alternatives and state why they were pruned — the slate exists, just pre-pruned.
+2. **Explicit ranking criteria.** State the criteria used (e.g. correctness, blast radius, reversibility, cost, effort) before ranking, so the order is auditable rather than asserted.
+3. **Full reasoning per option** — trade-offs, failure modes, and a genuine sacrifice. No all-upside option; if an option looks free, the cost is being hidden.
+4. **A recommendation** — the top pick plus the cheapest test or smallest reversible step that would de-risk or falsify it.
+5. **Command-specific artifact for the leading option(s):**
+   - `/debate` — back the leading option with **sample code or pseudocode**, not prose alone.
+   - `/audit-work` — a concrete diff-level proposed fix per option, which then feeds the existing Proposed-Fix Disposition Gate.
+   - `/cowork` — ranked correction plans presented before any correction is applied.
+   - `/consensus` single-pass — the ranked slate + recommendation in the synthesis section.
+
+**Scope guard:** this does NOT apply to `/debate` Round 1, which stays solution-neutral (see the Debate Problem-Framing and Round-Disclosure guards). It activates only at synthesis / Round 2+, once independent positions exist.
+
 ## Heavier Repo Workloads
 
 Treat this as guidance, not a hard constraint:
@@ -109,7 +127,11 @@ The `gemini` CLI has been sunsetted for the individual tier. Use `agy` as the Ge
 
 **Key dispatch rules for `agy`:**
 
-- **Always run from `/tmp`** (or any directory outside the repo). `agy` has no `--ignore-rules` flag and will load `AGENTS.md` if invoked from within the repo, polluting the peer's context with Coordinator startup noise.
+- **Always run from a directory with no `AGENTS.md` in the working directory or any ancestor.** `agy` has no `--ignore-rules` flag and discovers `AGENTS.md` by walking ancestor directories, so any working dir still *inside* the repo tree can inherit the repo's root `AGENTS.md` and pollute the peer's context with Coordinator startup noise. "Outside the repo" is not sufficient by itself in a single-folder install where `<ADS_MEMORY_ROOT>` lives inside the repo tree.
+- **File context is the default, staged, not denied.** Running clean must not starve Gemini of the files it needs — that under-contexts deep work. Because `agy` can only read files inside its own working directory, stage the necessary repo files for it: copy the files the peer needs into the staging base's `files/` subdir (preserving relative paths), run `agy` from the staging base, and reference the staged paths in the packet so Gemini reads real file content with its file tools — without inheriting the repo's `AGENTS.md`. Choose the staging base by install topology:
+  - **Subfolder install** (`<ADS_MEMORY_ROOT>` is a sibling OUTSIDE the repo tree): use `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/`.
+  - **Single-folder install** (`<ADS_MEMORY_ROOT>` lives INSIDE the repo tree, e.g. `AI-Dev-Shop/ADS-memory/`, and a root `AGENTS.md` exists): staging under `<ADS_MEMORY_ROOT>/tmp/...` is still inside the repo tree and does NOT escape ancestor-walk discovery — use a genuinely external base instead, e.g. `${TMPDIR:-/tmp}/ads-peer-dispatch/<workflow>/`.
+  - Either way, verify no `AGENTS.md` resolves from the chosen base before dispatch. Reference ONLY the staged paths in the packet, never the original repo paths — `agy` cannot read outside its working dir, so an original-repo path is an unreadable dangling reference. Prefer a bounded, named file set over copying the whole tree. Only fall back to a fully self-contained inline packet (no staged files) when the peer genuinely needs no file reads or the set is too large to stage cleanly.
 - **Model flag:** `--model "Gemini 3.1 Pro (High)"` (use the exact string from `agy models`). The default peer model is `Gemini 3.1 Pro (High)`.
 - **Output mode:** `agy` returns plain text via `--print`. There is no `--output-format json` equivalent. Use the full stdout (stripped) as the peer answer — do not truncate to last line.
 - **Transport observability:** Tier 2 (deferred/buffered). Use probe-then-dispatch pattern.

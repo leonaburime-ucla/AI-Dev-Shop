@@ -49,6 +49,7 @@ Act as a Swarm Consensus Coordinator.
      - current position summary by participant when this is a later debate round
      - reasoning summary, limited to the strongest 2-4 reasons or disagreements
      - what is specifically being asked in this dispatch or next round
+     - **file-context line (mandatory):** state plainly that peers will read repo files for more context and better results, and name the bounded file set (or staged path) being made available. Reading necessary files is the default; if a run is deliberately packet-only (no file reads), say so and why. For Gemini/`agy`, name the staged `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/files/` set per the peer-dispatch rules.
      - what replying `run` will do
    - If the user flags an issue, revise the file and repeat the preview gate.
    - In debate mode, the Round 1 peer prompt must not include the Primary model's answer. Preview later rebuttal prompts too when they are materially different or include summarized model deltas.
@@ -56,6 +57,7 @@ Act as a Swarm Consensus Coordinator.
 9. Run consensus in the chosen mode:
    - `single-pass`: independent first pass + one synthesis.
    - `debate`: independent first pass + bounded debate rounds until `min_confidence` agreement or `max_rounds`.
+   - Apply the **Solution Slate Protocol** from `skills/llm-operations/references/peer-llm-dispatch.md` to the synthesis: require peers to return a ranked slate of solutions and reconcile them into one Coordinator slate (≥2 options, explicit ranking criteria, per-option trade-offs, a recommendation + cheapest de-risking test; for debate, back the leading option with sample code / pseudocode). This applies to `single-pass` synthesis and to `debate` synthesis / Round 2+ only — never `debate` Round 1, which stays solution-neutral.
    - In `debate` mode, each rebuttal round must require every responding model to explain its current position, why it holds that position, whether that position changed this round, the strongest argument against the leading opposing position, and what evidence or assumption change would move it.
    - Before starting the full peer timer, run the Peer Handshake Gate from `skills/llm-operations/references/peer-llm-dispatch.md`: require packet-bound ACK within 60 seconds by default, using `ACK_PACKET_RECEIVED <packet-id or deterministic packet marker> -- I received the packet and will work on it.`
    - Start `swarm_timeout_seconds` only after peer handshakes succeed or failed peers are explicitly classified and excluded.
