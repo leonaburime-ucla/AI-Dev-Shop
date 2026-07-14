@@ -52,7 +52,7 @@ Act as a Swarm Consensus Coordinator.
      - **file-context line (mandatory):** state plainly that peers will read repo files for more context and better results, and name the bounded file set (or staged path) being made available. Reading necessary files is the default; if a run is deliberately packet-only (no file reads), say so and why. For Gemini/`agy`, name the staged `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/files/` set per the peer-dispatch rules.
      - what replying `run` will do
    - If the user flags an issue, revise the file and repeat the preview gate.
-   - In debate mode, the Round 1 peer prompt must not include the Primary model's answer. Preview later rebuttal prompts too when they are materially different or include summarized model deltas.
+   - In debate mode, the Round 1 peer prompt must not include the Primary model's answer. Preview later rebuttal prompts too when they are materially different or include other participants' full previous-round reasoning.
 8. Treat the current host model as the `Primary` participant and require a substantive frozen first-pass response before any peer synthesis. If the host environment cannot surface that first-pass response cleanly, create exactly one same-family child/helper to fill the `Primary` slot before continuing. Do not count that helper as an extra voting peer. A peer-only run is invalid and must stop.
 9. Run consensus in the chosen mode:
    - `single-pass`: independent first pass + one synthesis.

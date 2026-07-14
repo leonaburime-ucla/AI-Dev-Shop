@@ -20,7 +20,7 @@ Round 1 must be adversarial and solution-neutral. Frame the prompt as "what we n
 Disclose the Coordinator's own analysis progressively — do not bias peers in Round 1, but do inform them afterward.
 
 - **Round 1 (blind):** The Primary/host still produces its substantive frozen first-pass answer in Round 1 (consensus.md Step 8) — it is formed and recorded, just withheld from the peers. What the Round 1 *packet* must not carry is any Coordinator opinion, leaning, finding, verdict, or the Primary's answer; peers form independent positions from the neutral framing alone. This extends consensus.md Step 7's "no Primary answer in the Round 1 peer prompt" to the Coordinator's own discoveries as well.
-- **Round 2+ (informed):** From the second round onward, the Coordinator SHOULD share what it discovered — its own analysis, the strongest points each side raised, cross-response deltas, and any evidence it gathered between rounds — so peers debate against the sharpest current state rather than re-arguing blind. Attribute these as Coordinator findings, keep them falsifiable, and still require each peer to state its position, whether it changed, and what would change its mind.
+- **Round 2+ (informed):** From the second round onward, give each peer the full reasoning of every other participant's previous-round response (Primary + all peers), verbatim — not a summary — plus the Coordinator's own analysis and any evidence gathered between rounds, so peers debate against the sharpest current state rather than re-arguing blind. Full reasoning is the default; only condense a single response when its length is disproportionately large next to the others (rare), and even then keep it lossless on substance, trimming only redundancy/filler. Attribute the Coordinator's own findings as such, keep them falsifiable, and still require each peer to state its position, whether it changed, and what would change its mind.
 
 Apply this guard to every participant that receives a round packet, including any user-requested in-host subagent added under the Debate Routing Guard.
 
@@ -44,6 +44,6 @@ Act as a Swarm Consensus Coordinator in `debate` mode.
 5. Remaining text is the prompt.
 6. If omitted, default to: `max_rounds=2`, `min_confidence=0.90`, `swarm_timeout_seconds=300`.
 7. Apply the Debate Problem-Framing Guard when creating the Round 1 prompt/context packet.
-8. Apply the Debate Round-Disclosure Guard on every round: keep Round 1 packets free of Coordinator opinion/findings; from Round 2 on, fold the Coordinator's discoveries and cross-response deltas into the rebuttal packet.
+8. Apply the Debate Round-Disclosure Guard on every round: keep Round 1 packets free of Coordinator opinion/findings; from Round 2 on, fold the Coordinator's discoveries and every participant's full previous-round reasoning (not summarized) into the rebuttal packet.
 9. If the user asked to add an in-host subagent (Addition case in the Debate Routing Guard), dispatch it alongside — never instead of — the external peers, under the same guards, and disclose it in the Peer Dispatch Brief.
 10. Then follow `<AI_DEV_SHOP_ROOT>/framework/slash-commands/consensus.md` exactly as if the user had invoked `/consensus debate ...`.

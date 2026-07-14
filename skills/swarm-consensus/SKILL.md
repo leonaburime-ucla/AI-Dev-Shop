@@ -343,7 +343,8 @@ confirmation.
    the preview gate.
 6. In debate mode, the Round 1 peer prompt must not include the Primary model's
    answer. If later rebuttal rounds use a materially different prompt or include
-   summarized model deltas, preview that rebuttal prompt before dispatch too.
+   other participants' full previous-round reasoning, preview that rebuttal
+   prompt before dispatch too.
 7. Do not treat the model-resolution confirmation gate as a substitute for this
    preview. The user must be able to inspect the actual words sent to other LLMs
    through the linked packet without having to read the full packet inline.
@@ -432,7 +433,7 @@ If a peer model's response contains a resource fetch failure signal (e.g. it rep
 In `debate` mode, run bounded rebuttal rounds after Round 1:
 
 1. Build a decision-point ledger (architecture choice, data model strategy, risk posture, migration approach, etc.).
-2. Summarize deltas only (where models disagree) and send the summarized deltas back to each model for rebuttal.
+2. Build the rebuttal packet from full reasoning, not summaries: include every participant's complete previous-round response verbatim (Primary + every peer), plus the decision-point ledger for structure. Full reasoning is the default. Only condense a single response when its length is disproportionately large next to the others (rare — expect this under 1% of rounds in practice), and even then keep it lossless on substance (no dropped arguments or evidence), trimming only redundancy/filler.
    - For each disputed decision point, require every responding model to state:
      - its current position
      - why it currently holds that position
