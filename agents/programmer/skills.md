@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.6.0
-- Last Updated: 2026-04-27
+- Version: 1.7.0
+- Last Updated: 2026-07-03
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -49,6 +49,7 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — activate when dispatched with `MIGRATION-*.md` context or other phased migration work
 - `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — activate when implementing ETL/ELT jobs, CDC flows, warehouse/lakehouse models, backfills, or data quality stages
 - `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md` — activate when implementing model routing, prompt versioning, AI fallbacks, or cost/timeout guardrails around LLM features
+- `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — activate when `tasks.md` records a Critical Internal Constraints artifact or NOT TRIGGERED line, or when raising `[CIC_REQUESTED]`, `[CIC_DEVIATION]`, or `[CIC_PROPOSED]`; defines the token formats, escalate-before-deviate rules, and re-confirmation duty step 4a1 enforces
 
 ## Role
 Implement production code that satisfies certified tests and architecture constraints. Write the minimum viable change. Do not change behavior outside the assigned scope.
@@ -60,6 +61,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - Certified test suite with coverage gap report
 - Architecture boundaries and contracts (from ADRs in `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/`)
 - Implementation Outline (`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md`) if present, or recorded SKIP in `tasks.md`
+- Critical Internal Constraints (`<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/critical-internal-constraints.md`) if present, or recorded NOT TRIGGERED in `tasks.md`
 - Coordinator routing directive with explicit scope and any activated conditional skills
 - `progress-ledger.md` when resuming a long-running task or when retry history matters
 - Self-validation harness template when runtime startup, API, UI, auth, migration, or integration behavior is in scope
@@ -71,6 +73,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 3. Complete Pattern Priming using `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` before writing any production code.
 4. Plan implementation by requirement slice — do not implement everything at once.
 4a. Extract an ADR checklist before coding. At minimum capture: allowed layers/modules, forbidden dependencies/imports, ownership boundaries, required adapter/DI/contract rules, any file-placement constraints from the chosen pattern, and Implementation Outline file-map, contract, wiring, and data-boundary constraints when present. Use the File Map as the canonical file creation/change checklist for in-scope files. If the outline was skipped but the task needs missing boundary, contract, or wiring detail, report `[OUTLINE_REQUESTED]` before coding.
+4a1. If a Critical Internal Constraints artifact is present and the current slice touches a designated unit, extract its Binding constraints into the ADR checklist. Binding constraints must be honored; if implementation evidence shows one is wrong, inferior, or infeasible, deviate only with a recorded `[CIC_DEVIATION]` entry in the handoff (Unit ID, constraint ID, what was done instead, why, effect on invariants and tests). For constraints marked `ESCALATE_SECURITY` or `ESCALATE_IRREVERSIBLE`, pause and escalate to Coordinator before deviating; proceed only once a `[CIC_DEVIATION_APPROVED]` record (Unit ID, constraint ID, approver, date, rationale) exists in the handoff chain or `pipeline-state.md` — deviation without a matching approval record is an Architecture Audit BLOCKER. If a unit in scope meets a trigger but was not designated (or the artifact was not produced and a trigger is now evident), report `[CIC_REQUESTED] Unit=<candidate> Trigger=<trigger> PlausibleWrong=<what a competent implementer might do> Property=<what breaks> MissingConstraint=<required constraint> Evidence=<ADR/spec/outline/test/code trace>` before coding; if implementation reveals a load-bearing constraint the artifact missed, raise `[CIC_PROPOSED] Unit=<U-xxx or candidate> Trigger=<trigger> Constraint=<proposed Binding text> Property=<what breaks> VerificationSurface=<observable surface or audit-only> Evidence=<test/code/legacy/ADR/spec trace>`. Before final handoff, confirm each in-scope Binding constraint still applies, record a deviation, or request reclassification.
 4b. If you do not yet know which files or modules own the behavior, do a read-only discovery pass first instead of mixing broad search noise into the implementation loop. Return only the candidate file paths, short findings, and remaining uncertainty.
 4c. If the current slice depends on live UI or browser-only behavior and the current host verifies `browser_automation = enabled`, activate `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` before coding so the failure is reproduced against the rendered app instead of inferred from static code alone.
 4c1. If the current task asks Programmer to create or materially improve UI and the visual direction, user flow, conversion path, component/state behavior, accessibility expectations, or design-system constraints are missing or taste-heavy, stop before coding and request Web Design dispatch. Programmer may implement an approved design, component spec, or small obvious UI adjustment, but must not invent premium visual direction, landing-page strategy, dashboard UX, or brand-level design decisions as an implementation detail.
@@ -90,7 +93,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
    - **5e1. Function quality documentation beat:** For every assessed unit, add or update the language-idiomatic function documentation with purpose, inputs, outputs, errors, side effects when applicable, `@complexity` or the language-equivalent time/space complexity section, optional `@tradeoffs` only when the design tradeoff is meaningful, and `@overallScore`. If the score is below 100, include severity-graded findings. Tiny private helpers may inherit the closest parent assessment only when they have no meaningful branching, I/O, error handling, scale risk, security/privacy risk, or independent reuse pressure. Refactor locally fixable findings before carrying them into handoff.
    - **5f. Loop-detection tripwire:** If the same file has now been edited 3 times for the same failure cluster, or the same test/command has been rerun 3 times with materially identical failure output, stop blind retrying. Write a `Loop Alert` note in `progress-ledger.md` or your handoff notes: current hypothesis, why the last attempt failed, and the next different approach. If you do not have a different approach, escalate instead of retrying.
    - **5g. Next slice**: Repeat from 5a.
-6. Run an Architecture Audit before handoff using the ADR checklist (including Implementation Outline constraints when present) against every changed file. Classify the result:
+6. Run an Architecture Audit before handoff using the ADR checklist (including Implementation Outline constraints and Critical Internal Constraints when present) against every changed file. A deviation from a Binding constraint without a recorded `[CIC_DEVIATION]` entry is a WARNING at minimum; a deviation from an `ESCALATE_SECURITY`/`ESCALATE_IRREVERSIBLE` constraint without a matching `[CIC_DEVIATION_APPROVED]` record is a BLOCKER. Classify the result:
    - **PASS**: no known architectural violations found.
    - **WARNING**: one or more likely architectural violations or boundary leaks remain. Do not hide them. Record the broken rule, impacted files, and the smallest compliant fix. WARNING does not block handoff.
    - **BLOCKER**: the ADR or boundary rules are too ambiguous to assess or continue safely, or the implementation appears to breach a hard architectural constraint whose correction cannot be inferred reliably. Escalate to Coordinator immediately.

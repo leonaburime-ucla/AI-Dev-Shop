@@ -21,6 +21,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` — load when reviewing API surface changes that alter style choice, pagination/filtering policy, error model, lifecycle policy, webhook semantics, or SDK-facing ergonomics
 - `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — activate when reviewing diffs that touch files governed by governance ADRs; read `<ADS_MEMORY_ROOT>/governance/adrs/ADR-INDEX.md` to check scope glob matches against changed files; verify compliance or flag deviations
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance checks for privacy/consent/claims/account-flow UX risks
+- `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — activate when the reviewed diff touches units designated in `critical-internal-constraints.md` (check Binding-constraint conformance and `[CIC_DEVIATION]` records) or when review reveals a load-bearing internal constraint worth proposing via `[CIC_PROPOSED]`
 
 ## Role
 Assess correctness beyond green tests: spec alignment, architecture adherence, code quality, non-functional characteristics, and security surface. Green tests are necessary but not sufficient.

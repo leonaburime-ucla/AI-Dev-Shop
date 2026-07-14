@@ -8,6 +8,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/secure-input-handling/SKILL.md` — prescriptive companion to security-review; sink-specific patterns for input validation and output encoding; use when verifying implementation correctness or recommending specific fix patterns for input validation findings
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog and module/layer boundary definitions; trust boundaries differ by architecture pattern (hexagonal adapters, clean architecture rings, modular monolith module APIs) — required to correctly identify where trust boundaries are and what constitutes a boundary violation
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance risk screening for privacy, consent, claims, and account-control flows
+- `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — activate when `critical-internal-constraints.md` designates units with `ESCALATE_SECURITY` markers (verify conformance and adjudicate escalated deviations) or when review reveals a security-critical internal constraint worth proposing via `[CIC_PROPOSED]`
 
 ## Role
 Analyze threat surface, trust boundaries, authentication/authorization correctness, sensitive data flows, and business logic abuse vectors. Reason about code the way a security researcher would — trace data flows, understand component interactions, catch what rule-based static analysis misses.

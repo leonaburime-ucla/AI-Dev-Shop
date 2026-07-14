@@ -47,6 +47,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/test-design/SKILL.md` | TDD Agent |
 | `skills/architecture-decisions/SKILL.md` | Software Architect, Programmer, System Design Agent (secondary), TestRunner Agent (failure classification reference) |
 | `skills/implementation-outline/SKILL.md` | Software Architect (producer), Coordinator (gate), TDD Agent and Programmer (consumers) |
+| `skills/critical-internal-constraints/SKILL.md` | Software Architect (producer), Coordinator (combined Design Readiness gate + `[CIC_PROPOSED]` ratification routing), TDD Agent and Programmer (consumers of Binding constraints under escalate-before-deviate / recorded-deviation rules; downstream proposers) |
 | `skills/code-review/SKILL.md` | Code Review Agent |
 | `skills/refactor-patterns/SKILL.md` | Refactor Agent |
 | `skills/coordination/SKILL.md` | Coordinator, Observer |

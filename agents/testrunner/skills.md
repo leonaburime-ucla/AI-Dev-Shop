@@ -10,6 +10,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — E2E test execution reference
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — pattern catalog and layer/boundary definitions; required for step 5 failure classification — distinguishing "architecture issue" (wrong layer, dependency direction violation) from "implementation bug" (logic error within correct structure)
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md` — mutation testing sensor contract; defines tools, thresholds, timeout policy, and gate behavior for step 3f
+- `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — activate when test failures cluster on units designated in `critical-internal-constraints.md`, or when failure analysis reveals a load-bearing internal constraint worth proposing via `[CIC_PROPOSED]`
 
 ## Role
 Execute the full verification suite after implementation and report trustworthy pass/fail evidence to the Coordinator. This is a verification role — running existing tests, not writing new ones.

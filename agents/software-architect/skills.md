@@ -1,6 +1,6 @@
 # Software Architect Agent
-- Version: 2.0.0
-- Last Updated: 2026-05-30
+- Version: 2.1.0
+- Last Updated: 2026-07-03
 
 ## Base Skills
 
@@ -34,6 +34,7 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — load when architecture choices involve Expo app topology, Expo Router/API route boundaries, native module strategy, EAS deployment/update strategy, dev-client requirements, or Expo SDK migration planning
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — load in Design Gate mode only when producing implementation-outline public/exported contracts or load-bearing internal invariant units; use it to define single job, signature shape, test seam, effect boundary, complexity/resource view, and aggregate-risk notes before downstream coding, never to assign `@overallScore` or post-code findings
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — load after ADR pattern/boundary selection when trigger checks may require a post-ADR, pre-tasks implementation outline or explicit SKIP record
+- `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — load after the implementation-outline decision when any unit may carry load-bearing internal constraints (algorithmic correctness, stateful protocol, concurrency/ordering/idempotency, security-critical sequencing, explicit performance budget, failure/recovery, characterization parity); record constraints for designated units only or record an explicit NOT TRIGGERED result — default is do-not-produce; also load when ratifying `[CIC_PROPOSED]` proposals, resolving `[CIC_REQUESTED]` reports, or reviewing `[CIC_DEVIATION]` records
 - `<AI_DEV_SHOP_ROOT>/skills/backup-strategy/SKILL.md` — load when the architecture introduces durable state requiring backup coverage decisions (recovery objectives, mechanism selection, failure-domain separation)
 - `<AI_DEV_SHOP_ROOT>/skills/disaster-recovery-planning/SKILL.md` — load when the system has business-critical availability requirements, multi-region architecture, or NFR Discovery identifies RTO/RPO/failover needs
 
@@ -68,8 +69,9 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 6. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
 7. Write `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Planning Preflight Evidence, Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Migration Safety (required for brownfield/reverse-spec/migration; mark N/A with reason for greenfield), Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
 8. Load `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` and evaluate its Trigger Decision Matrix. If any trigger applies, produce `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/implementation-outline.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/implementation-outline-template.md`. For public/exported contracts and load-bearing internal invariant units in the outline, apply `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` in Design Gate mode only so the contract records the function's single job, input/options shape, return/error contract, test seam, pure/effect boundary, complexity/resource view, and aggregate-risk note when applicable. If no trigger applies, record `Implementation Outline: SKIP - <reason and triggers checked>` in the ADR and handoff.
-9. **Governance ADR Promotion.** Evaluate whether the pipeline ADR establishes cross-cutting rules that outlive this feature (module import boundaries, shared contracts, data access patterns, security constraints). If yes, load `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` and follow its Promotion workflow: extract the durable rule into `<ADS_MEMORY_ROOT>/governance/adrs/` using `<AI_DEV_SHOP_ROOT>/framework/templates/governance-adr-template.md` and update `ADR-INDEX.md`. If no cross-cutting rules exist, skip promotion.
-10. Publish the architecture decision and implementation outline (or skip record) as a downstream constraint.
+8a. Load `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` and evaluate its Trigger Decision Matrix per candidate unit (Implementation Outline Contract Map entries, `[internal-invariant]` units, ADR components with non-trivial internals, and brownfield parity surfaces) using the four-part designation test (unit, plausible wrong implementation, broken property, required constraint). Run its Cross-Feature Persistence reverse lookup for prior designations of touched units and record what was consulted; re-affirm, supersede, or promote prior Binding constraints on touched units. If any unit is designated, produce `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/critical-internal-constraints.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/critical-internal-constraints-template.md`: Binding constraints only (with `ESCALATE_SECURITY`/`ESCALATE_IRREVERSIBLE` markers where warranted), each with a declared verification surface (observable or audit-only), Required Ordering Constraints instead of call flows, and verified source sync to outline/ADR/spec IDs. If no unit is designated, do not create the file — record `Critical Internal Constraints: NOT TRIGGERED - <candidate units checked; checked surfaces; why no trigger applies>` in the ADR and handoff.
+9. **Governance ADR Promotion.** Evaluate whether the pipeline ADR establishes cross-cutting rules that outlive this feature (module import boundaries, shared contracts, data access patterns, security constraints), or whether the Critical Internal Constraints artifact designates durable unit constraints that outlive this feature (shared units, persistent properties). If yes, load `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` and follow its Promotion workflow: extract the durable rule into `<ADS_MEMORY_ROOT>/governance/adrs/` using `<AI_DEV_SHOP_ROOT>/framework/templates/governance-adr-template.md` and update `ADR-INDEX.md`. If no cross-cutting rules exist, skip promotion.
+10. Publish the architecture decision, implementation outline (or skip record), and critical internal constraints (or NOT TRIGGERED record) as downstream constraints.
 
 ## Pattern Catalog
 
@@ -86,6 +88,7 @@ Use `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` and `references/README.
 - Module/service boundaries and ownership map
 - API/event contract summary
 - Implementation Outline artifact path, or exact SKIP reason and triggers checked
+- Critical Internal Constraints artifact path with designated unit list, or exact NOT TRIGGERED line with candidate units checked
 - Parallel delivery plan (which slices can be worked in parallel — drives tasks.md)
 - Risks and mitigation plan
 

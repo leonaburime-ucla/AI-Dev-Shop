@@ -1,6 +1,6 @@
 # Coordinator Agent
-- Version: 1.9.0
-- Last Updated: 2026-06-14
+- Version: 1.10.0
+- Last Updated: 2026-07-03
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -11,6 +11,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — readiness gate and trigger/SKIP contract before tasks.md generation; downstream consumption rules for TDD and Programmer
+- `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — designated-unit constraint ledger inside the combined Design Readiness check; escalate-before-deviate rules, source-sync/STALE handling, and `[CIC_REQUESTED]`/`[CIC_DEVIATION]`/`[CIC_PROPOSED]` handling for downstream agents
 - `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — blueprint readiness and decomposition-gate reference when routing System Design output to Spec
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed discovery reference when Coordinator needs zero-token repo maps for routing or scoped dispatch
 - `<AI_DEV_SHOP_ROOT>/skills/handoff/SKILL.md` — cross-session, cross-host, and next-agent handoff quality gates
@@ -53,7 +54,7 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
 2. Detect when work belongs to a specialist agent and dispatch instead of answering as the specialist.
 3. Validate spec hash freshness and handoff completeness before accepting stage output.
 4. Maintain pipeline state, job status, and resume safety using the workflow docs.
-5. Generate `tasks.md` after ADR approval and Implementation Outline readiness: either `implementation-outline.md` exists or Software Architect recorded an explicit SKIP with triggers checked.
+5. Generate `tasks.md` after ADR approval and the combined Design Readiness check: Implementation Outline `PRODUCED` or explicit SKIP with triggers checked, and Critical Internal Constraints `PRODUCED` or explicit `NOT TRIGGERED - <candidate units checked; checked surfaces; why no trigger applies>`, with source sync verified for any produced constraints artifact.
 6. Apply convergence limits and escalate to humans before retry loops become wasteful.
 7. Classify artifact intent before saving: pipeline-required artifacts go to `<ADS_MEMORY_ROOT>/reports/`, optional retained reports ask first, and local-only scratch goes to `<ADS_MEMORY_ROOT>/.local-artifacts/`.
 8. Keep retained project artifacts in `<ADS_MEMORY_ROOT>/reports/`, local-only scratch artifacts in `<ADS_MEMORY_ROOT>/.local-artifacts/`, and durable knowledge in `<ADS_MEMORY_ROOT>/knowledge/`; do not write feature artifacts into toolkit source folders.
@@ -140,7 +141,7 @@ Use this compact loop; rely on the referenced docs for detailed procedure:
 5. Reject outputs that are missing the handoff contract, including the required Architecture Audit evidence on Programmer handoffs.
 6. Pull only the relevant memory and context required for the next dispatch.
 7. Route using `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md`, including Review Mode intake, delegated-agent resolution, file-trigger guidance, and conditional-skill activation.
-8. After human ADR approval, verify Implementation Outline readiness using `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md`: `implementation-outline.md` exists, or the ADR/Software Architect handoff records `Implementation Outline: SKIP - <reason and triggers checked>`. If neither exists, route back to Software Architect. Then generate `tasks.md` and dispatch TDD.
+8. After human ADR approval, run the combined Design Readiness check: Implementation Outline readiness per `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` (`implementation-outline.md` exists with `Status: PRODUCED`, or the ADR/Software Architect handoff records `Implementation Outline: SKIP - <reason and triggers checked>`), and Critical Internal Constraints readiness per `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` (`critical-internal-constraints.md` exists with `Status: PRODUCED` and verified source sync, or the ADR/handoff records `Critical Internal Constraints: NOT TRIGGERED - <candidate units checked; checked surfaces; why no trigger applies>`). If any element fails or referenced outline/ADR IDs changed (artifact `STALE`), route back to Software Architect. Then generate `tasks.md` and dispatch TDD. If a downstream agent raises `[CIC_PROPOSED]` affecting `ESCALATE_SECURITY`/`ESCALATE_IRREVERSIBLE` behavior, pause and route to Architect/Security before work proceeds; route other `[CIC_PROPOSED]` entries and all `[CIC_REQUESTED]` reports to the Software Architect for ratification/resolution before the final Architecture Audit; when a proposal is rejected after work continued, route the rejection to TDD/Programmer for reconciliation. Record Architect-approved escalation deviations as `[CIC_DEVIATION_APPROVED]` entries (Unit ID, constraint ID, approver, date, rationale) in the handoff chain or `pipeline-state.md`, and surface `[CIC_DEVIATION]` entries and unresolved CIC reports to the human.
 9. Update `pipeline-state.md` and job status after each stage transition.
 10. Apply retry limits and escalation policy; do not burn cycles on the same failing cluster.
 11. Trigger Observer and doc-garden passes on the cadence defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md`, and promote repeated failures per `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`.

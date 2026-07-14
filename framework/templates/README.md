@@ -20,6 +20,7 @@ Provider note:
 - **`evaluator-report-template.md`**: Used when a retained evaluator run should record scope check, findings, blocking outcome, and next action for the generator.
 - **`handoff-template.md`**: The mandatory contract format used by every agent at the end of their execution. It ensures the next agent in the pipeline receives the correct input hashes, context, and risk warnings.
 - **`implementation-outline-template.md`**: Used by the Software Architect for the conditional post-ADR, pre-tasks implementation outline or explicit SKIP record. Includes module maps, public/exported contract maps, wiring, data boundaries, and critical invariants.
+- **`critical-internal-constraints-template.md`**: Used by the Software Architect for the conditional designated-unit constraint ledger (produced only when a trigger fires; otherwise a NOT TRIGGERED record in the ADR/handoff). Includes four-part trigger designation, Binding constraints with escalation markers and verification surfaces, state machines, Required Ordering Constraints, and failure/recovery constraints.
 - **`known-flaky-tests-template.md`**: Used by the Coordinator to initialize the human-approved flaky-test exclusion registry when the first flaky test is detected.
 - **`load-bearing-harness-audit-template.md`**: Used for retained maintenance audits that test whether older harness components are still needed on current models and hosts.
 - **`red-team-template.md`**: Used by the Red-Team Agent to output vulnerability, ambiguity, and logic-flaw findings against a proposed spec.

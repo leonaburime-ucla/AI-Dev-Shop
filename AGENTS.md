@@ -113,6 +113,7 @@ Agents are specialized roles, each with a `skills.md`. By default, all routing f
 
 - `[VibeCoder]` is an optional starting point — say "switch to vibecoder" to prototype fast, then promote to the full pipeline when ready. If slash-command templates are installed, `/agent vibecoder` may also be available.
 - Software Architect conditionally produces an **Implementation Outline** or explicit SKIP before tasks.md generation
+- Software Architect conditionally produces **Critical Internal Constraints** (designated complex units only; default do-not-produce) or records an explicit NOT TRIGGERED result before tasks.md generation
 - `[Observer]` is passive and active across all stages when enabled
 - `[...]` stages are optional; dispatched by Coordinator when spec/ADR triggers them or when you specifically ask for them
 

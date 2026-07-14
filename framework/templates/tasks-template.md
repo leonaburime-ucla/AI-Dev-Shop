@@ -5,6 +5,7 @@
 - Spec: SPEC-<id> v<version> (hash: <sha256>)
 - ADR: ADR-<id>
 - Outline: <path to implementation-outline.md OR "SKIP - <reason and triggers checked>">
+- Critical Internal Constraints: <path to critical-internal-constraints.md OR "NOT TRIGGERED - <candidate units checked; checked surfaces; why no trigger applies>">
 - Date: <ISO-8601 UTC>
 - Author: Coordinator
 
@@ -17,6 +18,7 @@
 - Every task references exact file paths
 - If an Implementation Outline is present, tasks should derive story order and phase boundaries from the outline's wiring map and module map.
 - If Implementation Outline was skipped, record the exact SKIP reason in the metadata above and derive phases from the ADR only.
+- If a Critical Internal Constraints artifact is present, tasks touching its designated units must reference the Unit IDs (U-xxx) so TDD and Programmer load the Binding constraints. If not triggered, record the exact NOT TRIGGERED line in the metadata above.
 - Task checkboxes are Coordinator-owned state. Implementation, TDD, TestRunner,
   and Code Review agents must treat `tasks.md` as read-only unless the
   Coordinator explicitly delegates a task-list update.
@@ -144,6 +146,7 @@ Use this instead of the full template when the feature has one implementation ta
 - Spec: SPEC-<id> v<version> (hash: <sha256>)
 - ADR: ADR-<id>
 - Outline: <path to implementation-outline.md OR "SKIP - <reason and triggers checked>">
+- Critical Internal Constraints: <path to critical-internal-constraints.md OR "NOT TRIGGERED - <candidate units checked; checked surfaces; why no trigger applies>">
 - Date: <ISO-8601 UTC>
 - Author: Coordinator
 - Convergence threshold before Code Review: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason
