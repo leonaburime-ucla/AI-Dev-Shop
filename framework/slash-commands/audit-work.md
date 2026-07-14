@@ -211,7 +211,7 @@ Act as an External Audit Coordinator.
    - `Auditor Matrix` (must include each auditor's 1-10 score and one-line rationale)
    - `Degraded Coverage` when any planned auditor failed, was skipped, or did not review the target scope
    - `Per-Auditor Scope Checks`
-   - `What The External LLMs Said`
+   - `What The External LLMs Said` — full reasoning trace per auditor by default, not a condensed summary: complete finding text and rationale as the auditor wrote it. Only condense a single auditor's section when its raw output is disproportionately large next to the others (rare), and even then keep it lossless on substance (no dropped findings, evidence, or caveats) and say plainly that it was condensed.
    - `Per-Finding Rationales`
    - `Cross-Auditor Synthesis`
    - `Suggested Changes By Auditor`

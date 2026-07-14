@@ -45,8 +45,10 @@
 
 ## What The External LLMs Said
 
+Show each auditor's full reasoning trace by default — the complete finding text and rationale as the auditor wrote it, not a condensed paraphrase. Condensing a single auditor's section is only acceptable when its raw output is disproportionately large next to the others (rare); even then, keep it lossless on substance (no dropped findings, evidence, or caveats) and trim only redundancy/filler. State plainly when a section has been condensed and why.
+
 ### <Auditor CLI> Findings By Severity
-- <succinct but faithful summary of this auditor's findings>
+- <this auditor's findings in full — complete rationale per finding, not a summary>
 
 ### <Auditor CLI> Blockers
 - <real blockers, or "none">
@@ -55,10 +57,10 @@
 - <non-blocking improvements, or "none">
 
 ### <Auditor CLI> Strengths
-- <what the auditor said looked solid, or "none stated">
+- <what the auditor said looked solid, in full, or "none stated">
 
 ### <Auditor CLI> Suggested Changes
-- <summary of file-level suggestions, or "none returned">
+- <this auditor's file-level suggestions in full, or "none returned">
 
 ## Per-Finding Rationales
 
