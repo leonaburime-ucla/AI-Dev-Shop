@@ -433,20 +433,22 @@ If a peer model's response contains a resource fetch failure signal (e.g. it rep
 In `debate` mode, run bounded rebuttal rounds after Round 1:
 
 1. Build a decision-point ledger (architecture choice, data model strategy, risk posture, migration approach, etc.).
-2. Build the rebuttal packet from full reasoning, not summaries: include every participant's complete previous-round response verbatim (Primary + every peer), plus the decision-point ledger for structure. Full reasoning is the default. Only condense a single response when its length is disproportionately large next to the others (rare — expect this under 1% of rounds in practice), and even then keep it lossless on substance (no dropped arguments or evidence), trimming only redundancy/filler.
-   - For each disputed decision point, require every responding model to state:
+2. **Self (primary model) rebuttal — mandatory, every round:** Before or alongside building the peer rebuttal packet, the Primary model MUST produce its own fresh rebuttal for this round. Read every participant's full previous-round response (peers + your own prior round), then independently write your current position for each disputed decision point, why you hold it, whether it changed this round and why, the strongest argument against the leading opposing position, and what would change your mind. Freeze this before reading any peer's *this-round* response — do not let a peer's round-N answer bias the Primary's round-N position, mirroring the Round 1 anti-bias rule. The Primary is a full debate participant in every round, not just Round 1: a round where the Primary silently relays or synthesizes without stating and updating its own reasoned position is invalid and must be redone.
+   - The Primary's frozen Round 1 answer is never simply carried forward unchanged into later rounds' Decision Ledger entries — each round's Primary row reflects that round's actual rebuttal, even when the conclusion is "unchanged" (state that explicitly, with why).
+3. Build the rebuttal packet from full reasoning, not summaries: include every participant's complete previous-round response verbatim (Primary + every peer), plus the decision-point ledger for structure. Full reasoning is the default. Only condense a single response when its length is disproportionately large next to the others (rare — expect this under 1% of rounds in practice), and even then keep it lossless on substance (no dropped arguments or evidence), trimming only redundancy/filler.
+   - For each disputed decision point, require every responding model — Primary and peers alike — to state:
      - its current position
      - why it currently holds that position
      - the strongest reason against the leading opposing position
      - whether its position changed this round and, if so, why
      - what evidence, assumption change, or repo fact would change its mind
-   - Do not accept a bare "still agree/disagree" rebuttal when the model can provide reasoning. The point of the debate round is rationale movement, not just vote counting.
+   - Do not accept a bare "still agree/disagree" rebuttal when the model can provide reasoning. The point of the debate round is rationale movement, not just vote counting. This applies to the Primary exactly as it applies to peers.
    - **Mid-Debate Dropout Rule:** If a model that participated in Round 1 fails to respond, times out, or reports a resource failure in Round 2+, it **withdraws from the remainder of the debate**. 
    - Do not hallucinate its rebuttal. Note its withdrawal inline to the user. Its Round 1 positions remain in the ledger but are marked as "Final (Withdrawn)".
    - The same `swarm_timeout_seconds` budget applies to debate rounds. If the remaining budget expires mid-debate, stop additional rebuttal calls, mark affected peers as `Withdrawn`, and synthesize with the evidence already collected.
    - Recompute active participants each round. If active participants drop below two total responders (primary + at least one peer), stop debate and report insufficient participants for meaningful consensus.
-3. Repeat for up to `max_rounds`.
-4. Stop early when agreement is >=`min_confidence` on decision points.
+4. Repeat for up to `max_rounds`.
+5. Stop early when agreement is >=`min_confidence` on decision points.
 
 Agreement formula:
 - `agreement_percent = (decision_points_with_same_outcome / total_decision_points) * 100`
@@ -515,14 +517,14 @@ Produce a `consensus-report.md` (or inline if the user prefers) with this struct
 | codex  | json | event stream / agent message | <short summary> | <attempt summary> |
 
 ## Debate Trace
-<Only include in debate mode. Capture round-by-round deltas, rationale changes, withdrawals, and position shifts before synthesis. For each disputed decision point, record each model's current position, why it held that position that round, whether it changed, and what would change its mind.>
+<Only include in debate mode. Capture round-by-round deltas, rationale changes, withdrawals, and position shifts before synthesis. For each disputed decision point, record each model's current position — including the Primary's — why it held that position that round, whether it changed, and what would change its mind. The Primary must have its own row/entry every round; it is a participant, not just the synthesizer.>
 
 ## Individual Responses
 
 Use the resolved model identity (e.g., "Claude Opus 4.6", "Gemini 3.1 Pro", "Codex GPT-5.5 xhigh") as the heading — not the CLI name alone.
 
 ### <Primary: resolved model identity>
-<Summary of primary reasoning>
+<Summary of primary reasoning. In debate mode, this must reflect the Primary's own position across all rounds, not just its frozen Round 1 answer — note explicitly where it held firm vs. changed and why.>
 
 ### <Peer 1: resolved model identity> (if responded)
 <Summary of peer response>
