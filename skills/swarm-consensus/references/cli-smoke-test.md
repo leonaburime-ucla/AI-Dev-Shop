@@ -33,12 +33,10 @@ python3 skills/swarm-consensus/scripts/cli_smoke_test.py \
   --output-format json
 ```
 
-Model-plan-only lookup order:
-
-1. Per-run model flags.
-2. `<ADS_MEMORY_ROOT>` evidence, resolved from `ADS_MEMORY_ROOT`, `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-memory/`.
-3. AI Dev Shop repo-local evidence in repo `.local-artifacts/`, repo `reports/`, and `tmp/peer-dispatch/`.
-4. Home CLI defaults in `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`.
+`--model-plan-only` is the mechanical implementation of the `Model Memory Map` in
+`skills/llm-operations/references/peer-llm-dispatch.md`. That map is the only place the
+lookup order, the evidence rules, and the explicitly-invalid sources are written; this
+document deliberately does not restate them, because a second copy drifts from the first.
 
 If a Claude model is requested but rejected or unproven locally, run discovery first:
 

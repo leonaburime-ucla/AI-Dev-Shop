@@ -49,14 +49,11 @@ Core collaboration invariant:
    - Detect available peer CLIs: `claude`, `gemini`, and `codex`.
    - Select peers from `peers=` if provided; otherwise select available external peer CLIs, preferring different model families from the current host.
    - Minimum viable cowork is the primary model plus at least one external peer. If no external peer is available, stop and ask whether to proceed as single-agent implementation instead; do not call it `/cowork`.
-   - Resolve exact model identity for each selected peer using per-run pins first, then project knowledge and AI Dev Shop repo-local evidence, then home CLI defaults, and finally fresh smoke-test proof where required.
-   - Project/repo evidence includes retained or local smoke-test caches, recent smoke-test reports, retained or local consensus reports, and bounded peer-dispatch packets under `tmp/peer-dispatch/`.
-   - For Gemini, inspect the saved local preference in `~/.gemini/settings.json` at `model.name` before asking the user to pin `gemini_model=...`.
-   - For Claude, inspect `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` and the legacy local cache before asking the user to pin `claude_model=...`; if only stale exact evidence is found, report the saved preference and the staleness reason instead of saying the model is unknown.
+   - Resolve exact model identity for each selected peer by working that map in full, including its interpretation rules for alias-only and stale evidence. Do not ask the user to pin `claude_model=...`, `gemini_model=...`, or `codex_model=...` until every source in the map has been checked or is unavailable.
    - If Claude rejects an alias, do not accept a lower-version `Try --model ...` suggestion until the Model Memory Map and `--model-plan-only` have been checked for an exact saved `command_model`.
    - If a selected peer's exact model cannot be proven, print a model confirmation gate before dispatch:
      `Planned cowork peers: Claude=<resolved-or-inferred>, Gemini=<resolved-or-inferred>, Codex=<resolved-or-inferred>. Reply with "run" to proceed or override with claude_model=..., gemini_model=..., codex_model=....`
-   - CLI version strings are diagnostics only. Do not present CLI versions as model identities.
+   - Name every participant under the `Model Identity Disclosure Guard` in `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`.
    - Maintain a participant status table from this point forward with: role, CLI, resolved model, CLI version, transport, status, failure class, and retry count.
 
 3. Protect the worktree before any writes.

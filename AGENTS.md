@@ -182,7 +182,7 @@ Detailed Agent Direct consensus and cross-agent consultation rules live in `<AI_
 
 Detailed routing guards live in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md`.
 
-When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or requests multiple agents/models to argue a question, default to **Swarm Consensus debate with external peer LLM CLIs**; show the resolved or planned **model name/version** first, and CLI version strings are diagnostics only.
+When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or requests multiple agents/models to argue a question, default to **Swarm Consensus debate with external peer LLM CLIs**, and name the participants under the `Model Identity Disclosure Guard` in `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`.
 
 - Platform subagents, current-LLM helper agents, repo-persona consultations, and same-family child agents are not the default route for debate requests.
 - Do not silently fall back to platform subagents.
