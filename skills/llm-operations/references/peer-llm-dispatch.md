@@ -396,9 +396,9 @@ Use this checklist for `/consensus`, `/debate`, `/audit-work`, `/cowork`, and an
 Check model sources in this order:
 
 1. Per-run controls: `claude_model=...`, `gemini_model=...`, `codex_model=...`.
-2. Project knowledge root evidence: resolve `<ADS_MEMORY_ROOT>` from `ADS_MEMORY_ROOT`, `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-memory/`, then inspect retained and local smoke-test caches, discovery reports, and consensus reports there.
+2. Project knowledge root evidence: resolve `<ADS_MEMORY_ROOT>` from `ADS_MEMORY_ROOT`, `ADS_PROJECT_KNOWLEDGE_ROOT`, `ADS_WORKSPACE_ROOT`, or sibling `ADS-memory/`, then inspect retained and local smoke-test caches, discovery reports, and consensus reports there. The retained cache is `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`; a legacy local cache of the same name is still read as a fallback.
 3. AI Dev Shop repo evidence: inspect repo `.local-artifacts/`, repo `reports/`, and bounded peer-dispatch packets under `tmp/peer-dispatch/`.
-4. Workspace and home CLI config files that expose model defaults. Workspace config (`.gemini/settings.json` in repo root) takes precedence over home config (`~/.gemini/settings.json`). Claude CLI uses `~/.claude/settings.json`; Gemini CLI uses `model.name` in settings; Codex reports its model in the session startup header (`model: <id>`). These are fallback preferences such as `us.anthropic.claude-opus-4-6-v1[1m]` or `gemini-3.1-pro-preview`.
+4. Workspace and home CLI config files that expose model defaults. Workspace config (`.gemini/settings.json` in repo root) takes precedence over home config (`~/.gemini/settings.json`). Claude CLI uses `~/.claude/settings.json`; Gemini CLI uses `model.name` in settings; Codex saves its model in `~/.codex/config.toml` and also reports it in the session startup header (`model: <id>`). These are fallback preferences such as `us.anthropic.claude-opus-4-6-v1[1m]` or `gemini-3.1-pro-preview`.
 5. Candidate ladders: `skills/swarm-consensus/references/model-candidate-ladders.json`. These are discovery candidates, not proof by themselves.
 
 **Explicitly invalid evidence (never use):**

@@ -26,8 +26,13 @@ These validators are the first mechanical enforcement layer for this repo.
   - project-scoped `gstack-*` commands are opt-in (`--include-project`); a MISSING one is never a failure
   - FIX telemetry points at `install-slash-commands.sh --install --overwrite`
 - `validate_swarm_model_identity_guard.py`
-  - checks that Swarm Consensus preflight shows peer model identity first
-  - fails when CLI version strings can be presented as model names or model versions
+  - enforces one home per rule for `Model Identity Disclosure` (`skills/swarm-consensus/SKILL.md`)
+    and the `Model Memory Map` (`skills/llm-operations/references/peer-llm-dispatch.md`)
+  - fails when a participating doc restates or paraphrases either rule instead of deferring to it,
+    when a participant stops pointing at its home, or when a home stops stating its own rule
+  - AST-checks `cli_smoke_test.py` for the model-plan entry points, the `--model-plan-only`
+    flag, and the evidence sources the map promises — including shadowed redefinitions
+  - it does **not** pin doctrine prose across files; that earlier design drifted three times
 - `validate_specs_as_built_freshness.py`
   - checks `ADS-memory/specs_as_built/` metadata when present
   - recomputes source-scope fingerprints and fails on concrete stale generated/hybrid artifacts

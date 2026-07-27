@@ -50,6 +50,11 @@ DOCTRINES = {
             "Do not present CLI version strings such as",
             "CLI versions belong only in diagnostics",
             "Preflight copy must distinguish",
+            # The fallback-label rule: what to print when identity cannot be proven,
+            # and that the label blocks. This is the line that stops a CLI version
+            # being substituted at the exact moment substituting one is tempting.
+            "say `model unresolved` or `local default, exact model unknown`",
+            "that unresolved label is a blocking status and must not be dispatched",
         ],
         # Reworded copies of the same rule. These are NOT the canonical wording, so
         # they are not required at home — they are only ever evidence that someone
@@ -58,7 +63,6 @@ DOCTRINES = {
         "forbidden_paraphrases": [
             "CLI version strings are diagnostics only",
             "must not be presented as model identity",
-            "show the resolved or planned",
         ],
         "participants": [
             "framework/slash-commands/consensus.md",
@@ -74,8 +78,21 @@ DOCTRINES = {
         "exclusive_phrases": [
             "Check model sources in this order",
             "Explicitly invalid evidence (never use)",
-            "models hallucinate their own identity",
+            # Long enough to be unmistakably a copy. The bare clause "models
+            # hallucinate their own identity" is a true general statement that
+            # eval and taxonomy docs have every right to make.
+            "models hallucinate their own identity. Self-report is not evidence",
             "until every source in this map has been checked",
+            # The ladder itself, step by step. Without these the home could be
+            # gutted — the ordering replaced wholesale — while the four phrases
+            # above still matched. The home is now the only copy, so its contents
+            # need more protection than the old design gave them, not less.
+            "1. Per-run controls:",
+            "2. Project knowledge root evidence:",
+            "3. AI Dev Shop repo evidence:",
+            "4. Workspace and home CLI config files",
+            "5. Candidate ladders:",
+            "takes precedence over home config",
         ],
         "forbidden_paraphrases": [
             "until every source in the map has been checked",
@@ -85,6 +102,10 @@ DOCTRINES = {
             "framework/slash-commands/consensus.md",
             "framework/slash-commands/cowork.md",
             "skills/swarm-consensus/references/cli-smoke-test.md",
+            # Carried its own 5-step ladder until 2026-07-27, already drifted from
+            # canonical in four ways while line 147 called peer-llm-dispatch.md the
+            # canonical map. Registered so it cannot quietly grow one again.
+            "skills/swarm-consensus/SKILL.md",
         ],
     },
 }
@@ -107,6 +128,13 @@ REQUIRED_SMOKE_TEST_API = [
     "resolve_model_plan",
 ]
 REQUIRED_SMOKE_TEST_FLAGS = ["--model-plan-only"]
+REQUIRED_SMOKE_TEST_EVIDENCE = [
+    "last-known-good.json",
+    "peer-dispatch",
+    ".gemini",
+    ".codex",
+    ".claude",
+]
 
 # Vendored and generated trees are not ours to police for doctrine duplication.
 SCAN_EXCLUDE_PREFIXES = (
@@ -178,6 +206,9 @@ def scannable_markdown() -> list[str]:
         ]
 
         for filename in filenames:
+            # ORIGINAL.md files are pre-import snapshots of vendored skills, kept for
+            # diffing against upstream. They are not repo-authored doctrine, and
+            # validate_path_references.py skips them for the same reason.
             if not filename.endswith(".md") or filename == "ORIGINAL.md":
                 continue
             rel = f"{prefix}{filename}"
@@ -187,6 +218,19 @@ def scannable_markdown() -> list[str]:
                 continue
             found.append(rel)
     return sorted(found)
+
+
+POINTER_PROXIMITY_LINES = 3
+
+
+def has_proximate_pointer(text: str, home: str, reference_name: str) -> bool:
+    """True when the section name and the home path appear close enough to be one pointer."""
+    lines = text.splitlines()
+    name_lines = [i for i, line in enumerate(lines) if reference_name in line]
+    path_lines = [i for i, line in enumerate(lines) if home in line]
+    return any(
+        abs(n - p) <= POINTER_PROXIMITY_LINES for n in name_lines for p in path_lines
+    )
 
 
 def read_text_or_none(path: Path) -> str | None:
@@ -218,7 +262,14 @@ def check_doctrines(violations: list[str]) -> None:
             )
             continue
 
-        home_text = home_path.read_text(encoding="utf-8")
+        home_text = read_text_or_none(home_path)
+        if home_text is None:
+            violations.append(
+                f"VIOLATION: {spec['home']} could not be read as UTF-8.\n"
+                f"FIX: The {name} home must be readable. A decode error here would otherwise abort "
+                f"run-all.sh under `set -euo pipefail` before any later validator runs."
+            )
+            continue
 
         # 1. The canonical section still exists and is still findable by its anchor.
         if spec["anchor"] not in home_text:
@@ -248,16 +299,36 @@ def check_doctrines(violations: list[str]) -> None:
                 )
                 continue
 
-            participant_text = participant_path.read_text(encoding="utf-8")
+            participant_text = read_text_or_none(participant_path)
+            if participant_text is None:
+                violations.append(
+                    f"VIOLATION: {participant} could not be read as UTF-8.\n"
+                    f"FIX: Participants must be readable for the {name} deferral to be checkable."
+                )
+                continue
+
             if spec["home"] not in participant_text:
                 violations.append(
                     f"VIOLATION: {participant} does not reference the {name} home ({spec['home']}).\n"
                     f"FIX: It must point a reader at the canonical file by path rather than paraphrasing the rule."
                 )
-            if spec["reference_name"] not in participant_text:
+            elif spec["reference_name"] not in participant_text:
                 violations.append(
                     f"VIOLATION: {participant} does not name the `{spec['reference_name']}` section.\n"
                     f"FIX: A bare file path is not enough — name the section so the reader lands on the rule."
+                )
+            elif not has_proximate_pointer(
+                participant_text, spec["home"], spec["reference_name"]
+            ):
+                # Both halves present but far apart is not a pointer. In cowork.md the
+                # home path appears at :47 and again under an unrelated protocol at
+                # :121, so a scattered pair would satisfy the check by coincidence
+                # while the line that should defer says something else entirely.
+                violations.append(
+                    f"VIOLATION: {participant} mentions {spec['home']} and `{spec['reference_name']}`, "
+                    f"but never together — so nothing in it actually points at the {name} rule.\n"
+                    f"FIX: Put the section name and the file path in one deferral, within "
+                    f"{POINTER_PROXIMITY_LINES} lines of each other."
                 )
 
         # 4. Nobody else restates it. This is the check that keeps the rule single-homed.
@@ -312,17 +383,26 @@ def check_implementation(violations: list[str]) -> None:
         )
         return
 
-    defined = {
+    # Module level only. A nested helper of the same name is not the entry point,
+    # and counting occurrences lets us see a shadowing redefinition appended later.
+    top_level = [
         node.name
-        for node in ast.walk(tree)
+        for node in tree.body
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-    }
+    ]
     for symbol in REQUIRED_SMOKE_TEST_API:
-        if symbol not in defined:
+        count = top_level.count(symbol)
+        if count == 0:
             violations.append(
-                f"VIOLATION: {SMOKE_TEST_MODULE} no longer defines `{symbol}()`.\n"
+                f"VIOLATION: {SMOKE_TEST_MODULE} no longer defines `{symbol}()` at module level.\n"
                 f"FIX: The Model Memory Map depends on this entry point. Restore it, or update "
                 f"REQUIRED_SMOKE_TEST_API here and the map's description of the lookup together."
+            )
+        elif count > 1:
+            violations.append(
+                f"VIOLATION: {SMOKE_TEST_MODULE} defines `{symbol}()` {count} times at module level.\n"
+                f"FIX: The later definition silently shadows the real one, so the lookup can be "
+                f"stubbed out while every name the guard checks still appears. Remove the duplicate."
             )
 
     literals = {
@@ -335,6 +415,19 @@ def check_implementation(violations: list[str]) -> None:
             violations.append(
                 f"VIOLATION: {SMOKE_TEST_MODULE} no longer registers the `{flag}` flag.\n"
                 f"FIX: The docs instruct agents to invoke this flag by name; it is a published interface."
+            )
+
+    # Every evidence source the Model Memory Map promises the lookup consults. Without
+    # these, a source can be deleted from the implementation while the five entry-point
+    # names still resolve and the guard still passes — the map would then describe a
+    # lookup the code no longer performs.
+    joined_literals = "\n".join(literals)
+    for source in REQUIRED_SMOKE_TEST_EVIDENCE:
+        if source not in joined_literals:
+            violations.append(
+                f"VIOLATION: {SMOKE_TEST_MODULE} no longer references the evidence source {source!r}.\n"
+                f"FIX: The Model Memory Map lists this as a source the lookup checks. Either restore it, "
+                f"or change the map and this list together so prose and code still agree."
             )
 
 

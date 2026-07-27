@@ -125,7 +125,7 @@ From the output:
 - Check for any user-saved model version preferences (e.g. from a prior "always use Opus for consensus" instruction) and apply them via CLI flags if the tool supports it
 - Before any peer prompt preview or dispatch, run the Model Memory Map using the smoke-test harness in model-plan mode:
   `python3 skills/swarm-consensus/scripts/cli_smoke_test.py --model-plan-only --output-format json`
-- The model-plan lookup must inspect retained smoke-test proof first, especially `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json`, then legacy local smoke-test caches, dated smoke-test reports, retained/local consensus reports, repo-local evidence, and only then home CLI defaults. Do not rely on CLI version output for model identity.
+- Work that map in full for the lookup order and the evidence rules. Do not rely on CLI version output for model identity.
 - Run preflight transparency announcement before asking any model:
   - `Planned peer models: Claude=<exact-model-or-not-installed>, agy/Gemini=<exact-model-or-not-installed>, Codex=<exact-model-or-not-installed>.`
   - `CLI diagnostics: Claude CLI=<version-or-not-installed>, agy CLI=<version-or-not-installed>, Codex CLI=<version-or-not-installed>.`
@@ -136,15 +136,11 @@ A minimum viable swarm is **primary model + 1 peer**. If no peers are available,
 
 ### Model Selection Resolution Protocol
 
-Before dispatching prompts, resolve the planned model for each available peer CLI in this order:
-
-1. Per-run override from the current prompt (`claude_model=...`, `gemini_model=...`, `codex_model=...`)
-2. Project knowledge root evidence from `<ADS_MEMORY_ROOT>` or sibling `ADS-memory/`
-3. AI Dev Shop repo-local evidence such as repo `.local-artifacts/`, repo `reports/`, and `tmp/peer-dispatch/`
-4. Home CLI defaults such as `~/.claude/settings.json`, `~/.gemini/settings.json`, and `~/.codex/config.toml`, but only when they expose an exact model ID rather than a family alias
-5. Candidate ladders such as `skills/swarm-consensus/references/model-candidate-ladders.json` for smoke-test discovery candidates only. Candidate ladders are not proof by themselves.
-
-Use `skills/llm-operations/references/peer-llm-dispatch.md` as the canonical Model Memory Map. The smoke-test harness implements that order with `--model-plan-only`.
+Before dispatching prompts, resolve the planned model for each available peer CLI by
+working the `Model Memory Map` in
+`skills/llm-operations/references/peer-llm-dispatch.md`. That map is the only place the
+lookup order, the evidence rules, and the explicitly-invalid sources are written. The
+smoke-test harness implements that order with `--model-plan-only`.
 
 For each peer, record:
 
