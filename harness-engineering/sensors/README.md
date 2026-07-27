@@ -10,7 +10,7 @@ A scheduled or event-driven check that measures codebase health decay over time.
 
 | Class | Meaning | Example |
 |-------|---------|---------|
-| `computational` | Deterministic tool output, exit code or structured report | `npm audit`, coverage diff |
+| `computational` | Deterministic tool output, exit code or structured report | a declared slot command; a coverage diff |
 | `inferential` | LLM-assisted analysis of patterns that tools can't catch alone | critical-path coverage judgment |
 
 ## Phase 1 Sensors
@@ -34,7 +34,7 @@ A scheduled or event-driven check that measures codebase health decay over time.
 Every one is `unvalidated` in
 `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/gate-validation-status.md`, which
 caps their `REQUIRED` dispositions at `RECOMMENDED` until an eval runs and the
-(still undefined) ablation canary is specified.
+gate passes the ablation canary specified there.
 
 What does still block: the canonical integrity findings `INT-1`…`INT-9` in that
 file, and the two pre-existing legacy gates (mutation regression, suite

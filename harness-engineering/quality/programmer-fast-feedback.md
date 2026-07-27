@@ -90,7 +90,7 @@ This prevents the agent from being repeatedly interrupted by the same known fail
 The watcher state becomes stale and must reset when:
 
 - Branch changes (`git checkout`, `git switch`)
-- Dependency changes (`npm install`, `pip install`, lockfile updates)
+- Dependency changes (installs, lockfile updates)
 - Test configuration changes (jest.config, pytest.ini, etc.)
 - More than 30 minutes of inactivity
 

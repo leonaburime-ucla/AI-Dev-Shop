@@ -421,6 +421,18 @@ def check_doctrines(violations: list[str], corpus: dict[str, str]) -> None:
                     )
 
 
+# "Never ask the peer what model it is" is the rule, not a breach of it. Without
+# this, the check flagged correct prose — including in `agent-evals/bug-taxonomy.md`,
+# which CLAUDE.md mandates as a pre-read for eval work, so the program was blocked
+# from documenting the very bug this guard exists to prevent.
+PRACTICE_NEGATION = re.compile(
+    r"\b(never|do not|don'?t|must not|cannot|can not|no not|avoid|forbidden|"
+    r"invalid|not evidence|not valid|refuse|reject|instead of|rather than|"
+    r"a common (harness )?bug|seed defect|anti-pattern|antipattern|wrong)\b",
+    re.IGNORECASE,
+)
+
+
 def check_forbidden_practices(violations: list[str], corpus: dict[str, str]) -> None:
     """Catch instructions to use evidence the map forbids, however freshly written."""
     for rel, text in sorted(corpus.items()):
@@ -429,6 +441,11 @@ def check_forbidden_practices(violations: list[str], corpus: dict[str, str]) -> 
         for pattern, why in FORBIDDEN_PRACTICE_PATTERNS:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
+                line_start = text.rfind("\n", 0, match.start()) + 1
+                line_end = text.find("\n", match.end())
+                sentence = text[line_start : line_end if line_end != -1 else len(text)]
+                if PRACTICE_NEGATION.search(sentence):
+                    continue  # prohibiting the practice, not prescribing it
                 line_no = text[: match.start()].count("\n") + 1
                 violations.append(
                     f"VIOLATION: {rel}:{line_no} {why}.\n"

@@ -114,8 +114,8 @@ See [enforcement.md](enforcement.md). Summary:
 
 ## Relationship to Static Analysis
 
-Declare the tool that computes the module graph in the **`dependency_graph`** slot of the [Computational Controls Contract](computational-controls.md) — dependency-cruiser, madge, import-linter, ArchUnit. That slot is what makes `no_cycle` rules and mechanical `dependency_direction` / `forbidden_import` checks executable; gate logic lives in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md`. General-purpose analyzers that happen to include some import lint rules stay in `static_analysis`.
+Declare the tool that computes the module graph in the **`dependency_graph`** slot of the [Computational Controls Contract](computational-controls.md). That slot is what makes `no_cycle` rules and mechanical `dependency_direction` / `forbidden_import` checks executable; gate logic lives in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md`. General-purpose analyzers that happen to include some import lint rules stay in `static_analysis`.
 
-The architecture-fitness contract adds semantic meaning and priority rules on top of what the tool mechanically checks. Where the tool supports it, generate its ruleset from these declarations rather than maintaining two sources of truth — dependency-cruiser's `forbidden` ruleset can express `no_cycle`, `dependency_direction`, and `forbidden_import`.
+The architecture-fitness contract adds semantic meaning and priority rules on top of what the tool mechanically checks. Where the declared command supports a ruleset of its own, generate it from these declarations rather than maintaining two sources of truth.
 
 **`boundary_ownership` is not mechanically checkable and never will be.** It asserts that a human approval exists ("security review sign-off in PR", "architect ACK in handoff"). An import graph describes edges between modules; it cannot observe an approval. That rule type stays an evidence check performed by Code Review against the handoff and PR record. Do not describe `dependency_graph` as covering all four rule types — it covers three.

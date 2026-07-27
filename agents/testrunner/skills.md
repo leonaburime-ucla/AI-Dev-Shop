@@ -65,7 +65,7 @@ Execute the full verification suite after implementation and report trustworthy 
      command from the `mutation_tests` slot against touched source files only.
    - Replace `{touched_files}` in the command with the list of modified source files
      that have corresponding tests. Format the list to match the tool's expected syntax
-     (e.g., comma-separated glob for Stryker, space-separated paths for mutmut).
+     (the separator and quoting are host detail, declared with the command).
    - Enforce the timeout from the slot declaration (default 600s). Kill and classify
      as Escalation (inconclusive) if exceeded.
    - Parse results using the sensor contract in

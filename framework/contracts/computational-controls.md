@@ -75,13 +75,13 @@ Every host project should declare as many of these as apply. Each slot is a sing
 
 ### mutation_tests
 
-- **Command**: e.g., `npx stryker run --mutate '{touched_files}'`, `mutmut run --paths-to-mutate={touched_files}`
+- **Command**: a command that mutates a caller-supplied scope and emits killed and survived counts for it, plus each surviving mutant with its location. Substitute the scope with `{touched_files}`, `{touched_packages}` or `{touched_classes}` — whichever granularity the command accepts
 - **Working directory**: project root unless specified
 - **Required**: yes/no
 - **Blocking**: conditional (default behavior is escalation; hard-blocks only on >10% score regression — full gate logic in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`)
 - **Timeout**: default 600 (mutation testing is expensive; projects may increase)
 - **Success criteria**: exit code 0 (gate behavior beyond exit code — including absolute thresholds, regression checks, and first-run baseline — is defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md`)
-- **Scope placeholder**: `{touched_files}` is replaced at runtime with the list of modified source files that have corresponding test files (mutating untested files produces no meaningful signal). Format per tool syntax (comma-separated glob for Stryker, space-separated for mutmut, etc.)
+- **Scope placeholder**: `{touched_files}` is replaced at runtime with the list of modified source files that have corresponding test files (mutating untested files produces no meaningful signal). The separator and quoting are host detail, declared alongside the command
 - **Comparison base**: the VCS merge base, recomputed each run. **No baseline file** — a stored, agent-writable score with enforcement authority was the one poisonable artifact left in the harness and has been removed
 - **Notes**: triggered by TestRunner after green suite + coverage evaluation. If this slot is not declared, the mutation quality sensor is inactive (advisory note only).
 
@@ -102,7 +102,7 @@ mandatory to report and never gated — cyclomatic complexity and function size
 (NLOC); they exist to help a reviewer interpret a gated result, not to produce
 findings of their own.
 
-- **Command**: `lizard --csv {files}` for the mandatory cross-language `cyclomatic` and `size_nloc` fields (both reported, never gated), plus a host-declared command supplying `cognitive` and `nesting` per the capability contract in the sensor doc. **This contract names no per-stack tools, flags or thresholds** — that is a deliberate deletion, not an omission.
+- **Command**: a cross-language per-function command supplying the mandatory `cyclomatic` and `size_nloc` fields (both reported, never gated), plus a command supplying `cognitive` and `nesting` per the capability contract in the sensor doc. One command may cover all four. **This contract names no per-stack tools, flags or thresholds** — that is a deliberate deletion, not an omission.
 - **No per-stack tool table lives here.** Declare a command that emits a numeric
   value per changed function plus the threshold and comparison operator it used,
   and prove it with the sensor's conformance fixtures. Naming specific tools,
@@ -110,8 +110,8 @@ findings of their own.
   see the capability contract in
   `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/code-structure-quality.md`.
 - **Record the operator with the threshold.** What silence proves depends on both. A threshold with no recorded operator cannot establish that an unreported function is under the band, and reporting it as `PASS` anyway is `INT-8`.
-- **Secondary command** (optional): a second tool whose per-function output is merged on `file path + symbol name`. Most hosts need two — one cross-language tool for the mandatory cyclomatic field, one per-language tool for the gated cognitive metric. A single tool that emits both (SonarQube) may fill the slot alone.
-- **Required output fields**: per changed function — `cyclomatic` and `size_nloc` are **mandatory** (both reported, never gated); `cognitive` and `nesting` are **conditional**, supplied where the stack has an analyzer for each. `lizard` emits cyclomatic and NLOC from the same parse, so the mandatory pair costs one command. **`nesting` needs its own adapter on most stacks** — `lizard` does not emit it and most cognitive analyzers do not either; only the JS/TS `max-depth` rule supplies both in one run. A missing `cognitive` or `nesting` value makes that metric's gate `INCONCLUSIVE`, never `PASS`. A declared command that cannot emit per-function cyclomatic or size values is a **declaration defect**, reported as a Required workflow finding against the contract rather than against the code under review.
+- **Secondary command** (optional): a second tool whose per-function output is merged on `file path + symbol name`. Most hosts need two — one cross-language tool for the mandatory cyclomatic field, one per-language tool for the gated cognitive metric. A single command that emits both may fill the slot alone.
+- **Required output fields**: per changed function — `cyclomatic` and `size_nloc` are **mandatory** (both reported, never gated); `cognitive` and `nesting` are **conditional**, supplied where the stack has an analyzer for each. Cross-language per-function tools typically emit cyclomatic and NLOC from the same parse, so the mandatory pair usually costs one command. **`nesting` needs its own adapter on most stacks** — cross-language tools generally do not emit it, and neither do most cognitive analyzers. A missing `cognitive` or `nesting` value makes that metric's gate `INCONCLUSIVE`, never `PASS`. A declared command that cannot emit per-function cyclomatic or size values is a **declaration defect**, reported as a Required workflow finding against the contract rather than against the code under review.
 - **Scoped command**: strongly recommended — this slot is only meaningful on changed files
 - **Working directory**: project root unless specified
 - **Required**: no
@@ -130,7 +130,7 @@ check the boundary rules declared in
 slot that makes `no_cycle` rules executable — an agent reading a diff cannot see
 a cycle that closes through files it never opened.
 
-- **Command**: e.g., `npx depcruise --output-type json {src}` (recommended for JS/TS — covers cycles *and* the two mechanically-checkable boundary types, `dependency_direction` and `forbidden_import`, in one pass), `npx madge --circular --json {src}` (cycles only), `lint-imports --config .importlinter` (Python), `godepgraph -s {pkg}` (Go). **`boundary_ownership` is not covered by any of these** — it asserts that a human approval exists, which an import graph cannot observe; it stays an evidence check in Code Review. **Note `{src}`, not `{files}`**: cycle detection needs the reachable closure, and a graph built only from changed files cannot see a cycle that closes through untouched modules
+- **Command**: a command that emits the import graph over the full source root, naming both endpoints of every edge. Prefer one that covers cycles *and* the two mechanically-checkable boundary types, `dependency_direction` and `forbidden_import`, in a single pass — otherwise those rules are maintained in two places that drift. **`boundary_ownership` cannot be covered by any import graph** — it asserts that a human approval exists, which no graph can observe; it stays an evidence check in Code Review. **Pass `{src}`, not `{files}`**: cycle detection needs the reachable closure, and a graph built only from changed files cannot see a cycle that closes through untouched modules
 - **Required output fields**: per finding — the rule name or `cycle`, the participating module paths in order, and for cycles the cycle length
 - **Scoped command**: scope depends on the check. Boundary rules need the changed modules plus one level of direct importers. **Cycle detection needs the full reachable closure of every changed module** — a cycle can close through files the diff never touched, so a one-level scan cannot support a "no cycles" result and is `INCONCLUSIVE` for that check
 - **Working directory**: project root unless specified
@@ -169,7 +169,7 @@ added or modified is exercised by tests. Distinct from `unit_tests` coverage
 output, which is a suite-level percentage: a suite at 98% can absorb a dozen new
 untested branches without moving.
 
-- **Command**: two layers. The **branch layer** (primary) is a host adapter that intersects the coverage report's branch records (`BRDA:` in lcov, `condition-coverage` in Cobertura, JaCoCo branch counters) with the diff's changed line ranges. The **line layer** (secondary) is `diff-cover coverage.xml --compare-branch={base_ref} --json-report {out}`. **`diff-cover` reports changed *lines*, not changed *branches*** — declaring it alone satisfies the secondary metric only, and a host that reports its line ratio under a branch field name commits `INT-7`.
+- **Command**: two layers. The **branch layer** (primary) is a host adapter that intersects the coverage report's branch records (`BRDA:` in lcov, `condition-coverage` in Cobertura, JaCoCo branch counters) with the diff's changed line ranges. The **line layer** (secondary) attributes a coverage report to the diff and reports changed lines covered. **A line-layer command satisfies the secondary metric only** — a host that reports its line ratio under a branch field name commits `INT-7`.
 - **Required output fields**: `changed_branches_total`, `changed_branches_covered`, and **the same pair per changed file**. Per-file output is mandatory: the aggregate alone cannot detect denominator padding, where well-covered boilerplate lifts the ratio while the new logic stays untested. Where only line data exists, report the branch fields as `null` and gate on the line ratio, labeled as line-based.
 - **Input**: the raw coverage report emitted by the `unit_tests` / `integration_tests` run — this slot does not run tests
 - **Working directory**: project root unless specified

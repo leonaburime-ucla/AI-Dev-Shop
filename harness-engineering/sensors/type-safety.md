@@ -131,13 +131,19 @@ large number of pre-existing violations. Those are grandfathered; see Brownfield
 The host declares a command in the `type_safety` slot of
 `<AI_DEV_SHOP_ROOT>/framework/contracts/computational-controls.md`.
 
-| Signal group | Tool | Reference command |
-|---|---|---|
-| Tier A + Tier B rules | `typescript-eslint` (**type-aware config required**) | `npx eslint --format json {files}` |
-| Single assertions, assertion style | `@typescript-eslint/consistent-type-assertions` | part of the same `eslint` run |
-| **Double assertions** (`as unknown as T`) | **no stock rule detects these** — needs a local AST rule matching a `TSAsExpression` whose `.expression` is itself a `TSAsExpression`; the rule ID must appear in output | host-authored ESLint rule |
-| Directive and suppression counts | `ripgrep`, one pattern per `-e` | `rg -n --json -e '@ts-ignore' -e '@ts-expect-error' -e '@ts-nocheck' -e 'eslint-disable' {files}` |
-| Compiler strictness | `tsc` config diff | `git diff {base_ref}..{head_ref} -- tsconfig*.json .eslintrc* eslint.config.*` |
+So the contract is a **capability**, not a tool:
+
+> Declare a command that emits, per finding, a **rule identifier** with its file
+> and position. Prove it with the conformance fixtures below. If it cannot, this
+> sensor is `inactive` — reported as absent, never as clean.
+
+| Signal group | What the declared command must do |
+|---|---|
+| Tier A + Tier B rules | Run **type-aware**. The Tier A rules cannot be decided from syntax alone, and a syntax-only configuration silently reports zero for them |
+| Single assertions, assertion style | Emit a rule id per occurrence, from the same run |
+| **Double assertions** (`as unknown as T`) | **No stock rule is known to detect these.** Detection needs a local AST rule matching an assertion expression whose operand is itself an assertion expression, and its rule id must appear in the output. Absent that rule, this signal is `inactive`, not clean |
+| Directive and suppression counts | Count `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck` and `eslint-disable` occurrences with positions. See the AST requirement below — a regex over source is not sufficient |
+| Compiler strictness | Report whether the change touches compiler or lint configuration, so a strictness reduction is visible alongside the findings it suppresses |
 
 **No stock lint rule detects the Tier A double assertion.** An earlier draft
 paired `consistent-type-assertions` with `no-unnecessary-type-assertion` and

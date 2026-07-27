@@ -161,7 +161,7 @@ changed code exits successfully and emits an empty finding list that reads
 exactly like clean code. "Zero findings" is evidence only when the detector is
 known to have been live.
 
-### The four controls
+### The five controls
 
 Every control must pass, against the detector the host has actually declared,
 at the version it will run.
@@ -170,11 +170,20 @@ at the version it will run.
 |---|---|---|
 | 1 | **Injection** | Plant each defect the gate claims to catch. The gate must fire and name it. Where a sensor already specifies conformance fixtures, those are the injection set — do not invent a parallel one. |
 | 2 | **Negative** | Run against code that is clean *and* against the idioms this toolkit itself mandates. The gate must stay quiet. This measures the false-positive rate; the exhaustive-`switch` case is the known trap. |
-| 3 | **Ablation** | Cripple the detector — narrow its entry point so it cannot reach the planted defect — and re-run. The result **must differ** from the healthy run. If it does not, the findings never depended on the detector traversing the code, and no zero result from this gate means anything. |
+| 3 | **Ablation** | Cripple the detector — narrow its entry point so it cannot reach the planted defect — and re-run. The healthy run must **find** the defect, the crippled run must **miss** it, and the reported traversal must visibly shrink. Comparing the two outputs alone is not enough: that shows only that output depends on the scope argument, which a detector that never opens a file can satisfy. |
 | 4 | **Sensitivity** | The threshold must decide something. The planted defect must be a finding on the strict side of the threshold and not on the permissive side. A gate that fires identically at every threshold is reporting the detector's presence, not the measurement. |
+| 5 | **Unseen** | Run against a fixture generated at canary time, nested deeper than any committed one. A detector answering from memorised structure cannot know it, and one whose discovery is capped near the root cannot reach it. |
 
-Control 3 is the canary proper and the reason for the name. Controls 1, 2 and 4
-can all pass against a detector that is quietly scoped to the wrong tree.
+Controls 3 and 5 are the canary proper. Controls 1, 2 and 4 all pass against a
+detector quietly scoped to the wrong tree.
+
+**Ablation alone is not sufficient, and an earlier version of this spec wrongly
+said it was.** Two detectors were built that defeat it: one that opens no files
+and answers from a hardcoded table, and one that parses correctly but caps file
+discovery two directories deep — literally the misconfiguration this canary is
+named for. Both honour the scope argument, so both satisfy a control that asks
+only whether the output changed. Control 5 exists because of them: it is the
+only control whose input the detector cannot have been built against.
 
 ### What a promotion must record
 
@@ -244,8 +253,9 @@ state.
 
 ## Open Dependencies
 
-- **The ablation canary is unspecified.** Blocks all promotion. Highest-priority
-  open item.
+- **No gate has been through the canary against a real detector.** The criterion
+  is specified above and piloted in `harness-engineering/canary/`, but the pilot's
+  subject is a stand-in, so nothing is promotable yet. Highest-priority open item.
 - **No eval has run** against any gate in the registry.
 - **The two legacy gates block without validation** and are not demoted. Scope
   decision outstanding.

@@ -23,7 +23,7 @@ Committed seeded eval suites live in `../agent-evals/`. This directory keeps the
 - `test-first-design-policy.md` — design-stage checklist for making code naturally testable before implementation starts
 - `testability-antipatterns.md` — catalog of coding anti-patterns that reduce testability, with required human reporting rule
 - `coverage-integrity-policy.md` — canonical anti-metric-gaming rule for coverage, test seams, refactoring, and narrow approved exceptions
-- `gate-validation-status.md` — which mechanical gates may block and which may not, plus the closed set of canonical integrity findings (`INT-1`…`INT-9`) that block regardless. Each gate's status is recorded there; promotion is blocked on the still-undefined ablation canary
+- `gate-validation-status.md` — which mechanical gates may block and which may not, plus the closed set of canonical integrity findings (`INT-1`…`INT-9`) that block regardless. Each gate's status is recorded there; promotion requires passing the ablation canary specified in that file
 - `react-component-testing-policy.md` - mandatory component-test expectations when React surfaces are present
 - `debug-playbook.md` - debugging workflow support for quality and testability work
 

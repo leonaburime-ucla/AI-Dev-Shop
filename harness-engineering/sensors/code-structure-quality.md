@@ -77,12 +77,11 @@ first.
 | **SonarQube / SonarCloud** | 30+ languages | per-function | **both** cyclomatic and cognitive, one consistent algorithm. Requires a server, scanner, and token. |
 | **`scc`** | 200+ languages | **file-level only** | a branch-keyword approximation, **not true McCabe**. Usable for scheduled trends; **not** valid for the per-function layer. |
 
-Reference: `lizard --csv {files}`
-
-`lizard` is the recommended default for the mandatory CC layer because it is a
-single `pip install`, needs no server, and covers most stacks a host will bring.
-Its parsers are heuristic rather than full ASTs, so treat values as consistent
-rather than authoritative — which is acceptable, since nothing gates on CC.
+For the mandatory CC layer, prefer a cross-language per-function tool that runs
+locally and needs no server — that is the cheapest thing to declare, and nothing
+gates on CC. Such tools usually parse heuristically rather than building full
+ASTs, so treat their values as internally consistent rather than authoritative.
+Whatever is declared, record it and its version with the result.
 
 ### Per-language layer — the host declares, the fixture decides
 

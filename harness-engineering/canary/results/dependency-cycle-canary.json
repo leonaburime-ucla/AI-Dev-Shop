@@ -1,15 +1,20 @@
 {
   "gate": "New dependency cycle in a `blocking`-severity scope",
   "sensor": "harness-engineering/sensors/dependency-structure.md",
-  "detector": "harness-engineering/canary/reference_detector.py (pilot stand-in)",
+  "detector": {
+    "command": "harness-engineering/canary/reference_detector.py",
+    "version": "pilot stand-in; not a host `dependency_graph` command",
+    "pinned": false
+  },
+  "seed": 1,
   "verdict": "PASS",
   "summary": {
     "injection": {
-      "passed": 3,
+      "passed": 4,
       "failed": 0
     },
     "negative": {
-      "passed": 1,
+      "passed": 3,
       "failed": 0
     },
     "ablation": {
@@ -17,6 +22,10 @@
       "failed": 0
     },
     "sensitivity": {
+      "passed": 1,
+      "failed": 0
+    },
+    "unseen": {
       "passed": 1,
       "failed": 0
     }
@@ -37,7 +46,7 @@
     {
       "control": "injection",
       "fixture": "f2_indirect_cycle",
-      "expectation": "3-module cycle reported though it closes through an untouched file",
+      "expectation": "3-module cycle reported, closing through a module the entry point does not import directly",
       "observed": [
         [
           "a",
@@ -61,6 +70,18 @@
       "passed": true
     },
     {
+      "control": "injection",
+      "fixture": "f6_relative_imports",
+      "expectation": "cycle written with relative imports is found \u2014 intra-package is where cycles live",
+      "observed": [
+        [
+          "pkg.a",
+          "pkg.b"
+        ]
+      ],
+      "passed": true
+    },
+    {
       "control": "negative",
       "fixture": "f4_acyclic_fanout",
       "expectation": "acyclic module importing five others is NOT reported",
@@ -72,9 +93,31 @@
       "passed": true
     },
     {
+      "control": "negative",
+      "fixture": "f5_reexport_hub",
+      "expectation": "a package re-exporting its own submodules is NOT reported \u2014 a mandated idiom, and the shape naive detectors flag",
+      "observed": {
+        "cycles": [],
+        "direction_violations": [],
+        "modules_graphed": 4
+      },
+      "passed": true
+    },
+    {
+      "control": "negative",
+      "fixture": "false-positive rate",
+      "expectation": "measured across the negative-control set; must be 0.0",
+      "observed": {
+        "negative_controls": 2,
+        "fired_on": 0,
+        "rate": 0.0
+      },
+      "passed": true
+    },
+    {
       "control": "ablation",
       "fixture": "f1_direct_cycle",
-      "expectation": "under-scoped detector produces a different result than a healthy one",
+      "expectation": "healthy run finds the planted cycle, under-scoped run misses it, traversal shrinks",
       "observed": {
         "healthy_cycles": [
           [
@@ -82,12 +125,20 @@
             "b"
           ]
         ],
-        "healthy_modules": 2,
+        "healthy_modules": [
+          "a",
+          "b"
+        ],
         "ablated_cycles": [],
-        "ablated_modules": 1
+        "ablated_modules": [
+          "a"
+        ],
+        "healthy_found": true,
+        "ablated_missed": true,
+        "traversal_shrank": true
       },
       "passed": true,
-      "note": "The ablated run reports zero cycles on a fixture that has one. That is the silent failure this control exists to expose: a zero finding is only evidence when the detector is known to have been live."
+      "note": "The ablated run reports zero cycles on a fixture that has one. That is the silent failure this control exists to expose: a zero finding is evidence only when the detector is known to have been live."
     },
     {
       "control": "sensitivity",
@@ -104,11 +155,38 @@
         ]
       },
       "passed": true
+    },
+    {
+      "control": "unseen",
+      "fixture": "generated depth-3 package (seed 1)",
+      "expectation": "a cycle in a package the detector has never seen, three directories deep, is found",
+      "observed": {
+        "planted": [
+          "svc.g0001.core.alpha_g0001",
+          "svc.g0001.core.beta_g0001"
+        ],
+        "cycles": [
+          [
+            "svc.g0001.core.alpha_g0001",
+            "svc.g0001.core.beta_g0001"
+          ]
+        ],
+        "modules_graphed": [
+          "svc.__init__",
+          "svc.g0001.__init__",
+          "svc.g0001.core.__init__",
+          "svc.g0001.core.alpha_g0001",
+          "svc.g0001.core.beta_g0001"
+        ]
+      },
+      "passed": true,
+      "note": "A detector answering from a lookup table cannot know these names, and one that caps file discovery near the root cannot reach this depth. Vary --seed for a promotion run."
     }
   ],
+  "human_approval": null,
   "caveats": [
-    "The subject is the pilot reference detector, not a host's declared `dependency_graph` command. This run demonstrates the canary loop; it does not validate any host's detector.",
-    "Fixture sources are Python because the pilot must run with nothing installed. The controls are language-neutral; the fixture language is incidental.",
-    "A PASS here is evidence the gate can fire and can stay quiet. It is not evidence that the gate's disposition or scope is correct."
+    "The subject is the pilot stand-in detector, not a host's declared `dependency_graph` command. This run demonstrates the canary loop; it validates no host's detector, and `human_approval` is null because nothing is being promoted.",
+    "Fixture sources are Python so the pilot runs with nothing installed. The controls are language-neutral; the fixture language is incidental.",
+    "A PASS means the gate can fire and can stay quiet. It is not evidence that the gate's threshold, disposition or scope is correct."
   ]
 }
