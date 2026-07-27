@@ -31,7 +31,6 @@ has the highest false-positive cost of any metric here — its findings propose
 deletions, and a wrong one removes working behaviour. Treat every finding as a
 question, not an instruction.
 
-The host project declares which tool applies in their computational-controls contract under `static_analysis` or as a standalone sensor command.
 
 ## Action-on-Fail
 

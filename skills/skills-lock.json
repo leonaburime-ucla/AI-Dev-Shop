@@ -1,6 +1,18 @@
 {
   "version": 1,
   "skills": {
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": "skills/impeccable/SKILL.md",
+      "computedHash": "c50f7c022a561809ff465b4fe57fb6036a1c12e64ceda8da3eafaf3be337b59d"
+    },
+    "improve-codebase-architecture": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/improve-codebase-architecture/SKILL.md",
+      "computedHash": "0026900866ed2a542af0559cef11dd7ae707633b75cc6f668c2e7c0a33e35032"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
@@ -12,12 +24,6 @@
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
       "computedHash": "ccd6e4596bd51cf344fe76c464867c541ccc16b6d90ae7a9db449fb17588613b"
-    },
-    "impeccable": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "skillPath": "skills/impeccable/SKILL.md",
-      "computedHash": "c50f7c022a561809ff465b4fe57fb6036a1c12e64ceda8da3eafaf3be337b59d"
     },
     "taste-skill/brandkit": {
       "source": "Leonxlnx/taste-skill",

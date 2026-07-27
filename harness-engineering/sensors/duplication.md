@@ -137,7 +137,7 @@ So the contract is a **capability**, not a tool:
 | Requirement | Why |
 |---|---|
 | Emits both sites of every clone, with file and line ranges | the delta logic below compares clone groups between base and head; one end is not a group |
-| Scans the full source root | a detector pointed at the changed files alone cannot see the other end of a pair, per the `{src}` rule above |
+| Scans the full source root | a detector pointed at the changed files alone cannot see the other end of a pair, per the scan-scope rule above |
 | Records its token and line minimums | what a zero result proves depends on the threshold it ran at |
 
 A detector that cannot emit **stable clone identities across revisions** is still

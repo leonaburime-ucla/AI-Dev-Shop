@@ -45,7 +45,6 @@ Act as a Swarm Consensus Coordinator.
    - This preview gate is mandatory even when model resolution was already confirmed.
    - Do not inline the full packet by default unless the user asks for it. The linked file is the exact source of truth for what will be sent.
    - Build the `Peer Dispatch Brief` from the required fields in `<AI_DEV_SHOP_ROOT>/skills/llm-operations/references/peer-llm-dispatch.md`, which is the only place those fields are listed.
-     - what replying `run` will do
    - If the user flags an issue, revise the file and repeat the preview gate.
    - In debate mode, the Round 1 peer prompt must not include the Primary model's answer. Preview later rebuttal prompts too when they are materially different or include other participants' full previous-round reasoning.
 8. Treat the current host model as the `Primary` participant and require a substantive frozen first-pass response before any peer synthesis. If the host environment cannot surface that first-pass response cleanly, create exactly one same-family child/helper to fill the `Primary` slot before continuing. Do not count that helper as an extra voting peer. A peer-only run is invalid and must stop.

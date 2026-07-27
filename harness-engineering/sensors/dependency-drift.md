@@ -36,7 +36,6 @@ one that makes a zero result meaningless when skipped. Record it with the result
 This sensor is advisory here and gates nothing; a host may still wire its own
 release blocking around the same commands.
 
-The host project declares which tool applies. If no tool is declared, the sensor skips with an advisory note.
 
 ## Action-on-Fail
 
