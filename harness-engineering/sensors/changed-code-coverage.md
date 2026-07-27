@@ -214,15 +214,27 @@ everywhere:**
 The **ratio** — which is what the gate arithmetic needs — is genuinely
 implementable on all three. Only the actionable identity degrades.
 
-| Layer | Tool | Reference command | Emits |
-|---|---|---|---|
-| **Branch layer** (primary, required) | host adapter over `BRDA:` / `condition-coverage` / JaCoCo counters, intersected with `git diff` ranges | project-specific | `changed_branches_total`, `changed_branches_covered`, per-branch identities |
-| **Line layer** (secondary, context) | **`diff-cover`** | `diff-cover coverage.xml --compare-branch={base_ref} --json-report {out}` | `changed_lines_total`, `changed_lines_covered` |
-| TypeScript / JavaScript | `c8`/`nyc`/`vitest` → lcov (`BRDA:` present) | `npx vitest run --coverage --coverage.reporter=lcovonly` | input to both layers |
-| Python | `pytest-cov` → Cobertura with `branch = True` in `.coveragerc` | `pytest --cov=src --cov-branch --cov-report=xml` | input to both layers |
-| Java / Kotlin | JaCoCo XML | project-specific | input to both layers |
-| Go | `go test -covermode=atomic` → lcov via `gcov2lcov` | — | **line only**; Go's cover tool has no branch mode |
-| Generic fallback | none | — | sensor inactive; say so rather than reporting zero |
+| Layer | Required | Emits |
+|---|---|---|
+| **Branch layer** (primary) | yes, where the report carries branch records | `changed_branches_total`, `changed_branches_covered`, per-branch identities to the extent the format above allows |
+| **Line layer** (secondary, context) | always | `changed_lines_total`, `changed_lines_covered` |
+
+So the contract is a **capability**, not a tool:
+
+> Declare a command that produces a coverage report in one of the formats above,
+> with branch recording enabled, and intersect it with the changed-line ranges.
+> If no slot is declared, this sensor is `inactive` — say so rather than
+> reporting zero.
+
+Two host facts decide which layer is available, and both must be recorded with
+the result:
+
+- **Branch recording is usually opt-in.** A run that did not enable it produces a
+  valid report with no branch records, which reads exactly like fully covered
+  code. Absence of branch records is not evidence of coverage.
+- **Some toolchains have no branch mode at all.** On those the branch layer is
+  structurally unavailable, not misconfigured, and the line layer is the whole
+  result.
 
 **When only the line layer is available**, report `changed_branch_ratio` as
 `null`, gate on `changed_line_ratio` against the same floor, and label the finding

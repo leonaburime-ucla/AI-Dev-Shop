@@ -127,17 +127,25 @@ This costs more than the other sensors' scoped runs. If a full scan is too slow
 for PR context on a large repo, say so and mark the result `INCONCLUSIVE` — do
 not narrow the scan and report the result as clean.
 
-| Stack | Tool | Reference command | Notes |
-|---|---|---|---|
-| JS/TS and ~150 formats | **`jscpd`** (recommended default) | `npx jscpd --reporters json --min-tokens 50 --min-lines 5 {src}` — **`{src}`, the full source root, not `{files}`** | token-based, per-clone JSON with both site ranges |
-| Cross-language | **PMD CPD** | `pmd cpd --minimum-tokens 50 --format xml --dir {src}` | broader language table, ships with PMD |
-| Python | `pylint --disable=all --enable=duplicate-code` | `pylint --enable=duplicate-code {src}` — **`{src}`, same full-tree rule as every clone detector** | line-based, coarser; cannot emit stable cross-revision clone groups, so delta comparison is by recomputation at base and head |
-| Java / Kotlin / polyglot host already running Sonar | SonarQube | project-specific | reports Type-1/2 consistently |
-| Generic fallback | none | — | sensor inactive; say so rather than reporting zero |
+So the contract is a **capability**, not a tool:
 
-`jscpd` is the recommended default because it emits both ends of every clone with
-file and line ranges, which the delta logic below needs — a tool that reports
-only a duplication *percentage* cannot support this gate at all.
+> Declare a command that emits, for every clone group, **both ends** with file and
+> line ranges, scanning the full source root. Prove it with the conformance
+> fixtures below. If it cannot, this sensor is `inactive` — say so rather than
+> reporting zero.
+
+| Requirement | Why |
+|---|---|
+| Emits both sites of every clone, with file and line ranges | the delta logic below compares clone groups between base and head; one end is not a group |
+| Scans the full source root | a detector pointed at the changed files alone cannot see the other end of a pair, per the `{src}` rule above |
+| Records its token and line minimums | what a zero result proves depends on the threshold it ran at |
+
+A detector that cannot emit **stable clone identities across revisions** is still
+usable: compare by recomputing at base and head rather than by matching group ids.
+Record which mode was used, because the two do not fail the same way.
+
+A command that reports only a duplication *percentage* cannot support this gate
+at all.
 
 **A slot whose command emits only an aggregate ratio is a declaration defect.** A
 percentage cannot be attributed to a change, cannot be delta-compared, and is the

@@ -17,6 +17,11 @@ These validators are the first mechanical enforcement layer for this repo.
   - fails when a vendored skill is edited in place, when a locked path is missing,
     and when a shadow `skills-lock.json` appears at the repo root
   - before this, nothing read `computedHash`; two entries had matched no file since `a1721d2`
+- `validate_sensor_tool_tables.py`
+  - fails when a sensor doc grows a per-stack tool table row (`| Python | tool | command |`)
+  - sensors declare a capability — what a command must emit, and `inactive` when none can
+  - naming a tool to **warn against** it is allowed; so are file/report formats
+  - the rule predates the check; 32 rows sat in 7 of 11 sensors while a handoff called it an invariant
 - `validate_evaluator_artifacts.py`
   - checks retained evaluator contracts and evaluator reports for required fields and sections
   - fails when a `progress-ledger.md` marks `evaluator_mode: required` but no retained evaluator contract is recorded

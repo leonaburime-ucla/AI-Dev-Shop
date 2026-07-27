@@ -9,14 +9,26 @@ Tracks test coverage trends, identifies critical-path gaps, and detects coverage
 - **Owner**: Observer → routes to TDD agent or Programmer
 - **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/coverage-quality-<timestamp>.md`
 
-## Tools by Stack
+## Detector
 
-| Stack | Coverage tool | Command |
-|-------|--------------|---------|
-| TypeScript/JavaScript | c8 / istanbul / vitest coverage | `npm run test:coverage` |
-| Python | coverage.py / pytest-cov | `pytest --cov=src/` |
-| Go | go test -cover | `go test -coverprofile=coverage.out ./...` |
-| Generic | lcov / cobertura | project-specific |
+The toolkit installs nothing. The host declares the command it already uses to
+produce a coverage report — through an existing slot such as `static_analysis`,
+or alongside its test slots. If nothing is declared, this sensor is `inactive`:
+report the absence, never a zero.
+
+So the contract is a **capability**, not a tool:
+
+> Declare a command that emits a **per-file** coverage report in a documented
+> format, over the whole project rather than a selected subset.
+
+| Requirement | Why |
+|---|---|
+| Per-file records, not a single project total | a project percentage cannot locate anything, and is the form of this metric most easily moved by adding or removing files |
+| Covers the whole project | a report over a subset reads as full coverage of a small codebase |
+| States whether branch recording was enabled | branch recording is usually opt-in; a report without it looks identical to code with no branches |
+
+This sensor is advisory and gates nothing. Its numbers are context for the gated
+coverage sensor, not a substitute for it.
 
 ## What This Sensor Measures
 

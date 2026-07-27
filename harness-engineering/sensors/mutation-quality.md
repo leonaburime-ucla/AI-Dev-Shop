@@ -9,24 +9,35 @@ Grades test effectiveness by deliberately injecting faults into modified code an
 - **Owner**: TestRunner triggers → Observer tracks trends → routes to TDD agent or Programmer
 - **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-quality-<timestamp>.md`
 
-## Tools by Stack
+## Detector
 
-Resolved from the `mutation_tests` slot in `<ADS_MEMORY_ROOT>/governance/contracts/computational-controls.md`. If no slot is declared, this sensor is inactive (advisory note only).
+The toolkit installs nothing. The host declares a command in the `mutation_tests`
+slot of `<ADS_MEMORY_ROOT>/governance/contracts/computational-controls.md`. If no
+slot is declared, this sensor is `inactive` (advisory note only) — reported as
+absent, never as clean.
 
-| Stack | Mutation tool | Typical command |
-|-------|--------------|-----------------|
-| TypeScript/JavaScript | Stryker | `npx stryker run --mutate '{touched_files}'` |
-| Python | mutmut | `mutmut run --paths-to-mutate={touched_files}` |
-| Go | go-mutesting | `go-mutesting {touched_packages}` |
-| Java/Kotlin | PIT | `mvn org.pitest:pitest-maven:mutationCoverage -DtargetClasses={touched_classes}` |
-| Generic | project-specific | declared in computational controls |
+So the contract is a **capability**, not a tool:
 
-**Placeholder replacement rules:**
-- `{touched_files}` — space-separated file paths of modified source files that have corresponding tests (comma-separated glob for Stryker)
-- `{touched_packages}` — Go package paths containing modified files (e.g., `./pkg/auth/...`)
-- `{touched_classes}` — fully qualified class names for modified Java/Kotlin source files (e.g., `com.example.auth.*`)
+> Declare a command that mutates a **caller-supplied scope** and emits a killed
+> and survived count for it, plus each surviving mutant with its location. If it
+> can only mutate the whole project, say so — the scope policy below is then
+> unenforceable and the PR-context gate is `inactive`.
 
-The actual command and placeholder used is declared per-project in the `mutation_tests` slot of computational controls.
+| Requirement | Why |
+|---|---|
+| Accepts a scope placeholder | the PR context mutates touched files only; a command with no scope input cannot express that |
+| Emits killed and survived counts for the scope it ran | a score without a denominator cannot be compared between base and head |
+| Locates each surviving mutant | a bare score routes to nobody; the surviving mutant is the finding |
+| Records the mutation operator set it ran | two operator sets produce different scores from the same tests, so silence means different things |
+
+**Scope placeholders.** A host declares whichever its command accepts; these name
+the granularity, not any particular tool:
+
+- `{touched_files}` — file paths of modified source files that have corresponding tests
+- `{touched_packages}` — package paths containing modified files
+- `{touched_classes}` — fully qualified type names for modified source files
+
+The separator and quoting a command needs are host detail, declared with it.
 
 ## Scope Policy
 

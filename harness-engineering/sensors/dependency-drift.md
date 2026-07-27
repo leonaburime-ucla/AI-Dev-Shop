@@ -9,15 +9,32 @@ Detects outdated dependencies, known vulnerabilities, and license compliance iss
 - **Owner**: Observer → routes to Security agent or DevOps agent
 - **Artifact location**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/dependency-drift-<timestamp>.md`
 
-## Tools by Stack
+## Detector
 
-| Stack | Vulnerability scan | Outdated check |
-|-------|-------------------|----------------|
-| Node.js | `npm audit` / `yarn audit` | `npm outdated` |
-| Python | `pip-audit` / `safety check` | `pip list --outdated` |
-| Go | `govulncheck ./...` | `go list -m -u all` |
-| Rust | `cargo audit` | `cargo outdated` |
-| Generic | `trivy fs .` | — |
+The toolkit installs nothing. The host declares the commands it uses, through an
+existing slot such as `static_analysis`. If nothing is declared, this sensor is
+`inactive`: report the absence, never a clean bill of health.
+
+Two distinct capabilities, and a host may have one without the other:
+
+> **Vulnerability scan** — emit each known advisory against the **resolved**
+> dependency set, with its identifier, severity, and the affected version range.
+>
+> **Outdated check** — emit each dependency whose resolved version trails an
+> available one, distinguishing patch, minor and major.
+
+| Requirement | Why |
+|---|---|
+| Reads the **resolved** dependency set, not the declared ranges | a manifest range says what is permitted; the lockfile says what ships |
+| Emits an advisory identifier per finding | severity alone cannot be deduplicated across runs or looked up |
+| Records the advisory database and the time it was fetched | **a scan is only as current as its database.** A stale database returns a clean result that is indistinguishable from a secure dependency set |
+| Covers transitive dependencies, or says it does not | most real exposure is transitive |
+
+The database-freshness requirement is the one most often skipped, and it is the
+one that makes a zero result meaningless when skipped. Record it with the result.
+
+This sensor is advisory here and gates nothing; a host may still wire its own
+release blocking around the same commands.
 
 The host project declares which tool applies. If no tool is declared, the sensor skips with an advisory note.
 

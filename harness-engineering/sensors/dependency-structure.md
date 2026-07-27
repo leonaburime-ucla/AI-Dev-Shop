@@ -42,20 +42,24 @@ slot of `<AI_DEV_SHOP_ROOT>/framework/contracts/computational-controls.md`. If t
 slot is undeclared this sensor is inactive, and `no_cycle` rules go dark rather
 than degrading to agent inspection — the review report must say so.
 
-| Stack | Tool | Reference command | Emits |
-|---|---|---|---|
-| TypeScript / JavaScript | **dependency-cruiser** (recommended) | `npx depcruise --output-type json {src}` | cycles, forbidden deps, orphans — one pass |
-| TypeScript / JavaScript (light) | `madge` | `npx madge --circular --json {src}` | cycles only |
-| Python | `pydeps` / `import-linter` | `lint-imports --config .importlinter` | cycles, layer contracts |
-| Go | `go list` + `godepgraph` | `godepgraph -s {pkg}` | package graph |
-| Java / Kotlin | ArchUnit / JDepend | project-specific | cycles, layer rules |
-| Generic fallback | none | — | sensor inactive; boundary rules stay agent-checked |
+So the contract is a **capability**, not a tool:
 
-**dependency-cruiser is the recommended default for JS/TS** because it covers
-cycles *and* the two mechanically-checkable boundary rule types in one
-declaration — a host can map `dependency_direction` and `forbidden_import`
-straight onto its `forbidden` ruleset rather than maintaining two sources of
-truth.
+> Declare a command that emits the **import graph over the full source root**,
+> naming both endpoints of every edge. Prove it with the conformance fixtures
+> below. If it cannot, this sensor is `inactive` and `no_cycle` rules go dark —
+> reported as absent, never as clean.
+
+| Requirement | Why |
+|---|---|
+| Emits edges, not just a verdict | a cycle must be reported as a named module sequence for anyone to act on it |
+| Traverses the full import closure | a cycle can close through modules the diff never touched, per the traversal rule below |
+| Reports the rule a violation breaches, by name | otherwise a boundary failure is indistinguishable from a cycle finding, and the contract rules cannot be shown to have loaded |
+| Records its entry point and scope | an under-scoped run and a clean repository emit the same thing |
+
+A command that covers cycles **and** the mechanically-checkable boundary rule
+types in one pass is worth preferring: `dependency_direction` and
+`forbidden_import` can then map onto one ruleset rather than being maintained in
+two places that drift.
 
 `boundary_ownership` is the third declared rule type and is **not** among them —
 it asserts that a human approval exists, which no import graph can observe. Three
