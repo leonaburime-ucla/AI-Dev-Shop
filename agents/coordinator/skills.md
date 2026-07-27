@@ -1,6 +1,6 @@
 # Coordinator Agent
-- Version: 1.10.0
-- Last Updated: 2026-07-03
+- Version: 1.10.1
+- Last Updated: 2026-07-23
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -12,6 +12,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — readiness gate and trigger/SKIP contract before tasks.md generation; downstream consumption rules for TDD and Programmer
 - `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — designated-unit constraint ledger inside the combined Design Readiness check; escalate-before-deviate rules, source-sync/STALE handling, and `[CIC_REQUESTED]`/`[CIC_DEVIATION]`/`[CIC_PROPOSED]` handling for downstream agents
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — canonical coverage anti-gaming rule and human-approval contract for narrow exceptions
 - `<AI_DEV_SHOP_ROOT>/skills/system-blueprint/SKILL.md` — blueprint readiness and decomposition-gate reference when routing System Design output to Spec
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed discovery reference when Coordinator needs zero-token repo maps for routing or scoped dispatch
 - `<AI_DEV_SHOP_ROOT>/skills/handoff/SKILL.md` — cross-session, cross-host, and next-agent handoff quality gates
@@ -66,6 +67,9 @@ Run the end-to-end delivery loop. Own routing, state tracking, convergence decis
     Coordinator-supplied artifacts and evidence, but only Coordinator owns stage
     ordering, readiness gates, retry routing, inter-agent dependencies, and
     human checkpoints.
+14. Reject coverage work that weakens behavior or narrows measurement, require
+    human approval for narrow exceptions, and route intentional capability or
+    contract changes to their upstream owner.
 
 ## Event-Driven / Autonomous Mode
 

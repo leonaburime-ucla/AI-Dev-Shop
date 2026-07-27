@@ -39,7 +39,7 @@ Use these values in `coverage-matrix.tsv` and `seed-catalog.tsv`.
 | `boundary_error` | Inclusive/exclusive, off-by-one, or threshold mistake | `>=` vs `>` on capacity |
 | `semantic_mismatch` | Names, comments, or docs lie about behavior | Comment says rate limited, code is not |
 | `severity_misclassification` | Issue is found but downplayed | Invariant break labeled Recommended |
-| `cosmetic_fix` | Claimed fix does not change behavior structurally | Comments-only debt-band fix |
+| `cosmetic_fix` | Claimed fix does not change behavior structurally | Comments-only fix on an advisory finding |
 | `type_contract_error` | Return shape, type, or interface contract is unstable or wrong | Raw SDK error leaks across boundary |
 | `missing_test` | A required scenario is not tested or is weakly asserted | No error-path test, fake cleanup |
 | `anti_pattern` | Known harmful implementation pattern | Catch-all error handling, N+1 I/O |

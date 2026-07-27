@@ -45,12 +45,28 @@ Full module or package mutation run. Expensive — run on CI with extended timeo
 
 Mutation testing thresholds are progressive, not absolute from day one.
 
-### Baseline Establishment
+### Comparison base — the merge base, not a stored file
 
-On first run for a project:
-1. Record the initial mutation score per module as the baseline
-2. No enforcement on the first run — advisory only
-3. Baseline is stored in `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-baseline.json`
+The comparison base is the **VCS merge base**, recomputed each run. There is no
+baseline file.
+
+<!-- historical:start -->
+An earlier design stored per-module scores in
+`<ADS_MEMORY_ROOT>/.local-artifacts/sensors/mutation-baseline.json` and ratcheted
+them upward. That file was writable by every agent sharing the workspace, and it
+decided whether this gate blocked — so lowering it before measurement was the
+cheapest way to pass, and nothing could detect it after the fact. It was the only
+persistent, agent-writable artifact with enforcement authority left in the
+harness; every other gate had already moved to merge-base recomputation
+specifically to remove that surface.
+<!-- historical:end -->
+
+On first run for a project: no enforcement, advisory only. There is nothing to
+record — the merge base supplies the comparison on every subsequent run.
+
+Recompute base and head with the **same tool and configuration version**. A
+mutation score produced by one tool version compared against another is
+`INCONCLUSIVE`, not a regression.
 
 ### Ongoing Enforcement
 
@@ -68,9 +84,32 @@ When multiple conditions match simultaneously, apply the most severe gate behavi
 | Mutation run times out | **Escalation** — inconclusive, cannot gate |
 | Mutation tool errors or unsupported stack | **Advisory** — sensor degraded |
 
-### Threshold Ratchet
+### No ratchet
 
-Once a module's mutation score reaches 80%+, the baseline ratchets up. The new floor for that module becomes `current_score - 5%`. Falling below this ratcheted floor triggers an Escalation. This prevents score backsliding after investment in test quality.
+<!-- historical:start -->
+An earlier design ratcheted a stored floor to `current_score - 5%` once a module
+passed 80%. That mechanism required the writable baseline file above, and it
+inherited its weakness: the floor an agent must clear was a number that agent
+could edit.
+<!-- historical:end -->
+
+Backsliding is caught by the merge-base delta instead — a drop against the base
+is a regression whether or not the module ever reached 80%. This is strictly
+simpler and has no poisonable state, at the cost of not rewarding a module for
+historic investment. That trade is deliberate: a floor nobody can forge is worth
+more than a floor that remembers.
+
+## Scope is the changed set, not the tested set
+
+A source file in the changed set stays in mutation scope **whether or not it has
+a corresponding test**. A changed file with no test yields no mutation evidence,
+and *that* is the finding — it must not silently leave the measurement.
+
+Deleting, renaming or skipping a test so its source file drops out of mutation
+scope is `INT-5` and blocks regardless of gate status — see
+`<AI_DEV_SHOP_ROOT>/harness-engineering/quality/gate-validation-status.md`.
+Scoping to "changed files that have tests" made removing evidence the cheapest
+way to improve the number.
 
 ## Timeout Policy
 

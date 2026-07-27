@@ -67,7 +67,8 @@ Evaluate every change across all dimensions. Do not skip any.
 ### 4. Code Quality and Maintainability
 - Is each function doing one thing?
 - Are names accurate and domain-aligned?
-- Is there duplication that should be extracted?
+- Is there duplication that should be extracted? Run the `duplication` slot rather than eyeballing it — and note that the mechanical answer is narrower than the instinct: a clone group is Required only when this diff **pushes it past three sites** (`head > base && head >= 3`) above threshold — not merely because the group is new. Two sites is a Recommended finding *with* the caveat that extracting may be premature, because a two-site extraction routinely produces a helper parameterized by caller identity. See `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md`.
+- Did any unsafe typed-language operation enter? Run the `type_safety` slot. New `no-unsafe-*` / `no-floating-promises` / `@ts-ignore` occurrences and any weakening of compiler strictness are Required; new `any`, `!`, or `as T` are Recommended. A count of zero from rules that were never enabled is not a pass — see `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md`.
 - Is the complexity justified by the problem?
 - Are non-trivial complexity-sensitive paths explained when the cost or tradeoff is not obvious from the code?
 - Are hidden mutation, hidden dependencies, or boolean flag parameters making the code harder to reason about than necessary?
@@ -90,14 +91,12 @@ Evaluate every change across all dimensions. Do not skip any.
 
 ### 7. Function Quality Assessment
 - Did every new or materially changed logic-bearing function receive the required assessment from `function-quality-assessment`?
-- Are `@overallScore`, complexity, optional tradeoffs, and severity-graded findings present where required?
-- Are scores plausible, or did the implementation inflate scores to avoid a blocking route?
+- Are algorithmic complexity, optional tradeoffs, and severity-graded findings present where required? (There is no numeric quality score, and metric values must not appear in source comments.)
 - Did Programmer include the compact function-quality handoff table?
-- If every assessed unit is `100/100` in a non-trivial change, did Programmer document a score skepticism pass?
+- If a non-trivial change records **no findings at all**, did Programmer document the zero-findings skepticism pass?
 - Did tiny helpers get over-documented while meaningful helpers were under-assessed?
 - For rule, validation, batch, reducer, or cross-record workflows, is there at least one adversarial aggregate/cross-item test or direct probe?
-- Did the Programmer attempt a local fix cycle for scores in the `80-89` debt band?
-- Are Critical findings or scores below 80 classified as Required?
+- Did the Programmer attempt a local fix cycle for units carrying `RECOMMENDED` findings?
 - Does the review report include the Function Quality Assessment summary?
 
 ## Finding Classification
@@ -106,9 +105,13 @@ Every finding must be classified. This determines whether it blocks progression.
 
 **Required**: Must be fixed before this work can proceed. Spec misalignment, architecture violations, security surface changes, correctness issues.
 
-**Recommended**: Should be fixed but does not block. Code quality, naming, duplication, minor complexity debt. Route to Refactor Agent.
+**Recommended**: Should be fixed but does not block. Code quality, naming, minor complexity debt. Route to Refactor Agent.
 
 **Optional**: Nice to have. Style preferences, minor readability. Log in project notes if worth tracking.
+
+**These three categories describe judgment findings only.** They do not assign dispositions to mechanical findings. A finding produced by a tool takes its severity and disposition from the fixed table in `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/references/finding-rubric.md`, capped by the gate's status in `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/gate-validation-status.md` — never from the category it superficially resembles here. Duplication in particular is **not** automatically Recommended: a clone group grown past three sites is `REQUIRED` at `validated` gate status; below that it lands as `RECOMMENDED` at full `Medium` severity — check the registry for the current status. Do not classify a mechanical finding by reading this list.
+
+**Routing keys on disposition, not counts.** Do not route to Refactor based on the number of Recommended findings, and do not escalate because several accumulated. Count-gating is score-gating in a different notation.
 
 Never mix required and optional findings in the same severity level. The Programmer Agent must know unambiguously what blocks progression.
 
@@ -119,9 +122,8 @@ Every retained code review report must include:
 ```text
 ## Function Quality Assessment
 
-- Status: PASS | DEBT | BLOCKED
+- Outcome: PASS | PASS_WITH_ADVISORIES | BLOCKED | INCONCLUSIVE
 - Functions assessed: <count>
-- Lowest score: <score or n/a>
 - Critical findings: <count>
 - High findings: <count>
 - Missing assessments: <count>
@@ -134,15 +136,16 @@ Every retained code review report must include:
 ```
 
 Use `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` for the
-thresholds. Missing required assessments, Critical findings, and scores below 80
-are Required findings. Scores in the `80-89` debt band are Recommended only when
-the Programmer already attempted one local fix cycle and the remaining debt is
-documented. The local fix cycle must be evidenced by the diff, progress ledger,
-or handoff table. A claim without changed structure, or a comments/rename-only
-change, is treated as missing debt-band evidence and becomes a Required finding.
-Missing function-quality handoff tables, missing score skepticism passes for
-all-100 non-trivial changes, and missing adversarial aggregate/cross-item tests
-for rule or batch workflows are Required when they hide correctness, coverage,
+dispositions — **there is no numeric score anywhere in this harness.** Missing
+required assessments and Critical findings are Required. A unit carrying only
+`RECOMMENDED` findings stays Recommended when the Programmer already attempted
+one local fix cycle and the remaining debt is documented. The local fix cycle
+must be evidenced by the diff, progress ledger, or handoff table. A claim without
+changed structure, or a comments/rename-only change, is treated as missing
+evidence and becomes a Required finding. Missing function-quality handoff tables,
+missing zero-findings skepticism passes on non-trivial changes, and missing
+adversarial aggregate/cross-item tests for rule or batch workflows are Required
+when they hide correctness, coverage,
 scale, or review-routing risk. Pure documentation noise from over-scoring tiny
 helpers is Recommended unless it obscures a Required finding.
 

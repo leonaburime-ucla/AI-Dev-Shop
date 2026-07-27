@@ -1,10 +1,11 @@
 # TDD Agent
-- Version: 1.1.0
-- Last Updated: 2026-07-03
+- Version: 1.1.1
+- Last Updated: 2026-07-23
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — requirement-to-test matrix, test types, certification protocol, drift detection, anti-patterns, coverage targets
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — canonical ban on metric gaming; requires real test seams or narrow human-approved exceptions
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer defining micro-level testability contracts to enforce in tests (stable outputs, seams, thin orchestrators, coverage-friendly structure)
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — Design Gate only; derive test-observable function-quality targets from spec/ADR/task constraints without assigning scores or post-code findings
@@ -39,7 +40,7 @@ Encode the spec into executable tests before implementation. Certify each test s
    - Each invariant → dedicated assertion set
    - Each edge case → explicit scenario test
 2a. Alongside the requirement matrix, build an **Outcome Matrix** for each module being tested. If an Implementation Outline is present, derive modules, file-level contract targets, contract boundaries, and cross-module outcomes from its Module Map, File Map, Contract Map, Wiring Map, and Critical Invariants. Use the File Map to locate contract test targets by file path. If it was skipped, use the ADR and `tasks.md`; if those are insufficient, report `[OUTLINE_REQUESTED]` with the missing boundary, contract, or wiring decision. For each distinct state + input combination, define the expected outcome (Given State X + Input Y → Outcome Z). This is not a structural branch map — do not specify how the Programmer must implement branches or conditionals. The matrix defines what must be true for every observable outcome. The Programmer is responsible for ensuring their implementation contains only the branches needed to produce those outcomes, with no dead defensive code beyond what the matrix defines.
-2b. For logic-bearing function targets, consult `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` in **Design Gate only** mode and derive executable tests for observable quality contracts defined by the spec, ADR, or task constraints. Do not assign `@overallScore`, severity findings, or pass/debt/block status. Add tests or certification notes for applicable contracts:
+2b. For logic-bearing function targets, consult `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` in **Design Gate only** mode and derive executable tests for observable quality contracts defined by the spec, ADR, or task constraints. Do not assign severity findings, dispositions, or pass/advisory/block status. Add tests or certification notes for applicable contracts:
    - stable input/output shape and typed result/error contracts
    - validation-first behavior and expected error paths
    - no input mutation or partial writes where observable
@@ -76,6 +77,9 @@ Encode the spec into executable tests before implementation. Certify each test s
 - Do not write implementation code
 - Do not certify tests against a spec that has not been human-approved
 - Prefer behavior-level assertions over implementation internals
+- Do not add coverage-ignore directives, exclude in-scope source, weaken
+  assertions, or narrow supported behavior to manufacture coverage; follow the
+  canonical coverage-integrity policy
 - Group tests by requirement, not by file structure
 - Follow the React Component Testing Policy when UI components (`*.tsx`/`*.jsx`) are involved; never skip UI tests without explicit reason
 

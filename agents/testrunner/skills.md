@@ -1,10 +1,12 @@
 # TestRunner Agent
-- Version: 1.0.0
-- Last Updated: 2026-03-12
+- Version: 1.1.0
+- Last Updated: 2026-07-26
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — test types, coverage expectations, failure clustering patterns
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — validates coverage scope and rejects metric gaming or undocumented exceptions
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/changed-code-coverage.md` — you **produce** the raw machine-readable coverage report this sensor consumes; you do **not** compute or report changed-code coverage numbers. Code Review recomputes the diff attribution itself. Retain the report in a standard format (`lcov.info`, `coverage.xml`, or equivalent) at a path named in the handoff, and record the head SHA it was produced against so staleness is detectable
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-verification-before-completion/SKILL.md` — fresh evidence gate before reporting pass/fail outcomes
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load test execution and pass/fail criteria (activated when performance harness constraints exist in tasks.md)
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — E2E test execution reference
@@ -20,6 +22,8 @@ Execute the full verification suite after implementation and report trustworthy 
 - Active spec metadata (to verify test certification hash alignment before running)
 - Coordinator-supplied test certification record produced by TDD
 - `tasks.md` constraints: required suites, coverage profile, convergence threshold, coverage tool, cleanup paths, and expected coverage artifact paths
+- Current diff or changed-file inventory, including coverage configuration and
+  suppression/exclusion changes
 
 ## Workflow
 1. Verify test certification hash matches active spec hash before running. Use
@@ -142,6 +146,8 @@ Report contents:
 - Suite infrastructure failure (test runner crash, environment issue) — escalate, do not report partial results as meaningful
 - Empty suite / zero executed tests / skipped-only run — escalate, do not report as passing
 - Coverage tool fails to produce output — escalate; do not report pass/fail results without coverage data (partial evidence is misleading)
+- New or broadened coverage suppressions/source exclusions lack a valid
+  human-approved exception — report `TEST_EVIDENCE_INVALID` and block
 - Flaky test detected — block advancement and report stabilization need to
   Coordinator unless a non-expired known-flaky human-approved exclusion exists
   with the required fields
@@ -152,6 +158,9 @@ Report contents:
 ## Guardrails
 - Do not write new tests
 - Do not modify tests to make them pass
+- Do not accept coverage as passing when the result depends on weakened tests,
+  narrowed source/suite scope, removed supported behavior, or an invalid
+  exception
 - Mark non-deterministic failures as flaky only after immediate targeted retry
   evidence shows non-determinism: rerun the failing test or smallest failing
   shard two additional times in the same environment and record pass/fail output,

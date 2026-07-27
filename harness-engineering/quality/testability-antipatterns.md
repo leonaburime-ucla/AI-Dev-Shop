@@ -29,6 +29,12 @@ Do not silently proceed on repeat anti-patterns.
 | Shared mutable fixtures across tests | Test pollution and sequence coupling | Create fresh fixtures per test; remove shared mutability |
 | Async fire-and-forget without observability hooks | Races and unassertable side effects | Return awaitable handles/events; expose completion signals |
 | Dead defensive code paths without spec mapping | Coverage noise, unclear ownership | Remove or route to spec/refactor decision |
+| Coverage suppression or source exclusion without an approved exception | Hides applicable runtime behavior and makes the coverage result untrustworthy | Restore coverage scope; test through a real seam or use the narrow exception contract |
+| Capability removal disguised as coverage cleanup | Improves the percentage by weakening validation, compatibility, or recovery behavior | Restore behavior; route intentional contract changes through Spec/Architecture and Programmer |
+
+Apply `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md`
+whenever a coverage gap or hard-to-test branch triggers implementation,
+refactoring, or review work.
 
 ## Surface Template
 

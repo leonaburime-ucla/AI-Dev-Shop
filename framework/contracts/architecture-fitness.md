@@ -13,7 +13,7 @@ Each rule is a structured entry:
 ### Rule Entry Fields
 
 - **Name**: short identifier (e.g., `no-ui-imports-from-data-layer`)
-- **Type**: one of `dependency_direction`, `forbidden_import`, `boundary_ownership`
+- **Type**: one of `dependency_direction`, `forbidden_import`, `boundary_ownership`, `no_cycle`
 - **Scope**: file glob or module path defining where this rule applies (e.g., `src/data/**`, `packages/api/`)
 - **Description**: what this rule prevents and why
 - **Severity**: `blocking` or `advisory`
@@ -33,6 +33,12 @@ Type-specific fields:
 **boundary_ownership** rules also declare:
 - **Owner**: team or role responsible for approving changes
 - **Approval required**: what constitutes approval (e.g., "security review sign-off in PR", "architect ACK in handoff")
+
+**no_cycle** rules also declare:
+- **Max cycle length**: optional integer; omit to forbid all import cycles within Scope
+- **Checked by**: the `dependency_graph` slot in the [Computational Controls Contract](computational-controls.md)
+
+`no_cycle` is the only rule type that **cannot be checked by an agent reading a diff** — a cycle can close through files the agent never opened. It requires a computed module graph. If `dependency_graph` is undeclared, a `no_cycle` rule is inert and the review report must say so rather than implying enforcement. The other three types degrade gracefully to agent inspection; this one does not degrade, it goes dark.
 
 ### Example Rules
 
@@ -60,12 +66,21 @@ Type-specific fields:
 - Severity: blocking
 - Rationale: auth changes have security implications that need human review
 
+**No cycle:**
+- Name: `no-cycles-in-domain`
+- Type: `no_cycle`
+- Scope: `src/domain/**`
+- Description: domain modules must form an acyclic import graph
+- Severity: blocking
+- Max cycle length: (omitted — all cycles forbidden)
+- Rationale: cycles in the domain layer make modules impossible to test or extract independently
+
 ## Enforcement Scope
 
 Architecture fitness rules enforce **only on files modified in the current work** by default.
 
 - Agents do not audit the entire codebase against architecture rules on every run
-- If a modified file introduces a new violation, it blocks (for blocking rules) or warns (for advisory rules)
+- If a modified file introduces a new violation, it is `REQUIRED` (for `blocking` rules) or `RECOMMENDED` (for `advisory` rules) — **subject to the gate registry**. A rule's `Severity` here is one axis; whether the sensor that checks it has blocking authority is a separate axis recorded in `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/gate-validation-status.md`. Whether a violated `blocking` rule actually stops the pipeline depends on that gate's status in the registry — read it there rather than assuming. Downgrading a rule's declared `Severity` to clear a finding is `INT-3` and blocks regardless
 - Pre-existing violations in untouched files are grandfathered until explicitly addressed
 - Whole-project enforcement can be requested explicitly by the user or during a dedicated refactoring pass
 
@@ -84,9 +99,10 @@ This rule prevents architecture purity from blocking urgent product work, while 
 | Stage | How architecture fitness is used |
 |-------|--------------------------------|
 | Software Architect | ADR must acknowledge declared boundaries; new patterns must not contradict blocking rules |
-| Programmer | Modified files checked against rules before handoff |
-| Code Review | Reviewer checks modified files against full rule set; flags violations |
+| Programmer | Modified files checked against rules before handoff; may run `dependency_graph` as an advisory preview |
+| Code Review | Executes the `dependency_graph` slot itself on every reviewed change and flags violations; its run is authoritative and never replaced by a Programmer-reported result |
 | Refactor | May address grandfathered violations as dedicated cleanup work |
+| Observer | Runs the full-graph scheduled pass and routes systemic findings to Software Architect |
 
 ## Behavior When Contract Is Missing
 
@@ -98,4 +114,8 @@ See [enforcement.md](enforcement.md). Summary:
 
 ## Relationship to Static Analysis
 
-If the host project has a static analysis tool that enforces architectural rules (e.g., eslint import rules, ArchUnit, dependency-cruiser), declare that tool in the `static_analysis` slot of the [Computational Controls Contract](computational-controls.md). The architecture-fitness contract adds semantic meaning and priority rules on top of what the tool mechanically checks.
+Declare the tool that computes the module graph in the **`dependency_graph`** slot of the [Computational Controls Contract](computational-controls.md) — dependency-cruiser, madge, import-linter, ArchUnit. That slot is what makes `no_cycle` rules and mechanical `dependency_direction` / `forbidden_import` checks executable; gate logic lives in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md`. General-purpose analyzers that happen to include some import lint rules stay in `static_analysis`.
+
+The architecture-fitness contract adds semantic meaning and priority rules on top of what the tool mechanically checks. Where the tool supports it, generate its ruleset from these declarations rather than maintaining two sources of truth — dependency-cruiser's `forbidden` ruleset can express `no_cycle`, `dependency_direction`, and `forbidden_import`.
+
+**`boundary_ownership` is not mechanically checkable and never will be.** It asserts that a human approval exists ("security review sign-off in PR", "architect ACK in handoff"). An import graph describes edges between modules; it cannot observe an approval. That rule type stays an evidence check performed by Code Review against the handoff and PR record. Do not describe `dependency_graph` as covering all four rule types — it covers three.

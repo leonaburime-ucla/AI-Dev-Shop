@@ -25,6 +25,13 @@ run_hard_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_swarm_model_identity_guard.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_specs_as_built_freshness.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_backend_manifest.py"
+  python3 "$ROOT_DIR/harness-engineering/validators/validate_harness_consistency.py"
+  run_gate_logic_tests
+}
+
+run_gate_logic_tests() {
+  echo "--> Gate logic reference tests"
+  python3 -m pytest "$ROOT_DIR/harness-engineering/gate-logic/" -q
 }
 
 run_advisory_checks() {
@@ -44,6 +51,8 @@ run_precommit_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_registry_integrity.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_contracts.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_slash_command_parity.py"
+  python3 "$ROOT_DIR/harness-engineering/validators/validate_harness_consistency.py"
+  run_gate_logic_tests
 }
 
 run_governance_scenarios() {

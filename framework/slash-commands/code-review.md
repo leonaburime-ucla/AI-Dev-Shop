@@ -51,7 +51,7 @@ When the gate passes, run Code Review and Security in parallel when the Subagent
 - Programmer's most recent handoff table, including Function Quality Assessment
   summary
 - Progress ledger: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/progress-ledger.md`
-  if present, especially when a debt-band fix cycle is claimed
+  if present, especially when a local fix cycle on advisory findings is claimed
 - Coordinator verification packet:
   `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
   with active spec hash, executed vs expected count, test-file hash status,

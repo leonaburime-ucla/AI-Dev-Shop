@@ -115,7 +115,7 @@ These are still the core function-quality dimensions that seeds should exercise.
 | Deletion/refactor signal | oversized logic with no structural fix path |
 | Test anti-patterns | brittle mocks, implementation assertions, shared fixtures |
 | Adversarial aggregate behavior | repeated keys, combined totals, ordering changes, partial invalid batches |
-| Function scoring | inflated `100/100` or skeptical review theater |
+| Function assessment | suppressed findings or skeptical review theater |
 | Documentation noise | excessive helper-level scoring that hides meaning |
 | Handoff/reporting | missing score tables, risk disclosure, or coverage evidence |
 | Comment-code mismatch | names or docs contradict actual behavior |
@@ -153,7 +153,7 @@ Use all of these across a benchmark suite:
 | `combined` | N+1 I/O plus missing timeout in the same batch loop |
 | `layered` | Type looseness hides a deeper aggregation bug |
 | `distributed` | Caller, helper, and test together reveal the issue |
-| `camouflaged` | Confident handoff claims score skepticism already passed |
+| `camouflaged` | Confident handoff claims the skepticism pass already ran |
 | `interference` | One rule pushes cleanup while another pushes severity escalation |
 
 If the suite lacks `combined`, `layered`, and `distributed` coverage, it is

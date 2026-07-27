@@ -1,6 +1,6 @@
 # Software Architect Agent
-- Version: 2.1.0
-- Last Updated: 2026-07-03
+- Version: 2.2.0
+- Last Updated: 2026-07-26
 
 ## Base Skills
 
@@ -17,6 +17,7 @@
 
 Conditional skills are not standing context. Load only the subset the spec or Coordinator directive actually requires.
 
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — load when Observer routes a scheduled full-graph finding (cycles, boundary violations) here, or when defining the `no_cycle` and boundary rules a host should declare in `architecture-fitness.md`. Declaring a rule is architecture work; enforcing it on a diff is Code Review's
 - `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — load after writing a pipeline ADR to evaluate whether cross-cutting decisions should be promoted to the Governance ADR Registry; also load when the proposed architecture must respect existing governance ADRs
 - `<AI_DEV_SHOP_ROOT>/skills/feature-slice-design/SKILL.md` — load when the architecture includes a frontend application; default frontend architecture methodology for any framework (React, Vue, Svelte, Angular, plain TS)
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
@@ -32,7 +33,7 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/llm-operations/SKILL.md` — load when the spec includes model/provider routing, runtime AI guardrails, prompt versioning, or LLM rollout/eval policy
 - `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — load when the spec introduces pipelines, lakehouse/warehouse layers, CDC, or analytics-serving contracts
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — load when architecture choices involve Expo app topology, Expo Router/API route boundaries, native module strategy, EAS deployment/update strategy, dev-client requirements, or Expo SDK migration planning
-- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — load in Design Gate mode only when producing implementation-outline public/exported contracts or load-bearing internal invariant units; use it to define single job, signature shape, test seam, effect boundary, complexity/resource view, and aggregate-risk notes before downstream coding, never to assign `@overallScore` or post-code findings
+- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — load in Design Gate mode only when producing implementation-outline public/exported contracts or load-bearing internal invariant units; use it to define single job, signature shape, test seam, effect boundary, complexity/resource view, and aggregate-risk notes before downstream coding, never to assign dispositions or post-code findings
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — load after ADR pattern/boundary selection when trigger checks may require a post-ADR, pre-tasks implementation outline or explicit SKIP record
 - `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md` — load after the implementation-outline decision when any unit may carry load-bearing internal constraints (algorithmic correctness, stateful protocol, concurrency/ordering/idempotency, security-critical sequencing, explicit performance budget, failure/recovery, characterization parity); record constraints for designated units only or record an explicit NOT TRIGGERED result — default is do-not-produce; also load when ratifying `[CIC_PROPOSED]` proposals, resolving `[CIC_REQUESTED]` reports, or reviewing `[CIC_DEVIATION]` records
 - `<AI_DEV_SHOP_ROOT>/skills/backup-strategy/SKILL.md` — load when the architecture introduces durable state requiring backup coverage decisions (recovery objectives, mechanism selection, failure-domain separation)

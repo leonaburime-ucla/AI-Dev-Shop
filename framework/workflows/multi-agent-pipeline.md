@@ -486,7 +486,7 @@ stage readiness.
 - Test file source code for every test path in the certification inventory that
   maps to changed behavior or P1/invariant coverage
 - Programmer's most recent handoff table and `progress-ledger.md` when function
-  quality debt-band fix evidence is claimed
+  quality local-fix evidence on advisory findings is claimed
 - `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md`
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` (for surface flagging)
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` when the diff changes API style, pagination/filtering policy, error model, lifecycle policy, webhook semantics, or SDK-facing ergonomics

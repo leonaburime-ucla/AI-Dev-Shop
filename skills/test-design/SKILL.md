@@ -1,7 +1,7 @@
 ---
 name: test-design
-version: 1.1.0
-last_updated: 2026-03-18
+version: 1.1.2
+last_updated: 2026-07-23
 description: Use when designing tests, building requirement-to-test matrices, selecting test types, certifying test coverage against a spec, or detecting test drift after spec changes.
 ---
 
@@ -135,6 +135,14 @@ success before it executes the suite.
 
 ## Coverage Targets
 
+### Coverage Integrity (Canonical)
+
+Apply
+`<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md`.
+Coverage gates must be met by exercising behavior through real seams, not by
+weakening tests, production behavior, contracts, or coverage scope. Any narrow
+exception must satisfy that policy's evidence and approval contract.
+
 ### Coverage Terminology
 
 - **Big Four**: `% Stmts | % Branch | % Funcs | % Lines` (in this exact order)
@@ -169,6 +177,12 @@ If no custom profile is provided, defaults apply automatically. Persist the acti
 - Target state is **no uncovered lines** in changed or high-priority runtime code paths.
 - If uncovered lines remain, they require explicit written justification before stopping the cycle.
 - Acceptable justifications are limited to concrete technical constraints (for example: unreachable defensive branch tied to runtime/environment, vendor boundary that cannot be deterministically simulated, or deprecated path pending approved removal).
+- Any justification that relies on a narrow-exception category (generated/vendor
+  code, compiler-proven unreachable defense, runtime/environment-only path, or
+  deprecated path pending approved removal) must satisfy the evidence and
+  **human-approval** contract in
+  `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md`.
+  A specialist may recommend such a justification but may not self-approve it.
 - "Not enough time" or "too hard to test" are not valid justifications.
 
 Coverage targets are risk-weighted by module class. Apply the correct threshold based on what the file does, not where it lives in the directory tree.

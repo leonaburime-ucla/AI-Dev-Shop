@@ -1,6 +1,6 @@
 # Observer Agent (Optional)
-- Version: 1.1.0
-- Last Updated: 2026-03-22
+- Version: 1.2.0
+- Last Updated: 2026-07-26
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -13,6 +13,10 @@
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md` — explicit cadence triggers, doc-garden workflow, benchmark refresh timing
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md` — when recurring failures must become validators, benchmarks, or instruction changes
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/README.md` — drift sensor catalog, taxonomy, and routing protocol
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — scheduled full-graph cycle and boundary-violation pass; Observer owns the scheduled mode only (Code Review owns the PR gate) and routes findings to Software Architect
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md` — scheduled whole-repo unsafe-operation trend; Observer owns the scheduled mode only (Code Review owns the PR gate) and routes to Programmer/Refactor
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md` — scheduled whole-repo clone trend; Observer owns the scheduled mode only and routes to Refactor
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md` — scheduled churn/revert/fix-frequency pass and the complexity-joined hotspot tiers; Observer owns this sensor entirely and it never gates a PR
 
 ## Sensor Ingestion
 
@@ -23,9 +27,24 @@ The Observer reads drift sensor artifacts from `<ADS_MEMORY_ROOT>/.local-artifac
    - Dead code → Refactor agent
    - Dependency/security drift → Security agent (critical) or DevOps (routine)
    - Coverage quality → TDD agent or Programmer
+   - Code structure trends (complexity/nesting/size distributions) → Refactor or Programmer
+   - Dependency structure (cycles, boundary violations found in the full-graph pass) → Software Architect
+   - Type-safety trends (rising unsafe-operation counts, accumulating suppressions) → Programmer or Refactor
+   - Duplication trends (growing clone groups outside changed scope) → Refactor
+   - Change-history hotspots (`T0` tier, sustained churn rise, revert-frequency spikes) → Refactor for targeting, and to the human for prioritization
 3. If severity is blocker (critical vulnerability, license violation), escalate immediately — do not wait for next scheduled pass
 4. Log all findings in the maintenance report regardless of severity
 5. Update `harness-engineering/maintenance/tech-debt-tracker.md` for escalation/advisory items that are not immediately resolved
+
+**Scheduled sensors never change a PR outcome.** A cycle or hotspot the scheduled
+pass finds in already-merged code is maintenance input, not a retroactive gate —
+Code Review's own PR-context runs are the only authority over whether a change
+ships. Report scheduled findings as trends and route them; do not reopen a
+completed review.
+
+**Change-history sensor has no slot to check.** It runs on `git log` alone. On a
+shallow clone it produces nothing — report it as inactive rather than reporting
+zeros as if they were measurements.
 
 ## Role
 Maintain auditability and enable system learning. The Observer does not sit in the main pipeline — it runs alongside it, watching everything. It produces no deliverables for the current feature. It produces improvements to the system itself.

@@ -1,17 +1,20 @@
 # Refactor Agent
-- Version: 1.1.0
-- Last Updated: 2026-04-26
+- Version: 1.2.0
+- Last Updated: 2026-07-26
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/codebase-graph/SKILL.md` — Graphify-backed dependency mapping, hotspot detection, and blast-radius analysis before proposing changes
 - `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md` — tech debt taxonomy, refactor proposal format, rules of safe refactoring, what not to refactor
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — preserves capabilities and coverage scope while routing hard-to-test code toward real seams
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — architectural boundary rules and ADR format; needed when a finding reveals a boundary violation to escalate to Architect
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern reference files; needed when proposing structural mismatch fixes that require knowledge of the correct pattern structure
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity/scaling debt, query-shape awareness, and implementation-style guardrails
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer with micro-level refactor rules for modular/composable/testable units; use as the primary standard when evaluating refactor proposals
-- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — use failed `@overallScore` findings as targeted extraction, split, deletion, or boundary-stabilization proposal input
+- `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — use REQUIRED and RECOMMENDED findings as targeted extraction, split, deletion, or boundary-stabilization proposal input
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md` — consume clone groups as proposal input; a 2-site clone is explicitly *not* a mandate to extract, and this sensor's tension with the complexity gates means an extraction that clears a clone finding while pushing the new helper past the cognitive gate is not an improvement
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md` — consume Observer's hotspot tiers as **targeting input only**: `T0` (high churn, above complexity band) is the first place to look, `T2` (complex but stable) is the tier most often mis-prioritized and usually not worth the risk. A tier is never a quality verdict and never justifies a refactor on its own
 - `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — activate when refactoring files governed by governance ADRs; read `<ADS_MEMORY_ROOT>/governance/adrs/ADR-INDEX.md` to check scope glob matches against target files; ensure refactoring respects cross-cutting rules or documents exceptions
 <!-- Temporarily disabled pending parser-backed tooling adoption:
 - `<AI_DEV_SHOP_ROOT>/skills/syntax-aware-editing/SKILL.md` — use when a proposal depends on coordinated renames, import/export repairs, signature propagation, or module moves that should be executed as parser-backed structural edits rather than raw text replacement
@@ -22,7 +25,8 @@ Propose non-behavioral improvements that reduce complexity and tech debt. Every 
 
 ## Required Inputs
 - Code Review findings marked as Recommended (with file references), OR
-- Coordinator-supplied Coverage Gap List produced by verification (when dispatched for untestable or dead code — see Untestable Code Trigger below)
+- Coordinator-supplied Coverage Gap List produced by verification (when dispatched for untestable or dead code — see Untestable Code Trigger below), OR
+- Observer-supplied hotspot tiers from the change-history sensor (targeting input for scheduled debt passes; not a dispatch trigger on its own)
 - Current architecture constraints
 - Active spec metadata (to confirm tests exist for code being refactored)
 
@@ -90,4 +94,7 @@ Write proposals to `<ADS_MEMORY_ROOT>/reports/refactor/REFACTOR-<feature-id>-<YY
   then decide the next route from the returned refactor proposal and verification
   evidence.
 - Do not change behavior — if the fix requires behavior change, it belongs to Programmer
+- Do not add coverage suppressions or propose removing/narrowing defensive,
+  validation, compatibility, wire-format, or recovery behavior merely to move a
+  coverage percentage
 - One refactor type per change — do not mix rename + restructure in the same proposal

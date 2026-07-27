@@ -16,11 +16,13 @@ Use the language's idiomatic function documentation format:
 - Java / Kotlin: Javadoc or KDoc
 
 The documentation must cover purpose, required inputs, optional inputs, return
-value, expected errors, side effects, complexity, and the overall quality score.
+value, expected errors, side effects, and algorithmic complexity. It must NOT
+carry a quality disposition or a cyclomatic/cognitive complexity number — those live in
+the handoff and the review report, never in source comments.
 Use `@tradeoffs` only when there is a real design tradeoff worth preserving for
 future maintainers.
 
-Do not turn every tiny private helper into a fully scored documentation block by
+Do not turn every tiny private helper into a full documentation block by
 default. Tiny helpers may inherit the nearest parent assessment only when they
 have no meaningful branching, I/O, error handling, scale risk, security/privacy
 risk, or independent reuse pressure. Assess directly when a helper owns a rule,
@@ -42,9 +44,6 @@ tradeoff.
  * @complexity Space: O(f), where f is the number of failures returned.
  * @tradeoffs Uses sequential rule evaluation to keep failure ordering deterministic and easy to test.
  *
- * @overallScore 92/100
- * @qualityFindings
- * - Medium: Rules are easy to add, but rule ordering is implicit and should become explicit if the rule set grows.
  */
 export function verifyItems(
   input: { items: Item[] },
@@ -83,11 +82,6 @@ def verify_items(
     Tradeoffs:
         Uses sequential rule evaluation to keep failure ordering deterministic and easy to test.
 
-    Overall score:
-        92/100
-
-    Quality findings:
-        - Medium: Rules are easy to add, but rule ordering is implicit and should become explicit if the rule set grows.
     """
 ```
 
@@ -231,9 +225,10 @@ listed so the canonical rule stays in one place.
     assessed units to direct tests or probes.
     Source: `testable-design-patterns`, `test-design`.
 
-24. **Score calibration**
-    A non-trivial change with every assessed unit scored `100/100` includes a
-    second-pass skepticism check. Re-check requirements, edge cases, aggregate
-    behavior, hidden dependencies, error paths, scale, coverage, and security
-    before preserving a perfect score set.
+24. **Zero-findings skepticism**
+    A non-trivial change with every assessed unit at `NO_RECORDED_FINDINGS`
+    includes a documented second-pass check. Re-check requirements, edge cases,
+    aggregate behavior, hidden dependencies, error paths, scale, coverage, and
+    security before preserving a clean result. Under-reporting is the cheapest
+    possible output in a findings regime; this item is the control on it.
     Source: `function-quality-assessment`, `code-review`.

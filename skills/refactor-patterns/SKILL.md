@@ -1,7 +1,7 @@
 ---
 name: refactor-patterns
-version: 1.0.0
-last_updated: 2026-02-22
+version: 1.0.2
+last_updated: 2026-07-23
 description: Use when classifying tech debt, evaluating safe refactoring opportunities, proposing refactors without implementing them, or writing refactor proposals after code review.
 ---
 
@@ -36,7 +36,7 @@ Risk: Low. Safe to rename with IDE-wide refactoring.
 ---
 
 **Type B — Duplication**
-The same logic or structure copied across two or more places. The rule of three: duplication in two places is a warning. Three or more places is always a refactor.
+The same logic or structure copied across two or more places. The rule of three: duplication in two places is a warning, not a mandate — extracting at two sites regularly produces a helper parameterized by caller identity, which is worse than the duplication. Three or more places is a refactor unless a reviewer upholds a justification that the sites will diverge. Detection and gate logic live in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md`; note that an extraction which clears a clone finding while pushing the new helper past the cognitive-complexity gate has traded one finding for another, not improved the code.
 
 Signs: Identical validation logic in multiple handlers. Same transformation applied to data in multiple services. Copy-pasted error handling blocks.
 
@@ -128,10 +128,26 @@ Programmer Agent to implement. TestRunner to verify green before and after.
 5. **Never change behavior.** If the fix requires changing what the code does to make it cleaner, that is a Programmer task, not a Refactor task.
 6. **Verify with the test suite, not by reading.** You cannot tell by reading code whether a refactor preserved behavior. Only the tests can tell you.
 
+## Coverage Integrity During Refactoring
+
+Apply
+`<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md`.
+Do not add coverage suppressions, narrow coverage scope, or remove defensive,
+validation, compatibility, wire-format, or recovery behavior merely to improve
+coverage. A refactor may strengthen structure and testability, but it must
+preserve supported capabilities and observable contracts. If the intended
+change alters behavior, route it through Spec/Architecture and Programmer
+instead of labeling it a refactor.
+
 ## What Not to Refactor
 
 - Code that is about to be deleted
-- Code that has no test coverage (add tests first, then refactor)
+- Code that has no test coverage (add tests first, then refactor) — **exception:**
+  seam extraction on code classified `untestable coupling` or `dead code` from a
+  Coordinator-supplied coverage-gap report is permitted before tests exist, per
+  `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md`
+  and the Refactor Agent contract; this enables tests, it does not bypass the
+  coverage rule
 - Code in the middle of an active bug fix (complete the fix, then refactor)
 - Code whose "messiness" is a deliberate temporary workaround tracked in `<ADS_MEMORY_ROOT>/knowledge/project_notes.md`
 - Working code that is slightly inconsistent with your personal style preferences (style is not tech debt)
