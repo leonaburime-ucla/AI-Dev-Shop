@@ -149,25 +149,67 @@ which is **coverage-scoped**. The non-coverage rules here are stated in this fil
 because that policy does not contain them — citing it as their source, as an
 earlier draft did, sent a reader to a document where the rule does not appear.
 
-## Promotion — the criterion does not exist yet
+## Promotion — the ablation canary
 
 Promoting a gate from `unvalidated` to `validated` requires passing the
 **ablation canary**.
 
-**The ablation canary is undefined.** It is referenced across this program as the
-gate on promotion, and no specification for it exists in this repository. Stated
-here as an open dependency rather than papered over with a placeholder, because a
-placeholder would let a gate be promoted against a standard nobody wrote.
+The canary answers one question: **does this detector actually detect?** A gate
+that has never been shown to fire cannot be distinguished from a gate that
+cannot fire, and the failure is silent — a detector whose entry point misses the
+changed code exits successfully and emits an empty finding list that reads
+exactly like clean code. "Zero findings" is evidence only when the detector is
+known to have been live.
 
-**Consequence: no gate in the registry can currently be promoted.** That is the
-intended state, not an oversight.
+### The four controls
 
-When the canary is specified, promotion should minimally require a retained eval
-artifact with tool and version pinned; a measured false-positive rate on negative
-controls including the idioms this toolkit itself mandates (the exhaustive-`switch`
-case is the known trap); evidence the detector was active when it reported zero;
-and explicit recorded human approval. That list is a **starting point for the
-specification, not the specification.**
+Every control must pass, against the detector the host has actually declared,
+at the version it will run.
+
+| # | Control | Requirement |
+|---|---|---|
+| 1 | **Injection** | Plant each defect the gate claims to catch. The gate must fire and name it. Where a sensor already specifies conformance fixtures, those are the injection set — do not invent a parallel one. |
+| 2 | **Negative** | Run against code that is clean *and* against the idioms this toolkit itself mandates. The gate must stay quiet. This measures the false-positive rate; the exhaustive-`switch` case is the known trap. |
+| 3 | **Ablation** | Cripple the detector — narrow its entry point so it cannot reach the planted defect — and re-run. The result **must differ** from the healthy run. If it does not, the findings never depended on the detector traversing the code, and no zero result from this gate means anything. |
+| 4 | **Sensitivity** | The threshold must decide something. The planted defect must be a finding on the strict side of the threshold and not on the permissive side. A gate that fires identically at every threshold is reporting the detector's presence, not the measurement. |
+
+Control 3 is the canary proper and the reason for the name. Controls 1, 2 and 4
+can all pass against a detector that is quietly scoped to the wrong tree.
+
+### What a promotion must record
+
+A promotion commit contains **both** the status change and the canary artifact.
+The registry is a writable file in a shared workspace; a status flipped without
+its evidence in the same commit is a claim, not a validation.
+
+The artifact records: the gate, the sensor, the detector command and its pinned
+version, every control with its expectation and observed output, the verdict,
+and the explicit human approval. Re-run the canary on any detector or ruleset
+change — a passing artifact describes one detector at one version and expires
+when either moves.
+
+### Scope of a PASS
+
+A passing canary means the gate **can fire and can stay quiet**. It does not
+establish that the gate's threshold is well-chosen, that its disposition is
+right, or that its scope matches the risk. Those remain judgment, and the canary
+does not launder them into evidence.
+
+### Pilot
+
+`harness-engineering/canary/` runs this specification end to end for the
+dependency-cycle gate, executing the conformance fixtures already specified in
+`dependency-structure.md`. It exists to prove the loop is cheap and real, and it
+is mutation-tested: five deliberately broken detectors each fail the control that
+should catch them.
+
+**It does not promote anything.** Its subject is a pilot stand-in detector, not a
+host's declared `dependency_graph` command, so the dependency-cycle gate remains
+`unvalidated` in the registry above. Promoting it requires running these same
+four controls against a real declared detector on a real project.
+
+**Consequence: no gate in the registry is promoted yet.** The criterion now
+exists; nothing has met it.
 
 ## How a sensor references this
 

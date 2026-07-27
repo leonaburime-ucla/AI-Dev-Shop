@@ -59,6 +59,9 @@ run_precommit_checks() {
 
 run_governance_scenarios() {
   echo
+  echo "--> Ablation canary (dependency-cycle pilot)"
+  python3 "$ROOT_DIR/harness-engineering/canary/run_canary.py" --check
+
   echo "==> Governance scenarios"
   python3 -m pytest "$ROOT_DIR/harness-engineering/governance-scenarios/" -v --tb=short 2>&1
 }

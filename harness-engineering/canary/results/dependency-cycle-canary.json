@@ -1,0 +1,114 @@
+{
+  "gate": "New dependency cycle in a `blocking`-severity scope",
+  "sensor": "harness-engineering/sensors/dependency-structure.md",
+  "detector": "harness-engineering/canary/reference_detector.py (pilot stand-in)",
+  "verdict": "PASS",
+  "summary": {
+    "injection": {
+      "passed": 3,
+      "failed": 0
+    },
+    "negative": {
+      "passed": 1,
+      "failed": 0
+    },
+    "ablation": {
+      "passed": 1,
+      "failed": 0
+    },
+    "sensitivity": {
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "controls": [
+    {
+      "control": "injection",
+      "fixture": "f1_direct_cycle",
+      "expectation": "cycle of length 2, both modules named",
+      "observed": [
+        [
+          "a",
+          "b"
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "control": "injection",
+      "fixture": "f2_indirect_cycle",
+      "expectation": "3-module cycle reported though it closes through an untouched file",
+      "observed": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "control": "injection",
+      "fixture": "f3_boundary_violation",
+      "expectation": "reported against the declared rule by name",
+      "observed": [
+        {
+          "rule": "domain-does-not-depend-on-infra",
+          "from": "domain.service",
+          "to": "infra.db"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "control": "negative",
+      "fixture": "f4_acyclic_fanout",
+      "expectation": "acyclic module importing five others is NOT reported",
+      "observed": {
+        "cycles": [],
+        "direction_violations": [],
+        "modules_graphed": 6
+      },
+      "passed": true
+    },
+    {
+      "control": "ablation",
+      "fixture": "f1_direct_cycle",
+      "expectation": "under-scoped detector produces a different result than a healthy one",
+      "observed": {
+        "healthy_cycles": [
+          [
+            "a",
+            "b"
+          ]
+        ],
+        "healthy_modules": 2,
+        "ablated_cycles": [],
+        "ablated_modules": 1
+      },
+      "passed": true,
+      "note": "The ablated run reports zero cycles on a fixture that has one. That is the silent failure this control exists to expose: a zero finding is only evidence when the detector is known to have been live."
+    },
+    {
+      "control": "sensitivity",
+      "fixture": "f2_indirect_cycle",
+      "expectation": "the 3-cycle is a finding at max_cycle_length=2 and not at 3",
+      "observed": {
+        "max_cycle_length=3": [],
+        "max_cycle_length=2": [
+          [
+            "a",
+            "b",
+            "c"
+          ]
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "caveats": [
+    "The subject is the pilot reference detector, not a host's declared `dependency_graph` command. This run demonstrates the canary loop; it does not validate any host's detector.",
+    "Fixture sources are Python because the pilot must run with nothing installed. The controls are language-neutral; the fixture language is incidental.",
+    "A PASS here is evidence the gate can fire and can stay quiet. It is not evidence that the gate's disposition or scope is correct."
+  ]
+}
