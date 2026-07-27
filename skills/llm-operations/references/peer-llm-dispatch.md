@@ -174,20 +174,30 @@ Claude Code CLI sessions are managed by the host process. When Claude is the pri
 - If the peer is Claude Code CLI, also use `<AI_DEV_SHOP_ROOT>/skills/llm-operations/references/claude-code-cli-audits.md` for host-specific transport quirks, timing behavior, and runner guidance.
 - The dispatch-copy pattern is intended to be cross-platform, but it is not yet verified on native Windows shells in this repo. Current shell examples assume a Bash-compatible environment.
 
-## User-Facing Dispatch Brief
+## Peer Dispatch Brief
 
 Before asking the user to approve a peer dispatch, show a compact brief rather
 than dumping the full packet inline by default. The packet file remains the
 exact source of truth and must be linked or named so the user can inspect it.
 
-The brief should include:
+This is the only place the brief's required fields are written. Commands and
+skills that show a brief defer here rather than listing the fields again.
 
-1. **Planned peers** — model names first; CLI versions are diagnostics only.
+The brief must include:
+
+1. **Planned peers** — the peer models, named under the `Model Identity
+   Disclosure Guard` in `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`.
 2. **Current positions** — one short line per participant when prior peer
    positions exist.
 3. **Reasoning summary** — the strongest 2-4 reasons, disagreements, or risks.
 4. **Next ask** — the exact question this dispatch asks the peers to answer.
 5. **Run meaning** — what replying `run` will execute.
+6. **File context (mandatory)** — state plainly that peers will read repo files
+   for more context and better results, and name the bounded file set or staged
+   path being made available. Reading necessary files is the default; if a run is
+   deliberately packet-only, say so and why. For Gemini/`agy`, name the staged
+   `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/files/` set per the
+   peer-dispatch rules above.
 
 For debate rebuttal rounds, the brief must make the next-round ask explicit:
 what positions are being challenged, which disagreements matter, and what

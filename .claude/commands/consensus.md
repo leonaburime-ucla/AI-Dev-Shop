@@ -44,12 +44,7 @@ Act as a Swarm Consensus Coordinator.
 7. Before dispatching any external peer LLM, write the exact peer-facing prompt/context packet to disk, show the user a short `Peer Dispatch Brief`, show the file path, and wait for the user to reply `run`.
    - This preview gate is mandatory even when model resolution was already confirmed.
    - Do not inline the full packet by default unless the user asks for it. The linked file is the exact source of truth for what will be sent.
-   - The `Peer Dispatch Brief` must include:
-     - planned peer models, with CLI versions only as diagnostics
-     - current position summary by participant when this is a later debate round
-     - reasoning summary, limited to the strongest 2-4 reasons or disagreements
-     - what is specifically being asked in this dispatch or next round
-     - **file-context line (mandatory):** state plainly that peers will read repo files for more context and better results, and name the bounded file set (or staged path) being made available. Reading necessary files is the default; if a run is deliberately packet-only (no file reads), say so and why. For Gemini/`agy`, name the staged `<ADS_MEMORY_ROOT>/tmp/peer-dispatch/<workflow>/files/` set per the peer-dispatch rules.
+   - Build the `Peer Dispatch Brief` from the required fields in `<AI_DEV_SHOP_ROOT>/skills/llm-operations/references/peer-llm-dispatch.md`, which is the only place those fields are listed.
      - what replying `run` will do
    - If the user flags an issue, revise the file and repeat the preview gate.
    - In debate mode, the Round 1 peer prompt must not include the Primary model's answer. Preview later rebuttal prompts too when they are materially different or include other participants' full previous-round reasoning.

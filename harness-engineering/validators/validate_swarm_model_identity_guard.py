@@ -108,6 +108,32 @@ DOCTRINES = {
             "skills/swarm-consensus/SKILL.md",
         ],
     },
+    "Peer Dispatch Brief": {
+        "home": "skills/llm-operations/references/peer-llm-dispatch.md",
+        "anchor": "## Peer Dispatch Brief",
+        "reference_name": "Peer Dispatch Brief",
+        # The field list existed in three places with three different field sets:
+        # consensus.md alone carried the mandatory file-context line, SKILL.md
+        # omitted planned peers, and the reference lacked file context entirely.
+        # The union now lives here.
+        "exclusive_phrases": [
+            "The brief must include:",
+            "**Current positions** —",
+            "**Reasoning summary** —",
+            "**Next ask** —",
+            "**Run meaning** —",
+            "**File context (mandatory)** —",
+        ],
+        "forbidden_paraphrases": [
+            "The `Peer Dispatch Brief` must include:",
+            "file-context line (mandatory)",
+            "what replying `run` will execute",
+        ],
+        "participants": [
+            "framework/slash-commands/consensus.md",
+            "skills/swarm-consensus/SKILL.md",
+        ],
+    },
 }
 
 # Ambiguous phrasings that must not come back, wherever they appear.

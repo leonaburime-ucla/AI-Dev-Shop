@@ -326,14 +326,11 @@ confirmation.
 2. Show the user:
    - a short `Peer Dispatch Brief`
    - the file path for the exact prompt or packet
-   - the planned peer models, with CLI versions only as diagnostics
    - the full file content only when the user asks for it or when the packet is
      tiny enough to be clearer than a summary
-3. The `Peer Dispatch Brief` must include:
-   - current position summary by participant when prior positions exist
-   - the strongest 2-4 reasoning points, disagreements, or risks
-   - what is specifically being asked in this dispatch or next round
-   - what replying `run` will execute
+3. Build the `Peer Dispatch Brief` from the required fields in
+   `skills/llm-operations/references/peer-llm-dispatch.md`, which is the only
+   place those fields are listed.
 4. Ask the user to reply `run` before dispatching external peer CLIs.
 5. If the user edits the intent or flags an issue, revise the file and repeat
    the preview gate.
