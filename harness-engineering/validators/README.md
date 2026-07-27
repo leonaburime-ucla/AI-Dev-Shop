@@ -12,6 +12,11 @@ These validators are the first mechanical enforcement layer for this repo.
   - checks that `skills-registry.md` entries point to real files
   - fails when canonical skill files exist on disk but are not registered
   - allows explicit exclusions only through `framework/routing/skills-registry-exceptions.md`
+- `validate_skill_provenance.py`
+  - verifies every `skills/skills-lock.json` entry against `sha256` of the file it names
+  - fails when a vendored skill is edited in place, when a locked path is missing,
+    and when a shadow `skills-lock.json` appears at the repo root
+  - before this, nothing read `computedHash`; two entries had matched no file since `a1721d2`
 - `validate_evaluator_artifacts.py`
   - checks retained evaluator contracts and evaluator reports for required fields and sections
   - fails when a `progress-ledger.md` marks `evaluator_mode: required` but no retained evaluator contract is recorded
