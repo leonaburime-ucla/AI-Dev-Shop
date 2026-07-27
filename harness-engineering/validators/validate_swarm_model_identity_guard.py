@@ -30,6 +30,7 @@ are replaced by an AST parse of that module, which is what they were approximati
 from __future__ import annotations
 
 import ast
+import os
 from pathlib import Path
 import sys
 
@@ -50,9 +51,19 @@ DOCTRINES = {
             "CLI versions belong only in diagnostics",
             "Preflight copy must distinguish",
         ],
+        # Reworded copies of the same rule. These are NOT the canonical wording, so
+        # they are not required at home — they are only ever evidence that someone
+        # re-authored the doctrine instead of deferring to it. `routing-guards.md`
+        # carried the first two for months without any check noticing.
+        "forbidden_paraphrases": [
+            "CLI version strings are diagnostics only",
+            "must not be presented as model identity",
+            "show the resolved or planned",
+        ],
         "participants": [
             "framework/slash-commands/consensus.md",
             "framework/slash-commands/cowork.md",
+            "framework/operations/routing-guards.md",
             "AGENTS.md",
         ],
     },
@@ -65,6 +76,10 @@ DOCTRINES = {
             "Explicitly invalid evidence (never use)",
             "models hallucinate their own identity",
             "until every source in this map has been checked",
+        ],
+        "forbidden_paraphrases": [
+            "until every source in the map has been checked",
+            "Model-plan-only lookup order",
         ],
         "participants": [
             "framework/slash-commands/consensus.md",
@@ -106,23 +121,71 @@ SCAN_EXCLUDE_PREFIXES = (
 )
 
 
+# Directory names never worth descending into. Pruned during the walk rather than
+# filtered afterwards: rglob() over this repo descends into .git and the vendored
+# upstream clones under integrations/, which dominated the runtime.
+SCAN_PRUNE_DIRS = {
+    ".git",
+    ".local-artifacts",
+    "node_modules",
+    ".venv",
+    "venv",
+    "__pycache__",
+    ".pytest_cache",
+    "archive",
+}
+
+# Under integrations/<name>/, these hold cloned upstream code that is not ours to
+# police. Kept identical to IGNORED_INTEGRATION_ARTIFACT_DIRS in
+# validate_path_references.py so the two validators agree on what "repo-owned"
+# means; if that set changes, change it here too.
+IGNORED_INTEGRATION_ARTIFACT_DIRS = frozenset(
+    {"upstream", "bin", ".venv", "venv", "node_modules", "dist", "build"}
+)
+
+
+def is_ignored_integration_artifact(rel_dir: str) -> bool:
+    parts = rel_dir.split("/")
+    return (
+        len(parts) == 3
+        and parts[0] == "integrations"
+        and parts[2] in IGNORED_INTEGRATION_ARTIFACT_DIRS
+    )
+
+
 def scannable_markdown() -> list[str]:
     """Repo-owned markdown, as paths relative to ROOT.
 
     Skips generated and vendored trees, and tolerates the dangling symlinks this
     repo carries into gitignored artifact directories — a broken link is not a
     doctrine copy, and must not abort the run.
+
+    Note `.claude/commands/` is deliberately in scope: those are installed copies
+    of the slash commands, and a doctrine restatement there is exactly as harmful
+    as one in the source.
     """
     found = []
-    for path in ROOT.rglob("*.md"):
-        rel = path.relative_to(ROOT).as_posix()
-        if rel.startswith(SCAN_EXCLUDE_PREFIXES):
-            continue
-        if "/.local-artifacts/" in f"/{rel}":
-            continue
-        if not path.is_file():  # False for broken symlinks
-            continue
-        found.append(rel)
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        rel_dir = Path(dirpath).relative_to(ROOT).as_posix()
+        prefix = "" if rel_dir == "." else f"{rel_dir}/"
+
+        dirnames[:] = [
+            d
+            for d in dirnames
+            if d not in SCAN_PRUNE_DIRS
+            and not f"{prefix}{d}/".startswith(SCAN_EXCLUDE_PREFIXES)
+            and not is_ignored_integration_artifact(f"{prefix}{d}")
+        ]
+
+        for filename in filenames:
+            if not filename.endswith(".md") or filename == "ORIGINAL.md":
+                continue
+            rel = f"{prefix}{filename}"
+            if rel.startswith(SCAN_EXCLUDE_PREFIXES):
+                continue
+            if not (ROOT / rel).is_file():  # False for broken symlinks
+                continue
+            found.append(rel)
     return sorted(found)
 
 
@@ -133,8 +196,18 @@ def read_text_or_none(path: Path) -> str | None:
         return None
 
 
+def load_corpus() -> dict[str, str]:
+    """Read every scannable file once, not once per doctrine."""
+    corpus = {}
+    for rel in scannable_markdown():
+        text = read_text_or_none(ROOT / rel)
+        if text is not None:
+            corpus[rel] = text
+    return corpus
+
+
 def check_doctrines(violations: list[str]) -> None:
-    corpus = scannable_markdown()
+    corpus = load_corpus()
 
     for name, spec in DOCTRINES.items():
         home_path = ROOT / spec["home"]
@@ -188,16 +261,18 @@ def check_doctrines(violations: list[str]) -> None:
                 )
 
         # 4. Nobody else restates it. This is the check that keeps the rule single-homed.
-        for rel in corpus:
+        #    Verbatim copies alone are not enough to look for: the first version of
+        #    this check passed while routing-guards.md carried a reworded copy.
+        copies = [(p, "restates") for p in spec["exclusive_phrases"]]
+        copies += [(p, "paraphrases") for p in spec.get("forbidden_paraphrases", [])]
+
+        for rel, text in corpus.items():
             if rel == spec["home"]:
                 continue
-            text = read_text_or_none(ROOT / rel)
-            if text is None:
-                continue
-            for phrase in spec["exclusive_phrases"]:
+            for phrase, kind in copies:
                 if phrase in text:
                     violations.append(
-                        f"VIOLATION: {rel} restates the {name} rule: {phrase!r}\n"
+                        f"VIOLATION: {rel} {kind} the {name} rule: {phrase!r}\n"
                         f"FIX: Delete the copy and defer to `{spec['reference_name']}` in {spec['home']}. "
                         f"A rule written in two places drifts in one of them — that is what this check exists to stop."
                     )

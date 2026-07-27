@@ -48,7 +48,7 @@ When the user asks for a debate, uses `/debate`, asks for a "2 round debate", or
 - Generic wording such as "agents", "debaters", "external agents", or "models" is not enough to justify current-LLM subagents; route to Swarm Consensus external peers instead.
 - If external peer CLIs are unavailable, say so and stop or continue only under the Swarm Consensus fallback rules. Do not silently fall back to platform subagents.
 - Before launching any debate, state which protocol will be used: `Swarm Consensus debate` or `repo-persona subagent consultation`.
-- When naming debate participants, show the resolved or planned **model name/version** first. CLI version strings are diagnostics only and must not be presented as model identity.
+- Name debate participants under the `Model Identity Disclosure Guard` in `<AI_DEV_SHOP_ROOT>/skills/swarm-consensus/SKILL.md`, which is the only place those presentation rules are written.
 
 ## Cowork Routing Guard
 
