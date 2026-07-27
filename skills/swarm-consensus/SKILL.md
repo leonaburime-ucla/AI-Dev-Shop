@@ -36,6 +36,14 @@ When naming LLM participants to the user, always show the peer model identity fi
 - If the exact model cannot be proven, say `model unresolved` or `local default, exact model unknown`; do not substitute the CLI version. For `/consensus` and `/debate`, that unresolved label is a blocking status and must not be dispatched.
 - Preflight copy must distinguish `Planned peer models` from `CLI diagnostics`.
 
+**Mode-entry disclosure line.** A command that announces consensus is available
+states this promise to the user, verbatim, rather than paraphrasing it:
+
+`I will show model identity first in preflight, with CLI versions only as diagnostics. If any model is inferred instead of explicitly pinned for this run, I will ask you to confirm or override it first.`
+
+User-facing wording lives here with the rule it promises. A command that restates
+it in its own words is a second copy that drifts from this one.
+
 ### Reporting Results to User (Blocking)
 
 When reporting debate results, synthesis, decision ledgers, or any peer output back to the user, always identify each participant by **model family + version + reasoning mode** — not by CLI name alone.

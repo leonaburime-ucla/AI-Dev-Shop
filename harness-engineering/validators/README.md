@@ -37,6 +37,9 @@ These validators are the first mechanical enforcement layer for this repo.
     when a participant stops pointing at its home, or when a home stops stating its own rule
   - AST-checks `cli_smoke_test.py` for the model-plan entry points, the `--model-plan-only`
     flag, and the evidence sources the map promises — including shadowed redefinitions
+  - blocks instructions to use never-valid evidence (peer self-report, CLI version as
+    identity) however freshly written — a vocabulary check over the two known-invalid
+    methods, not a general correctness check
   - it does **not** pin doctrine prose across files; that earlier design drifted three times
 - `validate_specs_as_built_freshness.py`
   - checks `ADS-memory/specs_as_built/` metadata when present

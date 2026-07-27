@@ -32,6 +32,7 @@ from __future__ import annotations
 import ast
 import os
 from pathlib import Path
+import re
 import sys
 
 
@@ -55,6 +56,10 @@ DOCTRINES = {
             # being substituted at the exact moment substituting one is tempting.
             "say `model unresolved` or `local default, exact model unknown`",
             "that unresolved label is a blocking status and must not be dispatched",
+            # The sanctioned user-facing wording. Commands print it verbatim rather
+            # than paraphrasing, so the promise shown to a user cannot drift from
+            # the rule that backs it.
+            "I will show model identity first in preflight, with CLI versions only as diagnostics",
         ],
         # Reworded copies of the same rule. These are NOT the canonical wording, so
         # they are not required at home — they are only ever evidence that someone
@@ -68,6 +73,7 @@ DOCTRINES = {
             "framework/slash-commands/consensus.md",
             "framework/slash-commands/cowork.md",
             "framework/operations/routing-guards.md",
+            "framework/slash-commands/agent.md",
             "AGENTS.md",
         ],
     },
@@ -134,6 +140,48 @@ DOCTRINES = {
             "skills/swarm-consensus/SKILL.md",
         ],
     },
+}
+
+# Instructions to use evidence the Model Memory Map lists as never-valid.
+#
+# The single-homing checks catch *copies* of a rule. They cannot catch someone
+# newly authoring an instruction that contradicts it — an adversarial review
+# replaced a cowork.md line with "Resolve exact model identity by asking each peer
+# CLI what model it is", the one method the map forbids outright, and every check
+# still passed. This closes that specific hole.
+#
+# Scope honestly: this is a vocabulary check over the two known-invalid methods
+# (peer self-report, and CLI version as identity). It catches the ways those get
+# written, not every possible wrong instruction. Fresh prose that is wrong in a
+# new way remains a review problem, not a grep problem.
+FORBIDDEN_PRACTICE_PATTERNS = [
+    (
+        # Scoped to peer-ish objects on purpose. Asking the *user* which model to
+        # pin is valid and instructed elsewhere; asking the *peer* is the forbidden
+        # method. An earlier draft matched both and flagged correct prose.
+        r"ask\w*\s+(?:the\s+|each\s+|any\s+|a\s+)?"
+        r"(?:peer|model|llm|cli|claude|gemini|codex)\w*"
+        r"[^.\n]{0,60}\b(?:what|which)\s+model\b",
+        "instructs asking a peer which model it is; models misreport their own identity",
+    ),
+    (
+        r"\bwhat model are you\b",
+        "instructs peer self-report, which the Model Memory Map lists as never-valid evidence",
+    ),
+    (
+        r"\b(?:use|treat|report)\w*\s+(?:the\s+)?CLI version[^.\n]{0,40}\bas\b[^.\n]{0,20}\bmodel\b",
+        "instructs presenting a CLI version as model identity",
+    ),
+    (
+        r"--version[^.\n]{0,40}\bto\s+(?:determine|resolve|prove)\b[^.\n]{0,20}\bmodel\b",
+        "instructs resolving model identity from a CLI version string",
+    ),
+]
+
+# The home describes these methods in order to forbid them, so it is exempt.
+FORBIDDEN_PRACTICE_EXEMPT = {
+    "skills/llm-operations/references/peer-llm-dispatch.md",
+    "skills/swarm-consensus/SKILL.md",
 }
 
 # Ambiguous phrasings that must not come back, wherever they appear.
@@ -276,9 +324,7 @@ def load_corpus() -> dict[str, str]:
     return corpus
 
 
-def check_doctrines(violations: list[str]) -> None:
-    corpus = load_corpus()
-
+def check_doctrines(violations: list[str], corpus: dict[str, str]) -> None:
     for name, spec in DOCTRINES.items():
         home_path = ROOT / spec["home"]
         if not home_path.exists():
@@ -375,6 +421,25 @@ def check_doctrines(violations: list[str]) -> None:
                     )
 
 
+def check_forbidden_practices(violations: list[str], corpus: dict[str, str]) -> None:
+    """Catch instructions to use evidence the map forbids, however freshly written."""
+    for rel, text in sorted(corpus.items()):
+        if rel in FORBIDDEN_PRACTICE_EXEMPT:
+            continue
+        for pattern, why in FORBIDDEN_PRACTICE_PATTERNS:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                line_no = text[: match.start()].count("\n") + 1
+                violations.append(
+                    f"VIOLATION: {rel}:{line_no} {why}.\n"
+                    f"  matched: {match.group(0).strip()!r}\n"
+                    f"FIX: Resolve identity through the `Model Memory Map` in "
+                    f"skills/llm-operations/references/peer-llm-dispatch.md. If this text is "
+                    f"describing the method in order to forbid it, it belongs in that map's "
+                    f"`Explicitly invalid evidence` block, not here."
+                )
+
+
 def check_forbidden(violations: list[str]) -> None:
     for relative_path, markers in FORBIDDEN_MARKERS.items():
         path = ROOT / relative_path
@@ -459,7 +524,9 @@ def check_implementation(violations: list[str]) -> None:
 
 def main() -> int:
     violations: list[str] = []
-    check_doctrines(violations)
+    corpus = load_corpus()
+    check_doctrines(violations, corpus)
+    check_forbidden_practices(violations, corpus)
     check_forbidden(violations)
     check_implementation(violations)
 
