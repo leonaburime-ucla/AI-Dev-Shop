@@ -439,12 +439,22 @@ def check_forbidden_practices(violations: list[str], corpus: dict[str, str]) -> 
         if rel in FORBIDDEN_PRACTICE_EXEMPT:
             continue
         for pattern, why in FORBIDDEN_PRACTICE_PATTERNS:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
+            # Every occurrence, not the first. Using `re.search` plus `continue`
+            # abandoned the whole pattern for the whole file as soon as one negated
+            # occurrence appeared — so prefixing a document with the correct rule
+            # ("Never ask the peer what model it is") silently exempted every real
+            # instruction below it. That was worse than the false positive it fixed:
+            # noisy-but-safe became quiet-and-wrong.
+            for match in re.finditer(pattern, text, re.IGNORECASE):
                 line_start = text.rfind("\n", 0, match.start()) + 1
                 line_end = text.find("\n", match.end())
                 sentence = text[line_start : line_end if line_end != -1 else len(text)]
-                if PRACTICE_NEGATION.search(sentence):
+
+                # The negation has to govern this occurrence, not merely share a line
+                # with it. "Ask the peer what model it is; never skip this step" is an
+                # instruction to do the forbidden thing, with an unrelated "never".
+                before = sentence[: match.start() - line_start]
+                if PRACTICE_NEGATION.search(before):
                     continue  # prohibiting the practice, not prescribing it
                 line_no = text[: match.start()].count("\n") + 1
                 violations.append(

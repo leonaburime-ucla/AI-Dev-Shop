@@ -80,7 +80,14 @@ def collect_imports(path: Path, current: str) -> set[str]:
                     for alias in node.names:
                         names.add(f"{resolved}.{alias.name}" if resolved else alias.name)
             elif node.module:
+                # `from pkg import b` names its target in the alias list. Recording
+                # the bare package and expanding it to every member fabricated edges
+                # between siblings, which reported a 2-cycle for plain `a -> b -> c`.
+                # Same shape as the relative-import bug above; only that branch had
+                # been fixed. Record the module itself too, for `from pkg.mod import f`.
                 names.add(node.module)
+                for alias in node.names:
+                    names.add(f"{node.module}.{alias.name}")
     return names
 
 
@@ -96,15 +103,12 @@ def build_graph(root: Path, scope: str = "**/*.py") -> dict[str, set[str]]:
     graph: dict[str, set[str]] = {name: set() for name in known}
     for name, path in known.items():
         for target in collect_imports(path, name):
+            # Exact resolution only. Every `from X import y` form is now resolved to
+            # `X.y` when the imports are collected, so expanding a bare package to
+            # all of its members is no longer needed — and it was inventing edges
+            # the source never had. Importing a package does not import its members.
             if target in known:
                 graph[name].add(target)
-            else:
-                # A package-level import still registers an edge to its members —
-                # but never back to the importer, which would be a fabricated
-                # self-loop rather than anything the source says.
-                for candidate in known:
-                    if candidate != name and candidate.startswith(target + "."):
-                        graph[name].add(candidate)
     return graph
 
 

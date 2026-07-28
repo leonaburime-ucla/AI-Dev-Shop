@@ -180,10 +180,23 @@ detector quietly scoped to the wrong tree.
 **Ablation alone is not sufficient, and an earlier version of this spec wrongly
 said it was.** Two detectors were built that defeat it: one that opens no files
 and answers from a hardcoded table, and one that parses correctly but caps file
-discovery two directories deep — literally the misconfiguration this canary is
-named for. Both honour the scope argument, so both satisfy a control that asks
-only whether the output changed. Control 5 exists because of them: it is the
-only control whose input the detector cannot have been built against.
+discovery two directories deep. Both honour the scope argument, so both satisfy a
+control that asks only whether the output changed. Control 5 exists because of
+them.
+
+**Control 5 as piloted is also not sufficient, and this is measured.** A later
+review passed six broken detectors — including one that opens no source file —
+through all five controls. The cause is structural: the generated fixture varies
+its *names* but not its *shape*, so a detector can pattern-match the shape
+without reading anything, and the fixtures are too uniform (every import on line
+one, no repeated leaf names, no cycle longer than three) for several whole
+classes of breakage to show up.
+
+**A host implementing this spec should therefore vary the fixture's shape, not
+only its identifiers, and should vary the seed per run.** The pilot in
+`harness-engineering/canary/` records its own measured blind spots; read them
+before copying it. A passing canary means the detector is not broken in one of
+the ways the controls model — no more than that.
 
 ### What a promotion must record
 
@@ -215,7 +228,7 @@ should catch them.
 **It does not promote anything.** Its subject is a pilot stand-in detector, not a
 host's declared `dependency_graph` command, so the dependency-cycle gate remains
 `unvalidated` in the registry above. Promoting it requires running these same
-four controls against a real declared detector on a real project.
+five controls against a real declared detector on a real project.
 
 **Consequence: no gate in the registry is promoted yet.** The criterion now
 exists; nothing has met it.

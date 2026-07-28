@@ -47,25 +47,51 @@ validation loop that cannot run on the machine in front of you is the problem
 this program is trying to solve.
 
 Consequence: **this pilot promotes nothing.** The dependency-cycle gate stays
-`unvalidated`. Promotion needs these same four controls run against a real
+`unvalidated`. Promotion needs these same five controls run against a real
 declared detector, pinned by version, on a real project.
 
-## It is mutation-tested
+## What it catches
 
-A canary that only ever passes is worth nothing. Five deliberately broken
-detectors were each caught by the control that should catch them:
+Broken detectors that fail, each on the control that should catch it:
 
 | Broken detector | Control that failed |
 |---|---|
 | finds no cycles at all | injection |
 | flags fan-out as a cycle | negative |
-| ignores its scope argument | **ablation** |
+| caps file discovery two directories deep | **unseen** |
 | ignores the cycle-length threshold | sensitivity |
 | loses the direction rules | injection (`f3`) |
 
-The third is the one that matters. A detector that ignores its scope produces
-identical output however it is pointed, so its zero findings carry no
-information — and only the ablation control notices.
+## What it does NOT catch — measured, not assumed
+
+An adversarial review wrote six broken detectors that pass **every** control.
+This is recorded here because a canary trusted beyond its reach is worse than no
+canary at all.
+
+| Passes anyway | Why the controls miss it |
+|---|---|
+| Opens no source file; guesses "deepest package with two modules → 2-cycle" | every fixture, including the generated one, has that shape |
+| Resolves imports by basename, so any two `utils.py` look linked | no fixture has a repeated leaf name |
+| Direction rules prefix-match with no path boundary | no fixture has a `domain_utils`-style near-miss |
+| Misses cycles longer than 3 | the longest planted cycle is 3 |
+| Reads only the first two lines of each file | every fixture puts its import on line 1 |
+| Caps discovery at four path segments | the generated fixture is fixed at depth 3 |
+
+Two structural weaknesses cause most of that. **The generated fixture varies its
+names, not its shape** — so a detector can pattern-match the shape without
+reading anything. And `run-all.sh` invokes `--check` with no `--seed`, so the
+default of `1` makes even the names identical on every run; a three-name lookup
+table passes.
+
+**Read a PASS as "this detector is not broken in one of the five ways the
+controls model."** It is not evidence that the detector reads your code.
+
+## It is mutation-tested
+
+The detector under test is mutation-tested separately: `find_cycles` and
+`strongly_connected` were differential-tested against an independent Kosaraju
+implementation and a brute-force cycle enumerator over 17 hand cases and 4,000
+random graphs, with no mismatches.
 
 ## Fixture language
 

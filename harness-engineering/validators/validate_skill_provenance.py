@@ -88,7 +88,7 @@ def main() -> int:
     for name, entry in sorted(entries.items()):
         if not isinstance(entry, dict):
             violations.append(
-                f"VIOLATION: Lock entry {name!r} is not an object.\n"
+                f"VIOLATION: Lock entry {name!r} is not an object ({type(entry).__name__}).\n"
                 f"FIX: Give it `skillPath` and `computedHash` fields."
             )
 
@@ -125,6 +125,8 @@ def main() -> int:
         )
 
     for name, entry in sorted(entries.items()):
+        if not isinstance(entry, dict):
+            continue  # already reported above; .get() would crash before printing it
         skill_path = entry.get("skillPath")
         if not skill_path:
             violations.append(
@@ -158,7 +160,7 @@ def main() -> int:
                 f"VIOLATION: Lock entry {name!r} has no computedHash.\n"
                 f"FIX: Set it to the sha256 of {skill_path}: {actual}"
             )
-        elif recorded.strip().lower() != actual:
+        elif str(recorded).strip().lower() != actual:
             # Compared case-insensitively on purpose: an uppercase or whitespace-padded
             # but otherwise correct hash used to report "the vendored skill was edited
             # in place — restore it from upstream", which would have someone clobber a
