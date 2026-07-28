@@ -3,7 +3,7 @@
 Version: 2.0.0
 Last Updated: 2026-04-26
 
-Use this plan to test whether Programmer, Code Review, and Refactor apply the
+Use this plan to test whether Programmer, Code Inspection, and Refactor apply the
 coding foundations, implementation guardrails, testable design rules, and
 function-quality assessment discipline under pressure.
 
@@ -81,7 +81,7 @@ peer models.
 Use `external_peer_cli` only when the user explicitly asks to compare the repo
 agent against Claude, Gemini, Codex CLI, or another outside model. Those runs
 are useful comparison evidence, but they are not the default proof of
-Programmer, Code Review, or Refactor capability.
+Programmer, Code Inspection, or Refactor capability.
 
 Record the chosen execution mode and model provenance in
 `run-manifest.tsv`, then persist the per-seed grading evidence in
@@ -276,7 +276,7 @@ Function-quality benchmark suites must satisfy:
 
 ## Minimum Suite Shape
 
-For Programmer, Code Review, and Refactor, use this as the default target:
+For Programmer, Code Inspection, and Refactor, use this as the default target:
 
 | Tier | Minimum seed count | Structural expectation |
 |---|---|---|
@@ -384,9 +384,9 @@ Key target pressure:
 - anti-pattern removal
 - test design realism
 
-### Code Review
+### Code Inspection
 
-Code Review receives pre-staged buggy code plus a fabricated Programmer handoff.
+Code Inspection receives pre-staged buggy code plus a fabricated Programmer handoff.
 
 Required pressure:
 
@@ -439,7 +439,7 @@ Apply `failure-promotion-policy.md`, but add this interpretation:
 
 ## Operational Rule
 
-Any future summary claiming Programmer or Code Review capability from a
+Any future summary claiming Programmer or Code Inspection capability from a
 function-quality suite should say whether the suite is exploratory, pilot,
 benchmark, or stable benchmark. If the label is omitted, treat the claim as
 under-specified.

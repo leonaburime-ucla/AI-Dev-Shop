@@ -18,7 +18,7 @@
 - <verification run or not run>
 
 ## Internal Verification
-- **Verifier persona:** <Code Review | TDD | Security | generic adversarial verifier>
+- **Verifier persona:** <Code Inspection | TDD | Security | generic adversarial verifier>
 - **Evidence packet:** <path or summary of what was included>
 - **Excluded rationale statement:** confirmed excluded author-side rationale (implementation reasoning, confidence claims, dismissed alternatives)
 - **Findings:** <hard blockers / escalations / advisories / none — with count>

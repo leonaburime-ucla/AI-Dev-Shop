@@ -42,7 +42,7 @@ Standard schema per agent:
 - Recovery route: Re-run with required output schema including cluster IDs and AC linkage.
 - Escalation trigger: Two incomplete reports in the same implementation cycle.
 
-## Code Review
+## Code Inspection
 - Failure mode: Focuses on style noise while missing behavioral/spec regressions.
 - Detection signal: Low-severity comments dominate; post-merge behavioral defects found.
 - Recovery route: Re-dispatch with spec-alignment and regression checks as required dimensions.

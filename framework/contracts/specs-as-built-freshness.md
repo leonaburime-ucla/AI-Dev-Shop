@@ -92,7 +92,7 @@ Summary:
 ## Stage Gate Behavior
 
 1. Before **Done**: Coordinator runs the validator when code changes are material to public behavior or declared component source scopes.
-2. Before **Code Review**: reviewer checks whether modified files intersect `source_scope` for generated component artifacts.
+2. Before **Code Inspection**: reviewer checks whether modified files intersect `source_scope` for generated component artifacts.
 3. During **reverse-spec**: extraction records raw evidence and updates `specs_as_built/` freshness metadata.
 4. During **brownfield adoption**: gaps are logged as advisory until the user promotes enforcement.
 

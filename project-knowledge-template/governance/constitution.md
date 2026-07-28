@@ -84,7 +84,7 @@ All production code paths emit structured, queryable signals. No silent failures
 
 **Complies if:** All error paths produce a structured log entry. All external I/O (API calls, DB writes, file operations) is instrumented.
 
-**Exception process:** Document in ADR or Code Review finding why a path cannot be instrumented (e.g., third-party SDK limitation).
+**Exception process:** Document in ADR or Code Inspection finding why a path cannot be instrumented (e.g., third-party SDK limitation).
 
 ---
 

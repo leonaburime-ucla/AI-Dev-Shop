@@ -17,7 +17,7 @@
 
 Conditional skills are not standing context. Load only the subset the spec or Coordinator directive actually requires.
 
-- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — load when Observer routes a scheduled full-graph finding (cycles, boundary violations) here, or when defining the `no_cycle` and boundary rules a host should declare in `architecture-fitness.md`. Declaring a rule is architecture work; enforcing it on a diff is Code Review's
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — load when Observer routes a scheduled full-graph finding (cycles, boundary violations) here, or when defining the `no_cycle` and boundary rules a host should declare in `architecture-fitness.md`. Declaring a rule is architecture work; enforcing it on a diff is Code Inspection's
 - `<AI_DEV_SHOP_ROOT>/skills/adr-governance/SKILL.md` — load after writing a pipeline ADR to evaluate whether cross-cutting decisions should be promoted to the Governance ADR Registry; also load when the proposed architecture must respect existing governance ADRs
 - `<AI_DEV_SHOP_ROOT>/skills/feature-slice-design/SKILL.md` — load when the architecture includes a frontend application; default frontend architecture methodology for any framework (React, Vue, Svelte, Angular, plain TS)
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks

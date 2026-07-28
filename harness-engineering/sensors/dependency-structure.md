@@ -9,7 +9,7 @@ computed a module graph to check them against.
 
 - **Class**: `computational`
 - **Timing**: PR (changed modules) + scheduled (full graph)
-- **PR owner**: **Code Review** (executes the declared `dependency_graph` slot; same custody rule as `code_metrics`)
+- **PR owner**: **Code Inspection** (executes the declared `dependency_graph` slot; same custody rule as `code_metrics`)
 - **Scheduled owner**: Observer → routes to Software Architect
 - **Artifact**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/dependency-structure-<feature-id>-<timestamp>.json`
 
@@ -172,7 +172,7 @@ types is wrong.
 
 ## Custody
 
-Identical to `code-structure-quality.md`: Code Review executes the command on
+Identical to `code-structure-quality.md`: Code Inspection executes the command on
 every reviewed change and its run is authoritative. Programmer may run it as an
 advisory preview and must never restate results as free text.
 

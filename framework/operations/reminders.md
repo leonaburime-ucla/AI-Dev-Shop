@@ -16,7 +16,7 @@ or delete the line from the Dismissed section.
 
 ## slash-commands-setup
 
-Available template commands: `/spec` `/plan` `/tasks` `/implement` `/code-review` `/clarify` `/agent` `/consensus` `/debate` `/audit-work` `/cowork` `/handoff`
+Available template commands: `/spec` `/plan` `/tasks` `/implement` `/code-inspection` `/clarify` `/agent` `/consensus` `/debate` `/audit-work` `/cowork` `/handoff`
 Note: `/agent` works only after the template is installed into a host that supports custom slash commands. In Claude, use natural language such as "talk to architect" or "switch to programmer" if `/agent <name>` errors.
 Placeholder note: `<AI_DEV_SHOP_ROOT>` means the toolkit folder path (usually `AI-Dev-Shop/`).
 
@@ -45,7 +45,7 @@ If the user says "yes" or "set up slash commands":
    add `--include-project` to also install the `gstack-*` commands.
 4. Confirm what was installed/skipped, then offer to dismiss the reminder.
 
-After setup, `/spec`, `/plan`, `/code-review`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, `/handoff`, etc. work directly in chat (except any you chose not to install).
+After setup, `/spec`, `/plan`, `/code-inspection`, `/consensus`, `/debate`, `/audit-work`, `/cowork`, `/handoff`, etc. work directly in chat (except any you chose not to install).
 
 ### Gemini CLI
 

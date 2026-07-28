@@ -33,7 +33,7 @@ In practice, this gives a repo a repeatable way to move from idea to working cod
 ```text
 [VibeCoder] -> [CodeBase Analyzer] -> [System Design] -> Spec
 -> [Red-Team] -> Software Architect -> [Database] -> TDD
--> Programmer -> [QA/E2E] -> TestRunner -> Code Review
+-> Programmer -> [QA/E2E] -> TestRunner -> Code Inspection
 -> [Refactor] -> Security -> [DevOps] -> [Docs] -> Done
 ```
 
@@ -60,7 +60,7 @@ Current status:
 ## Quick Overview
 
 - **For**: teams and solo builders who want coding agents to work through a defined software-delivery process instead of improvising
-- **Does**: routes work through specialized agents like Coordinator, Spec, Software Architect, TDD, Programmer, Code Review, and Security
+- **Does**: routes work through specialized agents like Coordinator, Spec, Software Architect, TDD, Programmer, Code Inspection, and Security
 - **Produces**: durable artifacts such as specs, ADRs, task lists, test certifications, review findings, and project memory
 - **Fits**: existing codebases and greenfield projects; the toolkit lives alongside your app rather than replacing it, while project-owned state lives in a sibling `ADS-memory/` folder
 

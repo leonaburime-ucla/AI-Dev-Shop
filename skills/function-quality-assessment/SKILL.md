@@ -79,7 +79,7 @@ definition and use this skill only to assess, report, and route the result.
 
 - Programmer applies this skill before and after implementation, fixes locally
   fixable findings, and documents the final disposition per assessment unit.
-- Code Review validates the Programmer's assessment independently and records a
+- Code Inspection validates the Programmer's assessment independently and records a
   Function Quality Assessment section in the saved code review report.
 - Refactor uses failed assessment findings as targeted cleanup input.
 - Coordinator sees only the routing summary: outcome, Critical/High count,
@@ -145,14 +145,14 @@ After coding (Assessment Gate):
     coverage cannot be measured, say why and identify the direct tests that
     cover each assessed unit.
 
-## Code Review Procedure
+## Code Inspection Procedure
 
 For every new or materially changed function in scope:
 
 1. Confirm the Programmer assessment exists when required.
 2. Confirm the Programmer handoff includes the compact assessment table.
 3. Re-assess the function using the same checklist.
-4. Compare finding sets: identify findings Code Review found that the
+4. Compare finding sets: identify findings Code Inspection found that the
    Programmer's handoff omitted, by severity. Comparing content is harder to
    fabricate agreement on than comparing numbers.
 5. Flag missing, omitted, or inconsistently severity-graded findings.
@@ -164,9 +164,9 @@ For every new or materially changed function in scope:
    adversarial aggregate/cross-item behavior test or probe exists.
 9. Classify findings using the thresholds below.
 10. Add a Function Quality Assessment section to the saved code review report at
-   `<ADS_MEMORY_ROOT>/reports/code-review/CR-<feature-id>-<YYYY-MM-DD>.md`.
+   `<ADS_MEMORY_ROOT>/reports/code-inspection/CR-<feature-id>-<YYYY-MM-DD>.md`.
 
-Do not create a separate function-quality report by default. Code Review already
+Do not create a separate function-quality report by default. Code Inspection already
 owns the retained review artifact; this assessment belongs inside that report.
 
 ## Findings And Blocking
@@ -252,7 +252,7 @@ Programmer handoff Style Notes must include:
 - remaining complexity, scale, I/O, determinism, concurrency, security, or
   extensibility risks
 
-Code Review report must include:
+Code Inspection report must include:
 
 ```text
 ## Function Quality Assessment

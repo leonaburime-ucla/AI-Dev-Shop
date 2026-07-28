@@ -37,7 +37,7 @@ branch_created: <timestamp>
 ## When to Signal PR-Ready
 
 The Coordinator signals **PR-ready at the Done gate** — after all implementation stages are complete:
-- Code Review passed
+- Code Inspection passed
 - Security review passed (if in scope)
 - Test certification exists
 - Self-validation completed (if runtime-changing work)

@@ -11,7 +11,7 @@ narrower than the others: it reports broadly and gates narrowly.
 
 - **Class**: `computational`
 - **Timing**: PR (changed files vs. the rest of the tree) + scheduled (whole-repo trend)
-- **PR owner**: **Code Review** (executes the declared `duplication` slot; same
+- **PR owner**: **Code Inspection** (executes the declared `duplication` slot; same
   custody rule as `code_metrics`)
 - **Scheduled owner**: Observer → routes to Refactor
 - **Artifact**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/duplication-<feature-id>-<timestamp>.json`
@@ -281,7 +281,7 @@ nothing.
 
 ## Custody
 
-Identical to `code-structure-quality.md`. Code Review executes the command on
+Identical to `code-structure-quality.md`. Code Inspection executes the command on
 every reviewed change and its run is authoritative. Programmer may run it as an
 advisory preview and must never restate results as free text in a handoff.
 
@@ -306,14 +306,14 @@ When the two conflict, the resolution is **not** to satisfy both. It is to recor
 a justification against one of them and say which cost was chosen and why. A
 change that satisfies both by producing a parameterized helper whose parameters
 are caller identities has satisfied neither — that is the specific outcome this
-section exists to prevent. Code Review adjudicates; it does not require a clean
+section exists to prevent. Code Inspection adjudicates; it does not require a clean
 sweep of both gates.
 
 ## Action-on-Fail
 
 | Finding | Severity | Action |
 |---|---|---|
-| Clone group grown past 3 sites, no upheld justification | Required | Code Review reports at fixed severity; **blocks only at `validated` gate status** (see the registry); otherwise routes to Programmer or Refactor as `RECOMMENDED` |
+| Clone group grown past 3 sites, no upheld justification | Required | Code Inspection reports at fixed severity; **blocks only at `validated` gate status** (see the registry); otherwise routes to Programmer or Refactor as `RECOMMENDED` |
 | Threshold raised or exclusion broadened without approval | Required | `INT-2`; blocks regardless of gate status; flags to the human |
 | Type-2 → Type-3 perturbation with no behavior change | Required | `INT-6`; blocks regardless of gate status |
 | New 2-site clone above threshold | Advisory | Recommended finding, with the premature-extraction caveat |

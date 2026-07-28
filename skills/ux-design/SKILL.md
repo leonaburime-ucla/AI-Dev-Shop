@@ -23,7 +23,7 @@ description: Use when creating frontend design systems, visual direction, compon
   - `references/delight-and-motion.md` for microcopy, micro-interactions, personality, motion, delight
   - `references/inclusive-ai-imagery.md` for inclusive representation rules and AI image/video prompting
 - Treat accessibility, responsive behavior, and implementation clarity as default requirements.
-- Produce design output that Programmer, QA/E2E, and Code Review can execute without guessing.
+- Produce design output that Programmer, QA/E2E, and Code Inspection can execute without guessing.
 
 ## Guardrails
 
@@ -46,7 +46,7 @@ Write a concise design artifact that includes:
 - accessibility and inclusive-design requirements
 - brand/voice constraints when relevant
 - implementation notes for Programmer
-- verification notes for QA/E2E and Code Review
+- verification notes for QA/E2E and Code Inspection
 
 Default path: `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/design-spec.md`
 

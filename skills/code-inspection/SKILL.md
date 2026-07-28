@@ -1,11 +1,11 @@
 ---
-name: code-review
+name: code-inspection
 version: 1.1.1
 last_updated: 2026-04-26
 description: Use when reviewing code for spec alignment, architecture violations, test quality, security surface, and non-behavioral improvement opportunities.
 ---
 
-# Skill: Code Review
+# Skill: Code Inspection
 
 Tests answer "does this work?" Code review answers "is this the right change, done the right way, safe to live in the codebase long-term?" These are different questions. Passing tests are necessary but not sufficient.
 
@@ -187,7 +187,7 @@ and the Coordinator supplies current verification evidence for the active spec
 hash. If the Coordinator explicitly requests advisory-only review without that
 evidence, state that limitation and do not present the result as ship-ready.
 
-**Calls**: None directly. Code Review reports findings to Coordinator.
+**Calls**: None directly. Code Inspection reports findings to Coordinator.
 Coordinator decides whether to dispatch Programmer, TDD, Refactor, Security,
 Software Architect, or Spec.
 

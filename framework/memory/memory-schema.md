@@ -60,7 +60,7 @@ A recurring failure cluster, an escalation, or a resolved blocker worth remember
 - supersedes: <entry_id> | N/A
 - expires_at: never | <ISO-8601 UTC>
 - feature: <NNN-feature-name>
-- stage: spec | clarify | architect | tasks | tdd | programmer | testrunner | code-review | security
+- stage: spec | clarify | architect | tasks | tdd | programmer | testrunner | code-inspection | security
 - cluster: <AC ID or description>
 - occurrences: <n>
 - resolved_by: <agent or human> on <date>
@@ -143,7 +143,7 @@ Agent output quality score from an LLM-as-judge pass. Used by the Observer to tr
 - supersedes: <entry_id> | N/A
 - expires_at: never | <ISO-8601 UTC>
 - feature: <NNN-feature-name>
-- agent: spec | architect | tdd | programmer | code-review | security
+- agent: spec | architect | tdd | programmer | code-inspection | security
 - spec_hash: <sha256>
 - scores:
   - <dimension 1>: <score>/10

@@ -172,11 +172,11 @@ In the multi-agent pipeline, evaluation occurs at these checkpoints:
 |---|---|---|
 | Post-TDD | Coordinator + human | Test coverage of spec requirements |
 | Post-Programmer | TestRunner (automated) | Pass rate against certified tests |
-| Post-Code Review | Coordinator | Finding severity and count trends |
+| Post-Code Inspection | Coordinator | Finding severity and count trends |
 | Post-Security | Human required | No Critical/High finding ships unevaluated |
 | End-of-cycle | Observer | Cross-cycle quality trends |
 
-The Observer agent is the designated cross-cycle evaluator — it accumulates scores over time and surfaces patterns (e.g., "Programmer Agent consistently misses EC edge cases" or "Code Review Agent consistently flags the same architecture violation").
+The Observer agent is the designated cross-cycle evaluator — it accumulates scores over time and surfaces patterns (e.g., "Programmer Agent consistently misses EC edge cases" or "Code Inspection Agent consistently flags the same architecture violation").
 
 ## Common Failure Modes
 

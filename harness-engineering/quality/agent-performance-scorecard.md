@@ -77,14 +77,14 @@ Scores reference specific memory-store.md `[QUALITY]` entry IDs as evidence. Sco
 
 ---
 
-### Code Review Agent
+### Code Inspection Agent
 
 | Run | Feature | Finding Classification Accuracy | Spec Alignment Coverage | Security Surface Detection | Composite | Evidence |
 |-----|---------|--------------------------------|------------------------|--------------------------|-----------|---------|
 | — | — | — | — | — | — | — |
 
 **False negative rate:** Not yet established
-(False negative = Security finding later caught by Security Agent that should have been flagged by Code Review.)
+(False negative = Security finding later caught by Security Agent that should have been flagged by Code Inspection.)
 
 **Baseline:** Not yet established
 

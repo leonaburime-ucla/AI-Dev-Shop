@@ -59,11 +59,11 @@ completeness but do not edit it, wait on its producers, or dispatch other agents
 - Empty/Skipped-Only Suite Check: PASS / FAIL
 - Unapproved Flaky Tests: none / listed below
 - Overall Verification Status: PASS / FAIL / UNAVAILABLE / BLOCKED
-- Code Review Gate Status: READY / NOT_READY / WAIVED
+- Code Inspection Gate Status: READY / NOT_READY / WAIVED
 
 ## Waiver
 
-Only complete when `Code Review Gate Status` is `WAIVED`.
+Only complete when `Code Inspection Gate Status` is `WAIVED`.
 
 - Human Reviewer: <name>
 - Approved At: <ISO-8601 UTC>

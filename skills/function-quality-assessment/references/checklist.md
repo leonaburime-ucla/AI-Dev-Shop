@@ -231,4 +231,4 @@ listed so the canonical rule stays in one place.
     aggregate behavior, hidden dependencies, error paths, scale, coverage, and
     security before preserving a clean result. Under-reporting is the cheapest
     possible output in a findings regime; this item is the control on it.
-    Source: `function-quality-assessment`, `code-review`.
+    Source: `function-quality-assessment`, `code-inspection`.

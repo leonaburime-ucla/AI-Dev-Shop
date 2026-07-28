@@ -45,7 +45,7 @@
 | Seed | Eval | Dimension | Nature | Structure | Difficulty | Control | Severity | FP Risk | Final trap |
 |---|---|---|---|---|---|---|---|---|---|
 | RF-SEED-01 | refactor-eval-1-routing-gates | 1 | duplication | single | Easy | positive_control | Critical | None | Two identical validation helpers have full tests and no semantic divergence; Refactor should propose a small shared extraction. |
-| RF-SEED-02 | refactor-eval-1-routing-gates | 1 | boundary_error | single | Easy | standard | Required | Low | Code Review finding is framed as coupling, but service imports another domain repository directly; this is an architecture boundary issue for Architect. |
+| RF-SEED-02 | refactor-eval-1-routing-gates | 1 | boundary_error | single | Easy | standard | Required | Low | Code Inspection finding is framed as coupling, but service imports another domain repository directly; this is an architecture boundary issue for Architect. |
 | RF-SEED-03 | refactor-eval-1-routing-gates | 1 | semantic_mismatch | layered | Hard | standard | Critical | Medium | Oversized route handler exists because the spec never defines side-effect/event ownership; arbitrary extraction would encode a spec guess. |
 | RF-SEED-04 | refactor-eval-1-routing-gates | 1 | anti_pattern | single | Medium | standard | Required | Low | Agent implements the refactor or edits code instead of producing a proposal artifact with risk, tests, and route recommendation. |
 | RF-SEED-05 | refactor-eval-1-routing-gates | 1 | hidden_dependency | distributed | Medium | standard | Required | Medium | Code is in an active bug-fix branch or scheduled for deletion in project notes, but agent proposes cleanup that would churn unstable work. |

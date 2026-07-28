@@ -21,10 +21,10 @@ return findings to the Coordinator.
 When a workflow needs output from another specialist stage, phrase and implement
 it as a Coordinator responsibility:
 
-- Correct: "Coordinator dispatches Code Review with the verification packet."
-- Correct: "If the verification packet is stale, Code Review reports an invalid
+- Correct: "Coordinator dispatches Code Inspection with the verification packet."
+- Correct: "If the verification packet is stale, Code Inspection reports an invalid
   input finding to Coordinator."
-- Incorrect: "Code Review waits for TestRunner" or "Refactor proceeds after TDD
+- Incorrect: "Code Inspection waits for TestRunner" or "Refactor proceeds after TDD
   confirms coverage."
 
 The Coordinator is the only owner of stage ordering, readiness gates, retry
@@ -44,22 +44,22 @@ lifecycle is a routing bug and must be corrected before use.
 8. **Discovery hygiene**: Use read-only discovery passes when broad exploration is needed so implementation context stays focused
 9. **Subagent mode resolution**: Default to helper-agent use only when the current host verifies support; otherwise stay in single-agent mode and explain why
 10. **Artifact intent classification**: Distinguish pipeline-required artifacts from optional retained reports and local scratch outputs before anything is written to disk
-11. **Command-level subagent default guard**: Default `/reverse-spec` and `/code-review` to spawned subagents when verified support is active, and announce that path before dispatch.
+11. **Command-level subagent default guard**: Default `/reverse-spec` and `/code-inspection` to spawned subagents when verified support is active, and announce that path before dispatch.
 12. **Debate routing guard**: Route debate requests to Swarm Consensus external peers by default and block accidental platform-subagent debates.
 
 ## Command-Level Subagent Default Guard
 
-Check the Subagent Default Guard in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md` before ordinary delegated agent resolution for `/reverse-spec` and `/code-review`.
+Check the Subagent Default Guard in `<AI_DEV_SHOP_ROOT>/framework/operations/routing-guards.md` before ordinary delegated agent resolution for `/reverse-spec` and `/code-inspection`.
 
 When the current host resolves to `subagent-assisted` and the user has not asked for `single-agent mode` or `disable subagents`, these commands default to spawned subagents rather than only the active agent's current context:
 
 - `/reverse-spec`: use spawned subagents for CodeBase Analyzer inventory and bounded extraction passes or module chunks.
-- `/code-review`: use spawned Code Review and Security subagents in parallel after the Coordinator readiness gate passes.
+- `/code-inspection`: use spawned Code Inspection and Security subagents in parallel after the Coordinator readiness gate passes.
 
 Before dispatch, explicitly tell the user which execution path is active:
 
 - `Coordinator(Pipeline Mode): Defaulting /reverse-spec to spawned subagents for CodeBase Analyzer inventory and bounded extraction passes, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
-- `Coordinator(Pipeline Mode): Defaulting /code-review to spawned subagents for Code Review and Security, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
+- `Coordinator(Pipeline Mode): Defaulting /code-inspection to spawned subagents for Code Inspection and Security, instead of running only the active agent in one context. Say "single-agent mode" or "disable subagents" to run this sequentially.`
 
 If subagent support is unavailable, unverified, disabled, or delegated bootstrap cannot be satisfied, say:
 
@@ -110,7 +110,7 @@ If the human does not provide custom values, apply defaults and persist the acti
 
 The same constraints section must also record required suites, coverage tool and
 machine-readable artifact paths, cleanup paths, E2E requirement status, and the
-convergence threshold. Default convergence before Code Review is `100%` of P1
+convergence threshold. Default convergence before Code Inspection is `100%` of P1
 acceptance tests and invariants passing. A lower value is valid only when a
 human-approved threshold and reason are recorded in `tasks.md`.
 
@@ -160,7 +160,7 @@ Default owner mapping:
 - Feature implementation against certified tests -> Programmer
 - User-journey or browser validation -> QA/E2E
 - Test execution evidence -> TestRunner
-- Code quality or spec alignment review -> Code Review
+- Code quality or spec alignment review -> Code Inspection
 - Non-behavioral structural cleanup -> Refactor
 - Threat modeling or security classification -> Security
 - CI/CD, Docker, IaC, or deployment runbooks -> DevOps
@@ -193,8 +193,8 @@ Default Programmer activation rules:
 - `observability-implementation` when the task adds or changes external I/O, telemetry, tracing, or instrumentation points
 - `change-management` and `architecture-migration` when dispatch includes `MIGRATION-*.md`, phased rollout, dual writes, backfill, or compatibility-window work
 - `superpowers-using-git-worktrees` when an isolated workspace, scratch branch, or worktree workflow is expected
-- `superpowers-requesting-code-review` when the task includes a review checkpoint for a meaningful change set
-- `superpowers-receiving-code-review` when the task is to address returned review findings
+- `superpowers-requesting-code-inspection` when the task includes a review checkpoint for a meaningful change set
+- `superpowers-receiving-code-inspection` when the task is to address returned review findings
 - `superpowers-finishing-a-development-branch` when the task is in branch wrap-up or implementation closeout phase
 
 ## Delegated Agent Resolution
@@ -205,7 +205,7 @@ Use the repo agent's existing `skills.md` file as the canonical persona spec:
 
 - implementation, refactor, bug fix, migrations, remediation work -> `agents/programmer/skills.md`
 - test-first suite definition or certification -> `agents/tdd/skills.md`
-- code quality, spec alignment, architecture adherence review -> `agents/code-review/skills.md`
+- code quality, spec alignment, architecture adherence review -> `agents/code-inspection/skills.md`
 - threat modeling or security analysis -> `agents/security/skills.md`
 - read-only codebase inspection, discovery, architecture analysis, or grep-heavy exploration -> appropriate repo agent persona + platform `explorer`
 
@@ -321,7 +321,7 @@ Agent output received
 │       - Implementation change removed a previously covered path → Programmer to restore coverage
 │       Context: which files regressed, previous vs current %, what changed in the diff
 │
-├─ Required test-quality/certification/hash/coverage-evidence finding from Code Review?
+├─ Required test-quality/certification/hash/coverage-evidence finding from Code Inspection?
 │   └─ Route to: TDD Agent
 │       Context: CR finding IDs, active spec hash, test certification, Coordinator verification packet,
 │                affected test files/spec refs, and why the test evidence is invalid
@@ -350,7 +350,7 @@ Agent output received
 │       Next:
 │         1) Ask whether to send the work back to Programmer for remediation or continue downstream
 │         2) Record the decision in pipeline state or cycle summary
-│         3) If human continues, keep the warning visible for Code Review
+│         3) If human continues, keep the warning visible for Code Inspection
 │
 ├─ Downstream agent raises `[ARCHITECTURE_REVISION_REQUEST]`?
 │   └─ Route to: Coordinator escalation flow
@@ -361,7 +361,7 @@ Agent output received
 │         3) Re-dispatch Software Architect Agent for ADR revision if the issue is feature-level technical architecture
 │         4) Require human approval for revised blueprint/ADR before resuming
 │
-├─ Architecture violation found (by Code Review)?
+├─ Architecture violation found (by Code Inspection)?
 │   └─ Route to: Software Architect Agent
 │       Context: specific violation, which ADR was breached
 │
@@ -374,11 +374,11 @@ Agent output received
 │   │   Context: full SEC finding, mitigation steps, Security Agent verifies after fix
 │   └─ Medium/Low → Log finding, continue to next pipeline stage
 │
-├─ Refactor findings (from Code Review)?
+├─ Refactor findings (from Code Inspection)?
 │   └─ Route to: Refactor Agent (Coordinator decides — skip if findings are trivial or low-value)
 │       Context: specific CR finding IDs marked as Recommended, diff, ADR constraints
 │
-├─ Spec misalignment (from Code Review)?
+├─ Spec misalignment (from Code Inspection)?
 │   └─ Route to: Spec Agent (if spec is wrong) or Programmer Agent (if code is wrong)
 │       Context: which requirement, what the code does vs what the spec says
 │
@@ -405,7 +405,7 @@ Agent output received
 ## Pipeline Stages
 
 ```
-CodeBase Analyzer (brownfield default) → System Design (conditional) → Spec → Red-Team → Software Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+CodeBase Analyzer (brownfield default) → System Design (conditional) → Spec → Red-Team → Software Architect → TDD → Programmer → TestRunner → Code Inspection (+Refactor) → Security → Done
 ```
 
 The Coordinator tracks which stage is active. An agent completing its stage does not automatically trigger the next — the Coordinator validates the output meets the handoff contract first.
@@ -438,7 +438,7 @@ with every hard coverage gate in `tasks.md` constraints passing, before Code
 Review. A lower threshold requires a human-approved value and reason recorded in
 `tasks.md`. Failing P1 tests, failing invariant tests, stale spec hashes,
 test-file hash mismatches, zero-test or skipped-only runs, missing required
-coverage artifacts, and unapproved flaky tests always block Code Review.
+coverage artifacts, and unapproved flaky tests always block Code Inspection.
 
 **Iteration budget**: 5 total retries across all clusters; escalate any single failing cluster after 3 retries, even if total budget is not exhausted. If the same cluster is failing after 3 rounds of Programmer → TestRunner → Programmer, this is no longer a code problem. It is either a spec problem, an architecture problem, or a genuinely hard edge case. Escalate to human.
 
@@ -485,8 +485,8 @@ Rules for parallel dispatch:
 - Enforce ownership sequencing for schema dependencies: if a module requires FK/contract linkage to another domain-owned table/interface, route it to a later wave
 - Modules must have no shared state that would cause conflicts
 - Each Programmer instance works against a separate, non-overlapping set of tests
-- TestRunner aggregates all parallel outputs before routing to Code Review
-- Code Review must see the full combined diff, not individual slices
+- TestRunner aggregates all parallel outputs before routing to Code Inspection
+- Code Inspection must see the full combined diff, not individual slices
 - The Coordinator owns `tasks.md` checkboxes and `pipeline-state.md` parallel
   task rows. Specialist agents report progress; they do not mutate task status
   unless explicitly delegated.
@@ -508,7 +508,7 @@ At the end of every cycle, publish:
 Cycle ID:         CYCLE-007
 Timestamp:        2026-02-21T16:00:00Z
 Active Spec:      SPEC-001 v1.2 (hash: abc123)
-Pipeline Stage:   TestRunner → Code Review
+Pipeline Stage:   TestRunner → Code Inspection
 
 Decisions Made:
 - Routed failing AC-03 cluster back to Programmer (cycle 2 of 5 budget)

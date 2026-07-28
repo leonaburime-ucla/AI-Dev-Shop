@@ -8,7 +8,7 @@ such as "talk to architect", "switch to programmer", or
 "talk to architect in consensus mode".
 
 Steps:
-1. Identify the agent from $ARGUMENTS. Valid names: `spec`, `architect`, `tdd`, `programmer`, `testrunner`, `code-review`, `refactor`, `security`, `observer`, `red-team`, `codebase-analyzer`, `database`, `coordinator`.
+1. Identify the agent from $ARGUMENTS. Valid names: `spec`, `architect`, `tdd`, `programmer`, `testrunner`, `code-inspection`, `refactor`, `security`, `observer`, `red-team`, `codebase-analyzer`, `database`, `coordinator`.
 2. Detect optional mode keyword:
    - If user includes `consensus` (for example `/agent architect consensus`), enter Agent Direct Mode with Consensus enabled for the next high-level question.
    - Otherwise use standard Direct Mode.

@@ -11,7 +11,7 @@ Each agent role has different cognitive demands. Routing every agent to the same
 | Software Architect Agent | Frontier | Pattern selection and tradeoff reasoning are complex. ADR quality determines all downstream work. |
 | TDD Agent | Frontier or Mid-tier | Encoding spec logic into precise assertions requires careful reasoning. Use frontier for complex domains; mid-tier for CRUD-heavy features. |
 | Programmer Agent | Frontier or Mid-tier | Complex implementation → frontier. Routine implementation tasks (boilerplate, standard CRUD) → mid-tier. |
-| Code Review Agent | Mid-tier | Pattern matching against known anti-patterns. Well-defined rubric reduces need for frontier reasoning. |
+| Code Inspection Agent | Mid-tier | Pattern matching against known anti-patterns. Well-defined rubric reduces need for frontier reasoning. |
 | Security Agent | Frontier | Threat modeling requires lateral thinking. Missing a threat is worse than missing a refactor. |
 | Refactor Agent | Mid-tier | Proposal generation against explicit findings. Rubric-driven; frontier not required. |
 | TestRunner Agent | Fast | Mechanical: parse test output, cluster failures, report. No reasoning required. |
@@ -31,7 +31,7 @@ Each agent role has different cognitive demands. Routing every agent to the same
 
 Override the default tier when:
 - **Spec is unusually complex** (multi-service, ambiguous domain, regulatory requirements) → bump TDD and Programmer to frontier
-- **Security-critical code** (auth, payments, PII handling) → bump Code Review to frontier
+- **Security-critical code** (auth, payments, PII handling) → bump Code Inspection to frontier
 - **First run on an unfamiliar codebase** → bump CodeBase Analyzer to mid-tier or frontier
 - **Repeated failures on the same cluster** → bump Programmer to frontier; the current tier may be missing something
 

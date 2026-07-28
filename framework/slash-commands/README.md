@@ -19,7 +19,7 @@ If the user types a command not in this table, say so and list available command
 | `/blueprint` | blueprint.md | Macro-level system design before detailed specs |
 | `/tasks` | tasks.md | Generate task list for an approved feature |
 | `/implement` | implement.md | Dispatch the implementation sequence |
-| `/code-review` | code-review.md | Dispatch the code-review pipeline |
+| `/code-inspection` | code-inspection.md | Dispatch the code-inspection pipeline |
 | `/clarify` | clarify.md | Clarification pass on the active feature spec |
 | `/debate` | debate.md | Multi-model structured debate on a question |
 | `/consensus` | consensus.md | Swarm consensus — converge multiple perspectives |

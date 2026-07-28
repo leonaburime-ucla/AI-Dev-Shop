@@ -130,7 +130,7 @@ check the boundary rules declared in
 slot that makes `no_cycle` rules executable — an agent reading a diff cannot see
 a cycle that closes through files it never opened.
 
-- **Command**: a command that emits the import graph over the full source root, naming both endpoints of every edge. Prefer one that covers cycles *and* the two mechanically-checkable boundary types, `dependency_direction` and `forbidden_import`, in a single pass — otherwise those rules are maintained in two places that drift. **`boundary_ownership` cannot be covered by any import graph** — it asserts that a human approval exists, which no graph can observe; it stays an evidence check in Code Review. **Pass `{src}`, not `{files}`**: cycle detection needs the reachable closure, and a graph built only from changed files cannot see a cycle that closes through untouched modules
+- **Command**: a command that emits the import graph over the full source root, naming both endpoints of every edge. Prefer one that covers cycles *and* the two mechanically-checkable boundary types, `dependency_direction` and `forbidden_import`, in a single pass — otherwise those rules are maintained in two places that drift. **`boundary_ownership` cannot be covered by any import graph** — it asserts that a human approval exists, which no graph can observe; it stays an evidence check in Code Inspection. **Pass `{src}`, not `{files}`**: cycle detection needs the reachable closure, and a graph built only from changed files cannot see a cycle that closes through untouched modules
 - **Required output fields**: per finding — the rule name or `cycle`, the participating module paths in order, and for cycles the cycle length
 - **Scoped command**: scope depends on the check. Boundary rules need the changed modules plus one level of direct importers. **Cycle detection needs the full reachable closure of every changed module** — a cycle can close through files the diff never touched, so a one-level scan cannot support a "no cycles" result and is `INCONCLUSIVE` for that check
 - **Working directory**: project root unless specified
@@ -195,7 +195,7 @@ Copy-paste clone detection on changed code.
 - **Timeout**: default 300
 - **Success criteria**: parseable output. A non-zero exit from a threshold-enforcing tool is a finding, not a slot failure.
 - **Placeholders**: `{files}` (changed files), `{src}`, `{base_ref}`, `{head_ref}`
-- **Notes**: this gate is deliberately narrow. Duplication is the metric most likely to push toward a **worse** design than the one it flagged — extracting at two sites regularly yields a helper parameterized by caller identity. It also pulls directly against the `code_metrics` complexity gates; the sensor doc defines how Code Review adjudicates that conflict rather than requiring both to be satisfied.
+- **Notes**: this gate is deliberately narrow. Duplication is the metric most likely to push toward a **worse** design than the one it flagged — extracting at two sites regularly yields a helper parameterized by caller identity. It also pulls directly against the `code_metrics` complexity gates; the sensor doc defines how Code Inspection adjudicates that conflict rather than requiring both to be satisfied.
 - **Gate logic**: defined in `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md`
 
 ## Slots With No Contract Entry
@@ -217,14 +217,14 @@ Not every sensor needs a declared command. `<AI_DEV_SHOP_ROOT>/harness-engineeri
 | Programmer (during implementation) | lint, typecheck, build, unit_tests; code_metrics, dependency_graph, type_safety, duplication (advisory previews) |
 | Programmer (before handoff) | all declared slots except mutation_tests |
 | TestRunner | unit_tests, integration_tests, mutation_tests* |
-| Code Review | lint, typecheck, static_analysis, code_metrics**, dependency_graph**, type_safety**, duplication**, diff_coverage*** |
+| Code Inspection | lint, typecheck, static_analysis, code_metrics**, dependency_graph**, type_safety**, duplication**, diff_coverage*** |
 | Observer (scheduled only) | code_metrics (complexity and size distribution trends — the only place the anti-fragmentation signature is watched), dependency_graph (full graph), type_safety, duplication (whole-repo trends), plus `git log` change-history passes that need no slot |
 
 *`mutation_tests` runs conditionally after `unit_tests` and `integration_tests` pass. See TestRunner agent skills for sequencing details.
 
-***`diff_coverage` splits by cost: TestRunner produces the raw coverage report as a side effect of the suite run it already owns, and Code Review recomputes the diff attribution and ratios itself from that report plus its own `git diff` against the merge base. Code Review never accepts a diff-coverage number from another agent. It cannot verify the raw report is authentic without re-running the suite — that residual is stated in the sensor doc rather than papered over.
+***`diff_coverage` splits by cost: TestRunner produces the raw coverage report as a side effect of the suite run it already owns, and Code Inspection recomputes the diff attribution and ratios itself from that report plus its own `git diff` against the merge base. Code Inspection never accepts a diff-coverage number from another agent. It cannot verify the raw report is authentic without re-running the suite — that residual is stated in the sensor doc rather than papered over.
 
-**`code_metrics`, `dependency_graph`, `type_safety`, and `duplication` are executed by Code Review on **every** reviewed change, not sampled. Code Review's own invocation is the authoritative result. The Programmer may run the same command as an advisory preview and must fix what it reports, but may never restate metric values as free text in a handoff — a handoff asserting metric values without a Code Review run behind them is a Required workflow finding. Rationale: the measured party must not author the measurement, and for a check costing seconds the correct control is unconditional recomputation by the consumer rather than artifact protection.
+**`code_metrics`, `dependency_graph`, `type_safety`, and `duplication` are executed by Code Inspection on **every** reviewed change, not sampled. Code Inspection's own invocation is the authoritative result. The Programmer may run the same command as an advisory preview and must fix what it reports, but may never restate metric values as free text in a handoff — a handoff asserting metric values without a Code Inspection run behind them is a Required workflow finding. Rationale: the measured party must not author the measurement, and for a check costing seconds the correct control is unconditional recomputation by the consumer rather than artifact protection.
 
 ## Behavior When Contract Is Missing
 

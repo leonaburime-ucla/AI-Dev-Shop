@@ -24,7 +24,7 @@ A handoff missing any checked item above is incomplete. Re-dispatch the agent wi
 ## Handoff: <Agent Name> → <Next Stage>
 
 - Agent: <agent name>
-- Stage: <pipeline stage — e.g., `tdd`, `programmer`, `code-review`>
+- Stage: <pipeline stage — e.g., `tdd`, `programmer`, `code-inspection`>
 - Feature: FEAT-<NNN> — <feature name>
 - Completed At: <ISO-8601 UTC>
 

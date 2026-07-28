@@ -106,5 +106,5 @@ The Coordinator checks contract status at each stage transition:
 1. Before **Programmer** dispatch: verify computational controls exist (greenfield) or note absence (brownfield). Include declared commands in Programmer context.
 2. Before **Programmer** handoff: verify all declared blocking checks pass on modified files.
 3. Before **TestRunner**: pass computational test commands to TestRunner context.
-4. Before **Code Review**: pass architecture fitness rules and computational lint/typecheck results to reviewer context.
+4. Before **Code Inspection**: pass architecture fitness rules and computational lint/typecheck results to reviewer context.
 5. At **Done** gate: verify no unresolved blockers from any contract. Report contract coverage in final summary.

@@ -28,7 +28,7 @@ Do not dispatch solely because a project has public routes or content. Do not di
 
 ## Pipeline Placement
 
-Run as an optional post-implementation audit only when the trigger conditions above are met. It may also run as a targeted code-review overlay when the user explicitly asks for search visibility review.
+Run as an optional post-implementation audit only when the trigger conditions above are met. It may also run as a targeted code-inspection overlay when the user explicitly asks for search visibility review.
 
 ## Required Inputs
 

@@ -16,7 +16,7 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | Search Visibility (optional) | Audits public surfaces for search, AI answer, and chatbot discoverability; produces metrics and routes fixes | `agents/search-visibility/skills.md` |
 | QA/E2E | Writes browser-level tests that validate user journeys and frontend ACs | `agents/qa-e2e/skills.md` |
 | TestRunner | Executes test suite, reports pass/fail evidence | `agents/testrunner/skills.md` |
-| Code Review | Reviews spec alignment, architecture, test quality, security surface | `agents/code-review/skills.md` |
+| Code Inspection | Reviews spec alignment, architecture, test quality, security surface | `agents/code-inspection/skills.md` |
 | Refactor | Proposes non-behavioral structural improvements post-review | `agents/refactor/skills.md` |
 | Security | Analyzes threat surface, classifies findings, blocks Critical/High | `agents/security/skills.md` |
 | DevOps | Produces Dockerfiles, CI/CD configs, IaC, and deployment runbooks | `agents/devops/skills.md` |
@@ -47,7 +47,7 @@ The following names are the canonical reserved agent names for response prefixes
 - `Search Visibility`
 - `QA/E2E`
 - `TestRunner`
-- `Code Review`
+- `Code Inspection`
 - `Refactor`
 - `Security`
 - `DevOps`

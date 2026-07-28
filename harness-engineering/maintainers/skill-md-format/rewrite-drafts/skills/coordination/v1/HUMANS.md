@@ -127,7 +127,7 @@ Agent output received
 │         3) Re-dispatch Architect Agent for ADR revision if the issue is feature-level technical architecture
 │         4) Require human approval for revised blueprint/ADR before resuming
 │
-├─ Architecture violation found (by Code Review)?
+├─ Architecture violation found (by Code Inspection)?
 │   └─ Route to: Architect Agent
 │       Context: specific violation, which ADR was breached
 │
@@ -140,11 +140,11 @@ Agent output received
 │   │   Context: full SEC finding, mitigation steps, Security Agent verifies after fix
 │   └─ Medium/Low → Log finding, continue to next pipeline stage
 │
-├─ Refactor findings (from Code Review)?
+├─ Refactor findings (from Code Inspection)?
 │   └─ Route to: Refactor Agent (Coordinator decides — skip if findings are trivial or low-value)
 │       Context: specific CR finding IDs marked as Recommended, diff, ADR constraints
 │
-├─ Spec misalignment (from Code Review)?
+├─ Spec misalignment (from Code Inspection)?
 │   └─ Route to: Spec Agent (if spec is wrong) or Programmer Agent (if code is wrong)
 │       Context: which requirement, what the code does vs what the spec says
 │
@@ -171,7 +171,7 @@ Agent output received
 ## Pipeline Stages
 
 ```
-System Blueprint (conditional) → Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Review (+Refactor) → Security → Done
+System Blueprint (conditional) → Spec → Red-Team → Architect → TDD → Programmer → TestRunner → Code Inspection (+Refactor) → Security → Done
 ```
 
 The Coordinator tracks which stage is active. An agent completing its stage does not automatically trigger the next — the Coordinator validates the output meets the handoff contract first.
@@ -191,7 +191,7 @@ If any field is missing, return the output to the agent with a request to comple
 
 The convergence threshold prevents the system from advancing on a broken foundation, and prevents the system from looping forever on unfixable problems.
 
-**Threshold**: ~90-95% of acceptance tests passing on a first Programmer cycle is the signal to advance to Code Review. This is not a hard rule — calibrate to project risk. A payment processor may require 100%. A prototype dashboard may accept 85%.
+**Threshold**: ~90-95% of acceptance tests passing on a first Programmer cycle is the signal to advance to Code Inspection. This is not a hard rule — calibrate to project risk. A payment processor may require 100%. A prototype dashboard may accept 85%.
 
 **Iteration budget**: 5 total retries across all clusters; escalate any single failing cluster after 3 retries, even if total budget is not exhausted. If the same cluster is failing after 3 rounds of Programmer → TestRunner → Programmer, this is no longer a code problem. It is either a spec problem, an architecture problem, or a genuinely hard edge case. Escalate to human.
 
@@ -235,8 +235,8 @@ Rules for parallel dispatch:
 - Enforce ownership sequencing for schema dependencies: if a module requires FK/contract linkage to another domain-owned table/interface, route it to a later wave
 - Modules must have no shared state that would cause conflicts
 - Each Programmer instance works against a separate, non-overlapping set of tests
-- TestRunner aggregates all parallel outputs before routing to Code Review
-- Code Review must see the full combined diff, not individual slices
+- TestRunner aggregates all parallel outputs before routing to Code Inspection
+- Code Inspection must see the full combined diff, not individual slices
 
 The Coordinator tracks all parallel instances and waits for all to complete before routing forward.
 
@@ -248,7 +248,7 @@ At the end of every cycle, publish:
 Cycle ID:         CYCLE-007
 Timestamp:        2026-02-21T16:00:00Z
 Active Spec:      SPEC-001 v1.2 (hash: abc123)
-Pipeline Stage:   TestRunner → Code Review
+Pipeline Stage:   TestRunner → Code Inspection
 
 Decisions Made:
 - Routed failing AC-03 cluster back to Programmer (cycle 2 of 5 budget)

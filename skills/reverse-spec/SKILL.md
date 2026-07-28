@@ -20,7 +20,7 @@ Extract what a system DOES from what it IS. Produce behavioral specifications th
 ## Do Not Use This For
 
 - Greenfield specs from human requirements (use Spec Agent directly)
-- Code review or quality assessment (use Code Review Agent)
+- Code review or quality assessment (use Code Inspection Agent)
 - Architecture analysis without spec extraction (use CodeBase Analyzer alone)
 - Generating implementation code (this produces specs, not code)
 

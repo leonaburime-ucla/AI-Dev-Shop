@@ -39,7 +39,7 @@ bash <AI_DEV_SHOP_ROOT>/framework/operations/scripts/install-slash-commands.sh -
 `--check` reports each command as NEW / IDENTICAL / CONFLICT; `--install` installs the
 safe ones and skips conflicts (add `--overwrite` to replace agreed conflicts — originals
 are backed up to `*.ads-bak`; `--include-project` adds the `gstack-*` commands). Then
-type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-review`, `/clarify`, `/consensus`,
+type `/spec`, `/plan`, `/tasks`, `/implement`, `/code-inspection`, `/clarify`, `/consensus`,
 `/debate`, `/audit-work`, `/cowork`, or `/handoff` in chat. On non-Claude hosts, use
 Option B from `<AI_DEV_SHOP_ROOT>/AGENTS.md` — paste the template contents as a prompt.
 

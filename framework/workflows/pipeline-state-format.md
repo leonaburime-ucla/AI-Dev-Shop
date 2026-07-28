@@ -62,7 +62,7 @@ Legacy note: older runs may still use `.pipeline-state.md`. Treat that as the pr
 - required_suite_status: PASS | FAIL | PARTIAL | N/A
 - coverage_status: NOT_RUN | PASS | FAIL | UNAVAILABLE | N/A
 - flaky_test_status: NONE | KNOWN_APPROVED | UNAPPROVED | N/A
-- code_review_gate_status: NOT_READY | READY | WAIVED
+- code_inspection_gate_status: NOT_READY | READY | WAIVED
 - started_at: <ISO-8601 UTC>
 - last_updated_at: <ISO-8601 UTC>
 - progress_ledger_path: <ADS_MEMORY_ROOT>/reports/pipeline/.../progress-ledger.md or <ADS_MEMORY_ROOT>/reports/continuity/.../progress-ledger.md
@@ -257,11 +257,11 @@ expected_test_count: <integer or N/A>
 required_suite_status: PASS | FAIL | PARTIAL | N/A
 coverage_status: NOT_RUN | PASS | FAIL | UNAVAILABLE | N/A
 flaky_test_status: NONE | KNOWN_APPROVED | UNAPPROVED | N/A
-code_review_gate_status: NOT_READY | READY | WAIVED
+code_inspection_gate_status: NOT_READY | READY | WAIVED
 ```
 
 The Coordinator updates these fields after accepting TDD and TestRunner outputs.
-`code_review_gate_status` may be `READY` only when the Coordinator verification
+`code_inspection_gate_status` may be `READY` only when the Coordinator verification
 packet is PASS for the active spec hash, certified test-file hashes match,
 executed tests are greater than zero and meet/exceed the certified expected
 count, required suites and coverage gates pass or are explicitly N/A, and no
@@ -282,7 +282,7 @@ scope, reason, and remaining risk in Notes.
 | `programmer` | Programmer Agent implementing |
 | `qa-e2e` | QA/E2E Agent writing browser tests |
 | `testrunner` | TestRunner Agent verifying pass rate |
-| `code-review` | Code Review Agent classifying findings |
+| `code-inspection` | Code Inspection Agent classifying findings |
 | `security` | Security Agent reviewing threat surface |
 | `devops` | DevOps Agent producing IaC/CI/deployment configs |
 | `docs` | Docs Agent generating user-facing documentation |
@@ -368,7 +368,7 @@ scope, reason, and remaining risk in Notes.
 - required_suite_status: N/A
 - coverage_status: NOT_RUN
 - flaky_test_status: N/A
-- code_review_gate_status: NOT_READY
+- code_inspection_gate_status: NOT_READY
 
 ## Completed Stages
 

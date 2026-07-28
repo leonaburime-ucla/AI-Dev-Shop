@@ -22,7 +22,7 @@ risk.
   workflows.
 - TDD Agent may use it when certifying aggregate invariants or adversarial edge
   cases.
-- Code Review treats missing adversarial evidence as a real gap when aggregate
+- Code Inspection treats missing adversarial evidence as a real gap when aggregate
   risk is present.
 
 ## Design Gate

@@ -109,7 +109,7 @@ AI Dev Shop core still owns:
 - Coordinator routing
 - Constitution enforcement at the toolkit level
 - Red-Team and Software Architect stages
-- TDD, Programmer, TestRunner, Code Review, Security, and Docs stages
+- TDD, Programmer, TestRunner, Code Inspection, Security, and Docs stages
 - pipeline state, retry policy, and recovery rules
 
 Providers only own the upstream planning/spec surface and how that surface is mapped into the core pipeline.

@@ -43,7 +43,7 @@ Select representative seeds from existing eval suites:
 | Suite | Seeds to include | What they test |
 |-------|-----------------|----------------|
 | Architect evals | Positive + negative controls, 2-3 staff+ seeds | Planning coherence, false-positive restraint |
-| Code Review evals | Positive + negative controls, 2-3 production+ seeds | Defect detection, severity accuracy |
+| Code Inspection evals | Positive + negative controls, 2-3 production+ seeds | Defect detection, severity accuracy |
 | Programmer evals | Implementation seeds with complexity | Code quality, spec adherence |
 | Contract enforcement evals | All 8 seeds | Harness rule-following |
 | Drift sensor evals | All 6 seeds | Observer classification accuracy |
@@ -63,7 +63,7 @@ Remove or weaken one harness component at a time and measure impact:
 | Evaluator loops | Skip evaluator contract → generator self-grades | Quality passes that shouldn't |
 | Context reset/compaction | Don't reset between stages | Attention drift, stale context bleed |
 | File-backed handoffs | Use conversation context instead of files | Lost detail, resumability failure |
-| Per-slice QA | Skip Code Review on individual slices | Bugs that compound across slices |
+| Per-slice QA | Skip Code Inspection on individual slices | Bugs that compound across slices |
 | Helper-agent decomposition | Use single-agent instead of delegated specialists | Compare quality at same token cost |
 
 ### Whole-Layer Ablation
@@ -71,7 +71,7 @@ Remove or weaken one harness component at a time and measure impact:
 Remove an entire workflow layer to detect discontinuous capability jumps:
 
 - Skip the entire planning layer (Spec + Architect + TDD) → implement from product intent directly
-- Skip the entire review layer (Code Review + Security) → ship after tests pass
+- Skip the entire review layer (Code Inspection + Security) → ship after tests pass
 - Skip the entire evaluation layer → trust generator self-assessment
 
 Whole-layer ablation is aggressive. Only use it when single-component results suggest the whole layer may be stale. If it shows broad stale signals, escalate to architecture review before removing default harness structure.

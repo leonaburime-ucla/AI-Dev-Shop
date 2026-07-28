@@ -44,7 +44,7 @@ Coordinator receives any task involving: schema design, data modeling, migration
    - Model cross-domain needs with foreign keys, join tables, read models, or events/contracts.
    - If a planned foreign key depends on a table from a domain not yet merged in the current wave, stop and require sequencing through Coordinator (owner domain first, dependent domain later).
    - If ownership is unclear, stop and escalate before generating migrations.
-10. **Produce handoff** — schema decisions documented for downstream agents (Programmer, TDD, Code Review).
+10. **Produce handoff** — schema decisions documented for downstream agents (Programmer, TDD, Code Inspection).
 
 ## Dispatch Rules
 

@@ -29,5 +29,5 @@ Provider note:
 - **`tasks-template.md`**: Used by the Coordinator to break down an approved ADR and spec into parallelizable implementation tasks for the TDD and Programmer agents.
 - **`tdd-coverage-triage-template.md`**: Used during the test gap-fill loop to categorize missing coverage and assign priority to unhandled edge cases.
 - **`test-certification-template.md`**: Used by the TDD Agent to prove that tests have been written against the active spec hash, certifying readiness for the Programmer Agent to begin implementation.
-- **`verification-packet-template.md`**: Used by the Coordinator to summarize accepted TestRunner/certification evidence before Code Review receives it.
+- **`verification-packet-template.md`**: Used by the Coordinator to summarize accepted TestRunner/certification evidence before Code Inspection receives it.
 - **`self-validation/*.md`**: Used for downstream runtime smoke-validation loops by stack (generic web app, Node API, Python service, Supabase).

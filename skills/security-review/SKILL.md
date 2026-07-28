@@ -154,7 +154,7 @@ Human Sign-Off Required: Yes
 
 ## Interaction with Other Agents
 
-**Receives from**: Code Review (flags components for security review), Coordinator (dispatches after implementation)
+**Receives from**: Code Inspection (flags components for security review), Coordinator (dispatches after implementation)
 
 **Reports to**: Coordinator with severity-classified findings
 

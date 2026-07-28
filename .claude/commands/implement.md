@@ -19,7 +19,7 @@ The tasks.md is ready. Run the implementation pipeline:
    - ADR constraints
    - Relevant `<ADS_MEMORY_ROOT>/knowledge/project_memory.md` entries
 4. After each Programmer cycle, dispatch **TestRunner Agent**. Report pass/fail counts and failure clusters.
-5. Advance to Code Review only when the Coordinator-owned convergence gate in
+5. Advance to Code Inspection only when the Coordinator-owned convergence gate in
    `tasks.md` passes. Default: `100%` of P1 acceptance tests and invariants
    passing, current spec hash verified, certified test-file hashes match, executed
    test count is greater than zero and meets/exceeds certification, required

@@ -208,8 +208,8 @@ What interfaces does this decision define that other agents must respect?
 
 How do we prevent violations?
 - CI lint rule: no imports from `infrastructure/` in `domain/` or `application/`
-- Code Review Agent must flag any direct ORM usage in use cases
-- Architecture compliance is a Required finding in Code Review
+- Code Inspection Agent must flag any direct ORM usage in use cases
+- Architecture compliance is a Required finding in Code Inspection
 
 ## Complexity Justification
 

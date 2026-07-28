@@ -109,7 +109,7 @@ The artifact header records which prior designations were consulted (or "none fo
 
 ## Downstream Constraint Promotion
 
-TDD, Programmer, Code Review, Security, or TestRunner may raise `[CIC_PROPOSED]` when implementation or test design reveals a load-bearing internal constraint not captured in the artifact. Proposals must carry the same rigor as a designation:
+TDD, Programmer, Code Inspection, Security, or TestRunner may raise `[CIC_PROPOSED]` when implementation or test design reveals a load-bearing internal constraint not captured in the artifact. Proposals must carry the same rigor as a designation:
 
 `[CIC_PROPOSED] Unit=<U-xxx or candidate> Trigger=<trigger> Constraint=<proposed Binding text> Property=<what breaks> VerificationSurface=<observable surface or audit-only> Evidence=<test/code/legacy/ADR/spec trace>`
 

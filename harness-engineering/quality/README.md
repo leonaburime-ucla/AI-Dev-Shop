@@ -12,7 +12,7 @@ Committed seeded eval suites live in `../agent-evals/`. This directory keeps the
 - `load-bearing-harness-audit.md` - when to re-test and simplify older harness assumptions
 - `model-upgrade-program.md` - formal program for evaluating new models/hosts: triggers, baselines, benchmark packs, ablation modes, retained report fields
 - `quality-score.md` - current repo-level harness quality snapshot
-- `function-quality-seeded-evals.md` - seeded eval protocol for testing Programmer, Code Review, and Refactor against function-quality traps
+- `function-quality-seeded-evals.md` - seeded eval protocol for testing Programmer, Code Inspection, and Refactor against function-quality traps
 - `agent-isolation-eval-framework.md` - repeatable harness for testing any agent in isolation with seeded defects, hidden ledgers, and post-hoc scoring; includes agent-specific eval designs for Spec, Security, Refactor, Architect, TDD, and Red Team agents
 - `templates/` - TSV starter templates for new eval suites (`coverage-matrix`, `seed-catalog`, `run-manifest`, and `run-results`)
 - `scripts/prepare_eval_run.py` - creates fresh `runs/<run-id>/` working copies from immutable `seed-state/` fixtures, and warns when the selected scope should be user-confirmed before dispatch

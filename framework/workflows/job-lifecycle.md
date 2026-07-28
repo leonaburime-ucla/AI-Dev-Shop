@@ -41,7 +41,7 @@ QUEUED → DISPATCHED → RUNNING → DONE
 | `tdd` | 3 | None | Same test failures after 3 cycles |
 | `programmer` | 5 total retries across all clusters | Inject failure cluster summary each retry | Same failing cluster after 3 retries (escalate that cluster even if total budget not exhausted) |
 | `testrunner` | 2 | None | Infrastructure/tooling failure (not test logic) |
-| `code-review` | 1 | None | Rare — escalate if output is malformed |
+| `code-inspection` | 1 | None | Rare — escalate if output is malformed |
 | `security` | 1 | None | Escalate all Critical/High findings immediately |
 | `coverage-loop` (tdd → programmer → testrunner cycle for gap fill) | 3 per High-priority gap cluster | None | Same High-priority gap cluster unresolved after 3 full cycles — escalate; Medium/Low gaps are deferred, not escalated |
 

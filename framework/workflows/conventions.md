@@ -198,8 +198,8 @@ All agent reports live under a single centralized folder in the sibling project 
     TESTRUN-<feature-id>-<YYYY-MM-DD-HHmm>.md  (TestRunner — one file per run, never overwritten)
   security/
     SEC-<feature-id>-<YYYY-MM-DD>.md  (Security Agent — threat findings)
-  code-review/
-    CR-<feature-id>-<YYYY-MM-DD>.md   (Code Review Agent — findings)
+  code-inspection/
+    CR-<feature-id>-<YYYY-MM-DD>.md   (Code Inspection Agent — findings)
   observer/
     timeline-CYCLE-<NNN>.md           (Observer — per-cycle timeline log)
     pattern-report-<YYYY-WNN>.md      (Observer — weekly pattern report)

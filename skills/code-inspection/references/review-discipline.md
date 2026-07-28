@@ -1,6 +1,6 @@
 <!-- Source: Addy Osmani / agent-skills / code-review-and-quality -->
 
-# Code Review Discipline
+# Code Inspection Discipline
 
 ## Change Sizing Guidelines
 

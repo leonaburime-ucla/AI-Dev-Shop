@@ -199,7 +199,7 @@ fi
 # --- one-time guidance (added to session context on first run) -------------
 if [ "$errors" -eq 0 ]; then
   echo "AI Dev Shop initialized: workspace ready at $workspace_root."
-  echo "Slash commands are NOT auto-installed. To enable /spec, /plan, /code-review, etc.,"
+  echo "Slash commands are NOT auto-installed. To enable /spec, /plan, /code-inspection, etc.,"
   echo "the agent should ASK first, then run a collision check before installing:"
   echo "  bash \"$install_cmds\" --check      # preview NEW / IDENTICAL / CONFLICT vs existing commands"
   echo "  bash \"$install_cmds\" --install    # install safe ones; conflicts are skipped unless --overwrite"

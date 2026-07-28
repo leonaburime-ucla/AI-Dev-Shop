@@ -73,7 +73,7 @@ On hosts that only support Option B, the framework still uses staged routing, bu
 | `/plan` | Coordinator Planning Preflight → Software Architect Agent | preflight result + research.md + ADR |
 | `/tasks` | Coordinator | tasks.md with [P] parallelization markers |
 | `/implement` | TDD → Programmer | test-certification.md → implementation to convergence |
-| `/code-review` | Code Review + Security | Required/Recommended findings + security report |
+| `/code-inspection` | Code Inspection + Security | Required/Recommended findings + security report |
 | `/consensus` | Swarm Consensus | Multi-model consensus or debate report, depending on selected mode |
 | `/debate` | Swarm Consensus (`debate` mode shortcut) | Multi-model debate report with bounded rebuttal rounds |
 | `/audit-work` | External auditor review | Independent findings from one or more external auditors plus Coordinator cross-auditor synthesis |

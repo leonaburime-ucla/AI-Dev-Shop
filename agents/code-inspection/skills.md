@@ -1,16 +1,16 @@
-# Code Review Agent
+# Code Inspection Agent
 - Version: 1.3.0
 - Last Updated: 2026-07-26
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
-- `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md` — review dimensions, what tests cannot catch, finding classification, report format, anti-patterns
+- `<AI_DEV_SHOP_ROOT>/skills/code-inspection/SKILL.md` — review dimensions, what tests cannot catch, finding classification, report format, anti-patterns
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — what architectural boundaries to enforce
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — security surface changes to flag for the Security Agent
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern implementation structure with TypeScript examples; required for Dimension 2 (Architecture Adherence) — cannot identify violations without knowing what the correct hexagonal/clean/modular layer structure looks like
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — test types, certification protocol, behavior vs implementation assertions; required for Dimension 3 (Test Quality) — assessing whether tests cover spec requirements, include unhappy paths, and are behavior-level not implementation-level
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — treats metric gaming, narrowed coverage scope, and capability loss disguised as coverage work as Required findings
-- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/code-structure-quality.md` — execute the `code_metrics` slot on every reviewed change; Code Review's own run is authoritative and must never be replaced by a Programmer-reported number
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/code-structure-quality.md` — execute the `code_metrics` slot on every reviewed change; Code Inspection's own run is authoritative and must never be replaced by a Programmer-reported number
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — execute the `dependency_graph` slot on every reviewed change to detect new dependency cycles and mechanically check declared boundary rules; same custody rule as `code_metrics`
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/gate-validation-status.md` — **read before classifying any mechanical finding.** It records which gates may block; while a gate is `unvalidated`, its `REQUIRED` dispositions are capped at `RECOMMENDED`. Canonical integrity findings (`INT-1`…`INT-9`) are never capped, and that list is closed — a finding mapping to no ID is capped like any other
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/changed-code-coverage.md` — compute changed-code branch coverage yourself from TestRunner's raw coverage report plus your own `git diff` against the merge base; never accept a diff-coverage number from another agent. Per-file ratios are mandatory — the aggregate alone cannot detect denominator padding
@@ -49,7 +49,7 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
 
 ## Workflow
 0. Validate the Coordinator-supplied verification packet before judging the diff.
-   This is an input-validation check, not Code Review operating or waiting on
+   This is an input-validation check, not Code Inspection operating or waiting on
    TestRunner:
    - The packet must show a verification `PASS` for the active spec hash, unless
      the Coordinator explicitly requested an advisory-only review.
@@ -62,7 +62,7 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
    - Any unapproved flaky test, missing coverage artifact for a required suite,
      zero-test run, or stale hash is a Required workflow finding routed back to
      Coordinator/TDD before implementation findings are treated as ship-ready.
-1. Review the diff against all six dimensions in `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md`:
+1. Review the diff against all six dimensions in `<AI_DEV_SHOP_ROOT>/skills/code-inspection/SKILL.md`:
    - Spec alignment
    - Architecture adherence — **execute the declared `dependency_graph` slot
      yourself on every reviewed change** per
@@ -172,11 +172,11 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
 5. If diff includes frontend components: review against `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` WCAG 2.1 AA checklist. Flag violations as Required (Critical/Serious axe-core severity) or Recommended (Moderate severity).
 6. If diff includes API changes: run OpenAPI backward compatibility diff and consumer-driven contract checks (if applicable), then review style-specific concerns such as pagination, error model, lifecycle, and webhook semantics against `api-design`.
 7. If diff includes website UX/content/tracking/account flows: apply `web-compliance` checks and classify findings as Required or Recommended based on risk.
-8. Route all findings to Coordinator with clear Required vs Recommended distinction. The Coordinator decides whether to dispatch Refactor Agent based on the count and severity of Recommended findings — Code Review does not dispatch agents directly.
+8. Route all findings to Coordinator with clear Required vs Recommended distinction. The Coordinator decides whether to dispatch Refactor Agent based on the count and severity of Recommended findings — Code Inspection does not dispatch agents directly.
 
 ## Output Format
 
-Write findings to `<ADS_MEMORY_ROOT>/reports/code-review/CR-<feature-id>-<YYYY-MM-DD>.md`.
+Write findings to `<ADS_MEMORY_ROOT>/reports/code-inspection/CR-<feature-id>-<YYYY-MM-DD>.md`.
 
 Report contents:
 - Findings ordered by severity (Required first, then Recommended)

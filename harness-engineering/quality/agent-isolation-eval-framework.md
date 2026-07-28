@@ -179,7 +179,7 @@ cell_id  agent  agent_dimension  bug_nature  seed_structure  difficulty  require
 Required columns:
 
 - `cell_id`: stable identifier such as `CR-SPEC-INV-HARD-01`
-- `agent`: target agent name, for example `code-review`
+- `agent`: target agent name, for example `code-inspection`
 - `agent_dimension`: the skill dimension that should catch the seed
 - `bug_nature`: taxonomy value from `eval-coverage-model.md`
 - `seed_structure`: taxonomy value from `eval-coverage-model.md`
@@ -477,13 +477,13 @@ If the validator fails, the suite is not benchmark-ready.
 
 ## Agent-Specific Input Designs
 
-### Code Review Agent
+### Code Inspection Agent
 
 **Input**: Pre-staged code with remaining bugs plus a fake Programmer handoff.
 
 **Target coverage**:
 
-- all Code Review dimensions
+- all Code Inspection dimensions
 - bug natures such as invariant violation, semantic mismatch, omission, and
   severity misclassification
 - structures beyond `single`, especially `camouflaged`, `distributed`, and
@@ -652,6 +652,6 @@ evidence, not as stable benchmark infrastructure.
 
 - `eval-coverage-model.md` — canonical taxonomy and coverage rules
 - `function-quality-seeded-evals.md` — domain-specific application for
-  Programmer, Code Review, and Refactor
+  Programmer, Code Inspection, and Refactor
 - `failure-promotion-policy.md` — promotion rules for repeated failures
 - `agent-performance-scorecard.md` — roll-up view after suites are benchmarked

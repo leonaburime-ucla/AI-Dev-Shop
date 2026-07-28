@@ -13,8 +13,8 @@
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md` — explicit cadence triggers, doc-garden workflow, benchmark refresh timing
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md` — when recurring failures must become validators, benchmarks, or instruction changes
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/README.md` — drift sensor catalog, taxonomy, and routing protocol
-- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — scheduled full-graph cycle and boundary-violation pass; Observer owns the scheduled mode only (Code Review owns the PR gate) and routes findings to Software Architect
-- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md` — scheduled whole-repo unsafe-operation trend; Observer owns the scheduled mode only (Code Review owns the PR gate) and routes to Programmer/Refactor
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — scheduled full-graph cycle and boundary-violation pass; Observer owns the scheduled mode only (Code Inspection owns the PR gate) and routes findings to Software Architect
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md` — scheduled whole-repo unsafe-operation trend; Observer owns the scheduled mode only (Code Inspection owns the PR gate) and routes to Programmer/Refactor
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md` — scheduled whole-repo clone trend; Observer owns the scheduled mode only and routes to Refactor
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md` — scheduled churn/revert/fix-frequency pass and the complexity-joined hotspot tiers; Observer owns this sensor entirely and it never gates a PR
 
@@ -38,7 +38,7 @@ The Observer reads drift sensor artifacts from `<ADS_MEMORY_ROOT>/.local-artifac
 
 **Scheduled sensors never change a PR outcome.** A cycle or hotspot the scheduled
 pass finds in already-merged code is maintenance input, not a retroactive gate —
-Code Review's own PR-context runs are the only authority over whether a change
+Code Inspection's own PR-context runs are the only authority over whether a change
 ships. Report scheduled findings as trends and route them; do not reopen a
 completed review.
 

@@ -180,9 +180,9 @@ For each survived mutant:
 |---------|----------|--------|
 | Score regression >10% on touched files | Hard Blocker | Pipeline stops; TDD or Programmer must add tests for survived mutants |
 | Score below ratcheted module floor | Escalation | Coordinator warns; Programmer asked to restore quality to historical levels |
-| Score below 60% on touched files | Escalation | Coordinator warns; Programmer asked to improve tests before Code Review |
-| Score 60-70% on touched files | Advisory | Noted in handoff; Code Review informed |
-| Score >=70% with minor regression (>0% and <=10%) | Advisory | Noted in handoff; Code Review informed of minor regression |
+| Score below 60% on touched files | Escalation | Coordinator warns; Programmer asked to improve tests before Code Inspection |
+| Score 60-70% on touched files | Advisory | Noted in handoff; Code Inspection informed |
+| Score >=70% with minor regression (>0% and <=10%) | Advisory | Noted in handoff; Code Inspection informed of minor regression |
 | Mutation tool timeout (inconclusive) | Escalation | Coordinator decides: retry with narrower scope, defer to scheduled run, or waive |
 | Survived mutants in critical-path code | Escalation | Even if overall score is above threshold, specific survived mutants in auth/payment/data-integrity paths escalate |
 
@@ -192,7 +192,7 @@ For each survived mutant:
    - TestRunner runs mutation pass after all suites are green and coverage is evaluated
    - Mutation results included in TestRunner's run report
    - Gate failures route back to Programmer (add tests) or TDD (redesign test approach)
-   - Results forwarded to Code Review as evidence for test quality dimension
+   - Results forwarded to Code Inspection as evidence for test quality dimension
 
 2. **Scheduled context (Observer)**:
    - Observer runs full-module mutation analysis weekly or at release gates
@@ -215,7 +215,7 @@ When `/audit-work` spawns an internal verification subagent:
 
 ## What This Does NOT Cover
 
-- Test design quality (whether tests check the right things conceptually — that's Code Review dimension 3)
+- Test design quality (whether tests check the right things conceptually — that's Code Inspection dimension 3)
 - Integration/E2E mutation (only unit/integration source mutations in phase 1)
 - Performance impact of code mutations
 - Security-specific fault injection (that's Red Team territory)

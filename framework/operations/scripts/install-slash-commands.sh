@@ -24,7 +24,7 @@
 #   install-slash-commands.sh --install                    # install NEW; skip CONFLICT/project
 #   install-slash-commands.sh --install --overwrite        # also replace CONFLICTs (unique backups)
 #   install-slash-commands.sh --install --include-project  # also install gstack-* commands
-#   install-slash-commands.sh --install --overwrite --only code-review  # exact scope (repeatable)
+#   install-slash-commands.sh --install --overwrite --only code-inspection  # exact scope (repeatable)
 #   install-slash-commands.sh --host-dir /path/to/host ... # explicit host root
 #
 # Default action with no flags is --check (safe).
@@ -117,7 +117,7 @@ is_project_cmd() { case "$1" in gstack-*) return 0 ;; *) return 1 ;; esac; }
 
 # --only is an exact set; validate every requested name equals a real source
 # basename. An exact per-name loop (not a space-delimited membership string)
-# avoids a value spanning two adjacent names — e.g. "code-review consensus" —
+# avoids a value spanning two adjacent names — e.g. "code-inspection consensus" —
 # passing validation while selecting nothing.
 if [ "${#only_names[@]}" -gt 0 ]; then
   for n in "${only_names[@]}"; do

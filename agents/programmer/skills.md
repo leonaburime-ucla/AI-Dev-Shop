@@ -37,8 +37,8 @@ Conditional skills are not standing context. Load only the subset explicitly act
 -->
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-using-git-worktrees/SKILL.md` — activate when the task uses an isolated workspace, scratch branch, or explicit worktree workflow
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-finishing-a-development-branch/SKILL.md` — activate when implementation is wrapping up and branch closeout options are needed
-- `<AI_DEV_SHOP_ROOT>/skills/superpowers-receiving-code-review/SKILL.md` — activate when addressing returned review findings
-- `<AI_DEV_SHOP_ROOT>/skills/superpowers-requesting-code-review/SKILL.md` — activate when a major change set should be handed into review
+- `<AI_DEV_SHOP_ROOT>/skills/superpowers-receiving-code-inspection/SKILL.md` — activate when addressing returned review findings
+- `<AI_DEV_SHOP_ROOT>/skills/superpowers-requesting-code-inspection/SKILL.md` — activate when a major change set should be handed into review
 - `<AI_DEV_SHOP_ROOT>/skills/ui-loop/SKILL.md` — activate when the task is UI-heavy (visual components, layouts, styling, interactions); reorders priorities to browser-first iteration with deferred reconciliation; requires browser-live-analysis to be available
 - `<AI_DEV_SHOP_ROOT>/skills/focused-test/SKILL.md` — activate when the full test suite is too slow for the iteration loop (large codebase, slow integration tests) or when Coordinator explicitly directs targeted testing; when active, overrides the default "run full local suite" step during iteration
 - `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — activate when a UI/runtime issue should be reproduced and verified in a real browser session via host-configured browser automation

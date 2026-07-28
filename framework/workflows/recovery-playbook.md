@@ -59,9 +59,9 @@ Is status WAITING_FOR_HUMAN?
 | `tdd` | Yes | Re-dispatch TDD Agent. Provide existing partial test file if present. |
 | `programmer` | **Partial** | Re-dispatch Programmer with existing code as context. Do not ask it to restart — continue from failing tests. |
 | `testrunner` | Yes | Re-run. Pure reporting, no state. |
-| `code-review` | Yes | Re-dispatch. Review is read-only. |
+| `code-inspection` | Yes | Re-dispatch. Review is read-only. |
 | `security` | Yes | Re-dispatch. Review is read-only. |
-| `refactor` | Yes | Re-dispatch with same Code Review findings. |
+| `refactor` | Yes | Re-dispatch with same Code Inspection findings. |
 
 **Partial** means: provide all existing artifacts as context. The agent should continue, not restart.
 
@@ -98,7 +98,7 @@ After successfully resuming:
 
 ## Upward Feedback Loop: Architecture Revision Request
 
-If a downstream agent (TDD/Programmer/QA/TestRunner/Code Review) discovers a blocking architecture mismatch, it may raise:
+If a downstream agent (TDD/Programmer/QA/TestRunner/Code Inspection) discovers a blocking architecture mismatch, it may raise:
 
 `[ARCHITECTURE_REVISION_REQUEST]`
 

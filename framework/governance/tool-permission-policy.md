@@ -13,7 +13,7 @@ Each agent role has an explicit allowed tool scope. Agents operating outside thi
 | TDD Agent | Read, Write (test files only) | Write test files. No implementation files. |
 | Programmer Agent | Read, Write (`src/` or equivalent, scoped) | Scoped to files assigned by Coordinator. No test rewrites. |
 | TestRunner Agent | Read, Bash (test runner only) | Run tests. No file writes. |
-| Code Review Agent | Read | Read-only. |
+| Code Inspection Agent | Read | Read-only. |
 | Security Agent | Read, Grep | Read-only. Pattern search only. |
 | Observer Agent | Read, Write (`<ADS_MEMORY_ROOT>/knowledge/`, `<ADS_MEMORY_ROOT>/reports/observer/`, and toolkit-maintenance `project-knowledge-template/reports/maintenance/` only) | Write to memory-store.md, observer reports, traces, and toolkit maintenance reports only. |
 | CodeBase Analyzer | Read, Glob, Grep | Read-only. No writes, no script execution. |

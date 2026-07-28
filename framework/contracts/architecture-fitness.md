@@ -100,7 +100,7 @@ This rule prevents architecture purity from blocking urgent product work, while 
 |-------|--------------------------------|
 | Software Architect | ADR must acknowledge declared boundaries; new patterns must not contradict blocking rules |
 | Programmer | Modified files checked against rules before handoff; may run `dependency_graph` as an advisory preview |
-| Code Review | Executes the `dependency_graph` slot itself on every reviewed change and flags violations; its run is authoritative and never replaced by a Programmer-reported result |
+| Code Inspection | Executes the `dependency_graph` slot itself on every reviewed change and flags violations; its run is authoritative and never replaced by a Programmer-reported result |
 | Refactor | May address grandfathered violations as dedicated cleanup work |
 | Observer | Runs the full-graph scheduled pass and routes systemic findings to Software Architect |
 
@@ -109,7 +109,7 @@ This rule prevents architecture purity from blocking urgent product work, while 
 See [enforcement.md](enforcement.md). Summary:
 
 - No architecture rules declared = no architecture enforcement
-- Agents proceed normally; Code Review uses general best practices instead of declared rules
+- Agents proceed normally; Code Inspection uses general best practices instead of declared rules
 - Coordinator notes absence in pipeline start summary if the project has meaningful complexity
 
 ## Relationship to Static Analysis
@@ -118,4 +118,4 @@ Declare the tool that computes the module graph in the **`dependency_graph`** sl
 
 The architecture-fitness contract adds semantic meaning and priority rules on top of what the tool mechanically checks. Where the declared command supports a ruleset of its own, generate it from these declarations rather than maintaining two sources of truth.
 
-**`boundary_ownership` is not mechanically checkable and never will be.** It asserts that a human approval exists ("security review sign-off in PR", "architect ACK in handoff"). An import graph describes edges between modules; it cannot observe an approval. That rule type stays an evidence check performed by Code Review against the handoff and PR record. Do not describe `dependency_graph` as covering all four rule types — it covers three.
+**`boundary_ownership` is not mechanically checkable and never will be.** It asserts that a human approval exists ("security review sign-off in PR", "architect ACK in handoff"). An import graph describes edges between modules; it cannot observe an approval. That rule type stays an evidence check performed by Code Inspection against the handoff and PR record. Do not describe `dependency_graph` as covering all four rule types — it covers three.

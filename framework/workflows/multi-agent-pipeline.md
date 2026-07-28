@@ -26,7 +26,7 @@ Artifact-intent rule:
 ## Full Path (Existing Codebase)
 
 ```
-[CodeBase Analyzer] → [System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[CodeBase Analyzer] → [System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Inspection → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - CodeBase Analyzer optionally produces a Migration Plan artifact — not a separate agent step
@@ -35,7 +35,7 @@ Artifact-intent rule:
 ## Ideal Path (Greenfield)
 
 ```
-[System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Review → [Refactor] → Security → [DevOps] → [Docs] → Done
+[System Design] → Spec → [Red-Team] → Software Architect → [Database] → TDD → Programmer → [QA/E2E] → TestRunner → Code Inspection → [Refactor] → Security → [DevOps] → [Docs] → Done
 ```
 
 - Software Architect conditionally produces `implementation-outline.md` or an explicit SKIP before task generation
@@ -70,7 +70,7 @@ At pipeline start and before each implementation stage, the Coordinator checks h
 2. **Before Programmer dispatch**: include declared computational controls commands in Programmer context. If runtime-changing work, include runtime-validation contract. If required contracts are missing, escalate to user per enforcement tier (greenfield: ask user to declare; brownfield: note absence and proceed in advisory mode).
 3. **Before Programmer handoff**: verify all declared blocking computational checks pass on modified files.
 4. **Before TestRunner**: pass declared test commands from computational controls.
-5. **Before Code Review**: pass architecture-fitness rules and lint/typecheck results to reviewer context.
+5. **Before Code Inspection**: pass architecture-fitness rules and lint/typecheck results to reviewer context.
 6. **At Done gate**: verify no unresolved contract blockers remain. Report contract coverage in pipeline summary.
 
 If a contract is missing and enforcement requires escalation, the Coordinator asks the user before proceeding — it does not silently skip or silently block.
@@ -385,7 +385,7 @@ Coordinator generates `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/t
 - Do not mark tasks parallel when one task depends on another domain's API/event/schema contract or table ownership boundary
 - Constraints section declaring required suites, coverage profile, coverage
   tool/artifact paths, cleanup paths, E2E requirement status, and convergence
-  threshold. The default convergence threshold before Code Review is `100%` of
+  threshold. The default convergence threshold before Code Inspection is `100%` of
   P1 acceptance tests and invariants passing; any lower threshold requires a
   human-approved value and reason recorded in `tasks.md`.
 - Task checkboxes are Coordinator-owned state. Specialist agents treat
@@ -472,10 +472,10 @@ Passing suites should be summarized briefly. Failing suites should include exact
 After accepting the TestRunner report, the Coordinator creates or updates
 `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/verification-packet.md`
 from `<AI_DEV_SHOP_ROOT>/framework/templates/verification-packet-template.md`.
-Code Review receives this Coordinator-owned packet, not raw assumptions about
+Code Inspection receives this Coordinator-owned packet, not raw assumptions about
 stage readiness.
 
-### Code Review Agent
+### Code Inspection Agent
 - Full diff of changed files
 - Active provider-defined planning surface (for alignment check)
 - ADR for the module (for architecture compliance check)
@@ -487,13 +487,13 @@ stage readiness.
   maps to changed behavior or P1/invariant coverage
 - Programmer's most recent handoff table and `progress-ledger.md` when function
   quality local-fix evidence on advisory findings is claimed
-- `<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md`
+- `<AI_DEV_SHOP_ROOT>/skills/code-inspection/SKILL.md`
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` (for surface flagging)
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` when the diff changes API style, pagination/filtering policy, error model, lifecycle policy, webhook semantics, or SDK-facing ergonomics
-- Previous Code Review findings (to detect recurrence)
+- Previous Code Inspection findings (to detect recurrence)
 
 ### Refactor Agent
-- Specific Code Review findings classified as Recommended
+- Specific Code Inspection findings classified as Recommended
 - Affected file contents
 - ADR constraints (to verify refactors stay within architecture)
 - `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md`
@@ -564,7 +564,7 @@ stage readiness.
 | Coverage gaps (any type) | TDD Agent (triage first) | Coverage Gap List (High-priority first), current % vs threshold per file, spec hash, test certification record — TDD classifies each gap as spec-traceable (writes tests) or no-spec-mapping (flags to Coordinator for Refactor dispatch) |
 | Coverage gaps — no spec mapping (flagged by TDD triage) | Refactor Agent | `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/coverage-triage-<YYYY-MM-DD>.md`, Coverage Gap List, uncovered files with line ranges, ADR constraints |
 | Touched-file coverage regression | Coordinator routing triage first — uses TestRunner/TDD evidence plus diff metadata, then routes to TDD (tests deleted) or Programmer (implementation removed covered path) | Regressed files, previous vs current %, diff metadata, latest coverage evidence |
-| Required test-quality, stale certification, test-file hash, semantic assertion, or required coverage-evidence finding from Code Review | TDD Agent | Code Review finding IDs, active spec hash, test certification, Coordinator verification packet, affected tests/spec refs |
+| Required test-quality, stale certification, test-file hash, semantic assertion, or required coverage-evidence finding from Code Inspection | TDD Agent | Code Inspection finding IDs, active spec hash, test certification, Coordinator verification packet, affected tests/spec refs |
 | Architecture violation | Software Architect | Specific violation, which ADR was breached |
 | Spec ambiguity | Spec Agent | Exact ambiguity, what decision is blocked |
 | Security finding (Critical/High) | Programmer | Full finding, mitigation steps; Security verifies after fix |
@@ -574,7 +574,7 @@ stage readiness.
 | All integration-contract dependencies Done | Integration Verification (optional) | Integration contracts from each dependent spec, combined test suite |
 | `[OUTLINE_REQUESTED]` from TDD or Programmer | Software Architect | Missing boundary, contract, or wiring decision; after outline or SKIP update, Coordinator regenerates `tasks.md` if phase order, file scope, or `[P]` markers change |
 | `[CIC_REQUESTED]` from TDD or Programmer | Software Architect | Unit, trigger, plausible wrong implementation, broken property, missing constraint, and evidence; after the constraints artifact or NOT TRIGGERED record is updated, Coordinator regenerates `tasks.md` if task unit references change |
-| `[CIC_PROPOSED]` from TDD, Programmer, Code Review, Security, or TestRunner | Software Architect (Coordinator pauses work first when the proposal affects `ESCALATE_SECURITY`/`ESCALATE_IRREVERSIBLE` behavior, routing via Security where relevant) | Unit, trigger, proposed Binding constraint, property, verification surface, and evidence; Architect ratifies, revises, or rejects before the final Architecture Audit |
+| `[CIC_PROPOSED]` from TDD, Programmer, Code Inspection, Security, or TestRunner | Software Architect (Coordinator pauses work first when the proposal affects `ESCALATE_SECURITY`/`ESCALATE_IRREVERSIBLE` behavior, routing via Security where relevant) | Unit, trigger, proposed Binding constraint, property, verification surface, and evidence; Architect ratifies, revises, or rejects before the final Architecture Audit |
 | Spec misalignment in code | Programmer or Spec Agent | Which requirement, what code does vs what spec says |
 
 ---
@@ -582,7 +582,7 @@ stage readiness.
 ## Convergence Policy
 
 - **Threshold**: default `100%` of P1 acceptance tests and invariants passing
-  before advancing to Code Review, plus every hard coverage gate in `tasks.md`
+  before advancing to Code Inspection, plus every hard coverage gate in `tasks.md`
   constraints. A lower threshold is allowed only when a human-approved value and
   reason are recorded in `tasks.md`; failing P1 tests, invariant tests, stale
   hashes, missing required coverage artifacts, zero-test runs, or unapproved
@@ -645,7 +645,7 @@ When the Software Architect defines independent modules (natural in Vertical Sli
 3. Each instance works against its own isolated test set
 4. Coordinator dispatches one TestRunner aggregation job for the feature cycle
    after parallel workers complete
-5. Code Review receives the full combined diff — not individual slices
+5. Code Inspection receives the full combined diff — not individual slices
 6. Security receives the combined diff
 
 Parallel rules:
@@ -687,7 +687,7 @@ Stage status:
   TDD:          DONE  (47 tests certified against hash abc123)
   Programmer:   IN PROGRESS (cycle 2, 44/47 passing)
   TestRunner:   —
-  Code Review:  —
+  Code Inspection:  —
   Security:     —
 
 Active failure clusters:

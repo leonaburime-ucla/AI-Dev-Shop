@@ -21,11 +21,11 @@ A scheduled or event-driven check that measures codebase health decay over time.
 | [Dependency Drift](dependency-drift.md) | computational | daily + lockfile change | Observer → Security/DevOps | `dependency-drift.md` |
 | [Coverage Quality](coverage-quality.md) | computational + inferential | PR + scheduled | Observer → TDD/Programmer | `coverage-quality.md` |
 | [Mutation Quality](mutation-quality.md) | computational | PR (conditional) + scheduled | TestRunner PR gate; Observer scheduled trends → TDD/Programmer | `mutation-quality.md` |
-| [Code Structure Quality](code-structure-quality.md) | computational | PR (every change) + scheduled | Code Review PR gate; Observer scheduled trends → Refactor/Programmer | `code-structure-quality.md` |
-| [Dependency Structure](dependency-structure.md) | computational | PR (changed modules) + scheduled (full graph) | Code Review PR gate; Observer scheduled trends → Software Architect | `dependency-structure.md` |
-| [Changed-Code Coverage](changed-code-coverage.md) | computational | PR only | TestRunner produces the report; Code Review computes and gates | `changed-code-coverage.md` |
-| [Type Safety](type-safety.md) | computational | PR (changed files) + scheduled | Code Review PR gate; Observer scheduled trends → Programmer/Refactor | `type-safety.md` |
-| [Duplication](duplication.md) | computational | PR (changed files) + scheduled | Code Review PR gate; Observer scheduled trends → Refactor | `duplication.md` |
+| [Code Structure Quality](code-structure-quality.md) | computational | PR (every change) + scheduled | Code Inspection PR gate; Observer scheduled trends → Refactor/Programmer | `code-structure-quality.md` |
+| [Dependency Structure](dependency-structure.md) | computational | PR (changed modules) + scheduled (full graph) | Code Inspection PR gate; Observer scheduled trends → Software Architect | `dependency-structure.md` |
+| [Changed-Code Coverage](changed-code-coverage.md) | computational | PR only | TestRunner produces the report; Code Inspection computes and gates | `changed-code-coverage.md` |
+| [Type Safety](type-safety.md) | computational | PR (changed files) + scheduled | Code Inspection PR gate; Observer scheduled trends → Programmer/Refactor | `type-safety.md` |
+| [Duplication](duplication.md) | computational | PR (changed files) + scheduled | Code Inspection PR gate; Observer scheduled trends → Refactor | `duplication.md` |
 | [Change History](change-history.md) | computational | scheduled only — never a PR gate | Observer → Refactor + human prioritization | `change-history.md` |
 
 ## Which sensors can block
@@ -54,7 +54,7 @@ Two shapes, and the sensor doc is authoritative for which one applies:
 
 - **PR-context sensors** (`code-structure-quality`, `dependency-structure`,
   `type-safety`, `duplication`, `changed-code-coverage`) emit **JSON** and carry a
-  `<feature-id>` — their output is machine-parsed by Code Review and scoped to one
+  `<feature-id>` — their output is machine-parsed by Code Inspection and scoped to one
   change.
 - **Scheduled-only sensors** (`change-history`, `dead-code`, `dependency-drift`,
   `coverage-quality`) emit the older `.md` trend shape with no feature id.
@@ -77,11 +77,11 @@ Seven sensors do not route through Observer in PR context. Each exception is del
 
 | Sensor | PR context | Scheduled context | Why the exception |
 |--------|-----------|-------------------|-------------------|
-| Code Structure Quality | **Code Review** executes and gates inline | Observer owns trends → Refactor/Programmer | The measured party must not author the measurement; Code Review already executes `static_analysis` per the computational-controls execution table |
-| Dependency Structure | **Code Review** executes and evaluates inline | Observer owns full-graph trends → Software Architect | Same custody rule, same slot owner; a cycle introduced by a diff belongs to that diff, not to a later scheduled pass |
-| Type Safety | **Code Review** executes and gates inline | Observer owns whole-repo trends → Programmer/Refactor | Same custody rule, same slot owner; strictness weakening must block the diff that introduces it |
-| Duplication | **Code Review** executes and gates inline | Observer owns whole-repo trends → Refactor | Same custody rule; Code Review is also the adjudicator when this gate conflicts with the complexity gates |
-| Changed-Code Coverage | **split**: TestRunner emits the raw report, **Code Review** computes and gates | none — "changed code" is undefined outside a change | The expensive half (running the suite) is TestRunner's; the cheap half (attributing it to the diff) is recomputed by the consumer, preserving the custody rule where cost allows |
+| Code Structure Quality | **Code Inspection** executes and gates inline | Observer owns trends → Refactor/Programmer | The measured party must not author the measurement; Code Inspection already executes `static_analysis` per the computational-controls execution table |
+| Dependency Structure | **Code Inspection** executes and evaluates inline | Observer owns full-graph trends → Software Architect | Same custody rule, same slot owner; a cycle introduced by a diff belongs to that diff, not to a later scheduled pass |
+| Type Safety | **Code Inspection** executes and gates inline | Observer owns whole-repo trends → Programmer/Refactor | Same custody rule, same slot owner; strictness weakening must block the diff that introduces it |
+| Duplication | **Code Inspection** executes and gates inline | Observer owns whole-repo trends → Refactor | Same custody rule; Code Inspection is also the adjudicator when this gate conflicts with the complexity gates |
+| Changed-Code Coverage | **split**: TestRunner emits the raw report, **Code Inspection** computes and gates | none — "changed code" is undefined outside a change | The expensive half (running the suite) is TestRunner's; the cheap half (attributing it to the diff) is recomputed by the consumer, preserving the custody rule where cost allows |
 | Mutation Quality | **TestRunner** owns and gates inline | Observer owns full-scope trends → TDD/Programmer | Mutation runs are expensive and sequenced off the test run TestRunner already owns |
 | Change History | **never runs in PR context** | Observer owns entirely → Refactor + human | Churn is a signal about where to look, not about whether a diff is acceptable; gating on it would punish work in the areas that most need it |
 

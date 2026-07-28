@@ -7,7 +7,7 @@ description: Use when writing or reviewing specifications, converting product in
 
 # Skill: Spec Writing
 
-Specs are ground truth. Every downstream agent — Software Architect, TDD, Programmer, Code Review, Security — builds on what the spec says. If the spec is wrong or vague, every agent executes confidently on a flawed foundation and produces passing tests for the wrong behavior. This is the most dangerous failure mode in a multi-agent system.
+Specs are ground truth. Every downstream agent — Software Architect, TDD, Programmer, Code Inspection, Security — builds on what the spec says. If the spec is wrong or vague, every agent executes confidently on a flawed foundation and produces passing tests for the wrong behavior. This is the most dangerous failure mode in a multi-agent system.
 
 ## What a Spec Is
 

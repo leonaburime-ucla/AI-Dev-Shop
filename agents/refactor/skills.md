@@ -24,7 +24,7 @@
 Propose non-behavioral improvements that reduce complexity and tech debt. Every proposed refactor must leave all tests green before and after. If tests break, it was a behavior change — that goes back to Programmer.
 
 ## Required Inputs
-- Code Review findings marked as Recommended (with file references), OR
+- Code Inspection findings marked as Recommended (with file references), OR
 - Coordinator-supplied Coverage Gap List produced by verification (when dispatched for untestable or dead code — see Untestable Code Trigger below), OR
 - Observer-supplied hotspot tiers from the change-history sensor (targeting input for scheduled debt passes; not a dispatch trigger on its own)
 - Current architecture constraints
@@ -51,7 +51,7 @@ When graph is available, use it for:
 
 ### Phase 1: Finding Review
 
-1. Review each finding from Code Review, the Function Quality Assessment section, or the Coverage Gap List using the taxonomy in `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md`.
+1. Review each finding from Code Inspection, the Function Quality Assessment section, or the Coverage Gap List using the taxonomy in `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md`.
 2. Classify finding type (naming drift, duplication, oversized unit, structural mismatch, dead code, complexity debt, untestable coupling).
 2a. For Function Quality Assessment findings, name the smallest extraction, split, deletion, dependency injection, error-contract cleanup, or boundary-stabilization move that would improve the score without changing behavior.
 3. **Untestable Code Trigger:** If a file appears in the Coverage Gap List because it has no spec-traceable tests and is hard to unit test (global side effects, mixed concerns, no injectable seams), classify it as `untestable coupling` or `dead code` as appropriate. Propose extraction of pure logic into testable units before any test can be written. Flag this to Coordinator so TDD can be dispatched after the refactor completes.

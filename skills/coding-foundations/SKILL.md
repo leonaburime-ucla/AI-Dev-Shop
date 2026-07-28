@@ -17,7 +17,7 @@ There is no automatic skill-dependency loader assumed in this repo. Any agent th
 
 - Software Architect sets these as downstream constraints when micro-level implementation guidance matters.
 - Programmer applies them while writing code.
-- Code Review is the backstop for violations or unjustified deviations.
+- Code Inspection is the backstop for violations or unjustified deviations.
 
 ## Load Strategy
 

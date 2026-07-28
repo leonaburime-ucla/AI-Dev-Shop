@@ -6,7 +6,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — test types, coverage expectations, failure clustering patterns
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — validates coverage scope and rejects metric gaming or undocumented exceptions
-- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/changed-code-coverage.md` — you **produce** the raw machine-readable coverage report this sensor consumes; you do **not** compute or report changed-code coverage numbers. Code Review recomputes the diff attribution itself. Retain the report in a standard format (`lcov.info`, `coverage.xml`, or equivalent) at a path named in the handoff, and record the head SHA it was produced against so staleness is detectable
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/changed-code-coverage.md` — you **produce** the raw machine-readable coverage report this sensor consumes; you do **not** compute or report changed-code coverage numbers. Code Inspection recomputes the diff attribution itself. Retain the report in a standard format (`lcov.info`, `coverage.xml`, or equivalent) at a path named in the handoff, and record the head SHA it was produced against so staleness is detectable
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-verification-before-completion/SKILL.md` — fresh evidence gate before reporting pass/fail outcomes
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load test execution and pass/fail criteria (activated when performance harness constraints exist in tasks.md)
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — E2E test execution reference
@@ -87,7 +87,7 @@ Execute the full verification suite after implementation and report trustworthy 
      not test authoring — consistent with TestRunner's verification role.
    - Include survived mutant details in the run report under a
      `## Mutation Quality` section.
-   - Route gate failures: Hard Blocker → back to Programmer/TDD before Code Review;
+   - Route gate failures: Hard Blocker → back to Programmer/TDD before Code Inspection;
      Escalation → Coordinator decides routing.
    - If the mutation_tests slot is not declared, or its Command field is empty,
      "not declared", or "none": do not run; include
@@ -97,7 +97,7 @@ Execute the full verification suite after implementation and report trustworthy 
    `test-certification.md`. `0 tests found`, skipped-only runs, or empty suites
    are BLOCKING infrastructure failures, not success.
 5. Aggregate results. Cluster failures by likely owner (spec gap, architecture issue, implementation bug).
-6. Report to Coordinator with convergence status vs threshold and coverage status. Default convergence before Code Review is `100%` of P1 acceptance tests and invariants passing; any lower threshold must be recorded in `tasks.md` with human approval.
+6. Report to Coordinator with convergence status vs threshold and coverage status. Default convergence before Code Inspection is `100%` of P1 acceptance tests and invariants passing; any lower threshold must be recorded in `tasks.md` with human approval.
 
 ## Output Format
 
@@ -151,7 +151,7 @@ Report contents:
 - Flaky test detected — block advancement and report stabilization need to
   Coordinator unless a non-expired known-flaky human-approved exclusion exists
   with the required fields
-- Touched-file coverage regression detected — flag to Coordinator before advancing to Code Review
+- Touched-file coverage regression detected — flag to Coordinator before advancing to Code Inspection
 - Any hard gate metric fails (unit 98% / integration 90% / e2e 80% by default, or active custom profile) — block advancement and include explicit failure reasons plus required next routing
 - Uncovered lines remain without acceptable justification — block advancement and route for additional tests or refactor
 

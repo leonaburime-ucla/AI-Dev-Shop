@@ -139,7 +139,7 @@ mis-routes a suggestion; it cannot mis-block a merge.
 | `safety-and-privacy` | Security |
 
 These are deliberately named differently from the six review dimensions in
-`<AI_DEV_SHOP_ROOT>/skills/code-review/SKILL.md` (spec alignment, architecture
+`<AI_DEV_SHOP_ROOT>/skills/code-inspection/SKILL.md` (spec alignment, architecture
 adherence, test quality, code quality, security, non-functional). They are not
 the same list and must never be conflated.
 
@@ -154,7 +154,7 @@ the same list and must never be conflated.
   coverage, adversarial cases, or cross-record behavior are missing.
 - If a finding comes from a unit owning too much, name the extraction that would
   resolve it.
-- The Programmer/Code Review cross-check is a **finding-set diff** — the findings
-  Code Review recorded that the Programmer's handoff omitted, by severity.
+- The Programmer/Code Inspection cross-check is a **finding-set diff** — the findings
+  Code Inspection recorded that the Programmer's handoff omitted, by severity.
   Comparing content is harder to fabricate agreement on than comparing numbers.
-  Code Review must flag any omission at `High` or above.
+  Code Inspection must flag any omission at `High` or above.

@@ -17,7 +17,7 @@ this toolkit mandates.
 
 - **Class**: `computational`
 - **Timing**: PR (every reviewed change) + scheduled (distribution trends)
-- **PR owner**: **Code Review** — it already executes `lint`, `typecheck`, and
+- **PR owner**: **Code Inspection** — it already executes `lint`, `typecheck`, and
   `static_analysis` per the execution table in
   `<AI_DEV_SHOP_ROOT>/framework/contracts/computational-controls.md`, and
   `code_metrics` is static analysis. No new role is introduced.
@@ -31,17 +31,17 @@ this toolkit mandates.
 | Actor | May do | May not do |
 |---|---|---|
 | Programmer | run the command locally as an **advisory preview**; fix what it reports | restate metric values as free text in a handoff; treat preview output as evidence |
-| Code Review | run the command itself; that run is **authoritative** | accept a Programmer-reported number in place of its own run |
+| Code Inspection | run the command itself; that run is **authoritative** | accept a Programmer-reported number in place of its own run |
 | Observer | read accepted artifacts for trends | change a PR outcome retroactively |
 
-Code Review runs `code_metrics` on **every** reviewed change. It is not sampled.
+Code Inspection runs `code_metrics` on **every** reviewed change. It is not sampled.
 
 A sampled or artifact-based scheme was considered and rejected: any audit trigger
 computed from bytes the measured agent authored is predictable by that agent, and
 a content hash proves an artifact matches the source files, not that the numbers
 came from the tool. For a check that costs seconds, unconditional recomputation
 by the consumer is both cheaper and deterministic. A handoff asserting metric
-values with no Code Review run behind it is a Required workflow finding.
+values with no Code Inspection run behind it is a Required workflow finding.
 
 **Honest limit, stated rather than obscured:** this closes fabrication by the
 *measured* agent. It does not close fabrication by the *reviewing* agent. No
@@ -225,7 +225,7 @@ record missing either is a declaration defect, not a clean result.
     "commands": ["<resolved command>", "<resolved secondary command or null>"],
     "tools": [{"name": "lizard", "version": "..."}],
     "conformance": "PASS | FAIL | NOT_RUN",
-    "executed_by": "code-review",
+    "executed_by": "code-inspection",
     "scope": ["<changed files>"],
     "exclusions": [{"path": "...", "rule": "...", "approval": "..."}]
   },
@@ -382,7 +382,7 @@ no breach. It removes a ceiling; it never adds quality.
 
 | Finding | Severity | Action |
 |---|---|---|
-| Gate breach, new or worsened, no upheld justification | Required | Code Review reports at fixed severity; **blocks only at `validated` gate status** (see the registry); otherwise routes to Programmer or Refactor as `RECOMMENDED` |
+| Gate breach, new or worsened, no upheld justification | Required | Code Inspection reports at fixed severity; **blocks only at `validated` gate status** (see the registry); otherwise routes to Programmer or Refactor as `RECOMMENDED` |
 | Threshold in the declared command raised to clear a breach | Required | `INT-2`; blocks regardless of gate status |
 | Gate breach with upheld justification | — | Recorded as adjudicated; no block |
 | Review-band value on changed code | Advisory | Review prompt in the CR report |

@@ -90,7 +90,7 @@ Include:
 - Motion and interaction rules
 - Accessibility, performance, compliance, and maintainability notes
 - Implementation notes for Programmer
-- Verification notes for QA/E2E and Code Review
+- Verification notes for QA/E2E and Code Inspection
 - Open questions or assumptions
 
 For quick conversational work, answer directly using the same categories only as needed.

@@ -18,7 +18,7 @@ description: Package the current work for one or more external LLM auditors, cap
 
 ## Scope
 
-This is not the same as pipeline `/code-review`, which routes implementation to the Code Review Agent and Security Agent.
+This is not the same as pipeline `/code-inspection`, which routes implementation to the Code Inspection Agent and Security Agent.
 
 This skill is for:
 - one packaged audit packet

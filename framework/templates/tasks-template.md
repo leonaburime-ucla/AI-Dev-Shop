@@ -20,7 +20,7 @@
 - If Implementation Outline was skipped, record the exact SKIP reason in the metadata above and derive phases from the ADR only.
 - If a Critical Internal Constraints artifact is present, tasks touching its designated units must reference the Unit IDs (U-xxx) so TDD and Programmer load the Binding constraints. If not triggered, record the exact NOT TRIGGERED line in the metadata above.
 - Task checkboxes are Coordinator-owned state. Implementation, TDD, TestRunner,
-  and Code Review agents must treat `tasks.md` as read-only unless the
+  and Code Inspection agents must treat `tasks.md` as read-only unless the
   Coordinator explicitly delegates a task-list update.
 
 ---
@@ -32,7 +32,7 @@
 - Unit minimums: defaults `98/98/98/98` for lines/branches/functions/statements unless human-approved override: <values or N/A>
 - Integration minimums: defaults `90/90/90/90` for lines/branches/functions/statements unless human-approved override: <values or N/A>
 - E2E minimums: defaults `80/80/80/80` for lines/branches/functions/statements when E2E is required unless human-approved override: <values or N/A>
-- Convergence threshold before Code Review: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason: <value/reason or N/A>
+- Convergence threshold before Code Inspection: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason: <value/reason or N/A>
 - **Contract Tests**: <Derive required contract suites from Implementation Outline if present; otherwise N/A>
 
 ### Required Suites
@@ -149,7 +149,7 @@ Use this instead of the full template when the feature has one implementation ta
 - Critical Internal Constraints: <path to critical-internal-constraints.md OR "NOT TRIGGERED - <candidate units checked; checked surfaces; why no trigger applies>">
 - Date: <ISO-8601 UTC>
 - Author: Coordinator
-- Convergence threshold before Code Review: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason
+- Convergence threshold before Code Inspection: default `100%` of P1 acceptance tests and invariants passing; lower threshold requires human-approved value and reason
 
 ## Tasks
 
@@ -157,5 +157,5 @@ Use this instead of the full template when the feature has one implementation ta
 - [ ] T002 [AC-01, AC-02] Implement <feature> — `src/...` (depends on T001)
 - [ ] T003 Run tests to convergence
 
-**Checkpoint**: Human reviews test results before Code Review dispatch.
+**Checkpoint**: Human reviews test results before Code Inspection dispatch.
 ```

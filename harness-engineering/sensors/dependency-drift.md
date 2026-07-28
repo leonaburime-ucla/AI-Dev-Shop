@@ -63,7 +63,7 @@ release blocking around the same commands.
 
 3. **PR-triggered (lockfile change)**:
    - Scan runs on the new lockfile
-   - If new vulnerabilities introduced, Code Review is informed
+   - If new vulnerabilities introduced, Code Inspection is informed
    - Advisory unless the new dep has a known critical vuln (then escalation)
 
 ## Baseline Management

@@ -187,7 +187,7 @@ This checklist must be completed before the feature ships.
 - [ ] Section 6.2 (untested) is empty or all entries are DEFERRED with approval
 - [ ] Section 6.3 (untested error codes) is empty or all entries are DEFERRED with approval
 - [ ] Section 7 (untraced) is empty
-- [ ] All VERIFIED rows have been reviewed and signed off by the Code Review Agent
+- [ ] All VERIFIED rows have been reviewed and signed off by the Code Inspection Agent
 
 **[ ] TRACEABILITY COMPLETE** — all requirements are implemented and tested. Feature is ready to ship.
 
@@ -200,5 +200,5 @@ This checklist must be completed before the feature ships.
 | Spec Agent | | | |
 | TDD Agent | | | |
 | Programmer Agent | | | |
-| Code Review Agent | | | |
+| Code Inspection Agent | | | |
 | Coordinator | | | |

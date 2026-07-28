@@ -106,7 +106,7 @@ Return: score per dimension, weighted overall, biggest weakness.
 
 ---
 
-## Code Review Agent Rubric
+## Code Inspection Agent Rubric
 
 | Dimension | What to Score | Weight |
 |-----------|--------------|--------|

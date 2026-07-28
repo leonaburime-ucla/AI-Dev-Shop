@@ -78,7 +78,7 @@ invalidates the coverage evidence.
   certified tests.
 - **TestRunner:** detect new or broadened suppressions/exclusions and reject
   coverage evidence that lacks a valid exception.
-- **Code Review:** classify metric gaming or capability loss disguised as
+- **Code Inspection:** classify metric gaming or capability loss disguised as
   coverage work as a Required finding.
 - **Refactor:** preserve observable behavior; propose seam extraction when
   coupling blocks tests, and route any capability change back to its owner.

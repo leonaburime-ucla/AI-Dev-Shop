@@ -213,7 +213,7 @@ it.
 - All acceptance criteria in the spec: covered by acceptance tests
 - All concrete edge cases listed in the spec: covered by explicit scenario tests
 
-**Blocking rule takes precedence:** failing any hard coverage gate (unit/integration/e2e) blocks progression to Code Review. High-priority gaps in core business logic or API adapters also block progression regardless of module-class discretion. In all cases, uncovered requirements and uncovered lines must be explicitly listed with rationale in the certification record.
+**Blocking rule takes precedence:** failing any hard coverage gate (unit/integration/e2e) blocks progression to Code Inspection. High-priority gaps in core business logic or API adapters also block progression regardless of module-class discretion. In all cases, uncovered requirements and uncovered lines must be explicitly listed with rationale in the certification record.
 
 ## Writing Good Assertions
 

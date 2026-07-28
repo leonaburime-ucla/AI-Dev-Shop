@@ -15,7 +15,7 @@ exists.
   outside the context of a change.
 - **Producer**: **TestRunner** — emits the raw coverage report as a side effect
   of the suite run it already owns
-- **Computer / PR owner**: **Code Review** — recomputes the diff-coverage
+- **Computer / PR owner**: **Code Inspection** — recomputes the diff-coverage
   arithmetic itself on every reviewed change
 - **Artifact**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/changed-code-coverage-<feature-id>-<timestamp>.json`
 
@@ -162,7 +162,7 @@ whose denominator the author controls directly.
 - **Deleting or skipping a test** to remove a failing branch from the run —
   same rule.
 - **Assertion-free tests** that execute a branch without checking anything.
-  Coverage cannot see this by construction; it is Code Review's Dimension 3
+  Coverage cannot see this by construction; it is Code Inspection's Dimension 3
   judgment and mutation testing's job, not this sensor's. Stated so this sensor
   is not mistaken for evidence that the tests are good.
 
@@ -265,9 +265,9 @@ at the point where cost changes:
 | Step | Cost | Owner |
 |---|---|---|
 | Run the suite, emit a raw coverage report | expensive | **TestRunner** |
-| Attribute that report to the diff and compute the ratios | **cheap** — a report plus a git diff | **Code Review, unconditionally** |
+| Attribute that report to the diff and compute the ratios | **cheap** — a report plus a git diff | **Code Inspection, unconditionally** |
 
-Code Review never accepts a diff-coverage *number* from anyone; it recomputes the
+Code Inspection never accepts a diff-coverage *number* from anyone; it recomputes the
 arithmetic itself from the raw report and its own `git diff` against the merge
 base. What it cannot do is verify the raw report was produced by a real,
 unmodified suite run without re-running the suite.

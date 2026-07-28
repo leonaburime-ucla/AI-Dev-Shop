@@ -26,7 +26,7 @@ See `<AI_DEV_SHOP_ROOT>/framework/templates/bootstrap/contracts-bootstrap.md` fo
 
 - **Programmer**: computational controls (all slots), runtime validation (when runtime-changing)
 - **TestRunner**: computational controls (test slots)
-- **Code Review**: architecture fitness, computational controls (lint, typecheck, static_analysis)
+- **Code Inspection**: architecture fitness, computational controls (lint, typecheck, static_analysis)
 - **Architect**: architecture fitness (for ADR alignment)
 - **Coordinator**: enforcement status at every stage gate
 - **Reverse-Spec / Done Gate**: specs-as-built freshness when generated current-state docs are enabled

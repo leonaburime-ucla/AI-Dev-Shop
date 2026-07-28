@@ -44,7 +44,7 @@ Dead code is never a hard blocker on its own — it's a quality signal, not a sa
 
 ## Routing
 
-1. **PR context**: Programmer receives advisory note before handoff. Code Review mentions it if the dead code is in modified files.
+1. **PR context**: Programmer receives advisory note before handoff. Code Inspection mentions it if the dead code is in modified files.
 2. **Scheduled context**: Observer reads the weekly scan artifact. If findings exceed threshold:
    - Creates a maintenance entry in `<ADS_MEMORY_ROOT>/reports/maintenance/`
    - Routes to Refactor agent with specific file paths and dead-code evidence

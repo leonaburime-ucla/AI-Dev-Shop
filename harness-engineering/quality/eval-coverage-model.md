@@ -445,7 +445,7 @@ easy domain conditions), but they cannot substitute for genuine depth. A suite
 that meets its Hard seed count but fails the depth floor because too many Hard
 seeds are shallow is not benchmark-ready.
 
-**For Architect and Code Review specifically**, the floors shift even higher
+**For Architect and Code Inspection specifically**, the floors shift even higher
 because these agents exist to catch the failures nobody else sees:
 
 | Complexity tier | Floor for Architect/CR |
@@ -468,7 +468,7 @@ Benchmark suites must contain at least **54 seeds** to claim stable benchmark
 status. Suites below 36 seeds are pilot-grade regardless of other qualities.
 
 For agents that are responsible for catching system-level or architectural
-failures (Architect, Code Review, Security), the target should be **72+ seeds**
+failures (Architect, Code Inspection, Security), the target should be **72+ seeds**
 to provide enough coverage across complexity categories at the higher tiers.
 
 ### Using Eval Results To Surface Skill Gaps
@@ -596,7 +596,7 @@ understand. Use these domain codes in `seed-catalog.tsv` (new column:
 
 1. **Breadth first**: A benchmark suite should probe as many concept domains as
    is reasonable for the agent's role. Architect evals should touch at least
-   **15 distinct concept codes**. Code Review should touch at least **20**.
+   **15 distinct concept codes**. Code Inspection should touch at least **20**.
    Programmer should touch at least **25**.
 
 2. **One seed per concept minimum**: Every probed concept must have at least one

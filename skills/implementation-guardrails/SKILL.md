@@ -16,7 +16,7 @@ Do not wire this skill by itself. Any agent that loads `implementation-guardrail
 ## Ownership
 
 - Programmer owns first-pass complexity and scaling decisions while writing code.
-- Code Review is the backstop for missed issues and unjustified deviations.
+- Code Inspection is the backstop for missed issues and unjustified deviations.
 - Refactor owns non-blocking complexity debt after the behavior is already correct.
 - TestRunner owns empirical performance evidence only when the active tasks or spec define performance constraints.
 

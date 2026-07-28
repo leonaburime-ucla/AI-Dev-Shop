@@ -4,7 +4,7 @@ Source of truth for what agents must and must not document in code. The goal is 
 
 ## MUST Document
 
-These require inline documentation. Missing docs on these surfaces is a **Required** Code Review finding.
+These require inline documentation. Missing docs on these surfaces is a **Required** Code Inspection finding.
 
 ### Public Interfaces
 - Exported functions, classes, types, and constants consumed by other modules
@@ -43,7 +43,7 @@ What to include: purpose, input semantics, output/error contract, and one usage 
 
 ## MUST NOT Document
 
-These are actively harmful. Comment bloat is a **Recommended** Code Review finding (escalates to Required if it obscures behavior).
+These are actively harmful. Comment bloat is a **Recommended** Code Inspection finding (escalates to Required if it obscures behavior).
 
 ### Obvious Leaf Logic
 - Simple getters/setters, trivial mappers, one-line utility functions
@@ -76,8 +76,8 @@ Before handing off, the Programmer classifies each changed public symbol:
 
 This classification goes in the handoff summary under a "Documentation" section.
 
-### Code Review Check
-The Code Review agent evaluates documentation as part of its review:
+### Code Inspection Check
+The Code Inspection agent evaluates documentation as part of its review:
 
 | Finding | Severity |
 |---------|----------|

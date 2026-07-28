@@ -52,7 +52,7 @@ Do not include: Architecture decisions (those belong in ADRs). Lessons learned (
 **`<ADS_MEMORY_ROOT>/knowledge/learnings.md`**
 Retrospective lessons: what went wrong, why, and what to do instead.
 - "2026-02-15: TDD Agent wrote tests against a draft spec that hadn't been approved yet. Tests had to be rewritten when spec changed. Fix: TDD Agent must verify spec is human-approved before certifying tests."
-- "2026-02-18: Programmer Agent bypassed the repository interface and queried the DB directly. Code Review caught it. Reminder: all DB access must go through the repository layer."
+- "2026-02-18: Programmer Agent bypassed the repository interface and queried the DB directly. Code Inspection caught it. Reminder: all DB access must go through the repository layer."
 
 Update when: A failure pattern reveals something worth remembering.
 Governance: Entries are permanent. Do not delete old lessons.
@@ -107,7 +107,7 @@ A Programmer Agent dispatch should include:
 - Relevant project_memory entries
 - The handoff output from the TDD Agent
 
-It should not include: the full TDD Agent session history, the Spec Agent's drafting notes, or Code Review findings from a previous unrelated feature.
+It should not include: the full TDD Agent session history, the Spec Agent's drafting notes, or Code Inspection findings from a previous unrelated feature.
 
 ## Avoiding Context Rot
 
@@ -204,7 +204,7 @@ The Coordinator always reconstructs context from canonical sources (spec, ADR, p
 
 ## Consensus and Divergence
 
-When multiple agents produce conflicting outputs (e.g., Software Architect and Code Review disagree on a boundary), the Coordinator must resolve the conflict rather than forwarding both to the next agent.
+When multiple agents produce conflicting outputs (e.g., Software Architect and Code Inspection disagree on a boundary), the Coordinator must resolve the conflict rather than forwarding both to the next agent.
 
 Resolution strategies:
 1. **Authority precedence**: ADRs take precedence over code review opinions on architecture decisions

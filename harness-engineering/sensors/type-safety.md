@@ -12,7 +12,7 @@ the rules that matter here were configured, enabled, or suppressed.
 
 - **Class**: `computational`
 - **Timing**: PR (changed files) + scheduled (whole-repo trend)
-- **PR owner**: **Code Review** (executes the declared `type_safety` slot; same
+- **PR owner**: **Code Inspection** (executes the declared `type_safety` slot; same
   custody rule as `code_metrics` — the measured party never authors the measurement)
 - **Scheduled owner**: Observer → routes to Programmer/Refactor
 - **Artifact**: `<ADS_MEMORY_ROOT>/.local-artifacts/sensors/type-safety-<feature-id>-<timestamp>.json`
@@ -283,10 +283,10 @@ uphold a documented justification; it may not relabel an unresolved breach.
 
 ## Custody
 
-Identical to `code-structure-quality.md`. Code Review executes the command on
+Identical to `code-structure-quality.md`. Code Inspection executes the command on
 every reviewed change and its run is authoritative. Programmer may run it as an
 advisory preview and must never restate results as free text in a handoff; a
-handoff asserting counts with no Code Review run behind it is a Required workflow
+handoff asserting counts with no Code Inspection run behind it is a Required workflow
 finding.
 
 ## Brownfield
@@ -305,7 +305,7 @@ grandfathered baseline via the merge base, and gate only what follows.
 
 | Finding | Severity | Action |
 |---|---|---|
-| New Tier A occurrence, no upheld justification | Required | Code Review reports at fixed severity; **blocks only at `validated` gate status** (see the registry); otherwise routes to Programmer as `RECOMMENDED` |
+| New Tier A occurrence, no upheld justification | Required | Code Inspection reports at fixed severity; **blocks only at `validated` gate status** (see the registry); otherwise routes to Programmer as `RECOMMENDED` |
 | Strictness weakened without approval | Required | `INT-1`; blocks regardless of gate status; routes to Programmer and flags to the human |
 | Suppression added over an existing violation | Required | `INT-4`; blocks regardless of gate status |
 | New Tier B occurrence | Advisory | Recommended finding in the CR report |

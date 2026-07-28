@@ -47,7 +47,7 @@ coverage sensor, not a substitute for it.
 
 | Finding | Severity | Action |
 |---------|----------|--------|
-| PR drops overall coverage by >5% | Escalation | Code Review flags; Programmer asked to add tests |
+| PR drops overall coverage by >5% | Escalation | Code Inspection flags; Programmer asked to add tests |
 | PR drops coverage on modified files specifically | Advisory | Noted in handoff summary |
 | Critical-path module has <50% coverage | Escalation | Observer reports; TDD agent recommended |
 | Zero-coverage file is modified | Advisory | Programmer reminded to add test |
@@ -59,7 +59,7 @@ Coverage alone is never a hard blocker — it's an escalation or advisory signal
 
 1. **PR context**:
    - Coverage diff computed against base branch
-   - Results included in Code Review context
+   - Results included in Code Inspection context
    - Significant drops flagged to Programmer before handoff
 
 2. **Scheduled context**:
