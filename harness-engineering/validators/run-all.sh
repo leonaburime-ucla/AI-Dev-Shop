@@ -61,10 +61,14 @@ run_precommit_checks() {
 
 run_governance_scenarios() {
   echo
-  echo "==> Ablation canary (dependency-cycle pilot)"
-  python3 "$ROOT_DIR/harness-engineering/canary/run_canary.py" --check
+  # The ablation canary is deliberately NOT run here. Its subject is a stand-in
+  # detector, not a host's declared `dependency_graph` command, so a PASS on every
+  # commit implied a validation that had not happened — and a review passed six
+  # broken detectors, one of which opens no source file, through all five of its
+  # controls. Run it by hand when working on the canary itself:
+  #   python3 harness-engineering/canary/run_canary.py
+  # See harness-engineering/canary/README.md § What it does NOT catch.
 
-  echo
   echo "==> Governance scenarios"
   python3 -m pytest "$ROOT_DIR/harness-engineering/governance-scenarios/" -v --tb=short 2>&1
 }

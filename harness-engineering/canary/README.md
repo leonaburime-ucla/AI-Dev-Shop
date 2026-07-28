@@ -1,5 +1,10 @@
 # Ablation Canary — dependency-cycle pilot
 
+> **Not run by `run-all.sh`, deliberately.** Its subject is the stand-in detector
+> below, not a host's declared `dependency_graph` command, so a PASS on every
+> commit implied a validation that had not happened. Run it by hand when working
+> on the canary itself. Read § What it does NOT catch before trusting a PASS.
+
 The specification lives in
 `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/gate-validation-status.md`
 § Promotion. This directory is the pilot that runs it end to end for one gate, so
@@ -8,6 +13,7 @@ the criterion is something executable rather than something described.
 ```bash
 python3 harness-engineering/canary/run_canary.py           # run and write the artifact
 python3 harness-engineering/canary/run_canary.py --check   # non-zero if any control fails
+python3 harness-engineering/canary/run_canary.py --seed 99 # vary the generated fixture
 ```
 
 ## Why one gate and not twelve
