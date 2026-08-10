@@ -27,7 +27,7 @@ git ls-remote https://github.com/Leonxlnx/taste-skill HEAD
 ## Relationship to this toolkit's own design skills
 
 This entire pack is a third-party opinionated alternative to, not a
-replacement for, `skills/ux-design`, `skills/premium-ui`, `skills/interface-design`,
+replacement for, `skills/ui-ux-design` (which now carries the premium-UI reference), `skills/interface-design`,
 `skills/impeccable`, and `skills/advanced-frontend-architecture`. Reach for a
 subskill below only when the user names one of its specific aesthetics or
 workflows; otherwise prefer this toolkit's native design skills.

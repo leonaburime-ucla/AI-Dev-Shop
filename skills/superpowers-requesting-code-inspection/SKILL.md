@@ -1,5 +1,5 @@
 ---
-name: superpowers-requesting-code-review
+name: superpowers-requesting-code-inspection
 description: Use when completed work should be reviewed before continuing or merging. Prepares a focused review request with scope, git range, and requirements context.
 ---
 

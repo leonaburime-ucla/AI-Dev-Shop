@@ -1,5 +1,5 @@
 ---
-name: superpowers-receiving-code-review
+name: superpowers-receiving-code-inspection
 description: Use when receiving code review feedback before implementing changes. Guides clarification, technical verification, and pushback when feedback is wrong or incomplete.
 ---
 

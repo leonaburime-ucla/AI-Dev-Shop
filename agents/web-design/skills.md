@@ -1,15 +1,15 @@
 # Web Design Agent (Optional)
-- Version: 1.0.0
-- Last Updated: 2026-07-01
+- Version: 2.0.0
+- Last Updated: 2026-08-09
 
 ## Base Skills
 
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching
-- `<AI_DEV_SHOP_ROOT>/skills/premium-ui/SKILL.md` — premium website and product UI design guidance; use as the primary taste, polish, first-impression, hierarchy, trust, and conversion-quality reference
-- `<AI_DEV_SHOP_ROOT>/skills/ux-design/SKILL.md` — design foundations, responsive behavior, component/state specs, brand-aware UI guidance, and implementation-ready handoff
+- `<AI_DEV_SHOP_ROOT>/skills/ui-ux-design/SKILL.md` — design foundations, responsive behavior, component/state specs, brand-aware UI guidance, and implementation-ready handoff; its premium bundle (`references/premium-ui.md` + the three design-school notes) is the primary taste, polish, first-impression, hierarchy, trust, and conversion-quality reference, and loads by default on any visual-quality work
 - `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` — accessibility baseline for visual design decisions, contrast, semantics, focus, keyboard paths, and reduced motion
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — legal/compliance checkpoints for public website UX content and flows
 - `<AI_DEV_SHOP_ROOT>/skills/interface-design/SKILL.md` — activate for dashboards, SaaS apps, tools, admin panels, and product interfaces where a persistent interface system matters
+- `<AI_DEV_SHOP_ROOT>/skills/theming/SKILL.md` — activate when building, extending, or auditing a theme; `references/inventory.md` is the checklist of pages, components, patterns, and premium details a complete theme contains
 - `<AI_DEV_SHOP_ROOT>/skills/vercel-web-design-guidelines/SKILL.md` — activate when auditing existing UI code, screenshots, or rendered pages against web interface quality rules
 - `<AI_DEV_SHOP_ROOT>/skills/shadcn-ui/SKILL.md` — activate when the project stack includes shadcn/ui or the handoff must map design decisions to shadcn primitives
 
@@ -59,9 +59,10 @@ If inputs are incomplete, proceed with explicit assumptions for reversible decis
 ## Workflow
 
 1. Identify the surface type: marketing site, landing page, ecommerce, SaaS/product page, dashboard/app screen, or audit.
-2. Load `premium-ui` first for premium-feel, hierarchy, trust, conversion, and reference routing.
-3. Load `ux-design` references only as needed for foundations, components/states, brand/voice, validation, visual storytelling, or motion.
+2. Load `ui-ux-design` first. If visual quality matters at all — premium, high-end, "make it look good", a redesign, any marketing or first-impression surface — read the whole premium bundle up front: `references/premium-ui.md` plus `sam-crawford-premium-websites.md`, `self-made-web-designer-core-skills.md`, and `kole-jain-uiux-concepts.md` (~6k tokens for all four). Do not wait for the user to name a source.
+3. Load the remaining `ui-ux-design` references only as needed for foundations, components/states, brand/voice, validation, visual storytelling, or motion.
 4. For app/tool/dashboard surfaces, activate `interface-design` before defining reusable UI patterns.
+4a. If the deliverable is a theme, activate `theming` and work through `references/inventory.md` — pages, then components, then patterns, then the details premium themes ship.
 5. For existing UI audits, activate `vercel-web-design-guidelines` and `frontend-accessibility`; use rendered evidence when available.
 6. Define the first-impression target and the page or screen's single primary job.
 7. Specify visual hierarchy, layout, typography, spacing, palette, imagery/assets, proof, CTAs, states, responsive behavior, and motion restraint.

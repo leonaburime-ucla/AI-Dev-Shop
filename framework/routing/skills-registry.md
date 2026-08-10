@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.29
-last_updated: 2026-06-29
+version: 1.2.31
+last_updated: 2026-08-09
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -68,6 +68,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/adversarial-test-design/SKILL.md` | Programmer (conditional for aggregate-risk workflows such as rule, validation, batch, reducer, reconciliation, transfer, and other cross-record logic) |
 | `skills/coding-foundations/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Inspection Agent (tiny shared parent for micro-level coding axioms) |
 | `skills/hexagonal-architecture/SKILL.md` | Software Architect, Programmer, CodeBase Analyzer, System Design Agent |
+| `skills/package-extensibility/SKILL.md` | Code Inspection Agent (**owns the authoritative demand inventory and ledger** under the sensor custody rule), Software Architect (authors the initial deviation set at extraction/design time), Programmer (advisory preview and probes only), Refactor Agent (consumes fork/subclassed rows), CodeBase Analyzer (full skill when a consumer is recorded; D12 internal-shotgun observation only when not) — conditional: activate only when a second consumer is recorded (existing consumer, named arriving host, or a fork/patch/vendored copy in the tree) |
 | `skills/implementation-guardrails/SKILL.md` | Software Architect, Programmer, Refactor Agent, Code Inspection Agent (child layer for complexity, scaling, and maintainability guardrails; always load alongside `coding-foundations`) |
 | `skills/function-quality-assessment/SKILL.md` | Software Architect (Design Gate only for implementation-outline contracts), Programmer, Code Inspection Agent, Refactor Agent (shared per-function scoring, findings, and pass/debt/block routing wrapper over coding foundations, testable design, implementation guardrails, and inline docs) |
 | `skills/non-functional-requirements-discovery/SKILL.md` | System Design Agent, Spec Agent, Software Architect (targeted deepening) |
@@ -79,8 +80,8 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/testable-design-patterns/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Inspection Agent (child layer for testability and coverage-friendly structure; always load alongside `coding-foundations`) |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Inspection Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Inspection Agent (React component API patterns) |
-| `skills/ux-design/SKILL.md` | Web Design Agent (design system creation, visual direction, component/state design, implementation-ready handoff) |
-| `skills/premium-ui/SKILL.md` | Web Design Agent (premium website polish, first-impression design, conversion hierarchy, and reference routing) |
+| `skills/ui-ux-design/SKILL.md` | Web Design Agent (design system creation, visual direction, component/state design, implementation-ready handoff, and premium website polish via `references/premium-ui.md` — the former `premium-ui` skill, folded in as a reference along with its three design-school notes) |
+| `skills/theming/SKILL.md` | Web Design Agent — conditional: activate when building, extending, or auditing a theme; `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
 | `skills/interface-design/SKILL.md` | Web Design Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
 | `skills/gstack-design/SKILL.md` | Manual/user-invoked via `/gstack-design`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/vercel-web-design-guidelines/SKILL.md` | Web Design Agent, Code Inspection Agent, QA/E2E Agent (UI/UX guideline audits) |
