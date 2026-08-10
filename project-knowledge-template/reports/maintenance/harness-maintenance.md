@@ -22,8 +22,8 @@ PASS: canonical skill coverage is complete for skills-registry.
 ```text
 Harness Doc-Garden Audit
 ------------------------
-AGENTS.md lines: 112
-ADVISORY: AGENTS.md size is in the safer range for a map-first entrypoint.
+AGENTS.md lines: 252
+ADVISORY: AGENTS.md is over 200 lines. Continue shrinking it toward a map-first entrypoint.
 Canonical skill files: 99
 Agent persona files: 21
 Benchmark sample directories: 7
@@ -51,9 +51,10 @@ ADVISORY: run this after routing/workflow changes to catch source-of-truth drift
 
 ## Repo Signals
 
-- `AGENTS.md` line count: 112
+- `AGENTS.md` line count: 252
 - Registry exceptions in use: 6
 
 ## Maintenance Recommendations
 
+- Keep shrinking `AGENTS.md` or move new detail into linked source docs.
 - Review whether every registry exception is still intentional and temporary.
