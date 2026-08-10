@@ -22,17 +22,17 @@ PASS: canonical skill coverage is complete for skills-registry.
 ```text
 Harness Doc-Garden Audit
 ------------------------
-AGENTS.md lines: 198
+AGENTS.md lines: 112
 ADVISORY: AGENTS.md size is in the safer range for a map-first entrypoint.
-Canonical skill files: 61
-Agent persona files: 20
+Canonical skill files: 99
+Agent persona files: 21
 Benchmark sample directories: 7
-File-trigger routes: 12
+File-trigger routes: 13
 ADVISORY: run this audit after framework changes and pair it with the hard validators.
 
 Harness Doc Staleness Audit
 ---------------------------
-Watchlist entries: 5
+Watchlist entries: 6
 ADVISORY: watchlist review dates are within declared cadence.
 ADVISORY: run this after routing/workflow changes to catch source-of-truth drift early.
 ```
@@ -51,9 +51,9 @@ ADVISORY: run this after routing/workflow changes to catch source-of-truth drift
 
 ## Repo Signals
 
-- `AGENTS.md` line count: 198
-- Registry exceptions in use: 0
+- `AGENTS.md` line count: 112
+- Registry exceptions in use: 6
 
 ## Maintenance Recommendations
 
-- No immediate repair recommendation. Keep weekly maintenance cadence running.
+- Review whether every registry exception is still intentional and temporary.
