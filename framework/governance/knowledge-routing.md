@@ -65,8 +65,13 @@ Is the content a standing instruction from the user ("always do X", "never do Y"
 │                   ├── YES → project_notes.md
 │                   └── NO  → It warrants structure → use memory-schema.md to select entry type → memory-store.md
 └── NO  → Did something fail, break, or produce a postmortem-style lesson?
-          ├── YES → learnings.md (human-readable summary)
-          │         AND memory-store.md [FAILURE] entry (structured, searchable)
+          ├── YES → Was it a mistake YOU made, that you are recording now?
+          │         ├── YES → mistakes/ — one file, per that directory's README.
+          │         │         Stop here. Do not also write learnings.md or
+          │         │         memory-store.md; a human or Observer promotes it
+          │         │         later if it recurs.
+          │         └── NO  → learnings.md (human-readable summary)
+          │                   AND memory-store.md [FAILURE] entry (structured, searchable)
           └── NO  → Is it a significant pipeline decision (architecture, tech, spec direction)?
                     ├── YES → memory-store.md [DECISION] entry
                     └── NO  → Is it an open question or parked item needing future resolution?
@@ -177,21 +182,24 @@ Under no circumstances should a "remember this" instruction result in a write to
 
 ### `mistakes/` vs `learnings.md`
 
-These are the raw and curated ends of the same thing, and the split is by
-occurrence count, not by topic.
+These are the raw and curated ends of the same thing. The split is by **who writes
+it and when**, not by occurrence count — an agent writing in the moment has no way to
+know whether this is the first time or the fifth, because nothing counts them.
 
-- **One occurrence, noticed by the agent that caused it** → `mistakes/`. A single
-  file, written in the moment, including guard ideas that are explicitly untried.
-  Nothing reads it automatically and nothing gates on it.
-- **A pattern across occurrences** → `learnings.md` as `[AGENT-LESSON]`. Written
-  once someone — usually the Observer or the human — has seen the same mistake more
-  than once and can say what it is in general.
+- **The agent that made the mistake** → `mistakes/`, always, unconditionally. One
+  file per occurrence, written when you notice. Do not check whether a similar entry
+  exists and do not decide whether it is "worth" recording; that judgment is what
+  suppresses the second copy that makes a pattern visible. Nothing reads this
+  automatically and nothing gates on it.
+- **A human or the Observer, later** → `learnings.md` as `[AGENT-LESSON]`, written
+  once the same mistake has appeared **twice across separate runs** — the threshold
+  already set by
+  `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`. That
+  file also governs turning the pattern into a validator, checklist, or skills change.
 
-Do not write both for a single event. A mistake earns its `[AGENT-LESSON]` entry by
-repeating; promoting it on first sight is how the same lesson ends up stated twice in
-two different voices. Turning a repeated mistake into a validator, checklist, or
-skills change is covered by
-`<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`.
+The writer of a raw entry never writes the `[AGENT-LESSON]`. That is the whole
+separation: raw entries are cheap and duplicated on purpose, and only a reader
+looking across them can say what the pattern is.
 
 ---
 

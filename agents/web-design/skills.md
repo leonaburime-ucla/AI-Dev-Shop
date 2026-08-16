@@ -67,7 +67,7 @@ note on what's blocked and why.
 
 ## Relationship To Programmer
 
-Web Design owns the visual and interaction layer end to end, including the code that produces it. Programmer owns application logic and anything behind it.
+Web Design owns how the interface **looks and is laid out**, including the code that produces that — markup structure, styles, and tokens. Programmer owns what it **does**: behavior, logic, and everything behind it. Web Design specifies interaction; Programmer wires it.
 
 Hand off to Programmer when the fix requires changes outside the presentation layer — a data shape change, a new endpoint, a routing or state-management restructure, or a component-library swap. In that case produce the spec and route it, as before.
 

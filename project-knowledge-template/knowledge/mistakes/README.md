@@ -53,12 +53,18 @@ is worse than an admission, because the guards below get built on it.>
   and bars SENSITIVE-BUSINESS (pricing models, customer lists, unreleased feature
   names) from anything that may be shared. Use repo-relative paths, and describe
   evidence rather than pasting raw tool output or the user's exact words.
-- **Append, don't rewrite.** If you make the same mistake again, write a new file.
-  Repetition is the signal.
+- **Always write one. Never check first.** Do not look for a similar existing entry
+  and do not decide whether this one is worth recording — you cannot tell from inside
+  a single session whether it is the first time or the fifth, and skipping the
+  duplicate is exactly what hides the pattern. Same mistake again means a new file.
+- **You write the entry; you do not write the lesson.** Summarizing a pattern across
+  entries is a human or Observer job, done later. Do not also add to `learnings.md`
+  or `memory-store.md` for the same event.
 
 ## What happens later
 
-Nothing automatic, for now. When the same mistake shows up a third time and one of
-its guard ideas looks worth building, that path already exists —
-`harness-engineering/quality/failure-promotion-policy.md` covers turning a repeated
-failure into a validator, checklist, or skills change.
+Nothing automatic, for now. Once the same mistake has appeared **twice across
+separate runs**, `harness-engineering/quality/failure-promotion-policy.md` takes over
+— that is the existing threshold for turning a repeated failure into a validator,
+checklist, or skills change, and it is the same number used everywhere else in this
+toolkit.
