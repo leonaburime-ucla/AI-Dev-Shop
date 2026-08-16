@@ -81,7 +81,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Inspection Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Inspection Agent (React component API patterns) |
 | `skills/ui-ux-design/SKILL.md` | Web Design Agent (design system creation, visual direction, component/state design, implementation-ready handoff, and premium website polish via `references/premium-ui.md` — the former `premium-ui` skill, folded in as a reference along with its three design-school notes) |
-| `skills/theming/SKILL.md` | Web Design Agent — conditional: activate when building, extending, or auditing a theme; `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
+| `skills/theming/SKILL.md` | Web Design Agent — loaded eagerly with the rest of that agent's Base Skills, not gated on a theme task; `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
 | `skills/interface-design/SKILL.md` | Web Design Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
 | `skills/gstack-design/SKILL.md` | Manual/user-invoked via `/gstack-design`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/vercel-web-design-guidelines/SKILL.md` | Web Design Agent, Code Inspection Agent, QA/E2E Agent (UI/UX guideline audits) |

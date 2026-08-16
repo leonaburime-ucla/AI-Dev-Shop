@@ -20,6 +20,7 @@ For host-project runs, the authorized memory store is the sibling project worksp
 | Architectural patterns or tech decisions ratified for this project | `<ADS_MEMORY_ROOT>/knowledge/project_memory.md` | `- YYYY-MM-DD: [PATTERN] <fact>` |
 | Failures, recurring error clusters, postmortems, what broke and why | `<ADS_MEMORY_ROOT>/knowledge/learnings.md` | `- YYYY-MM-DD: [FAILURE] <what/why/resolution>` |
 | Agent output quality lessons — what a specific agent does wrong repeatedly | `<ADS_MEMORY_ROOT>/knowledge/learnings.md` | `- YYYY-MM-DD: [AGENT-LESSON] <agent> — <what and why>` |
+| A mistake an agent made and noticed — one occurrence, self-reported | `<ADS_MEMORY_ROOT>/knowledge/mistakes/` | One file per mistake, per that directory's `README.md` |
 | Spec gaps that caused downstream failures | `<ADS_MEMORY_ROOT>/knowledge/learnings.md` | `- YYYY-MM-DD: [SPEC-GAP] <gap description and resolution>` |
 | Open questions awaiting a human decision | `<ADS_MEMORY_ROOT>/knowledge/project_notes.md` | `- YYYY-MM-DD: [OPEN] <question — owner — target date>` |
 | Deferred decisions: known issue, not urgent, no owner yet | `<ADS_MEMORY_ROOT>/knowledge/project_notes.md` | `- YYYY-MM-DD: [DEFERRED] <what is deferred and why>` |
@@ -171,7 +172,26 @@ Under no circumstances should a "remember this" instruction result in a write to
 | `learnings.md` under `<ADS_MEMORY_ROOT>/knowledge/` | Yes — append-only | Human, Observer, Coordinator | All agents; especially Spec Agent and TDD Agent | Failures, postmortems, agent quality lessons |
 | `project_notes.md` under `<ADS_MEMORY_ROOT>/knowledge/` | No — entries are resolved or expired | Human, Coordinator | Spec Agent, Coordinator | Open questions, deferred decisions, parking lot |
 | `memory-store.md` under `<ADS_MEMORY_ROOT>/knowledge/` | Yes — append-only, structured | Observer (primary), Coordinator | Observer, Coordinator | Structured searchable log; future Mem0 migration target |
+| `mistakes/` under `<ADS_MEMORY_ROOT>/knowledge/` | Yes — one immutable file per mistake | The agent that made the mistake, on any host | Human, on demand | Raw self-reported mistakes plus untried guard ideas |
 | `knowledge-routing.md` (this file) | Yes — framework update only | Human | All agents before writing any memory | Routing authority — determines destination for all memory writes |
+
+### `mistakes/` vs `learnings.md`
+
+These are the raw and curated ends of the same thing, and the split is by
+occurrence count, not by topic.
+
+- **One occurrence, noticed by the agent that caused it** → `mistakes/`. A single
+  file, written in the moment, including guard ideas that are explicitly untried.
+  Nothing reads it automatically and nothing gates on it.
+- **A pattern across occurrences** → `learnings.md` as `[AGENT-LESSON]`. Written
+  once someone — usually the Observer or the human — has seen the same mistake more
+  than once and can say what it is in general.
+
+Do not write both for a single event. A mistake earns its `[AGENT-LESSON]` entry by
+repeating; promoting it on first sight is how the same lesson ends up stated twice in
+two different voices. Turning a repeated mistake into a validator, checklist, or
+skills change is covered by
+`<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`.
 
 ---
 

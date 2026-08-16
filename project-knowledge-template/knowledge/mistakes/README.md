@@ -47,10 +47,12 @@ is worse than an admission, because the guards below get built on it.>
 
 - **Guards are ideas, not work.** Never implement one because you wrote it here.
   The human reads them and decides. Leave them as a list.
-- **No secrets, no personal data, no absolute paths.** This directory is committed
-  in team projects. Use repo-relative paths and describe evidence rather than
-  pasting raw tool output or the user's exact words. See
-  `framework/governance/data-classification.md`.
+- **No secrets, no personal data, no sensitive business data, no absolute paths.**
+  This directory is committed in team projects, so treat it as shared material:
+  `framework/governance/data-classification.md` bars SECRET outright, bars real PII,
+  and bars SENSITIVE-BUSINESS (pricing models, customer lists, unreleased feature
+  names) from anything that may be shared. Use repo-relative paths, and describe
+  evidence rather than pasting raw tool output or the user's exact words.
 - **Append, don't rewrite.** If you make the same mistake again, write a new file.
   Repetition is the signal.
 
