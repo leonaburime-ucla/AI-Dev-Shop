@@ -29,11 +29,20 @@ run_hard_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_backend_manifest.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_harness_consistency.py"
   run_gate_logic_tests
+  run_shipped_script_tests
 }
 
 run_gate_logic_tests() {
   echo "--> Gate logic reference tests"
   python3 -m pytest "$ROOT_DIR/harness-engineering/gate-logic/" -q
+}
+
+# Scripts this toolkit ships and runs itself. They gate nothing, but a metric
+# script whose counting rules have drifted reports wrong numbers silently, so
+# their rule tests run wherever the gate-logic tests run.
+run_shipped_script_tests() {
+  echo "--> Shipped script tests"
+  python3 -m pytest "$ROOT_DIR/skills/codebase-analysis/scripts/" -q
 }
 
 run_advisory_checks() {
@@ -57,6 +66,7 @@ run_precommit_checks() {
   python3 "$ROOT_DIR/harness-engineering/validators/validate_slash_command_parity.py"
   python3 "$ROOT_DIR/harness-engineering/validators/validate_harness_consistency.py"
   run_gate_logic_tests
+  run_shipped_script_tests
 }
 
 run_governance_scenarios() {

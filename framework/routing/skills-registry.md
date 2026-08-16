@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.31
-last_updated: 2026-08-09
+version: 1.2.32
+last_updated: 2026-08-12
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -57,7 +57,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/tool-design/SKILL.md` | Programmer |
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
 | `skills/agent-evaluation/SKILL.md` | Observer |
-| `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
+| `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer; Software Architect reads `references/component-coupling-metrics.md` alone when measuring an existing boundary (Martin package-design metrics — Ca/Ce/instability/abstractness/distance, with `scripts/main_sequence.py`; diagnostic, produces no findings) |
 | `skills/general-behavior/SKILL.md` | All agents (universal cross-cutting dispatcher; thin pointer layer to lightweight behavior references and larger shared skills) |
 | `skills/code-navigation/SKILL.md` | All agents (via general-behavior; per-query-class routing across rg and graph backends) |
 | `skills/codebase-graph/SKILL.md` | Coordinator, CodeBase Analyzer, Refactor Agent |

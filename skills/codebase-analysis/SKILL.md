@@ -1,8 +1,8 @@
 ---
 name: codebase-analysis
-version: 1.1.0
-last_updated: 2026-02-25
-description: Use when analyzing an existing codebase for architectural flaws, coupling issues, missing abstractions, code quality problems, or security surface before starting a new pipeline run. Produces a structured findings report using token-efficient phased analysis that scales to large codebases.
+version: 1.2.0
+last_updated: 2026-08-12
+description: Use when analyzing an existing codebase for architectural flaws, coupling issues, missing abstractions, code quality problems, or security surface before starting a new pipeline run. Produces a structured findings report using token-efficient phased analysis that scales to large codebases. Phase 2 measures coupling with a shipped script — afferent/efferent coupling, instability, abstractness, distance from the main sequence, Zone of Pain (Martin's package-design/JDepend metrics).
 ---
 
 # Skill: Codebase Analysis
@@ -51,14 +51,29 @@ Goal: identify structural violations and dependency direction problems.
 
 1. Read entry points in full (main.ts, index.ts, app.py — usually short)
 2. For each top-level module folder: read its index file or first 50 lines of the largest file
-3. Grep import/dependency patterns across key files (`import.*from`, `require(`)
+3. Compute the coupling numbers rather than sampling them (**Python only**):
+   `python3 <AI_DEV_SHOP_ROOT>/skills/codebase-analysis/scripts/main_sequence.py <SOURCE_ROOT> --sort ca`
+   — afferent/efferent coupling, instability, abstractness and distance from the
+   main sequence, per component. Load
+   `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/component-coupling-metrics.md`
+   to read the output; it also gives the two zone names, what each one implies,
+   and the cases where a number means less than it looks like. On other
+   languages, or when the script cannot resolve the tree, fall back to grepping
+   import patterns (`import.*from`, `require(`) and say in the Sampling Notice
+   that hotspots were sampled rather than counted.
 4. Check dependency direction: does `domain/` import from `infrastructure/`? Does `routes/` contain business logic?
 5. Check for circular dependency indicators
 
 **Output of Phase 2:**
 - Layer map: what layers exist vs what the apparent pattern requires
 - Dependency direction violations (with file and line locations)
-- Coupling hotspots (files imported by many others)
+- Coupling hotspots: the components with the highest `Ca`. A hotspot that is
+  also concrete (low `A`) **and stable** (low `I`) is the Zone of Pain — the
+  expensive kind, because every dependent is bound to an implementation. All
+  three coordinates matter: a concrete component that also depends outward
+  heavily is a hub, reported as `far`, not `pain`. Cite the numbers as evidence;
+  severity still comes from the Flaw Categories table below, never from a
+  distance band.
 - Missing layers (no service layer, no repository interfaces, no domain folder)
 
 ## Phase 3 — Code Sampling (Controlled Reads)
