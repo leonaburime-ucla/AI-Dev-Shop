@@ -317,6 +317,18 @@ Before starting the full peer-task timer for any long peer dispatch, run a cheap
 
 While the peer process is still running:
 
+### Process Ownership And Foreground Fallback (Blocking)
+
+Peer-dispatch completion is a process-lifecycle fact, not an inference from a shell return, a wrapper PID, or the current size of redirected output.
+
+- Never dispatch a peer with manual shell detachment such as `nohup ... &`, `( ... ) &`, or a hand-rolled background wrapper. Those wrappers can exit while the actual peer continues, can lose a controlling TTY, and make a later retry overlap a live request.
+- A peer is complete only after the dispatch owner has observed the **actual peer process** exit, reaped it, and captured its stdout and stderr. Do not use the PID of an intermediate shell, `nohup`, `script`, or harness wrapper as the liveness signal.
+- If the current host provides a verified harness-managed background runner that exposes the actual child process lifecycle, use it. Otherwise, run deferred/buffered peers in the foreground, sequentially, and wait for each full result before dispatching the next peer.
+- In that foreground fallback, `agy --print` must remain under its required PTY wrapper (`script -q /dev/null ...`); a fully detached PTY job is known to return only terminal-control bytes instead of a peer answer.
+- For a Claude peer that needs tools, use `claude -p --output-format stream-json --verbose` (plus the narrow read-only tool policy). Parse its live JSON events and wait for its terminal `result` event; do not use one buffered `--output-format json` response as the only progress signal. In Claude CLI v2.1.201, `stream-json` requires `--verbose`.
+- Do not retry, reframe, or dispatch a second request to the same peer until the previous request has been confirmed exited and reaped. An empty or zero-byte capture while the peer is alive is not a failure classification.
+- If a foreground peer exits without usable stdout, record the exit status and stderr, classify the failure under the rules below, and only then consider the workflow's allowed retry.
+
 - Treat process liveness and elapsed wall-clock time as the primary signal, not the current byte count of redirected stdout/stderr files.
 - Keep the workflow timeout (`audit_timeout_seconds`, `cowork_timeout_seconds`, or `swarm_timeout_seconds`) as the hard ceiling.
 - Use host-specific references for any peer-specific soft suspicion thresholds or buffering quirks.
