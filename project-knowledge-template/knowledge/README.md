@@ -10,3 +10,4 @@ Current runtime files:
 - `learnings.md`
 - `project_notes.md`
 - `memory-store.md`
+- `mistakes/` — one file per agent mistake, written by the agent that made it; see its `README.md`

@@ -12,7 +12,7 @@ Full operating procedure for each agent lives in its `skills.md`. Use this file 
 | Software Architect | Selects patterns, defines boundaries, produces ADR | `agents/software-architect/skills.md` |
 | TDD | Writes certified test suite before implementation | `agents/tdd/skills.md` |
 | Programmer | Implements code to satisfy certified tests | `agents/programmer/skills.md` |
-| Web Design (optional) | Defines premium website direction, product UI/UX, visual polish, conversion flow, and implementation-ready design specs | `agents/web-design/skills.md` |
+| Web Design (optional) | Owns premium website direction, product UI/UX, visual polish, and conversion flow — fixes the presentation layer directly by default; produces a design spec when the surface is new, the fix reaches past the presentation layer, or the user asked for grade-only | `agents/web-design/skills.md` |
 | Search Visibility (optional) | Audits public surfaces for search, AI answer, and chatbot discoverability; produces metrics and routes fixes | `agents/search-visibility/skills.md` |
 | QA/E2E | Writes browser-level tests that validate user journeys and frontend ACs | `agents/qa-e2e/skills.md` |
 | TestRunner | Executes test suite, reports pass/fail evidence | `agents/testrunner/skills.md` |
