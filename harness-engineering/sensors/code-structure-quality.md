@@ -418,6 +418,11 @@ no breach. It removes a ceiling; it never adds quality.
   `dependency-structure.md` via the `dependency_graph` slot; **fan-out
   concentration and public-API growth remain uncovered** by any sensor in this
   toolkit. Do not describe this sensor as providing architectural analysis.
+  A **diagnostic** for coupling shape — afferent/efferent coupling, instability,
+  abstractness, distance from the main sequence — exists at
+  `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/component-coupling-metrics.md`.
+  It is part of a skill, not a sensor: it produces no findings, no disposition is
+  derived from it, and it does not make fan-out concentration a covered metric.
 
 ## Related
 

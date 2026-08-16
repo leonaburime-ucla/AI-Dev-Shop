@@ -20,6 +20,7 @@ For host-project runs, the authorized memory store is the sibling project worksp
 | Architectural patterns or tech decisions ratified for this project | `<ADS_MEMORY_ROOT>/knowledge/project_memory.md` | `- YYYY-MM-DD: [PATTERN] <fact>` |
 | Failures, recurring error clusters, postmortems, what broke and why | `<ADS_MEMORY_ROOT>/knowledge/learnings.md` | `- YYYY-MM-DD: [FAILURE] <what/why/resolution>` |
 | Agent output quality lessons — what a specific agent does wrong repeatedly | `<ADS_MEMORY_ROOT>/knowledge/learnings.md` | `- YYYY-MM-DD: [AGENT-LESSON] <agent> — <what and why>` |
+| A mistake an agent made and noticed — one occurrence, self-reported | `<ADS_MEMORY_ROOT>/knowledge/mistakes/` | One file per mistake, per that directory's `README.md` |
 | Spec gaps that caused downstream failures | `<ADS_MEMORY_ROOT>/knowledge/learnings.md` | `- YYYY-MM-DD: [SPEC-GAP] <gap description and resolution>` |
 | Open questions awaiting a human decision | `<ADS_MEMORY_ROOT>/knowledge/project_notes.md` | `- YYYY-MM-DD: [OPEN] <question — owner — target date>` |
 | Deferred decisions: known issue, not urgent, no owner yet | `<ADS_MEMORY_ROOT>/knowledge/project_notes.md` | `- YYYY-MM-DD: [DEFERRED] <what is deferred and why>` |
@@ -64,8 +65,13 @@ Is the content a standing instruction from the user ("always do X", "never do Y"
 │                   ├── YES → project_notes.md
 │                   └── NO  → It warrants structure → use memory-schema.md to select entry type → memory-store.md
 └── NO  → Did something fail, break, or produce a postmortem-style lesson?
-          ├── YES → learnings.md (human-readable summary)
-          │         AND memory-store.md [FAILURE] entry (structured, searchable)
+          ├── YES → Was it a mistake YOU made, that you are recording now?
+          │         ├── YES → mistakes/ — one file, per that directory's README.
+          │         │         Stop here. Do not also write learnings.md or
+          │         │         memory-store.md; a human or Observer promotes it
+          │         │         later if it recurs.
+          │         └── NO  → learnings.md (human-readable summary)
+          │                   AND memory-store.md [FAILURE] entry (structured, searchable)
           └── NO  → Is it a significant pipeline decision (architecture, tech, spec direction)?
                     ├── YES → memory-store.md [DECISION] entry
                     └── NO  → Is it an open question or parked item needing future resolution?
@@ -171,7 +177,29 @@ Under no circumstances should a "remember this" instruction result in a write to
 | `learnings.md` under `<ADS_MEMORY_ROOT>/knowledge/` | Yes — append-only | Human, Observer, Coordinator | All agents; especially Spec Agent and TDD Agent | Failures, postmortems, agent quality lessons |
 | `project_notes.md` under `<ADS_MEMORY_ROOT>/knowledge/` | No — entries are resolved or expired | Human, Coordinator | Spec Agent, Coordinator | Open questions, deferred decisions, parking lot |
 | `memory-store.md` under `<ADS_MEMORY_ROOT>/knowledge/` | Yes — append-only, structured | Observer (primary), Coordinator | Observer, Coordinator | Structured searchable log; future Mem0 migration target |
+| `mistakes/` under `<ADS_MEMORY_ROOT>/knowledge/` | Yes — one immutable file per mistake | The agent that made the mistake, on any host | Human, on demand | Raw self-reported mistakes plus untried guard ideas |
 | `knowledge-routing.md` (this file) | Yes — framework update only | Human | All agents before writing any memory | Routing authority — determines destination for all memory writes |
+
+### `mistakes/` vs `learnings.md`
+
+These are the raw and curated ends of the same thing. The split is by **who writes
+it and when**, not by occurrence count — an agent writing in the moment has no way to
+know whether this is the first time or the fifth, because nothing counts them.
+
+- **The agent that made the mistake** → `mistakes/`, always, unconditionally. One
+  file per occurrence, written when you notice. Do not check whether a similar entry
+  exists and do not decide whether it is "worth" recording; that judgment is what
+  suppresses the second copy that makes a pattern visible. Nothing reads this
+  automatically and nothing gates on it.
+- **A human or the Observer, later** → `learnings.md` as `[AGENT-LESSON]`, written
+  once the same mistake has appeared **twice across separate runs** — the threshold
+  already set by
+  `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`. That
+  file also governs turning the pattern into a validator, checklist, or skills change.
+
+The writer of a raw entry never writes the `[AGENT-LESSON]`. That is the whole
+separation: raw entries are cheap and duplicated on purpose, and only a reader
+looking across them can say what the pattern is.
 
 ---
 

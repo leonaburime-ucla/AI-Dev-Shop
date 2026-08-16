@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.31
-last_updated: 2026-08-09
+version: 1.2.32
+last_updated: 2026-08-12
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -57,7 +57,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/tool-design/SKILL.md` | Programmer |
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
 | `skills/agent-evaluation/SKILL.md` | Observer |
-| `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer |
+| `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer; Software Architect reads `references/component-coupling-metrics.md` alone when measuring an existing boundary (Martin package-design metrics — Ca/Ce/instability/abstractness/distance, with `scripts/main_sequence.py`; diagnostic, produces no findings) |
 | `skills/general-behavior/SKILL.md` | All agents (universal cross-cutting dispatcher; thin pointer layer to lightweight behavior references and larger shared skills) |
 | `skills/code-navigation/SKILL.md` | All agents (via general-behavior; per-query-class routing across rg and graph backends) |
 | `skills/codebase-graph/SKILL.md` | Coordinator, CodeBase Analyzer, Refactor Agent |
@@ -81,8 +81,9 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Inspection Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Inspection Agent (React component API patterns) |
 | `skills/ui-ux-design/SKILL.md` | Web Design Agent (design system creation, visual direction, component/state design, implementation-ready handoff, and premium website polish via `references/premium-ui.md` — the former `premium-ui` skill, folded in as a reference along with its three design-school notes) |
-| `skills/theming/SKILL.md` | Web Design Agent — conditional: activate when building, extending, or auditing a theme; `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
+| `skills/theming/SKILL.md` | Web Design Agent — loaded eagerly with the rest of that agent's Base Skills, not gated on a theme task; `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
 | `skills/interface-design/SKILL.md` | Web Design Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
+| `skills/tovu-theme-authoring/SKILL.md` | Web Design Agent, Programmer (project-specific: authoring and explaining Tovu themes — tiers, `theme.json` schema, slots, embeds, regions, post templates). Load only on Tovu theme work; it is a product-specific domain skill, not general theming — `skills/theming/SKILL.md` remains the general one |
 | `skills/gstack-design/SKILL.md` | Manual/user-invoked via `/gstack-design`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/vercel-web-design-guidelines/SKILL.md` | Web Design Agent, Code Inspection Agent, QA/E2E Agent (UI/UX guideline audits) |
 | `skills/vercel-react-native-skills/SKILL.md` | Programmer, QA/E2E Agent, Code Inspection Agent (React Native/Expo tactical guidance) |

@@ -24,7 +24,7 @@ Not all memory serves the same purpose. Match the layer to the need.
 In our pipeline:
 - **Working memory** = agent's in-context reasoning during a task
 - **Short-term memory** = cycle summary passed between pipeline stages
-- **Long-term memory** = the three `<ADS_MEMORY_ROOT>/knowledge/` files
+- **Long-term memory** = the `<ADS_MEMORY_ROOT>/knowledge/` files — `project_memory.md`, `learnings.md`, `project_notes.md`, `memory-store.md`, and the `mistakes/` directory
 - **Entity memory** = individual spec files, ADRs, agent output artifacts
 - **Temporal knowledge** = learnings.md entries with dated context
 

@@ -1,6 +1,6 @@
 # Software Architect Agent
-- Version: 2.2.0
-- Last Updated: 2026-07-26
+- Version: 2.3.0
+- Last Updated: 2026-08-12
 
 ## Base Skills
 
@@ -22,6 +22,7 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/feature-slice-design/SKILL.md` — load when the architecture includes a frontend application; default frontend architecture methodology for any framework (React, Vue, Svelte, Angular, plain TS)
 - `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load when hexagonal / ports-and-adapters is a viable candidate or the selected architecture, especially for non-React stacks
 - `<AI_DEV_SHOP_ROOT>/skills/package-extensibility/SKILL.md` — load when the design extracts a package, workspace module, or shared library **and the extraction is driven by a named second consumer**. Author the initial deviation set as part of the implementation outline: deviations decided at design time are cheap, deviations discovered after the API ships are forks. Record the package's scope boundaries here too — but note they **never change the ledger's arithmetic**: every inventory row is scored, and a deviation the package will not serve carries a scope note beside its scored row rather than leaving the denominator. Scope is product context for the reader, not an input to the measurement. Do not load for single-consumer internal modules or for "we might reuse this later"
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/component-coupling-metrics.md` — load this reference **alone**, not the whole analysis skill, when proposing a layering, extraction, or boundary change to existing code: Ca/Ce/instability/abstractness and distance from the main sequence, via `skills/codebase-analysis/scripts/main_sequence.py`, to measure the current shape before arguing about the target one. It supplies evidence, not a verdict — distance is trivially moved by adding a one-method interface, so never cite a `D` value as a reason on its own, and never derive a finding or a threshold from it. The phased analysis around it is CodeBase Analyzer's work, not this agent's
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — load when the architecture involves migrating from an existing system, introducing FSD to a brownfield codebase, or replacing infrastructure components incrementally
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — load when the architecture introduces production backend/service/worker/API paths, external I/O, async jobs, telemetry, or alerting requirements; define observability expectations up front, not as post-code logging
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load when the spec has latency/throughput NFRs

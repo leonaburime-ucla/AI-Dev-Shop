@@ -171,7 +171,8 @@ Project-owned knowledge files live here.
 - `project_memory.md`: stable project conventions, constraints, and gotchas
 - `learnings.md`: lessons learned, postmortems, and repeated failure patterns
 - `project_notes.md`: temporary notes, open questions, and parking lot items
-- `memory-store.md`: structured memory entries when a workflow needs tagged retrieval'
+- `memory-store.md`: structured memory entries when a workflow needs tagged retrieval
+- `mistakes/`: one file per mistake an agent made and noticed; see its own README'
 
 reports_readme='# Reports
 
@@ -248,6 +249,7 @@ ensure_dir "$workspace_root/governance"
 ensure_dir "$workspace_root/governance/adrs"
 ensure_dir "$workspace_root/governance/contracts"
 ensure_dir "$workspace_root/knowledge"
+ensure_dir "$workspace_root/knowledge/mistakes"
 ensure_dir "$workspace_root/sessions"
 ensure_dir "$workspace_root/specs"
 ensure_dir "$workspace_root/reports"
@@ -346,6 +348,12 @@ write_file_if_missing "$workspace_root/knowledge/project_memory.md" "$project_me
 write_file_if_missing "$workspace_root/knowledge/learnings.md" "$learnings"
 write_file_if_missing "$workspace_root/knowledge/project_notes.md" "$project_notes"
 write_file_if_missing "$workspace_root/knowledge/memory-store.md" "$memory_store"
+
+# Copied, not inlined: the mistakes format is defined once in the template so the
+# rules cannot drift between the toolkit copy and what a new workspace receives.
+copy_file_if_missing \
+  "$ads_root/project-knowledge-template/knowledge/mistakes/README.md" \
+  "$workspace_root/knowledge/mistakes/README.md"
 
 log ""
 if [ "$dry_run" = true ]; then
