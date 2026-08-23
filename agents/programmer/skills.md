@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.7.1
-- Last Updated: 2026-07-23
+- Version: 1.7.2
+- Last Updated: 2026-08-23
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -39,7 +39,7 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-finishing-a-development-branch/SKILL.md` — activate when implementation is wrapping up and branch closeout options are needed
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-receiving-code-inspection/SKILL.md` — activate when addressing returned review findings
 - `<AI_DEV_SHOP_ROOT>/skills/superpowers-requesting-code-inspection/SKILL.md` — activate when a major change set should be handed into review
-- `<AI_DEV_SHOP_ROOT>/skills/ui-loop/SKILL.md` — activate when the task is UI-heavy (visual components, layouts, styling, interactions); reorders priorities to browser-first iteration with deferred reconciliation; requires browser-live-analysis to be available
+- `<AI_DEV_SHOP_ROOT>/skills/ui-ux-design/references/ui-loop.md` — activate Rendered Iteration mode when the task is UI-heavy (visual components, layouts, styling, interactions); this is the canonical browser-first loop and checklist, and requires browser-live-analysis to verify browser automation
 - `<AI_DEV_SHOP_ROOT>/skills/focused-test/SKILL.md` — activate when the full test suite is too slow for the iteration loop (large codebase, slow integration tests) or when Coordinator explicitly directs targeted testing; when active, overrides the default "run full local suite" step during iteration
 - `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — activate when a UI/runtime issue should be reproduced and verified in a real browser session via host-configured browser automation
 - `<AI_DEV_SHOP_ROOT>/skills/backend-implementation/SKILL.md` — activate as the default entrypoint for backend/service/worker/API implementation; it pulls in narrower backend skills such as hexagonal architecture, API contract guidance, observability, and change management only when those concerns are actually in scope

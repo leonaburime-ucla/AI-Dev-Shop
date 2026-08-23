@@ -1000,10 +1000,10 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 - A retained audit report exists with evidence-based keep/prune/revise decisions for the governance layer
 - Any unused governance ADRs are either deprecated or the enforcement mechanism is strengthened
 
-### Focused Loop Skills ($ui-loop, $test) **[OPEN]**
-**What it is:** Specialized operating modes for the generic commit→push→feedback loop. $ui-loop iterates fast in browser and reconciles after. $test runs focused test suites based on coverage and file changes.
+### Focused UI And Test Loops **[COMPLETE]**
+**What it is:** Specialized operating modes for fast visual iteration and focused test execution. The UI loop is consolidated into `skills/ui-ux-design/references/ui-loop.md` as the canonical design-intent, browser-iteration, and review checklist; `skills/focused-test/SKILL.md` owns targeted test execution.
 **Source:** 2026-06-03 debate consensus (3/3 agreement).
-**What to add:** Design and implement both skills, wire into Programmer agent as conditional skills.
+**Current state:** Web Design loads the UI loop through `ui-ux-design`; Programmer loads the same reference conditionally for UI-heavy work. Both browser-backed paths require verified browser automation. Focused Test remains a conditional Programmer skill.
 
 ### Enforcement Harness (git hooks + CI) **[PARTIAL]**
 **What it is:** Git hooks and CI checks running identical enforcement rules. "If you can't measure it, you can't enforce it."

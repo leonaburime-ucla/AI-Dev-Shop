@@ -14,11 +14,18 @@ For Claude packet audits, prefer this shape:
 6. Prefer a constrained `Read`-only tool surface when that is sufficient.
 7. If available, use the dedicated runner script at `<AI_DEV_SHOP_ROOT>/skills/external-audit/scripts/run_claude_packet_audit.py` instead of ad hoc shell capture.
 8. Pass an exact `--model` to the runner when the workflow promises exact model reporting.
-9. When the audit workflow requests suggested changes, pass the runner's `--suggest-changes <patches|notes|none>` flag so the fallback prompt preserves the same mode.
-10. Before discovery, check whether the exact requested Claude model already succeeded earlier in the current session on this same host/CLI. If yes, reuse it as `session_success` proof and skip the smoke test.
-11. If the requested Claude model is still unproven after that session-success check, or it is rejected, run `skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-require both --output-format json` and use the proven winner only if it matches the requested family/version. Otherwise stop and ask the user.
-12. Treat `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` as the retained environment-scoped cache. A cache hit is valid only when the host/OS/machine/Claude CLI version/transport tuple matches and the cached artifact path still exists.
-13. Absence of that cache file alone is not enough reason to rerun discovery when the exact model already has in-session proof.
+9. Pass `--effort <low|medium|high|xhigh>` when the user requests a specific Claude
+   reasoning effort; do not rely on the local default.
+10. When the audit workflow requests suggested changes, pass the runner's `--suggest-changes <patches|notes|none>` flag so the fallback prompt preserves the same mode.
+11. For a long or xhigh audit, use `--audit-output-format stream-json`. The runner
+    adds `--verbose`, writes the event stream incrementally, emits the mandatory
+    30-second heartbeats, and parses the terminal result event. If a buffered audit
+    already timed out, reuse the same frozen packet and change transport/timeout
+    deliberately rather than repeating the failed invocation.
+12. Before discovery, check whether the exact requested Claude model already succeeded earlier in the current session on this same host/CLI. If yes, reuse it as `session_success` proof and skip the smoke test.
+13. If the requested Claude model is still unproven after that session-success check, or it is rejected, run `skills/swarm-consensus/scripts/cli_smoke_test.py --discover-claude --claude-require both --output-format json` and use the proven winner only if it matches the requested family/version. Otherwise stop and ask the user.
+14. Treat `<ADS_MEMORY_ROOT>/reports/swarm-consensus/smoke-tests/last-known-good.json` as the retained environment-scoped cache. A cache hit is valid only when the host/OS/machine/Claude CLI version/transport tuple matches and the cached artifact path still exists.
+15. Absence of that cache file alone is not enough reason to rerun discovery when the exact model already has in-session proof.
 
 ## Observed Transport Quirks
 

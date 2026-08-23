@@ -13,6 +13,7 @@ import json
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -71,10 +72,21 @@ def parse_args() -> argparse.Namespace:
         help="Exact Claude model override to pass through to every Claude CLI invocation.",
     )
     parser.add_argument(
+        "--effort",
+        choices=("low", "medium", "high", "xhigh"),
+        help="Claude reasoning effort to pass through to every CLI invocation.",
+    )
+    parser.add_argument(
         "--suggest-changes",
         choices=("patches", "notes", "none"),
         default="patches",
         help="Whether the audit prompt should request proposed changes.",
+    )
+    parser.add_argument(
+        "--audit-output-format",
+        choices=("json", "stream-json"),
+        default="json",
+        help="Claude output transport for the substantive audit call.",
     )
     return parser.parse_args()
 
@@ -146,6 +158,104 @@ def parse_json_result(raw: str) -> dict | None:
         return json.loads(raw)
     except json.JSONDecodeError:
         return None
+
+
+def parse_stream_json_result(raw: str) -> dict | None:
+    """Return the terminal result event from Claude's newline-delimited stream."""
+    terminal: dict | None = None
+    for line in raw.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            payload = json.loads(stripped)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict) and payload.get("type") == "result":
+            terminal = payload
+    return terminal
+
+
+def run_stream_command(
+    cmd: list[str],
+    timeout_seconds: int,
+    stdout_path: Path,
+    stderr_path: Path,
+    peer_name: str,
+) -> tuple[subprocess.CompletedProcess[str] | None, float, str | None, list[dict[str, object]]]:
+    """Run a stream-json peer call with durable live offloads and heartbeats."""
+    start = time.monotonic()
+    stdout_chunks: list[str] = []
+    stderr_chunks: list[str] = []
+
+    with stdout_path.open("w", encoding="utf-8") as stdout_file, stderr_path.open(
+        "w", encoding="utf-8"
+    ) as stderr_file:
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+        )
+
+        def pump(source, destination, chunks: list[str]) -> None:
+            for line in iter(source.readline, ""):
+                chunks.append(line)
+                destination.write(line)
+                destination.flush()
+            source.close()
+
+        stdout_thread = threading.Thread(
+            target=pump,
+            args=(process.stdout, stdout_file, stdout_chunks),
+            daemon=True,
+        )
+        stderr_thread = threading.Thread(
+            target=pump,
+            args=(process.stderr, stderr_file, stderr_chunks),
+            daemon=True,
+        )
+        stdout_thread.start()
+        stderr_thread.start()
+
+        next_heartbeat = 30.0
+        failure: str | None = None
+        while process.poll() is None:
+            elapsed = time.monotonic() - start
+            if elapsed >= timeout_seconds:
+                failure = "timeout"
+                process.kill()
+                break
+            if elapsed >= next_heartbeat:
+                print(
+                    f"[peer-heartbeat] {peer_name} | alive | {int(elapsed)}s",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                next_heartbeat += 30.0
+            time.sleep(0.25)
+
+        returncode = process.wait()
+        stdout_thread.join(timeout=5)
+        stderr_thread.join(timeout=5)
+
+    elapsed = time.monotonic() - start
+    stdout_text = "".join(stdout_chunks)
+    stderr_text = "".join(stderr_chunks)
+    completed = subprocess.CompletedProcess(cmd, returncode, stdout_text, stderr_text)
+    attempts = [{
+        "attempt": 1,
+        "stdout_path": str(stdout_path),
+        "stderr_path": str(stderr_path),
+        "elapsed_seconds": round(elapsed, 2),
+        "timeout_seconds": timeout_seconds,
+        "failure": failure,
+        "returncode": returncode,
+        "stdout_length": len(stdout_text),
+        "stderr_length": len(stderr_text),
+    }]
+    return completed, elapsed, failure, attempts
 
 
 def quoted(value: str) -> str:
@@ -330,6 +440,8 @@ def build_claude_base_cmd(args: argparse.Namespace) -> list[str]:
     cmd = ["claude"]
     if args.model:
         cmd += ["--model", args.model]
+    if args.effort:
+        cmd += ["--effort", args.effort]
     return cmd
 
 
@@ -346,7 +458,9 @@ def main() -> int:
         "dispatch": str(dispatch),
         "offload_prefix": str(offload_prefix),
         "requested_model": args.model,
+        "requested_effort": args.effort,
         "suggest_changes": args.suggest_changes,
+        "audit_output_format": args.audit_output_format,
     }
 
     try:
@@ -421,24 +535,41 @@ def main() -> int:
             "model": probe_models[0] if probe_models else None,
             "models": probe_models,
         }
+        print(
+            "[peer-handshake] claude | ACK_PACKET_RECEIVED "
+            f"{dispatch.name} | {probe_payload.get('result', '').strip()}",
+            file=sys.stderr,
+            flush=True,
+        )
 
         audit_cmd = claude_base_cmd + [
             "-p",
             "--allowedTools",
             "Read",
             "--output-format",
-            "json",
-            "--",
-            build_audit_prompt(dispatch, args.suggest_changes),
+            args.audit_output_format,
         ]
-        audit_completed, audit_elapsed, audit_failure, audit_attempts = (
-            run_command_with_transient_retries(
+        if args.audit_output_format == "stream-json":
+            audit_cmd += ["--verbose"]
+        audit_cmd += ["--", build_audit_prompt(dispatch, args.suggest_changes)]
+
+        if args.audit_output_format == "stream-json":
+            audit_completed, audit_elapsed, audit_failure, audit_attempts = run_stream_command(
                 audit_cmd,
                 args.timeout_seconds,
                 audit_stdout,
                 audit_stderr,
+                "Claude Sonnet 5 xhigh",
             )
-        )
+        else:
+            audit_completed, audit_elapsed, audit_failure, audit_attempts = (
+                run_command_with_transient_retries(
+                    audit_cmd,
+                    args.timeout_seconds,
+                    audit_stdout,
+                    audit_stderr,
+                )
+            )
         summary["audit"] = {
             "elapsed_seconds": round(audit_elapsed, 2),
             "failure": audit_failure,
@@ -454,7 +585,10 @@ def main() -> int:
             return 1
 
         raw_stdout = audit_completed.stdout
-        audit_payload = parse_json_result(raw_stdout)
+        if args.audit_output_format == "stream-json":
+            audit_payload = parse_stream_json_result(raw_stdout)
+        else:
+            audit_payload = parse_json_result(raw_stdout)
         if audit_completed.returncode != 0 or not audit_payload:
             summary["status"] = "malformed_or_no_output"
             summary["audit"] |= {

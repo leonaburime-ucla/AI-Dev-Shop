@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.32
-last_updated: 2026-08-12
+version: 1.2.35
+last_updated: 2026-08-23
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -52,7 +52,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/refactor-patterns/SKILL.md` | Refactor Agent |
 | `skills/coordination/SKILL.md` | Coordinator, Observer |
 | `skills/context-engineering/SKILL.md` | Coordinator, Observer |
-| `skills/browser-live-analysis/SKILL.md` | Programmer, QA/E2E Agent |
+| `skills/browser-live-analysis/SKILL.md` | Web Design Agent (conditional when browser automation is verified), Programmer, QA/E2E Agent |
 | `skills/memory-systems/SKILL.md` | Coordinator, Observer |
 | `skills/tool-design/SKILL.md` | Programmer |
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
@@ -80,12 +80,12 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/testable-design-patterns/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Inspection Agent (child layer for testability and coverage-friendly structure; always load alongside `coding-foundations`) |
 | `skills/vercel-react-best-practices/SKILL.md` | Programmer, Code Inspection Agent (React/Next tactical guidance) |
 | `skills/vercel-composition-patterns/SKILL.md` | Programmer, Code Inspection Agent (React component API patterns) |
-| `skills/ui-ux-design/SKILL.md` | Web Design Agent (design system creation, visual direction, component/state design, implementation-ready handoff, and premium website polish via `references/premium-ui.md` — the former `premium-ui` skill, folded in as a reference along with its three design-school notes) |
-| `skills/theming/SKILL.md` | Web Design Agent — loaded eagerly with the rest of that agent's Base Skills, not gated on a theme task; `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
-| `skills/interface-design/SKILL.md` | Web Design Agent, Programmer (app/tool interface-system consistency and design-memory reference) |
+| `skills/ui-ux-design/SKILL.md` | Web Design Agent (full skill: design systems, visual direction, implementation-ready handoff, premium polish, the required canonical UI Loop with design-time mobile composition at `references/ui-loop.md`, and conditional rendered Chrome mobile verification at `references/chrome-mobile-test-matrix.md`); Programmer loads only `references/ui-loop.md` conditionally for UI-heavy browser iteration |
+| `skills/theming/SKILL.md` | Web Design Agent (conditional when creating, extending, auditing, or delivering a theme/design system); `references/inventory.md` lists the pages, components, patterns, and premium details a complete theme contains |
+| `skills/interface-design/SKILL.md` | Web Design Agent (standing core; retained after a documented conditional-loading miss on admin-panel work), Programmer (app/tool interface-system consistency and design-memory reference) |
 | `skills/tovu-theme-authoring/SKILL.md` | Web Design Agent, Programmer (project-specific: authoring and explaining Tovu themes — tiers, `theme.json` schema, slots, embeds, regions, post templates). Load only on Tovu theme work; it is a product-specific domain skill, not general theming — `skills/theming/SKILL.md` remains the general one |
 | `skills/gstack-design/SKILL.md` | Manual/user-invoked via `/gstack-design`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
-| `skills/vercel-web-design-guidelines/SKILL.md` | Web Design Agent, Code Inspection Agent, QA/E2E Agent (UI/UX guideline audits) |
+| `skills/vercel-web-design-guidelines/SKILL.md` | Web Design Agent (conditional only when the user explicitly requests Vercel Web Interface Guidelines or a fresh external-rule audit; supplemental to the UI Loop), Code Inspection Agent, QA/E2E Agent (UI/UX guideline audits) |
 | `skills/vercel-react-native-skills/SKILL.md` | Programmer, QA/E2E Agent, Code Inspection Agent (React Native/Expo tactical guidance) |
 | `skills/expo-react-native/SKILL.md` | Programmer, Software Architect, Code Inspection Agent, QA/E2E Agent, DevOps Agent (progressive-disclosure router for official Expo skills and React Native tactical rules) |
 | `skills/expo/skills/*/SKILL.md` | Loaded only through `skills/expo-react-native/SKILL.md` (vendored official Expo plugin subskills for UI, data fetching, API routes, native modules, EAS, deployment, upgrades, and update insights) |
@@ -97,7 +97,6 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/pattern-priming/SKILL.md` | Programmer |
 | `skills/inline-code-documentation/SKILL.md` | Programmer |
 | `skills/adr-governance/SKILL.md` | Software Architect (promotion), Programmer (conditional governance enforcement), Code Inspection Agent (audit reference), Refactor Agent (conditional), TDD Agent (conditional) |
-| `skills/ui-loop/SKILL.md` | Programmer (conditional for UI-heavy tasks) |
 | `skills/focused-test/SKILL.md` | Programmer (conditional for test-driven iteration) |
 | `skills/constitution-compliance/SKILL.md` | Software Architect |
 | `skills/superpowers-brainstorming/SKILL.md` | VibeCoder Agent |
@@ -108,9 +107,9 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/superpowers-requesting-code-inspection/SKILL.md` | Programmer |
 | `skills/superpowers-dispatching-parallel-agents/SKILL.md` | Coordinator |
 | `skills/superpowers-writing-plans/SKILL.md` | Coordinator |
-| `skills/shadcn-ui/SKILL.md` | Skills Librarian, Web Design Agent, Programmer (frontend component integration reference) |
+| `skills/shadcn-ui/SKILL.md` | Skills Librarian, Web Design Agent (conditional when the stack or handoff uses shadcn/ui), Programmer (frontend component integration reference) |
 | `skills/seo-geo/SKILL.md` | Search Visibility (primary), Skills Librarian (refresh/maintenance). Do not load as standing context for delivery agents; route through the optional Search Visibility module when explicitly triggered. |
-| `skills/web-compliance/SKILL.md` | Web Design Agent, Search Visibility, Code Inspection Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
+| `skills/web-compliance/SKILL.md` | Web Design Agent (conditional for public, ecommerce, form/consent, legal, or compliance-sensitive surfaces), Search Visibility, Code Inspection Agent, Security Agent, QA/E2E Agent (website legal/compliance UX risk checks) |
 | `skills/find-skills/SKILL.md` | Skills Librarian only (external discovery) |
 | `skills/enterprise-spec/SKILL.md` | Spec Agent (enterprise contexts) |
 | `skills/evaluation/eval-rubrics.md` | Observer |
