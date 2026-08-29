@@ -181,6 +181,93 @@ Examples:
 - `We are trading strict consistency for scale and responsiveness.`
 - `We are trading modularity for delivery speed in the first release.`
 
+### Post-Implementation Re-Score
+
+The scorecard above is written **before the code exists**. Every row is a
+prediction. Nothing in the pipeline ever checked whether the prediction held,
+which meant `modularity` was scored once, at the moment the least was known
+about the system, and never again.
+
+**Owner: Observer, on its scheduled cadence.** Not Software Architect — the
+party that authored the prediction does not grade it, the same custody rule the
+sensors use. Observer produces a recommendation for the human; it does not
+rewrite the ADR.
+
+#### Only two axes have shipped-code evidence
+
+This is the constraint that makes the re-score honest. Do **not** re-score all
+eight — most core axes need production telemetry this harness does not collect,
+and a re-scored `reliability` with no incident data would be a fresh guess
+wearing the authority of a measurement.
+
+| Axis | Re-scorable | Evidence |
+|---|---|---|
+| `modularity` | yes | coupling, cohesion and API surface diagnostics (below) |
+| `testability` | yes | changed-code coverage, mutation score, coverage-quality trends |
+| every other axis | **no** | keep the design-time score and its original confidence, unchanged |
+
+A re-scored axis carries confidence `measured`. An axis with no evidence keeps
+whatever it had — do not silently promote `assumed` to `measured` because time
+passed.
+
+#### Evidence for `modularity`
+
+Run all three, over the module boundary the ADR actually named:
+
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/scripts/main_sequence.py` — Ca/Ce,
+  instability, distance. Read against
+  `references/component-coupling-metrics.md`.
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/scripts/cohesion.py` — whether the
+  modules the ADR drew are one thing each.
+- `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/scripts/api_surface.py` — with
+  `--baseline` from the previous re-score, so surface **growth** is visible.
+  Without a prior run there is no growth reading, only a level.
+
+**Retain each diagnostic's raw `--json` output as its own file**, in
+`<ADS_MEMORY_ROOT>/reports/observer/adr-rescore/<ADR-id>-<YYYYMMDD>/`:
+
+```text
+main-sequence.json      coupling
+cohesion.json           cohesion
+api-surface.json        API surface  <- this is the --baseline file
+```
+
+**One file per diagnostic, not a bundle.** `api_surface.py --baseline` reads its
+own output shape and nothing else; a combined document containing all three is
+rejected, so a bundled artifact would silently end the trend at the first
+re-score. Pass the previous run's `api-surface.json`, and record both that path
+and the directory in the memory entry.
+
+Growth is a two-run measurement: a re-score that discards its artifacts makes
+the *next* one impossible. Capture the full run — a `--top`-truncated file is
+refused as a baseline.
+
+Plus, when a `hidden` co-change pair from
+`<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md` crosses a
+boundary the ADR declared: that is the strongest available evidence the
+partition did not hold, because it is behavioral rather than structural.
+
+#### What a re-score may and may not do
+
+- It **may** lower a score, raise it, or leave it. A re-score that never moves a
+  number is not evidence of a good ADR; it is evidence nobody ran it.
+- It **may** fire a `Re-evaluation Trigger` the ADR already declared. That is
+  what those triggers were for, and until now nothing fired them.
+- It **may not** retroactively block, reopen, or invalidate any merged change.
+  Same rule as every scheduled sensor: this is maintenance input about the
+  decision, not a gate on code that already shipped.
+- It **may not** be run on a feature that has not shipped. Before code exists
+  the design-time score is the only honest one.
+- A dropped `modularity` score is a **prompt to reconsider**, not an instruction
+  to refactor. The correct output is often "the ADR was right and the codebase
+  drifted," which routes to Refactor — but it is sometimes "the ADR was wrong,"
+  which routes to a new ADR, and the numbers alone cannot tell those apart.
+
+Record the result as an **`[ADR_RE_SCORE]`** entry in `memory-store.md` per
+`<AI_DEV_SHOP_ROOT>/framework/memory/memory-schema.md`. **Not `[QUALITY]`** —
+that entry type scores an agent's output on `/10` dimensions and carries no ADR
+id, no 1–5 architecture axis, no confidence, and no baseline-artifact field.
+
 ### Relationship To Pattern Evaluation
 
 Keep the existing Pattern Evaluation table for cross-candidate comparison:

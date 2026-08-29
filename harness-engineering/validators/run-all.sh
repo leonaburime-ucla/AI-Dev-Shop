@@ -42,7 +42,10 @@ run_gate_logic_tests() {
 # their rule tests run wherever the gate-logic tests run.
 run_shipped_script_tests() {
   echo "--> Shipped script tests"
-  python3 -m pytest "$ROOT_DIR/skills/codebase-analysis/scripts/" -q
+  python3 -m pytest \
+    "$ROOT_DIR/skills/codebase-analysis/scripts/" \
+    "$ROOT_DIR/harness-engineering/sensors/scripts/" \
+    -q
 }
 
 run_advisory_checks() {

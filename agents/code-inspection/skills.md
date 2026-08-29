@@ -1,6 +1,6 @@
 # Code Inspection Agent
-- Version: 1.3.0
-- Last Updated: 2026-07-26
+- Version: 1.4.0
+- Last Updated: 2026-08-28
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -17,6 +17,7 @@
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md` — execute the `type_safety` slot on every reviewed change; a zero count is `INCONCLUSIVE` unless type-aware rule activation was verified, and compiler-strictness weakening is Required regardless of the count
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md` — execute the `duplication` slot on every reviewed change; gates only when a diff pushes a clone group past three sites (`head > base && head >= 3`) — never on novelty alone — and defines how you adjudicate a duplication-vs-complexity conflict instead of demanding both gates come out clean
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
+- `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` — load for the dependency-injection question in Dimension 4 when the diff touches a unit that reaches for a clock, randomness, config, network, database, filesystem, or a global singleton. Owns the DI guidance; the review question is in `skills/code-inspection/SKILL.md` and must cite this rather than restate it. A DI container is never the standard — explicit parameter injection satisfies it
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity-sensitive paths, query-shape awareness, and other implementation-style guardrails
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — coverage-friendly design rules and anti-pattern bans; required for Dimension 3 (Test Quality) — identifying coverage-killing structural violations in any module containing decision logic, data transformation, or side effects
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — validates severity-graded findings, dispositions, complexity notes, and pass/advisory/block routing for new or materially changed logic-bearing functions. No numeric quality score exists; mechanical findings carry fixed severities that must not be downgraded

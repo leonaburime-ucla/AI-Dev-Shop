@@ -1,8 +1,8 @@
 ---
 name: codebase-analysis
-version: 1.2.0
-last_updated: 2026-08-12
-description: Use when analyzing an existing codebase for architectural flaws, coupling issues, missing abstractions, code quality problems, or security surface before starting a new pipeline run. Produces a structured findings report using token-efficient phased analysis that scales to large codebases. Phase 2 measures coupling with a shipped script — afferent/efferent coupling, instability, abstractness, distance from the main sequence, Zone of Pain (Martin's package-design/JDepend metrics).
+version: 1.3.0
+last_updated: 2026-08-28
+description: Use when analyzing an existing codebase for architectural flaws, coupling issues, missing abstractions, code quality problems, or security surface before starting a new pipeline run. Produces a structured findings report using token-efficient phased analysis that scales to large codebases. Phase 2 measures structure with three shipped scripts — afferent/efferent coupling, instability, abstractness, distance from the main sequence, Zone of Pain (Martin's package-design/JDepend metrics); class and module cohesion (LCOM4 and intra-module linkage); and public API surface per module with growth against a baseline.
 ---
 
 # Skill: Codebase Analysis
@@ -61,8 +61,26 @@ Goal: identify structural violations and dependency direction problems.
    languages, or when the script cannot resolve the tree, fall back to grepping
    import patterns (`import.*from`, `require(`) and say in the Sampling Notice
    that hotspots were sampled rather than counted.
-4. Check dependency direction: does `domain/` import from `infrastructure/`? Does `routes/` contain business logic?
-5. Check for circular dependency indicators
+4. Measure cohesion rather than eyeballing it (**Python only**):
+   `python3 <AI_DEV_SHOP_ROOT>/skills/codebase-analysis/scripts/cohesion.py <SOURCE_ROOT> --top 20`
+   — per-class LCOM4 and per-module file linkage, both counted as independent
+   groups. This answers a question coupling cannot: whether a module should have
+   been one module. Load
+   `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/cohesion-and-api-surface.md`
+   to read the output. **A split is a candidate boundary, not a defect** —
+   facades, protocol classes and namespace directories score high and are often
+   correct as written.
+5. Measure public API surface per module (**Python only**):
+   `python3 <AI_DEV_SHOP_ROOT>/skills/codebase-analysis/scripts/api_surface.py <SOURCE_ROOT> --top 20`
+   — public names per module, what the package front door declares, and how much
+   sits outside it. If a prior run's `--json` output is available, pass it as
+   `--baseline` to get growth; a single run is a level, not a trend, and the
+   script says so.
+6. Check dependency direction: does `domain/` import from `infrastructure/`? Does `routes/` contain business logic?
+7. Check for circular dependency indicators
+
+On non-Python trees, steps 3–5 do not run. Say so in the Sampling Notice rather
+than reporting the absence as a clean result.
 
 **Output of Phase 2:**
 - Layer map: what layers exist vs what the apparent pattern requires
@@ -74,6 +92,15 @@ Goal: identify structural violations and dependency direction problems.
   heavily is a hub, reported as `far`, not `pain`. Cite the numbers as evidence;
   severity still comes from the Flaw Categories table below, never from a
   distance band.
+- Cohesion splits: classes with `LCOM4 >= 2` and modules whose files form more
+  than one group. Report the group membership, not just the count — the groups
+  are the proposed boundary. The combination that carries the most signal is
+  **high `Ca` with high group count**: many dependents on something that is not
+  one thing.
+- API surface: the modules with the largest `public` count, any multi-file
+  module flagged `no front door`, and — when a baseline exists — which modules
+  grew. **High `Ca` with a large surface is the expensive pair**, because every
+  dependent is bound to a wide interface.
 - Missing layers (no service layer, no repository interfaces, no domain folder)
 
 ## Phase 3 — Code Sampling (Controlled Reads)

@@ -1,7 +1,7 @@
 ---
 name: code-inspection
-version: 1.1.1
-last_updated: 2026-04-26
+version: 1.2.0
+last_updated: 2026-08-28
 description: Use when reviewing code for spec alignment, architecture violations, test quality, security surface, and non-behavioral improvement opportunities.
 ---
 
@@ -72,6 +72,10 @@ Evaluate every change across all dimensions. Do not skip any.
 - Is the complexity justified by the problem?
 - Are non-trivial complexity-sensitive paths explained when the cost or tradeoff is not obvious from the code?
 - Are hidden mutation, hidden dependencies, or boolean flag parameters making the code harder to reason about than necessary?
+- **Are the change's dependencies injected or reached for?** Ask it of the specific things that make code untestable: clock, randomness, environment and config, network, database, filesystem, and any global singleton. A unit that constructs its own collaborator cannot be tested without the real one, and the test that follows will mock a module rather than pass a value. Guidance lives in `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` (Dependency Injection) and `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — do not restate it in the report, cite it.
+  - **A DI container is not the standard, and requiring one is a wrong finding.** Explicit constructor or parameter injection satisfies this completely; a default argument bound to the production instance satisfies it while keeping call sites clean. Flagging a script or a leaf helper for not having a composition root is the failure mode here, not the finding.
+  - **The mechanical half of this is already available and usually unused.** "The core must not import its adapters" is expressible today as a `forbidden_import` rule in `architecture-fitness.md`, computed by the `dependency_graph` slot per `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md`. If the project states a core/adapter or domain/infrastructure split and **no rule encodes it**, the boundary is being enforced by review alone — record that as a Recommended workflow finding against the contract, not against the diff under review.
+  - Severity follows consequence, not principle: a hard-wired dependency in a unit with decision logic is a Medium maintainability/testability finding, and Required only when it defeats a spec invariant or a Binding CIC constraint.
 - Will the next agent be able to understand this without reading git history?
 
 ### 5. Security Surface

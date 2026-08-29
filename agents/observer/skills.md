@@ -1,6 +1,6 @@
 # Observer Agent (Optional)
-- Version: 1.2.0
-- Last Updated: 2026-07-26
+- Version: 1.3.0
+- Last Updated: 2026-08-28
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -16,7 +16,8 @@
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/dependency-structure.md` — scheduled full-graph cycle and boundary-violation pass; Observer owns the scheduled mode only (Code Inspection owns the PR gate) and routes findings to Software Architect
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md` — scheduled whole-repo unsafe-operation trend; Observer owns the scheduled mode only (Code Inspection owns the PR gate) and routes to Programmer/Refactor
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md` — scheduled whole-repo clone trend; Observer owns the scheduled mode only and routes to Refactor
-- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md` — scheduled churn/revert/fix-frequency pass and the complexity-joined hotspot tiers; Observer owns this sensor entirely and it never gates a PR
+- `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md` — scheduled churn/revert/fix-frequency pass, the complexity-joined hotspot tiers, and co-change coupling; Observer owns this sensor entirely and it never gates a PR. A `hidden` co-change pair needs an import graph to be called hidden at all — `unknown` and `ungraphed` are not findings
+- `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — the Post-Implementation Re-Score section only. Observer owns that pass because the party that authored a prediction does not grade it. Re-score `modularity` and `testability` only; every other axis keeps its design-time score and confidence
 
 ## Sensor Ingestion
 
@@ -32,6 +33,7 @@ The Observer reads drift sensor artifacts from `<ADS_MEMORY_ROOT>/.local-artifac
    - Type-safety trends (rising unsafe-operation counts, accumulating suppressions) → Programmer or Refactor
    - Duplication trends (growing clone groups outside changed scope) → Refactor
    - Change-history hotspots (`T0` tier, sustained churn rise, revert-frequency spikes) → Refactor for targeting, and to the human for prioritization
+   - Co-change `hidden` pairs crossing a declared architecture boundary → Software Architect, as evidence for the ADR re-score below; pairs not crossing a boundary → Refactor for targeting
 3. If severity is blocker (critical vulnerability, license violation), escalate immediately — do not wait for next scheduled pass
 4. Log all findings in the maintenance report regardless of severity
 5. Update `harness-engineering/maintenance/tech-debt-tracker.md` for escalation/advisory items that are not immediately resolved
@@ -98,8 +100,9 @@ Use `<AI_DEV_SHOP_ROOT>/harness-engineering/maintenance/observer-cadence.md` as 
 7. **LLM-as-judge pass:** After each pipeline run, score the Spec Agent output using the rubric in `<AI_DEV_SHOP_ROOT>/skills/evaluation/eval-rubrics.md`. Weekly, score all agent outputs including Software Architect constitution compliance dimension. Record each score as a `[QUALITY]` entry in memory-store.md. Flag regressions (score drops > 1.0 vs baseline) to the Coordinator immediately.
 8. During toolkit-maintenance passes, run `bash harness-engineering/validators/run-all.sh` and capture the doc-garden output delta in the Observer report rather than treating it as an informal side task.
 9. Refresh `project-knowledge-template/reports/maintenance/harness-maintenance.md` with `python3 harness-engineering/validators/generate_maintenance_report.py` during scheduled maintenance passes or toolkit-maintenance closeout.
-10. When a recurring failure reaches the promotion threshold in `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`, recommend the smallest durable upgrade path: validator, benchmark, checklist, workflow rule, or skills update.
-11. Produce weekly improvement recommendations, referencing specific memory entries and quality scores as evidence. Flag any benchmark regressions alongside skills.md change recommendations. Track constitution compliance score trends separately.
+10. **ADR post-implementation re-score.** For each shipped feature whose ADR is older than the code, re-score `modularity` and `testability` against evidence per the Post-Implementation Re-Score section of `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`. Run the three codebase-analysis diagnostics over the module boundary the ADR named, and fold in any `hidden` co-change pair that crosses it. **Re-score no other axis** — the rest need production telemetry this harness does not collect, and a re-scored `reliability` with no incident data is a guess wearing the authority of a measurement. This never reopens a merged change; it is maintenance input about the decision. **Retain each diagnostic's raw `--json` output as its own file** in `<ADS_MEMORY_ROOT>/reports/observer/adr-rescore/<ADR-id>-<YYYYMMDD>/` (`main-sequence.json`, `cohesion.json`, `api-surface.json`) and pass the previous run's `api-surface.json` as `--baseline`. **Not a bundle** — `api_surface.py` reads only its own output shape and rejects a combined document, so bundling would silently end the trend at the first re-score. Growth is a two-run measurement; discarding the artifacts makes the next re-score impossible. Record as an **`[ADR_RE_SCORE]`** entry per `<AI_DEV_SHOP_ROOT>/framework/memory/memory-schema.md`, **not `[QUALITY]`** (that type scores agent output on `/10` dimensions and has no ADR, axis, confidence, or artifact field). Route a dropped score to the human as a question — "did the codebase drift from the ADR, or was the ADR wrong?" — because the numbers alone cannot tell those apart.
+11. When a recurring failure reaches the promotion threshold in `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/failure-promotion-policy.md`, recommend the smallest durable upgrade path: validator, benchmark, checklist, workflow rule, or skills update.
+12. Produce weekly improvement recommendations, referencing specific memory entries and quality scores as evidence. Flag any benchmark regressions alongside skills.md change recommendations. Track constitution compliance score trends separately.
 
 ## Memory Guidelines
 - Use `<AI_DEV_SHOP_ROOT>/framework/memory/memory-schema.md` for entry format when writing to `<ADS_MEMORY_ROOT>/knowledge/memory-store.md`

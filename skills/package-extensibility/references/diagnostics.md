@@ -337,9 +337,16 @@ new instance will cost a host at least that.
 different modules is the empirical version of "related files should be grouped."
 It is git-derived and therefore belongs to
 `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md`, which owns
-git-derived signals and currently computes churn and hotspot tiers but not
-co-change pairs. If the measure is wanted, extend that sensor. Do not add a second
-git detector inside this skill — a rule with two homes drifts.
+git-derived signals. That sensor now computes it — see its Co-Change Coupling
+section for the definitions and the reference implementation. Read its pairs;
+do not add a second git detector inside this skill, because a rule with two
+homes drifts.
+
+**A `hidden` pair is evidence for D12, not a D12 finding.** The sensor measures
+the whole repository over a time window; D12 scores one package against ledger
+rows. A pair the sensor reports inside this package is a place to look for the
+change-set locality D12 actually measures — it does not substitute for counting
+the files a ledger row touches.
 
 **Do not measure folder taxonomy.** "Are related files in the same directory" is
 not the question and rewards reorganizations that change nothing. A package with

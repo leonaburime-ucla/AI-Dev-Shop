@@ -33,6 +33,8 @@ Items marked **[PARTIAL]** have foundational work already in this repo.
 - Init Hook — Audit Convergence Follow-Through: **OPEN / PARTIAL** (TM-INIT-SU-01 round-1 converged, R1-1 fixed; 3 decisions open — round-2 re-audit / commit / report retention. See `init-hook-audit-HANDOFF.md`)
 - Web Escalation Gate (getting-unstuck): **OPEN / NEEDS-AUDIT** (first-pass: AGENTS.md rule + Claude PostToolUse hook landed; needs `/audit-work` — see detailed item below)
 - Critical Internal Constraints (CIC) Skill Eval: **OPEN** (skill v1.1.0 shipped: debate-designed, 3-round `/audit-work` PASS, Fable amendments landed; needs a behavioral eval before the pipeline relies on it — see detailed item below)
+- Code-Quality Metrics — Round-5 Cowork Hardening: **DONE 2026-08-29** (both PARTIAL items closed via `/cowork`; 311 tests, `run-all.sh ci` green; 6 Codex blockers found and fixed across 2 verification passes — see detailed item below)
+- Evaluate `griffe` as a Replacement for `api_surface.py`: **OPEN / HIGH PRIORITY** (the debt the "search open source first" rule exposed: 4 audit rounds + ~26 defects hand-rolling what `griffe`/`radon`/`code-maat` already do — see detailed item below)
 
 ---
 
@@ -1081,6 +1083,41 @@ The reverse-spec skill is now production-grade (v2.0.0) with a complex DAG of 5 
 - **Report retention:** keep in `.local-artifacts/external-audit/` (default) or move to `reports/external-audit/`.
 **Done when:** the 3 decisions above are resolved and (if chosen) round-2 confirms PASS.
 **Key refs:** handoff `init-hook-audit-HANDOFF.md`; frozen packet `ADS-memory/.local-artifacts/external-audit/packets/20260627T161208Z-audit-packet.md` (hash `sha256:323997c16e404de9`); working Codex dispatch `codex exec --json -c features.multi_agent=false -c 'hooks.SessionStart=[]'` (memory `codex-exec-empty-output`).
+
+---
+
+## Evaluate `griffe` as a Replacement for `api_surface.py` **[OPEN / HIGH PRIORITY]**
+**What it is:** Replace (or back) the hand-rolled `skills/codebase-analysis/scripts/api_surface.py` with **`griffe`**, the API-surface engine behind mkdocstrings — it does static public-API extraction plus `griffe check` for breaking-change diffing, and already handles the exact `__all__` edge-case class (mutation, wildcard imports, aliases, re-export provenance) that consumed four audit rounds here.
+**Source:** 2026-08-29 — user, after the round-5 `/cowork`: *"we need a rule that if we are writing scripts or whatever we look for open source. we wasted so much time and credits today."* The rule itself is now in `AGENTS.md` under Shared Rules; this item is the specific debt it exposed.
+**Why it matters:** `api_surface.py` cost 4 external audit rounds and ~26 defects. Essentially every remaining defect is a *pathological* `__all__` form (`__all__[:] = 'NEW'`, `__all__[0]: str = ...`, `*__all__[:], AUX = ...`) that real code never writes. That is a strong signal the hand-rolled path has bad cost/benefit against a library that already fought these battles.
+**Two real caveats to settle first (do not assume either away):**
+- This repo is deliberately **zero-dependency, stdlib-only** (`ast` is exact and free — same reasoning as the Python-over-JS rule). Adding `griffe` is a genuine policy change, not a detail.
+- `griffe` answers *"what is the API and did it break"*, not *"how much did the surface grow"* — and surface **growth** is what the ADR re-score consumes. Adapting its output is required; it is not a drop-in.
+**What to do:** install `griffe` in a scratch env, run it over the same fixtures in `test_api_surface.py` (especially `ORACLE_CASES` + `ORACLE_SUPERSET_CASES`), and compare against `api_surface.py`'s answers. Decide: replace, wrap, or keep-and-document-why-not. Apply the same evaluation to `cohesion.py` (vs `radon` / `wily` / the `cohesion` PyPI package) and `co_change.py` (vs `code-maat`).
+**Done when:** a decision is recorded with evidence for each of the three scripts, and either the replacement has landed or the reason for keeping the hand-rolled version is written down where the next session will find it.
+
+---
+
+## Code-Quality Metrics — Round-5 Cowork Hardening **[DONE 2026-08-29]**
+**What it is:** Finish hardening the code-quality metrics diagnostics (`api_surface.py`, `cohesion.py`, `co_change.py`) built and audited on 2026-08-28. **Note:** this item involves code, unlike most todo.md entries.
+**Source:** 2026-08-28 — 4 rounds of external audit (Codex `gpt-5.6-sol`, `xhigh`) against the code-quality-metrics build.
+- **Round 1:** 14 defects found, all fixed.
+- **Round 2:** 8 CLOSED, 6 PARTIAL, plus 4 NEW defects introduced by round 1's own fixes.
+- **Round 3:** 3 REGRESSED (defects round 2's fixes reintroduced), 3 NEW defects, 1 PARTIAL carried since round 1 (`cohesion.py` item 11 — receiver-shadowing gap). All fixed via two parallel Opus 5 subagents; independently verified by reading the actual diff and re-running the test suite, not by trusting the subagents' self-reports.
+- **Round 4: 0 REGRESSED, 0 new defects.** The regression-introducing pattern from rounds 2→3 has stopped. 3 CLOSED, 2 PARTIAL remain, both narrow and both in `api_surface.py`.
+**Why `/cowork` next, not another solo patch:** the user's standing frustration is real and documented in-session — every round so far was one model patching the literal reported case, then a different model auditing afterward in a separate pass, so adjacent edge cases kept slipping through until the next expensive round-trip. `/cowork` (`framework/slash-commands/cowork.md`) is built for exactly this: independent blind design from both models *before* either writes code, a single converged plan, then a mandatory built-in `/audit-work` pass plus scored correction rounds in the same run. Round 4's auditor explicitly said a broad round 5 is not justified — only a narrowly scoped fix on the 2 remaining items ("This has largely converged outside `AllState` and baseline validation. A narrowly scoped round 5 is justified after those two partials are fixed; another broad audit is unlikely to add value.").
+**What's still needed — the 2 remaining PARTIAL items, both in `skills/codebase-analysis/scripts/api_surface.py`:**
+- **Item 4** — the documented "computed `__all__` is a conservative superset" guarantee (in `skills/codebase-analysis/references/cohesion-and-api-surface.md`) still doesn't hold for literal mutations *during* an already-dynamic epoch. `AllState.extend()` silently no-ops once `dynamic=True`, so `__all__ += [...]` / `.extend()` / `.append()` issued after entering the dynamic state are dropped from the `frozen` fallback, and a literal subscript *replacement* (`__all__[0] = 'NEW'`) doesn't update `frozen` either — e.g. `__all__=['_OLD']; __all__[0]='_NEW'` reports `{_OLD}` versus runtime `{_NEW}`. Full repros in `round4-findings.md` Item 4. This is a real design choice (track in-epoch literal mutations into `frozen`, vs. narrow the documented guarantee to match what the code actually does), which is exactly why it's scoped to `/cowork` instead of another solo patch.
+- **Item 6** — `load_baseline()` still accepts two malformed shapes: duplicate module names in `"modules"` silently resolve last-wins instead of being rejected (can flip a delta's sign — see repro in `round4-findings.md` Item 6), and a present-but-non-dict `"run"` block bypasses the truncation-metadata check entirely. Also: round 3's `schema_version` enforcement means pre-round-3 baselines now silently fail with no explanation, and that break isn't disclosed in `--help` or the reference doc yet.
+**Next session — do this:**
+1. Run `/cowork` scoped to `skills/codebase-analysis/scripts/api_surface.py`, `skills/codebase-analysis/scripts/test_api_surface.py`, `skills/codebase-analysis/references/cohesion-and-api-surface.md`, with Claude resolved to Opus 5 and the Codex peer resolved to `gpt-5.6-sol` at `xhigh` reasoning. Confirm both model resolutions against the Model Memory Map in `skills/llm-operations/references/peer-llm-dispatch.md` at run time — do not assume an alias resolves the same way it did on 2026-08-28 (see memory `codex-model` on why that check matters).
+2. A full task description covering both items (with exact repros, suggested fixes, and test guidance) was already drafted and mid-dispatch when this was interrupted 2026-08-28 to defer to `/cowork` properly instead of continuing ad hoc. Reconstruct it from `round4-findings.md` Item 4 and Item 6 if the draft itself wasn't preserved elsewhere in session history.
+3. Do NOT re-run a full round-5 external audit first — round 4's auditor already said the remaining scope is narrow and a broad re-audit isn't justified. `/cowork`'s own built-in `/audit-work` step covers verification of whatever it implements.
+**Key refs (all four audit rounds, prompts + verbatim findings, archived specifically so the next session can see every mistake made and what was already tried, per user instruction 2026-08-28):**
+- `ADS-memory/reports/external-audit/20260828-code-quality-metrics/round{1,2,3,4}-prompt.md` — the audit prompts (round 3's structure is the template later rounds reused; each round's prompt explains why the prior round's fix was found insufficient)
+- `ADS-memory/reports/external-audit/20260828-code-quality-metrics/round{1,2,3,4}-findings.md` — verbatim auditor findings for each round
+- `ADS-memory/handoffs/20260828-code-quality-metrics-audit-handoff.md` — the handoff written after round 2 (before rounds 3-4 happened); still useful for original build context (what was built, where, why) but its "next session" instructions are superseded by this entry
+**Done when:** items 4 and 6 are fixed via `/cowork`, `python3 -m pytest harness-engineering/sensors/scripts/ skills/codebase-analysis/scripts/ -q` and `bash harness-engineering/validators/run-all.sh ci` still pass, and `/cowork`'s built-in audit step reports no unresolved blockers.
 
 ---
 

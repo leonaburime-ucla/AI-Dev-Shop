@@ -251,8 +251,8 @@ all three measures and their recipes**; they are named here, not restated:
 2. **Internal shotgun ratio** — the cost of adding one instance of the package's
    own primary abstraction.
 3. **Co-change coupling** — git-derived, and therefore owned by
-   `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md`. If wanted,
-   extend that sensor. Do not add a second git detector here.
+   `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/change-history.md`, which
+   computes it. Read its pairs as evidence; do not add a second git detector here.
 
 ## Findings And Routing
 

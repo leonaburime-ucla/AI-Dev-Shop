@@ -155,6 +155,57 @@ Agent output quality score from an LLM-as-judge pass. Used by the Observer to tr
 
 ---
 
+### ADR_RE_SCORE
+Post-implementation re-score of an ADR's Quality Attribute Scorecard against
+shipped-code evidence. Written by the Observer on its scheduled cadence per the
+Post-Implementation Re-Score section of
+`<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.
+
+**This is deliberately not a `[QUALITY]` entry.** `[QUALITY]` scores an *agent's
+output* on named `/10` dimensions and has no field for an ADR id, a 1–5
+architecture axis, a confidence value, or the diagnostic artifact the next run
+must diff against. Recording an ADR re-score there produced a schema-invalid
+entry and discarded the evidence.
+
+```markdown
+---
+## [ADR_RE_SCORE] <ADR-id> <axis> at <cadence date>
+
+- entry_id: ADRSCORE-<YYYYMMDD>-<NNN>
+- date: <ISO-8601 UTC>
+- supersedes: <entry_id> | N/A
+- expires_at: never
+- adr: <ADR-id>
+- feature: <NNN-feature-name>
+- axis: modularity | testability
+- design_time_score: <1-5>
+- design_time_confidence: measured | prior_art | analogical | assumed
+- re_scored: <1-5>
+- confidence: measured
+- scope: <the module boundary the ADR named, as a path glob>
+- evidence:
+  - <diagnostic>: <the values that moved the score>
+- artifact_dir: <ADS_MEMORY_ROOT>/reports/observer/adr-rescore/<ADR-id>-<YYYYMMDD>/
+- baseline_artifact: <artifact_dir>/api-surface.json
+- prior_artifact: <previous artifact_dir>/api-surface.json | N/A
+- reading: codebase-drifted | adr-was-wrong | unchanged
+- tags: #adr-rescore #<axis> #architecture
+```
+
+**`baseline_artifact` is required, and the file must actually be written.**
+Each diagnostic gets its **own** file in `artifact_dir` — `main-sequence.json`,
+`cohesion.json`, `api-surface.json` — because `api_surface.py --baseline` reads
+only its own output shape and rejects a combined document. Growth is a two-run
+measurement: without a retained artifact the next cadence has nothing to pass as
+`--baseline` and the axis cannot be re-scored at all.
+
+**`reading` is the judgment, and it is not derivable from the numbers.** A
+dropped score can mean the codebase drifted from a sound ADR or that the ADR was
+wrong; those route differently (Refactor vs. a new ADR). Leave it for the human
+when the evidence does not decide it.
+
+---
+
 ## Tagging Conventions
 
 Use lowercase, hyphenated tags with `#` prefix. Suggested tags:

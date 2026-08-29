@@ -418,11 +418,17 @@ no breach. It removes a ceiling; it never adds quality.
   `dependency-structure.md` via the `dependency_graph` slot; **fan-out
   concentration and public-API growth remain uncovered** by any sensor in this
   toolkit. Do not describe this sensor as providing architectural analysis.
-  A **diagnostic** for coupling shape — afferent/efferent coupling, instability,
-  abstractness, distance from the main sequence — exists at
-  `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/component-coupling-metrics.md`.
-  It is part of a skill, not a sensor: it produces no findings, no disposition is
-  derived from it, and it does not make fan-out concentration a covered metric.
+  **Diagnostics** for all three module-graph properties exist as skill scripts —
+  coupling shape (afferent/efferent coupling, instability, abstractness,
+  distance from the main sequence) in
+  `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/component-coupling-metrics.md`,
+  and cohesion plus public API surface with baseline growth in
+  `<AI_DEV_SHOP_ROOT>/skills/codebase-analysis/references/cohesion-and-api-surface.md`.
+  They are part of a skill, not sensors: they produce no findings, no disposition
+  is derived from them, they run only when someone invokes the analysis skill,
+  and **they do not make any of these covered metrics.** A diagnostic that
+  measures a thing and a sensor that acts on it are different claims; treating
+  the first as the second is the specific error this paragraph exists to prevent.
 
 ## Related
 
