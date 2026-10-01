@@ -48,9 +48,11 @@ Ask this of every test you write or review:
 > **If the behaviour this test is named for broke in a realistic way, would
 > this test fail?**
 
-To answer it, name one concrete one-line edit to the source that breaks the
-behaviour, then check whether the test still passes. If you cannot name one,
-you have not checked the test yet.
+To answer it, name the concrete change that breaks the behaviour and check
+the test against it. Once the code exists, that is a one-line source edit:
+apply it and confirm the test goes red. Before the code exists, name a
+concrete hypothetical faulty implementation instead (Author Checklist item 1).
+If you cannot name one, you have not checked the test yet.
 
 ## What I'm About to Test → Entries
 
@@ -2532,7 +2534,9 @@ export async function checkForUpdate(updater: Updater): Promise<void> {
 
 **Bad test**
 ```ts
-import { it, expect, vi } from 'vitest';
+import { it, expect, vi, afterEach } from 'vitest';
+
+afterEach(() => { vi.restoreAllMocks(); });
 
 it('retries a failed update check', async () => {
   const updater = { fetch: vi.fn().mockRejectedValueOnce(new Error('offline')) };
