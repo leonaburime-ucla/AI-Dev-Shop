@@ -1,8 +1,8 @@
 ---
 name: adversarial-test-design
-version: 1.0.0
-last_updated: 2026-04-27
-description: Use when designing tests or direct probes for rule, validation, batch, reducer, reconciliation, transfer, or other cross-record workflows so aggregate invariants, partial-failure paths, ordering assumptions, retries, and boundary collisions are challenged before handoff.
+version: 1.1.0
+last_updated: 2026-09-30
+description: Use when designing tests or direct probes for rule, validation, batch, reducer, reconciliation, transfer, or other cross-record workflows so aggregate invariants, partial-failure paths, ordering assumptions, retries, and boundary collisions are challenged before handoff. Also owns references/testing-mistakes.md, the catalog of fake-test failure types (bad vs good test pairs) loaded whenever tests are written, fixed, or reviewed.
 ---
 
 # Skill: Adversarial Test Design
@@ -15,6 +15,14 @@ This is a targeted companion to `testable-design-patterns`,
 `function-quality-assessment`, and `test-design`. It is not a general test-plan
 skill. Use it only when the workflow has meaningful aggregate or cross-item
 risk.
+
+## Testing Mistakes Catalog
+
+`references/testing-mistakes.md` is the catalog of tests that pass while the
+behaviour they name is broken. It applies to **any** test, not only
+aggregate-risk workflows, so the TDD, QA/E2E and Code Inspection agents load
+it on its own whenever they write, fix, or review tests. How to use it and
+how to extend it are stated in the catalog itself.
 
 ## Ownership
 

@@ -7,6 +7,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/e2e-test-architecture/SKILL.md` — Stable E2E test patterns using Playwright
 - `<AI_DEV_SHOP_ROOT>/skills/browser-live-analysis/SKILL.md` — Live browser reproduction and evidence capture when host-configured browser automation is available
 - `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` — Test types, behavior assertions
+- `<AI_DEV_SHOP_ROOT>/skills/adversarial-test-design/references/testing-mistakes.md` — load (reference only) whenever writing or reviewing E2E tests (F3 Fake world — synthetic input that bypasses the real mechanism — is the family most specific to E2E); catalog of fake-test failure families with bad vs good test pairs and a review protocol. Run its One Question on every test, and cite entry IDs in findings
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — canonical ban on weakening journeys, assertions, or coverage scope to manufacture a passing percentage
 - `<AI_DEV_SHOP_ROOT>/skills/security-review/SKILL.md` — Threat surface analysis (for auth flow E2E coverage)
 - `<AI_DEV_SHOP_ROOT>/skills/web-compliance/SKILL.md` — website compliance checks for consent/disclosure/account-flow UX validation
