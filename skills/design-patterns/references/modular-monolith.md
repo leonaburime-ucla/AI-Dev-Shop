@@ -33,6 +33,8 @@ A single deployable application with strongly enforced internal module boundarie
 
 The critical implementation challenge is enforcing module boundaries. TypeScript paths + barrel exports + an import linting rule (`eslint-plugin-boundaries` or similar) is the minimum viable enforcement stack.
 
+A module's public API lives in its `index.ts` and uses explicit named exports only; wildcard re-exports (`export *`) are not allowed.
+
 ```typescript
 // Module public API — the ONLY thing other modules may import
 // modules/billing/index.ts

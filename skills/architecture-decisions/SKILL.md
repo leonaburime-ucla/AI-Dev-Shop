@@ -11,10 +11,7 @@ Architecture is the set of constraints that governs how the system is built. The
 
 Technology moves fast. The patterns, libraries, and frameworks considered best practice today will be replaced. An architecture that locks you into today's tech stack is a liability. An architecture that makes it easy to swap a dependency, extract a service, or adopt a new approach is an asset.
 
-**Adaptability First**: When two candidate patterns are in the same fit band,
-choose the more adaptable one unless a hard requirement clearly rules it out.
-The cost of flexibility is paid once at design time. The cost of inflexibility
-is paid on every future change.
+For the governing adaptability rule, see principle 1 in **Principles That Always Apply** below.
 
 There is no "best" architecture. There are only tradeoffs — and adaptability is the most important one.
 
@@ -504,7 +501,7 @@ If the ADR omits this decision, route back to Architect before TDD.
 
 ## Principles That Always Apply
 
-1. **Adaptability First.** Choose the architecture that makes future change cheapest, not the one that best fits today's requirements. Technology moves fast — patterns, libraries, and frameworks considered best practice today will be replaced. An architecture that locks you into today's choices is a liability. When two candidates are in the same fit band, prefer the more adaptable one unless a hard requirement clearly rules it out.
+1. **Modular and reversible first.** Keep every part fixable, replaceable, and updatable as requirements change. This outranks elegance and performance; hard requirements remain binding. Treat reversal cost as a first-class criterion. Put one narrow seam at each coupling that already exists: "if this changes, how many places do I edit?" The answer must be one. Prefer additive changes beside published surfaces, then retire the old path; prefer movable configuration data over hardcoded policy where it keeps change local. Reuse proven migration mechanisms and settle shared surface shapes before concurrent work begins. Do not invent speculative extension points: replaceable does not require pluggable.
 2. **Dependencies point inward.** Core business logic must not depend on databases, frameworks, or external services.
 3. **Depend on interfaces, not implementations.** Every external dependency should be behind an interface so it can be swapped, mocked in tests, or replaced without touching core code.
 4. **Start simple, extract when needed.** Modular monolith before microservices. CRUD before CQRS. Add complexity only when the problem actually demands it.

@@ -111,6 +111,15 @@ create_invoice               ✗ (collides if another server has create_invoice)
 
 Format: `{server_name}_{action}_{resource}` in snake_case.
 
+## Host-Side Approval for External Tools
+
+Apply one host-owned approval policy to third-party MCP, integration, and plugin tools the host does not control; never require a plugin or connection to opt its tools into confirmation.
+
+- Server-marked read-only tools run without an approval card. Every other external call (write, destructive, or unannotated) requires a per-call card showing the exact arguments before execution, unless covered by a valid remembered approval.
+- Card buttons: **Allow / Allow for this chat / Always allow / Cancel**. Destructive tools never offer **Always allow**.
+- Store **Always allow** per host + connection + tool in host settings, never in plugin content; make it revocable.
+- Remote hints may only add friction, never relax the host's approval decision. Keep the per-tool enable/disable list independent of approvals.
+
 ## Tool Testing Pattern
 
 Before deploying a tool in a multi-agent system, test it with an agent:

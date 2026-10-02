@@ -54,7 +54,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/context-engineering/SKILL.md` | Coordinator, Observer |
 | `skills/browser-live-analysis/SKILL.md` | Web Design Agent (conditional when browser automation is verified), Programmer, QA/E2E Agent |
 | `skills/memory-systems/SKILL.md` | Coordinator, Observer |
-| `skills/tool-design/SKILL.md` | Programmer |
+| `skills/tool-design/SKILL.md` | Programmer, Software Architect and Security (Host-Side Approval for External Tools) |
 | `skills/syntax-aware-editing/SKILL.md` | Inactive by default; not wired to a default agent and available for future activation when parser-backed tooling is adopted |
 | `skills/agent-evaluation/SKILL.md` | Observer |
 | `skills/codebase-analysis/SKILL.md` | CodeBase Analyzer; Software Architect reads `references/component-coupling-metrics.md` alone when measuring an existing boundary (Martin package-design metrics — Ca/Ce/instability/abstractness/distance, with `scripts/main_sequence.py`; diagnostic, produces no findings) |

@@ -11,7 +11,7 @@ When starting a TypeScript project with this toolkit, copy the entries below int
 
 - YYYY-MM-DD: [CONVENTION] TypeScript function signatures use a two-object paradigm. First argument: required key-value pairs `{ param1, param2 }: { param1: Type1; param2: Type2 }`. Second argument: optional key-value pairs with defaults `{ opt1 = default, opt2 }: { opt1?: Type3; opt2?: Type4 } = {}`. Rationale: adding or renaming optional parameters never requires touching callsites.
 
-- YYYY-MM-DD: [CONVENTION] Page orchestrator prop defaults to the concrete orchestrator used internally. When a page component accepts an orchestrator as a prop (for testability or dependency injection), the prop must be typed as the interface or abstract type, and the default value must be the concrete orchestrator instance used in production. Pattern: `{ orchestrator = concreteOrchestratorInstance }: { orchestrator?: OrchestratorInterface } = {}`. This enables tests to inject a mock while production pages require no explicit prop.
+- YYYY-MM-DD: [CONVENTION] Page orchestrator props use the interface or abstract type. The production default is supplied by the composition root through a wrapper or provider, while tests inject a mock explicitly; follow `skills/hexagonal-architecture/SKILL.md` (Required Design Rules) for root ownership.
 
 - YYYY-MM-DD: [CONVENTION] No `any` types. All types must be specific. If a value's type is genuinely unknown, use `unknown` and narrow it explicitly before use. `any` is a code review deficiency.
 ```

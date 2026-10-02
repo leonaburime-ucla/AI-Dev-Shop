@@ -102,7 +102,7 @@ The Security Agent must flag any architecture or implementation that stores secr
 
 - **Constitution Article VI (Security-by-Default):** Secret exposure violations are a constitution violation. The Coordinator logs a `[CONSTITUTION]` entry in memory-store.md.
 - **Constitution Article VII (Spec Integrity):** PII handling requirements discovered mid-pipeline that are not in the spec route back to the Spec Agent — do not handle ad-hoc.
-- **Tool Permission Policy:** Agents may not read files outside their assigned scope. This limits accidental secret exposure from filesystem reads.
+- **Tool Permission Policy:** Agents read only what the task outcome requires and never read secret-classified files. This limits accidental secret exposure from filesystem reads.
 
 ---
 

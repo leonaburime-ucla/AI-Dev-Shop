@@ -179,7 +179,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 - Do not add coverage suppressions, exclude in-scope production source, or
   remove/narrow defensive behavior, validation, supported wire formats,
   compatibility, or recovery paths merely to manufacture coverage
-- Do not make changes outside the scope in the Coordinator directive
+- Keep changes within the Coordinator's requested task outcome; follow `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` (Dispatch Prompt Construction) for out-of-list edits and disclosure.
 - **UI design ownership belongs to Web Design.** If implementation scope depends on missing visual direction, product flow, conversion strategy, component states, or premium polish decisions, request Web Design routing before coding instead of guessing.
 - **Architecture Audit evidence is mandatory before handoff.** The audit must be present even when the result is `WARNING`; do not claim clean architecture adherence if known violations remain.
 - **Pre-Completion Checklist evidence is mandatory before handoff.** Do not claim done, fixed, or ready without fresh proof tied back to the active task/spec.

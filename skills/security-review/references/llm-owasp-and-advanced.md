@@ -40,7 +40,7 @@ element.innerHTML = DOMPurify.sanitize(llmOutput);
 The model can take irreversible or high-impact actions autonomously. Common in agent architectures with write access, deletion authority, or external API calls.
 
 **Mitigations:**
-- Require human confirmation for destructive or irreversible actions
+- Require human confirmation for destructive or irreversible actions; for third-party tools the host does not control, follow `<AI_DEV_SHOP_ROOT>/skills/tool-design/SKILL.md` (Host-Side Approval for External Tools)
 - Scope tool permissions to minimum required — read before write, write before delete
 - Log all agent actions with full context for audit
 - Implement rate limits and spending caps on LLM-driven automation

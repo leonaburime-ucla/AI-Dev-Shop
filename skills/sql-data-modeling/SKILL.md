@@ -110,6 +110,7 @@ Before modeling, confirm:
 - Prefer explicit CHECK constraints for bounded domains and invariants.
 - Prefer indexing FK columns and high-value query predicates, but only when real access patterns justify it.
 - Prefer additive-first migrations over one-shot destructive changes.
+- Ledger and audit tables are append-only: correct mistakes with new reversing rows and block UPDATE/DELETE through database privileges or a trigger.
 
 ## Common Failure Modes
 

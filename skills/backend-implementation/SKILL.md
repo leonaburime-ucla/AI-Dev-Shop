@@ -110,6 +110,7 @@ This skill is the front door. Load the following skills only when their narrower
 
 - Put retries, timeouts, and circuit breakers at infrastructure edges.
 - Retry only idempotent operations or operations protected by idempotency keys.
+- Protect every non-idempotent external write with an idempotency key and route it through one shared durable outbox; see `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/reliability-patterns.md` for the implementation pattern.
 - Use backpressure and queueing instead of unlimited fan-out.
 - Prefer graceful degradation over cascading failure when dependencies are unhealthy.
 

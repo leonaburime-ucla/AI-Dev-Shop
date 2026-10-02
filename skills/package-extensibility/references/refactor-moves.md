@@ -151,12 +151,15 @@ registry, an import-time env read, an unkeyed shared cache.
 export const client = new Client(process.env.API_URL!)
 // after
 export function createClient(config: Config) { return new Client(config) }
-export const defaultClient = /* lazily */ createClient(configFromEnv())
+export const defaultClient = /* temporary lazy compatibility export */ createClient(configFromEnv())
 ```
 
-**Keep the singleton as a lazy default export** so existing consumers do not
-change — that is what makes this behavior-preserving. Lazy matters: an eager
-default re-introduces the import-time env read the move exists to remove.
+**Keep a lazy default export only as a temporary compatibility step** so existing
+consumers do not change during migration. Lazy matters: an eager default
+re-introduces the import-time env read the move exists to remove. Add a removal
+note naming the remaining consumers and the migration to composition-root
+injection; remove the export when they have migrated. The final dependency rule
+is Core Rule 1 in `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md`.
 
 **Cost:** a factory plus threading the instance to its use sites, which frequently
 surfaces a D7 reachability problem underneath. **Risk:** medium, and it is the

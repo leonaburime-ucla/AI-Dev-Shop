@@ -11,7 +11,7 @@ Each agent role has an explicit allowed tool scope. Agents operating outside thi
 | Red-Team Agent | Read | Read spec and constitution.md only. No writes. |
 | Software Architect Agent | Read, Write (`specs/` only) | Write ADR and research.md only. |
 | TDD Agent | Read, Write (test files only) | Write test files. No implementation files. |
-| Programmer Agent | Read, Write (`src/` or equivalent, scoped) | Scoped to files assigned by Coordinator. No test rewrites. |
+| Programmer Agent | Read, Write (implementation files) | Task outcome defines scope; out-of-list edits and disclosure follow `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` (Dispatch Prompt Construction). No test rewrites. |
 | TestRunner Agent | Read, Bash (test runner only) | Run tests. No file writes. |
 | Code Inspection Agent | Read | Read-only. |
 | Security Agent | Read, Grep | Read-only. Pattern search only. |

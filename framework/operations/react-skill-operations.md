@@ -52,6 +52,12 @@ Apply this priority order:
 
 If two items conflict at the same level, use `harness-engineering/skills-inbox/skill-conflict-resolution.md`.
 
+### React Component Rules
+
+React `.tsx` components hold markup and composition only. No functions or derived-value computations are defined in a component body: handlers, callbacks, and derived values live in the component's `*.hooks.ts` (React state, effects, and memoization) or a pure `rules.ts` (computation called by the hook). Components wire handlers returned by the hook into JSX; inline JSX arrows such as `onClick={() => select(id)}` count as callbacks and must come from the hook. Inline conditional rendering stays in JSX. When touching a violating file, extract what you touch and list the remaining violations.
+
+Apply these rules through the precedence order above: explicit user constraints govern placement ahead of vendored Vercel tactics. Preserve those tactics' intent inside the hook — derive values during render and run interaction effects in event handlers — without editing vendored rules.
+
 ## 3) Source Pin and Update Process
 
 Imported source of truth:

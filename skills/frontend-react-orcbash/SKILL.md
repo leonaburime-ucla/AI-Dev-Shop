@@ -30,7 +30,7 @@ Dependency flow rules:
 
 1. Business Logic, API, and State Manager import from shared `types/` only.
 2. Hooks receive external dependencies through an explicit typed `deps` contract from the orchestrator.
-3. Orchestrators wire dependencies explicitly. No hidden globals, no direct store imports from hooks, no implicit singletons looked up inside hooks.
+3. Orchestrators compose the dependencies they receive and construct no infrastructure; root ownership follows `<AI_DEV_SHOP_ROOT>/skills/hexagonal-architecture/SKILL.md` (Required Design Rules). No hidden globals, no direct store imports from hooks, no implicit singletons looked up inside hooks.
 4. UI components consume orchestrator outputs only.
 5. If dependency injection is bypassed in any layer, stop and refactor before handoff.
 
@@ -113,7 +113,7 @@ Hook structure rules:
 
 State rules:
 
-- Orchestrators import the state adapter, never the concrete store directly.
+- Orchestrators receive the state adapter, never import the concrete store directly.
 - Swapping the client state library should require changing only the concrete store implementation and the state adapter.
 - Concrete state manager implementations belong in library-specific reference files, not in the core Orc-BASH contract.
 
@@ -123,7 +123,7 @@ Orchestrator rule:
 
 Component logic rule:
 
-- If a component contains business or domain logic beyond trivial rendering decisions, move that logic into `logic/` and expose it through the orchestrator or hook contract.
+- Follow `<AI_DEV_SHOP_ROOT>/framework/operations/react-skill-operations.md` (React Component Rules) for component logic placement.
 
 ## Feedback and Failure Handling Contract
 
@@ -190,7 +190,7 @@ Decision rule:
 
 - Hook receives all external dependencies via a typed `deps` interface.
 - Hook does not import API, state, or logic implementations directly.
-- Orchestrator imports the state adapter, not the concrete store.
+- Orchestrator receives the state adapter, not the concrete store.
 - Orchestrator wiring is explicit for API calls, logic methods, and state actions.
 - UI imports the orchestrator only.
 - Exported layer boundaries have explicit return types and documentation.

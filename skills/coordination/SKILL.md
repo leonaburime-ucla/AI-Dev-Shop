@@ -230,15 +230,16 @@ Use `<AI_DEV_SHOP_ROOT>/framework/routing/agent-index.md` as the canonical reser
 
 ## Dispatch Prompt Construction
 
-When building any delegated spawn prompt, include in this order:
+When building any delegated spawn prompt, include in this order; apply the task-scope and standing-rule items to external peer briefs as well:
 
 1. `Read <AI_DEV_SHOP_ROOT>/agents/<resolved-agent>/skills.md before any work.`
 2. Explicitly name any activated conditional skills for this task.
 3. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`.
-4. Give the concrete task directive with scope, constraints, ownership boundaries, and expected output.
-5. Require the subagent to stop if the persona file is missing or unreadable.
-6. Require the subagent to confirm in its first reply that the persona file was loaded.
-7. Require the subagent to use a reserved pipeline agent name from `<AI_DEV_SHOP_ROOT>/framework/routing/agent-index.md` only after that confirmation; otherwise it must use a generic helper label.
+4. Give the concrete task directive with scope, constraints, ownership boundaries, and expected output. Scope is the task's outcome: the agent may read any file, and a file list is a starting map, not a fence. If the fix needs other files, edit them minimally and list them under `CHANGED FILES`. Keep only two narrow write exceptions: files another live writer holds (report `NEEDS:` to prevent write collisions), and migrations that auto-apply to a live database (report `NEEDS:` to avoid changing live data).
+5. Include the owner's complete standing rules, including constitution and convention entries, verbatim as a fixed block, never summarized or relevance-filtered. Render it from the authoritative homes at send time: a brief is throwaway context, not a second rule home, and peers running with `--ignore-rules` cannot follow pointers to omitted instructions. For each gated metric, quote the metric name, comparison operator, and exact configured number from the sensor at send time, checking the effective configuration for the task's paths; when a project target is stricter than the enforced gate, brief the stricter number.
+6. Require the subagent to stop if the persona file is missing or unreadable.
+7. Require the subagent to confirm in its first reply that the persona file was loaded.
+8. Require the subagent to use a reserved pipeline agent name from `<AI_DEV_SHOP_ROOT>/framework/routing/agent-index.md` only after that confirmation; otherwise it must use a generic helper label.
 
 ## Delegated Output Validity Guard
 

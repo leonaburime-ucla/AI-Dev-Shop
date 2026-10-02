@@ -58,6 +58,7 @@ When the peer-facing prompt presents named options, candidates, or proposed shif
 
 ## Default Pattern
 
+- Follow `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` (Dispatch Prompt Construction) for task scope and the standing-rule block.
 - Build a shared packet first.
 - Make the packet packet-first and work-log-first.
 - Treat raw diffs, commits, or logs as supporting evidence, not the default payload.

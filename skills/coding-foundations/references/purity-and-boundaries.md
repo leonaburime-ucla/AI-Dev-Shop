@@ -71,3 +71,46 @@ Good:
 
 - a pure helper for the rule
 - a small orchestrator that performs the unavoidable effects
+
+## Registry Lifecycle and Per-Call Checks
+
+For registry ownership and lifecycle, follow Core Rule 1 in `../SKILL.md`.
+
+Bad — a module-owned registry whose activation filter runs only at registration:
+
+```ts
+declare const isEnabled: (id: string) => boolean;
+const tools = new Map<string, () => void>();
+export const register = (id: string, tool: () => void): void => {
+  if (isEnabled(id)) tools.set(id, tool);
+};
+export const invoke = (id: string): void => { tools.get(id)?.(); };
+```
+
+Good — an injected instance whose policy is evaluated when the capability is used:
+
+```ts
+type ToolRegistry = {
+  register: (id: string, tool: () => void) => void;
+  unregister: (id: string) => boolean;
+  reset: () => void;
+  invoke: (id: string) => boolean;
+};
+
+export const createToolRegistry = (canInvoke: (id: string) => boolean): ToolRegistry => {
+  const tools = new Map<string, () => void>();
+  return {
+    register: (id: string, tool: () => void): void => { tools.set(id, tool); },
+    unregister: (id: string): boolean => tools.delete(id),
+    reset: (): void => tools.clear(),
+    invoke: (id: string): boolean => {
+      const tool = tools.get(id);
+      if (!tool || !canInvoke(id)) return false;
+      tool();
+      return true;
+    },
+  };
+};
+```
+
+A filter at registration runs only once and captures boot state. Authorization and activation checks belong on every invocation, before the handler runs; the injected policy must read current state so disabling a capability takes effect immediately.

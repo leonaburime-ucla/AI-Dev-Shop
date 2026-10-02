@@ -269,7 +269,7 @@ Use a shared context packet when the question depends on brownfield repo knowled
 3. Save the packet at `<ADS_MEMORY_ROOT>/.local-artifacts/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md` by default.
 4. If the user explicitly wants a reusable retained artifact, save or promote the packet to `<ADS_MEMORY_ROOT>/reports/swarm-consensus/context/CTX-<slug>-<YYYY-MM-DD>.md`.
 5. Use `skills/swarm-consensus/references/context-packet-template.md` as the reference layout.
-6. Put only the context every participant needs:
+6. Put only the context every participant needs, subject to the standing-rule exception in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` (Dispatch Prompt Construction):
    - the exact question to answer
    - project type (`brownfield` or `greenfield`)
    - scope, goals, and constraints

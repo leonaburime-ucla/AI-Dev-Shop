@@ -28,11 +28,11 @@ Start here, then load only the reference you need:
 
 ## Core Rules
 
-1. Keep dependencies explicit. Do not hide clocks, random sources, repositories, config, or clients behind globals or inline construction in logic-bearing code.
+1. Keep dependencies explicit. Do not hide clocks, random sources, repositories, config, or clients behind globals or inline construction in logic-bearing code. Avoid module-level singletons and append-only registries; inject registry instances with unregister and reset lifecycles (see `references/purity-and-boundaries.md`).
 2. Separate decision logic from effect execution where practical. Pure or mostly-pure decision steps should be obvious; effectful wrappers should be thin and explicit.
 3. Prefer not mutating inputs or shared state by default. If mutation is required, the contract or performance reason must be obvious near the code.
 4. Keep exported contracts explicit and stable. Favor named fields and predictable shapes at module boundaries.
-5. Fail fast on invalid input or impossible state unless the spec explicitly requires graceful degradation or recovery.
+5. Fail fast on invalid input or impossible state unless the spec explicitly requires graceful degradation or recovery. Expose failures as a typed outcome or typed error; never silently swallow them. If a check guarding an irreversible action errors or cannot decide, deny the action (irreversible class: `<AI_DEV_SHOP_ROOT>/skills/critical-internal-constraints/SKILL.md`, Bindingness).
 6. Keep units small and readable enough that the next agent can reason about them without reading surrounding subsystems or git history.
 
 ## What Stays Out

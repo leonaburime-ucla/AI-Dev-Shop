@@ -77,7 +77,7 @@ All candidate patterns evaluated before selection. Fit Band is qualitative, not
 a fake precision score. Adaptability reflects how easily this choice can be
 replaced or extended as requirements and technology evolve. When two patterns
 land in the same Fit Band, the higher-adaptability pattern is preferred per the
-Adaptability First principle unless a hard requirement rules it out.
+Tiebreaker rule in `skills/architecture-decisions/SKILL.md` unless a hard requirement rules it out.
 
 | Pattern | Fit Band | Adaptability | Evidence Basis | Pros | Cons | Key Tradeoffs | Verdict |
 |---------|----------|--------------|----------------|------|------|---------------|---------|

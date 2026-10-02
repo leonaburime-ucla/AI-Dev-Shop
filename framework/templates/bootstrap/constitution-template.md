@@ -34,6 +34,7 @@ Copy this file to `ADS-memory/governance/constitution.md`. Fill in each article 
 
 ## Article III — [PRINCIPLE NAME]
 <!-- Example: Simplicity Gate -->
+<!-- Example: Reversible-by-Default — see skills/architecture-decisions/SKILL.md, Principles That Always Apply #1. -->
 
 [Principle statement]
 
@@ -67,6 +68,7 @@ Copy this file to `ADS-memory/governance/constitution.md`. Fill in each article 
 
 ## Article VI — [PRINCIPLE NAME]
 <!-- Example: Security-by-Default -->
+<!-- Example: Fail-Closed-on-Irreversible — see skills/coding-foundations/SKILL.md, Core Rule 5. -->
 
 [Principle statement]
 

@@ -70,8 +70,9 @@ Dependency rule:
 2. Define outbound ports in application language, not vendor language.
 3. Keep adapters thin: translate data, call infrastructure, map errors.
 4. Inject dependencies explicitly through constructors or function parameters.
-5. Use a composition root to assemble concrete adapters.
+5. Use one composition root per process entry point to construct infrastructure and assemble concrete adapters.
 6. Treat hidden globals, singleton lookups, and direct framework access in the core as boundary violations.
+7. Keep all vendor-specific plugin code, skills, and MCP configuration inside the plugin package. If the host lacks a feature, add a generic capability any plugin can use, never vendor-shaped core code; move existing vendor code out of core in the same change. In a plugin host, plugins count as recorded consumers of the extension surface, so these capabilities serve existing couplings rather than imagined variation.
 
 ## Port Design Rules
 
@@ -88,6 +89,8 @@ Bad port:
 - forces tests to boot real infrastructure just to exercise business rules.
 
 ## Default Structure
+
+For module `index.ts` public APIs, follow `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/modular-monolith.md` (TypeScript Implementation).
 
 Use names that match the language and framework, but preserve this separation:
 
@@ -122,7 +125,7 @@ Hexagonal architecture is strong when the tests follow the boundaries:
 
 - **Core tests**: drive the application through inbound ports with in-memory or fake outbound adapters
 - **Adapter tests**: verify each adapter against the real framework, database, or vendor sandbox
-- **Contract tests**: verify adapters satisfy the port contract
+- **Contract tests**: define one reusable suite per port and run it against every adapter, including the in-memory double
 - **End-to-end tests**: keep limited to critical journeys
 
 If most tests still require a real database, framework runtime, or network calls just to exercise business rules, the architecture is only hexagonal on paper.

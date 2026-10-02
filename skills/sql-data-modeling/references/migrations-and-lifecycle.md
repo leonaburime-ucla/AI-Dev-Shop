@@ -53,7 +53,7 @@ deleted_at timestamptz
 
 Use `timestamptz`, not timezone-less timestamps.
 
-If `updated_at` exists, maintain it reliably:
+If `updated_at` exists, maintain it reliably; append-only tables are exempt from the `updated_at` convention (see `../SKILL.md`, Implementation Defaults):
 
 ```sql
 CREATE OR REPLACE FUNCTION set_updated_at()

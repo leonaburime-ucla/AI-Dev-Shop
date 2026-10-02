@@ -76,7 +76,7 @@ Apply the correct safe API or encoding immediately before data reaches each sink
 
 ### 1. Identify Trust Boundaries
 
-List every input source and mark who controls it. Include: HTTP request bodies, query params, path params, headers, cookies, file uploads, webhook payloads, queue messages, partner API responses, model outputs, import files, CLI arguments.
+List every input source and mark who controls it. Include: HTTP request bodies, query params, path params, headers, cookies, file uploads, webhook payloads, queue messages, partner API responses, MCP and tool results, plugin manifests, model outputs, import files, CLI arguments.
 
 ### 2. Define Input Contract
 

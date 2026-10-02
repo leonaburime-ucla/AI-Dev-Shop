@@ -301,12 +301,14 @@ stored baseline file** — a writable baseline is enforcement authority an agent
 can poison; comparing to the merge base removes the attack surface instead of
 policing it.
 
+`gate` is the highest permitted value: 15 for cognitive complexity and 4 for nesting depth, so breaches begin at 16 and 5 respectively.
+
 ```text
 BREACH = head_value > gate
          AND (function_is_new OR head_value > base_value)
 ```
 
-| Metric | Review band | Gate |
+| Metric | Review band | Breach |
 |---|---|---|
 | Cognitive complexity | 11-15 | 16+ |
 | Max nesting depth | 4 | 5+ |

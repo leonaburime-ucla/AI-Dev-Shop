@@ -140,12 +140,12 @@ Core collaboration invariant:
 
 7. Write under leases.
    - The final writer implements the agreed shared plan for all leased files; the writer does not independently redesign the solution after convergence.
-   - A participant may modify only files it owns in the lease map.
+   - Leases prevent write collisions only; follow `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` (Dispatch Prompt Construction) for file-list scope and write exceptions.
    - If the user approved multiple writer peers, use isolated worktrees or another proven isolation mechanism. Do not run unconstrained writer CLIs concurrently in the same worktree.
    - If writing in the main worktree, run write leases sequentially unless the tooling can enforce disjoint file writes.
-   - Prefer peer-native file edits only when the CLI can be constrained to the leased file set. Otherwise, ask the peer to return a unified diff for its leased files and have the Coordinator apply that diff.
-   - After each writer returns, inspect `git diff --name-only` for out-of-lease changes. Out-of-lease writes are a protocol violation: stop, restore only the violating cowork changes from the saved baseline when safe, and record the violation in the disagreement ledger.
-   - Scope expansion requires user approval before any new file is read into the shared context or modified.
+   - Prefer peer-native file edits only when the CLI can respect other writers' leases. Otherwise, ask the peer to return a unified diff and have the Coordinator apply it after checking the lease map.
+   - After each writer returns, inspect `git diff --name-only`, reconcile disclosed additions into the lease map, and record any write collision in the disagreement ledger; restore only the colliding cowork changes from the saved baseline when safe.
+   - Scope expansion means changing the agreed task outcome or design and requires user approval.
 
 8. Peer verification phase.
    - Dispatch all non-writers to verify the diff against the shared edit plan and current file state.
@@ -187,7 +187,7 @@ Core collaboration invariant:
      - the change does not involve security, authentication, authorization, data integrity, schema migration, payment, public API contract, dependency/infra, concurrency, or architecture-sensitive areas
      - no unresolved or material resolved disagreement remains in the ledger
      - all peer verifiers approved their non-owned diffs
-     - no out-of-lease writes occurred
+     - no write collisions occurred
      - automated tests/checks passed
    - If `audit=skip` conflicts with the policy, do not silently skip. Report that the requested skip is blocked, explain why, and proceed with running the audit.
 

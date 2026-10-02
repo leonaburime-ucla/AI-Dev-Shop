@@ -53,7 +53,7 @@ export const evaluatePolicy = (
 
 This skill applies to any module containing decision logic, data transformation, or side effects — regardless of what architectural layer or pattern name it carries.
 
-**UI / Presentation Layer Exemption:** Declarative rendering code (React components, templates, view helpers) is exempt from the strict branch-extraction rules, complexity limits, and named-predicate requirements. Simple conditional rendering (`isLoaded && !error && <Component />`) is idiomatic and should not be refactored into helper functions. UI coverage is governed by the lower threshold in `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` (70%+ line, or documented E2E coverage) — not by the stricter rules in this skill.
+**UI / Presentation Layer Exemption:** Declarative markup (JSX/templates and the conditional-rendering expressions inside them) is exempt from the strict branch-extraction rules, complexity limits, and named-predicate requirements. Simple conditional rendering (`isLoaded && !error && <Component />`) stays inline. The exemption covers markup, not logic: event handlers, callbacks, and derived-value computations are not exempt because they sit in a component file. For React logic placement, see `<AI_DEV_SHOP_ROOT>/framework/operations/react-skill-operations.md` (React Component Rules). UI coverage is governed by the lower threshold in `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` (70%+ line, or documented E2E coverage) — not by the stricter rules in this skill.
 
 The risk-weighted coverage thresholds in `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md` and the scope rules here are co-designed: strict rules + high thresholds for logic-bearing code; lighter rules + lower thresholds for UI. Both must be applied together.
 

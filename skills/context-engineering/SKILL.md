@@ -97,7 +97,7 @@ The Coordinator is responsible for injecting the right context into each agent d
 1. Always include the active spec version and hash
 2. Include only the architecture constraints relevant to the current module
 3. Include only the test certification records relevant to the failing tests being fixed
-4. Include recent project_memory entries that apply to the domain being worked on
+4. Include recent project_memory entries that apply to the domain being worked on; apply the standing-rule exception in `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` (Dispatch Prompt Construction).
 5. Do not pass the full conversation history — pass structured summaries
 
 A Programmer Agent dispatch should include:
