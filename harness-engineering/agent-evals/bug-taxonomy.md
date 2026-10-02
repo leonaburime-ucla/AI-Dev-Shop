@@ -183,8 +183,10 @@ Every item planted in a fixture serves one of these roles:
 | RES-THREAD-LEAK | Thread/goroutine leak | Spawned worker never terminates |
 | RES-MEM-LEAK | Memory leak via unbounded collection | Map/list grows without eviction |
 | RES-LISTENER-LEAK | Event listener registered never unregistered | Accumulates handlers over time |
+| RES-BROWSER-SOCKET-LEAK | Long-lived browser connection never closed | EventSource/WebSocket/long-poll opened with no cancellation path reachable from unmount/reset/navigation, permanently consumes one of a finite per-origin connection slot budget (e.g. Chrome's 6-per-origin HTTP/1.1 cap) — distinct from RES-LISTENER-LEAK in that the exhausted resource is a shared, cross-tab OS/browser budget, not process memory |
 | RES-TEMP-FILE | Temporary file accumulation | Created but never cleaned up |
 | RES-RETRY-STORM | Retry storm / thundering herd | All clients retry at same time without jitter |
+| RES-POLL-NO-DEDUP | Poll loop fires overlapping duplicate requests | No single-flight guard or cancellation — a slow/stuck response compounds into unbounded pending requests instead of staying at one in flight |
 | RES-UNBOUNDED | Unbounded query / traversal | No limit on result set or graph walk = DoS |
 | RES-BACKPRESSURE | Backpressure not applied to retries | Fetch paused but retry queue grows unbounded |
 | RES-OOM-BATCH | Batch size causes OOM | Deserializer loads full payload into memory |
@@ -238,6 +240,7 @@ Every item planted in a fixture serves one of these roles:
 | API-VERSION-MISMATCH | Header says v2 but body uses v1 schema | Version mismatch between envelope and content |
 | API-SUNSET-BREAK | Deprecated field removed without sunset | Clients break on upgrade |
 | API-OPTIONAL-REQUIRED | Optional field becomes required silently | No migration path for existing consumers |
+| API-SEAM-PARTIAL-ADOPT | Optional param added to close a defect, not adopted everywhere | Interface gains an optional parameter specifically to fix a known defect (leak, missing auth); structural typing lets an existing implementation compile unchanged without adopting it, so the fix silently doesn't apply to that consumer |
 | API-ENUM-UNHANDLED | Enum gains value not handled by consumers | Switch/match has no default, crashes on new value |
 | API-COMPAT-BREAK | Backwards-incompatible response change | New field required, old clients can't parse |
 | API-PROVIDER-DRIFT | Third-party changes error contract | Provider returns different error shape, our parsing breaks |

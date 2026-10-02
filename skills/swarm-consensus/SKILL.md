@@ -276,7 +276,7 @@ Use a shared context packet when the question depends on brownfield repo knowled
    - architecture summary
    - relevant files and source artifacts
    - known unknowns and open decisions
-7. Give the same packet content to every peer CLI. The primary model may inspect the repo directly, but peer transport should prefer a self-contained `stdin` payload when the packet fits cleanly in one bounded prompt.
+7. Give the same packet content to every peer CLI. A self-contained `stdin` payload is the preferred transport **only for questions that are not repo-dependent**. When the question is about this codebase, the Repo Access Gate below overrides this step: the primary model must not inspect the repo directly while peers reason from prose.
 8. If the question is materially repo-dependent and no shared packet exists yet, create one before dispatching peers.
 9. If a peer still needs file-based packet access because the payload is too large or it must inspect repo files directly, follow the shared transport fallback rules in `skills/llm-operations/references/peer-llm-dispatch.md`.
 10. Do not promote a local-only context packet into `<ADS_MEMORY_ROOT>/reports/` only to satisfy peer readability.
@@ -312,6 +312,52 @@ When a debate or consensus question originates from or explicitly references an 
 5. Never dispatch a debate where the triggering source was available to the primary model but withheld from peers. That creates an asymmetric information advantage that undermines debate integrity.
 
 **Rationale:** Debates triggered by external research lose most of their value when peers argue from summaries or partial context. The primary model has already read the source — peers deserve the same grounding to produce genuinely independent, well-informed positions.
+
+### Repo Access Gate (hard requirement, debate mode)
+
+The code equivalent of the Source Material Gate above. When a debate or consensus question is about
+**this codebase** — its architecture, a proposed refactor, a migration, an interface, a build order,
+or any "should we build X this way" question grounded in existing source:
+
+1. **Every load-bearing claim about current state MUST appear in the packet as verbatim code with a
+   `file:line` citation, not as prose.** A description of an interface is not the interface. If the
+   debate will turn on what a type, signature, options bag, or call site actually looks like, quote
+   it.
+2. **Peers get repo file access by default, not packet-only.** External peer CLIs run locally and can
+   read files. Do not treat packet-only as the default for a repo question:
+   - `codex exec` — run from the repo with a read-only tool surface.
+   - `agy` — cannot read outside its working directory and inherits any ancestor `AGENTS.md`; use the
+     documented staging procedure in `skills/llm-operations/references/peer-llm-dispatch.md`
+     ("File context is the default, staged, not denied") to copy the needed files into a clean
+     staging base and reference the staged paths.
+   - Grant **read-only**. A debate participant never needs write access.
+3. **Name the repo, and every repo.** State explicitly which repository and package each cited file
+   lives in, and whether any of them is a separately-published artifact. A question spanning two
+   packages must say so in the packet — participants cannot price a package-boundary or public-API
+   cost they were never told exists.
+4. **Before dispatch, run a state-claim audit on the packet.** List every assertion the packet makes
+   about how the code works today. For each one, confirm it is backed by a quoted call site rather
+   than a doc comment or a summary. Comments in this codebase have been wrong repeatedly; a packet
+   that launders a stale comment into four participants' reasoning is the failure this gate exists to
+   prevent.
+5. **If a peer cannot be given repo access**, say so explicitly in the packet under a
+   `## Repo Access Limitation` heading naming which participants are packet-only, and compensate by
+   quoting more code, not less. Then weight that participant's *current-state* claims lower in
+   synthesis while still weighting its *design* reasoning normally.
+6. **Never dispatch a repo debate where the primary model read the code and the peers did not.**
+   Same rule as Source Material Gate step 5, same reason.
+7. **In the report, separate "converged on a target design" from "converged on a claim about current
+   state."** Participants agreeing on where to go is not evidence that they agreed on where things
+   stand. Record which participants had repo access when logging any convergence count.
+
+**Rationale (earned, 2026-09-02):** A 3-round, 5-participant debate on external-service integration
+adopted "the adapter never holds a secret" as its #1 finding, converged 5-of-5, four of them blind. The real
+code was the exact inverse — the host eagerly resolves every provider's plaintext key and hands the
+engine a map (a `credentials` field on the engine's options type, a *published npm package's public API*). The
+packet described the seam in prose and never named the repo the code lived in; the engine's options type
+appeared in zero of four packets. The one participant with repo access flagged the inversion; the four
+without it did not, and the finding shipped as "Adopt" with a refactor-sized cost estimate for what is
+actually a public-API migration across a package boundary.
 
 ### Prompt Transport Safety (hard requirement)
 

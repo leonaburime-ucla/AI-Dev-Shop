@@ -146,7 +146,9 @@ cd /tmp && agy --model "Gemini 3.1 Pro (High)" --print "$(cat /path/to/prompt.tx
 **What the `agy` preamble looks like:** When run from inside the repo, `agy` boots the Coordinator and prints startup info before the answer. Running from `/tmp` suppresses this entirely — output is the raw model response only.
 
 **Available models (from `agy models`):**
-- `Gemini 3.5 Flash (Low/Medium/High)`
+- `Gemini 3.8 Flash (Low/Medium/High)` ← newest, released 2026-09-02
+- `Gemini 3.7 Flash (Low/Medium/High)`
+- `Gemini 3.6 Flash (Low/Medium/High)`
 - `Gemini 3.1 Pro (Low/High)` ← default peer
 - `Claude Sonnet 4.6 (Thinking)`, `Claude Opus 4.6 (Thinking)` (same-family, exclude when primary is Claude)
 - `GPT-OSS 120B (Medium)`
