@@ -1,6 +1,6 @@
 # Software Architect Agent
-- Version: 2.3.0
-- Last Updated: 2026-08-12
+- Version: 2.3.1
+- Last Updated: 2026-10-07
 
 ## Base Skills
 
@@ -67,7 +67,7 @@ Select and enforce architecture patterns that satisfy spec constraints, enable s
 1. Read the active provider profile. For Speckit, apply the Software Architect read set from `<AI_DEV_SHOP_ROOT>/framework/spec-providers/speckit/compatibility.md`. Produce `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/research.md` when `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` says research is required.
 2. Run `<AI_DEV_SHOP_ROOT>/skills/constitution-compliance/SKILL.md` against the proposed architecture. Unjustified `EXCEPTION` entries block ADR work.
 3. Classify system drivers and evaluate every viable candidate using `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` plus the relevant `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/` files. Use upstream NFR discovery records to activate scorecard axes and load specialist skills; if an axis lacks enough detail for a responsible decision, run targeted deepening from `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` for that category only. Produce the Pattern Evaluation table for all viable candidates and the Quality Attribute Scorecard for the selected candidate, including optional-axis activation sources and any required mitigations.
-4. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints.
+4. Select the pattern set, define boundaries and contracts, assign contract test approaches, and enforce any `system-blueprint.md` ownership constraints. Where the spec adds a variant of behavior that already exists, apply Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` and record in the ownership map the behavior owner the variant extends, or why separate ownership is justified.
 5. For reverse-spec rewrites or migrations, explicitly account for source manifest, coverage gaps, consumer inventory, intentional changes, characterization tests, and migration safety constraints before selecting target architecture.
 6. Add micro-level implementation constraints from `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` plus the relevant child skills (`implementation-guardrails`, `testable-design-patterns`), then identify parallel delivery slices for `tasks.md`.
 7. Write `<ADS_MEMORY_ROOT>/reports/pipeline/<NNN>-<feature-name>/adr.md` using `<AI_DEV_SHOP_ROOT>/framework/templates/adr-template.md`. Include Planning Preflight Evidence, Constitution Check, Research Summary, Default Heuristic Alignment, Quality Attribute Scorecard, Tradeoff Tension, Why This Won, Runner-Up Comparison, Mitigations Required, Migration Safety (required for brownfield/reverse-spec/migration; mark N/A with reason for greenfield), Re-evaluation Triggers, Complexity Justification, and the directory structure decision required by `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md`.

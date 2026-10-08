@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.7.2
-- Last Updated: 2026-08-23
+- Version: 1.7.3
+- Last Updated: 2026-10-07
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -72,7 +72,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 0. If dispatched with a `MIGRATION-*.md` context: read the authorized phase, implement scaffolding, dual-write logic, and backfill scripts as needed.
 1. If `progress-ledger.md` exists, read it before acting. Resume from its Current Objective, Next Actions, and latest failure-cluster hypothesis instead of reconstructing state from memory.
 2. Confirm test certification hash matches active spec hash. Refuse to work against stale certifications.
-3. Complete Pattern Priming using `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` before writing any production code.
+3. Apply Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md`, then complete Pattern Priming using `<AI_DEV_SHOP_ROOT>/skills/pattern-priming/SKILL.md` before writing any production code.
 4. Plan implementation by requirement slice — do not implement everything at once.
 4a. Extract an ADR checklist before coding. At minimum capture: allowed layers/modules, forbidden dependencies/imports, ownership boundaries, required adapter/DI/contract rules, any file-placement constraints from the chosen pattern, and Implementation Outline file-map, contract, wiring, and data-boundary constraints when present. Use the File Map as the canonical file creation/change checklist for in-scope files. If the outline was skipped but the task needs missing boundary, contract, or wiring detail, report `[OUTLINE_REQUESTED]` before coding.
 4a1. If a Critical Internal Constraints artifact is present and the current slice touches a designated unit, extract its Binding constraints into the ADR checklist. Binding constraints must be honored; if implementation evidence shows one is wrong, inferior, or infeasible, deviate only with a recorded `[CIC_DEVIATION]` entry in the handoff (Unit ID, constraint ID, what was done instead, why, effect on invariants and tests). For constraints marked `ESCALATE_SECURITY` or `ESCALATE_IRREVERSIBLE`, pause and escalate to Coordinator before deviating; proceed only once a `[CIC_DEVIATION_APPROVED]` record (Unit ID, constraint ID, approver, date, rationale) exists in the handoff chain or `pipeline-state.md` — deviation without a matching approval record is an Architecture Audit BLOCKER. If a unit in scope meets a trigger but was not designated (or the artifact was not produced and a trigger is now evident), report `[CIC_REQUESTED] Unit=<candidate> Trigger=<trigger> PlausibleWrong=<what a competent implementer might do> Property=<what breaks> MissingConstraint=<required constraint> Evidence=<ADR/spec/outline/test/code trace>` before coding; if implementation reveals a load-bearing constraint the artifact missed, raise `[CIC_PROPOSED] Unit=<U-xxx or candidate> Trigger=<trigger> Constraint=<proposed Binding text> Property=<what breaks> VerificationSurface=<observable surface or audit-only> Evidence=<test/code/legacy/ADR/spec trace>`. Before final handoff, confirm each in-scope Binding constraint still applies, record a deviation, or request reclassification.
@@ -120,6 +120,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 
 ## Output Format
 - Files changed and behavior delivered (mapped to spec requirements)
+- Reuse line (required when new modules, components, tools, stores, tables, or helpers were added; format in implementation-guardrails Output Expectations)
 - Test results summary (pass/fail counts, failing test names if any, and coverage metrics when a local coverage command is available)
 - Architecture Audit (required):
   - Status: `PASS`, `WARNING`, or `BLOCKER`

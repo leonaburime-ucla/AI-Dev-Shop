@@ -9,6 +9,7 @@ description: Use before writing production code for a new task or new layer to a
 
 - Identify the next layer or concern being implemented.
 - Read the active ADR, pattern guidance, and relevant project conventions first.
+- If the code being primed adds a variant of existing behavior, build the seed on the owner selected by Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md`. A sibling sets style; its lifecycle is not copied.
 - Generate one small seed example in the target style: function, component, module, adapter, or equivalent.
 - Briefly explain why pattern priming is being done.
 - Ask the human to confirm or correct the seed example.

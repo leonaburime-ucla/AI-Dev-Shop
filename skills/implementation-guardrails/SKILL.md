@@ -1,8 +1,8 @@
 ---
 name: implementation-guardrails
-version: 1.3.0
-last_updated: 2026-04-26
-description: Use when implementing or reviewing backend/general code so complexity, scaling, and maintainability guardrails stay consistent: scaling sanity checks, selective complexity comments, query-shape awareness, one-source-of-truth rules, and readable call-site defaults.
+version: 1.4.0
+last_updated: 2026-10-07
+description: Use when implementing or reviewing backend/general code so complexity, scaling, and maintainability guardrails stay consistent: scaling sanity checks, selective complexity comments, query-shape awareness, the reuse-before-write decision, one-source-of-truth rules, and readable call-site defaults.
 ---
 
 # Skill: Implementation Guardrails
@@ -33,10 +33,27 @@ Start here, then load only the reference you need:
 2. Add a short inline complexity note only when the cost, query shape, or tradeoff is non-obvious and materially relevant to future maintainers.
 3. For data-heavy code, make query or network fan-out explicit. Prefer bounded bulk reads/writes over hidden per-item I/O.
 3b. For any function that calls an external service for a user-variable collection (roles, items, permissions, records), enforce resource bounds: maximum collection size (configurable cap), timeout on service calls, and defined behavior at the cap (error, truncate, or paginate). Do not assume typical usage equals worst-case usage.
-4. Keep one source of truth for business rules, mapping tables, and config lookups; do not duplicate them across modules.
+4. Keep one source of truth for business rules, mapping tables, config lookups, and shared lifecycles or security-sensitive sequences (for example permission check → secret exchange → sealed store → outcome report); do not duplicate them across modules. See Before You Write.
 5. Avoid boolean flag parameters when an enum, options object, or named variant would make the call site clearer.
 6. Prefer descriptive names and flow over clever compactness on non-trivial paths.
 7. If performance or framework constraints force a non-obvious tradeoff, leave the reason near the code.
+
+## Before You Write
+
+This section is the single home of the reuse-before-write decision. Other skills and personas point here; they do not restate it.
+
+1. **Understand first.** Read the task and trace the real flow it touches end to end before choosing an implementation. This decision shortens the solution, never the reading.
+2. **Search wide, not near.** Search the whole project and its declared workspace or platform libraries for the behavior you are about to build, not only the files next to your task. Inspect plausible owners and their contracts.
+3. **Stop at the first option that satisfies the required behavior, security boundaries, and approved architecture:**
+   1. Does this need to exist at all? A speculative need is skipped and named in one line.
+   2. An existing implementation that owns this behavior: call or extend it.
+   3. The language standard library.
+   4. A native platform capability: HTML element, CSS, browser API, framework built-in, or database constraint.
+   5. An already-installed dependency. Do not add a new dependency for what a few readable lines can do.
+   6. Only then: the smallest readable new code.
+4. **Reuse means calling or extending the implementation that owns the behavior.** Copying a sibling's lifecycle is not reuse, and a style precedent does not establish a new behavior owner. A sibling may illustrate style; it never stands in for the ownership decision.
+5. **Variants without a shared owner.** When existing variants share invariants but have no common implementation, identify the shared behavior and the real differences before adding another variant, then propose the smallest shared mechanism or state why separate ownership is justified. Consolidation follows shared invariants, not instance counts. Boundary changes route through Coordinator. Consolidating persisted variants (tables, stored formats) is a migration decision, not an automatic cleanup.
+6. **A named owner is binding.** Once a brief, ADR, governance ADR, or Critical Internal Constraints record names the owner of a behavior, a new parallel owner of that behavior is an architecture violation, not a style issue.
 
 ## Complexity Note Rule
 
@@ -61,6 +78,7 @@ When this skill is active during review, look for:
 - performance-driven mutation or batching with no rationale
 - boolean flag parameters where an enum or options object would be clearer
 - duplicated rules or lookup tables that should have one source of truth
+- a new module, component, tool, store, or table that parallels an existing owner of the same behavior (Before You Write; the review procedure is Code Inspection's Dimension 4)
 - clever compactness that obscures cost or intent
 
 ## Output Expectations
@@ -70,6 +88,7 @@ When this skill materially shaped the implementation or review, report:
 - changed paths that required complexity or query-shape notes
 - important maintainability tradeoffs or performance justifications
 - justified deviations from the default guardrails
+- the reuse decision, as one line whenever new modules, components, tools, stores, tables, or helpers were added: `Reuse: searched <areas/libraries>; used <implementation or option> | separate implementation because <contract mismatch>`
 
 ## References
 
