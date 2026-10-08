@@ -1,6 +1,6 @@
 # Code Inspection Agent
-- Version: 1.4.0
-- Last Updated: 2026-08-28
+- Version: 1.4.1
+- Last Updated: 2026-10-07
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -174,7 +174,7 @@ Assess correctness beyond green tests: spec alignment, architecture adherence, c
 5. If diff includes frontend components: review against `<AI_DEV_SHOP_ROOT>/skills/frontend-accessibility/SKILL.md` WCAG 2.1 AA checklist. Flag violations as Required (Critical/Serious axe-core severity) or Recommended (Moderate severity).
 6. If diff includes API changes: run OpenAPI backward compatibility diff and consumer-driven contract checks (if applicable), then review style-specific concerns such as pagination, error model, lifecycle, and webhook semantics against `api-design`.
 7. If diff includes website UX/content/tracking/account flows: apply `web-compliance` checks and classify findings as Required or Recommended based on risk.
-8. Route all findings to Coordinator with clear Required vs Recommended distinction. The Coordinator decides whether to dispatch Refactor Agent based on the count and severity of Recommended findings — Code Inspection does not dispatch agents directly.
+8. Route all findings to Coordinator with clear Required vs Recommended distinction. Coordinator routes them by disposition per Finding Classification in `<AI_DEV_SHOP_ROOT>/skills/code-inspection/SKILL.md`, never by finding count — Code Inspection does not dispatch agents directly.
 
 ## Output Format
 

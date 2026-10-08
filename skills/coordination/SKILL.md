@@ -1,6 +1,6 @@
 ---
 name: coordination
-version: 1.4.6
+version: 1.4.7
 last_updated: 2026-10-07
 description: Use when routing between agents, handling Review Mode intake, activating conditional skills, enforcing convergence policy, managing iteration budgets, formatting cycle summaries, or deciding when to escalate to a human checkpoint.
 ---
@@ -236,7 +236,7 @@ When building any delegated spawn prompt, include in this order; apply the task-
 2. Explicitly name any activated conditional skills for this task.
 3. Include the stage-specific context required by `<AI_DEV_SHOP_ROOT>/framework/workflows/multi-agent-pipeline.md`.
 4. Give the concrete task directive with scope, constraints, ownership boundaries, and expected output. Scope is the task's outcome: the agent may read any file, and a file list is a starting map, not a fence. If the fix needs other files, edit them minimally and list them under `CHANGED FILES`. Keep only two narrow write exceptions: files another live writer holds (report `NEEDS:` to prevent write collisions), and migrations that auto-apply to a live database (report `NEEDS:` to avoid changing live data).
-4a. When the task adds a variant of behavior that already exists (another card, tool, provider, store, table, or form), apply Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` while scoping it: search the repo and declared platform libraries yourself, and put the representative existing instances, the platform-library candidates, and the selected behavior owner (or the open ownership question) in the brief. Phrase the directive as extending that owner. A sibling may be cited as a style example only, never as the implementation template. If the shared owner or contract does not exist yet, resolve it before dispatching independent variant tasks: one task owns the shared work, and the variant tasks extend it after it lands.
+   - For variant work (another card, tool, provider, store, table, or form), apply Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` while scoping, and put its ownership evidence and sequencing decision in the brief.
 5. Include the owner's complete standing rules, including constitution and convention entries, verbatim as a fixed block, never summarized or relevance-filtered. Render it from the authoritative homes at send time: a brief is throwaway context, not a second rule home, and peers running with `--ignore-rules` cannot follow pointers to omitted instructions. For each gated metric, quote the metric name, comparison operator, and exact configured number from the sensor at send time, checking the effective configuration for the task's paths; when a project target is stricter than the enforced gate, brief the stricter number.
 6. Require the subagent to stop if the persona file is missing or unreadable.
 7. Require the subagent to confirm in its first reply that the persona file was loaded.

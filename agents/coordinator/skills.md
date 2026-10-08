@@ -1,6 +1,6 @@
 # Coordinator Agent
-- Version: 1.10.1
-- Last Updated: 2026-07-23
+- Version: 1.10.2
+- Last Updated: 2026-10-07
 
 ## Skills
 - `<AI_DEV_SHOP_ROOT>/skills/general-behavior/SKILL.md` — universal cross-cutting dispatcher every agent carries; on any codebase search/understanding need, load its referenced behavior before searching (routes rg vs graph analyzers, rg as fallback)
@@ -8,6 +8,8 @@
 - `<AI_DEV_SHOP_ROOT>/skills/external-audit/SKILL.md` — one-external-model audit of current work with Coordinator synthesis
 - `<AI_DEV_SHOP_ROOT>/skills/experimental-validation/SKILL.md` — empirical comparison protocol when the runtime disclosure mandate fires and user approves
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic, convergence policy, iteration budgets, escalation triggers, cycle summary format
+- `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — conditional: load when applying Before You Write during brief construction for variant work (Dispatch Prompt Construction item 4)
+- `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — conditional: load alongside implementation-guardrails (its required parent)
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-outline/SKILL.md` — readiness gate and trigger/SKIP contract before tasks.md generation; downstream consumption rules for TDD and Programmer

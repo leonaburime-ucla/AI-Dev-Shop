@@ -1,7 +1,7 @@
 ---
 name: architecture-decisions
-version: 1.2.0
-last_updated: 2026-04-27
+version: 1.2.1
+last_updated: 2026-10-07
 description: Use when selecting architecture patterns, writing ADRs, deciding whether research is required, evaluating tradeoffs, defining module and service boundaries and testable contracts, or producing quality-attribute scorecards with explicit tradeoff reasoning.
 ---
 
@@ -303,7 +303,7 @@ Organize by feature, not by technical layer. Each feature is self-contained: its
 
 **Avoid when**: Small solo or two-person teams where slice duplication overhead isn't worth it.
 
-**Key tradeoff**: Some logic duplication across slices is expected and acceptable. Extract shared code only when three or more slices need it (rule of three).
+**Key tradeoff**: Some logic duplication across slices is expected and acceptable. Extract shared code only when three or more slices need it (rule of three). Shared lifecycles, security-sensitive sequences, and behaviors with a named owner follow Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` instead.
 
 **File**: `<AI_DEV_SHOP_ROOT>/skills/design-patterns/references/vertical-slice-architecture.md`
 

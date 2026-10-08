@@ -99,7 +99,7 @@ router.post('/tasks', authenticate, async (req, res) => {
 
 ## Common Failure Modes
 
-**Business rule duplication becoming inconsistent**: `validateTitle` exists in `create-task`, `update-task`, and `duplicate-task` with slight variations. Fix: apply the rule of three — extract shared rules to a `domain/` module when the third slice needs them, not before.
+**Business rule duplication becoming inconsistent**: `validateTitle` exists in `create-task`, `update-task`, and `duplicate-task` with slight variations. Fix: apply the rule of three — extract shared rules to a `domain/` module when the third slice needs them, not before. Shared lifecycles, security-sensitive sequences, and behaviors with a named owner follow Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` instead.
 
 **Accidental coupling between slices**: Slice A imports a type or function from Slice B's folder. This couples their deployment and makes deletion unsafe. Fix: slices share only from a `shared/` or `domain/` folder, never from each other's feature folders.
 

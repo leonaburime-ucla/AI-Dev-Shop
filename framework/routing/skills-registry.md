@@ -1,7 +1,7 @@
 ---
 name: skills-registry
-version: 1.2.35
-last_updated: 2026-08-23
+version: 1.2.36
+last_updated: 2026-10-07
 description: Maps every shared skill to the agents that use it. Reference when dispatching agents or updating skills.
 ---
 
@@ -66,10 +66,10 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/design-patterns/SKILL.md` | Software Architect, CodeBase Analyzer, System Design Agent (secondary) |
 | `skills/backend-implementation/SKILL.md` | Programmer (default backend/service/worker implementation entrypoint) |
 | `skills/adversarial-test-design/SKILL.md` | Programmer (conditional for aggregate-risk workflows such as rule, validation, batch, reducer, reconciliation, transfer, and other cross-record logic); TDD Agent, QA/E2E Agent, and Code Inspection Agent read `references/testing-mistakes.md` alone whenever writing, fixing, or reviewing tests (fake-test failure catalog with bad vs good test pairs) |
-| `skills/coding-foundations/SKILL.md` | Software Architect, Programmer, TDD Agent, Refactor Agent, Code Inspection Agent (tiny shared parent for micro-level coding axioms) |
+| `skills/coding-foundations/SKILL.md` | Coordinator (conditional: brief construction), Software Architect, Programmer, TDD Agent, Refactor Agent, Code Inspection Agent (tiny shared parent for micro-level coding axioms) |
 | `skills/hexagonal-architecture/SKILL.md` | Software Architect, Programmer, CodeBase Analyzer, System Design Agent |
 | `skills/package-extensibility/SKILL.md` | Code Inspection Agent (**owns the authoritative demand inventory and ledger** under the sensor custody rule), Software Architect (authors the initial deviation set at extraction/design time), Programmer (advisory preview and probes only), Refactor Agent (consumes fork/subclassed rows), CodeBase Analyzer (full skill when a consumer is recorded; D12 internal-shotgun observation only when not) — conditional: activate only when a second consumer is recorded (existing consumer, named arriving host, or a fork/patch/vendored copy in the tree) |
-| `skills/implementation-guardrails/SKILL.md` | Software Architect, Programmer, Refactor Agent, Code Inspection Agent (child layer for complexity, scaling, and maintainability guardrails; always load alongside `coding-foundations`) |
+| `skills/implementation-guardrails/SKILL.md` | Coordinator (conditional: brief construction), Software Architect, Programmer, Refactor Agent, Code Inspection Agent (child layer for complexity, scaling, and maintainability guardrails; always load alongside `coding-foundations`) |
 | `skills/function-quality-assessment/SKILL.md` | Software Architect (Design Gate only for implementation-outline contracts), Programmer, Code Inspection Agent, Refactor Agent (shared per-function scoring, findings, and pass/debt/block routing wrapper over coding foundations, testable design, implementation guardrails, and inline docs) |
 | `skills/non-functional-requirements-discovery/SKILL.md` | System Design Agent, Spec Agent, Software Architect (targeted deepening) |
 | `skills/system-blueprint/SKILL.md` | System Design Agent, Coordinator |

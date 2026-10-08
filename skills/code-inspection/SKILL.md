@@ -1,6 +1,6 @@
 ---
 name: code-inspection
-version: 1.2.1
+version: 1.2.2
 last_updated: 2026-10-07
 description: Use when reviewing code for spec alignment, architecture violations, test quality, security surface, and non-behavioral improvement opportunities.
 ---
@@ -68,7 +68,7 @@ Evaluate every change across all dimensions. Do not skip any.
 - Is each function doing one thing?
 - Are names accurate and domain-aligned?
 - Is there duplication that should be extracted? Two questions. **Mechanical:** run the `duplication` slot per its contract — and note that the mechanical answer is narrower than the instinct: a clone group is Required only when this diff **pushes it past three sites** (`head > base && head >= 3`) above threshold — not merely because the group is new. Two sites is a Recommended finding *with* the caveat that extracting may be premature, because a two-site extraction routinely produces a helper parameterized by caller identity. See `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/duplication.md`.
-  - **Semantic:** the slot cannot see Type-3/Type-4 copies (renamed, reordered, or re-shaped lifecycles), so a clean clone result does not answer whether this change creates a parallel owner. Independently compare each new module, component, tool, store, or table in the diff with existing implementations and declared platform-library candidates of the same behavior, per Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md`. Comments such as "sibling of X" or "follows the precedent of X" are investigation leads, not findings by themselves. A semantic reuse finding names both implementations, the shared behavior, the real differences, and a feasible replacement. Disposition follows consequence: a new parallel owner of a behavior whose owner is named in a brief, ADR, governance ADR, or Critical Internal Constraints record is an architecture violation and Required; one that breaks spec or security is Required; otherwise unjustified duplication is Recommended. Neither instance count nor removable lines decides disposition.
+  - **Semantic:** the slot gates Type-1/Type-2 clones, may report Type-3, and cannot detect Type-4 (semantically equivalent, structurally different), so a clean result does not establish reuse. Assess the diff's new or materially changed behavior against Before You Write in `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md`, checking the author's Reuse evidence rather than re-running a whole-project search. A finding names both implementations, the shared invariants, the real differences, and a feasible replacement; disposition follows that section's rule 6 and Finding Classification. Comments such as "sibling of X" are leads, not findings by themselves.
 - Did any unsafe typed-language operation enter? Run the `type_safety` slot. New `no-unsafe-*` / `no-floating-promises` / `@ts-ignore` occurrences and any weakening of compiler strictness are Required; new `any`, `!`, or `as T` are Recommended. A count of zero from rules that were never enabled is not a pass — see `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/type-safety.md`.
 - Is the complexity justified by the problem?
 - Are non-trivial complexity-sensitive paths explained when the cost or tradeoff is not obvious from the code?
@@ -185,7 +185,7 @@ Suggested Next Route:
 Programmer Agent to move logic. TestRunner to verify tests remain green.
 ```
 
-Simplification findings (Recommended or Optional) may carry a short label: `reuse`, `stdlib`, `native`, or `delete`. Each one must name the concrete replacement (the existing implementation's path, the standard-library function, or the platform feature) and why required behavior is preserved. A lines-saved estimate is optional and never decides disposition.
+Simplification findings may carry `reuse`, `stdlib`, `native`, or `delete`. Name the concrete replacement and the behavior it preserves; for `delete`, instead cite evidence that the code is dead or its behavior is outside approved scope, per `<AI_DEV_SHOP_ROOT>/skills/refactor-patterns/SKILL.md` and `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md`. Lines saved never decide disposition.
 
 ## Interaction with Other Agents
 

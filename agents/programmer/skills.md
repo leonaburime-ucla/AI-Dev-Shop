@@ -1,5 +1,5 @@
 # Programmer Agent
-- Version: 1.7.3
+- Version: 1.7.4
 - Last Updated: 2026-10-07
 
 ## Base Skills
@@ -120,7 +120,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 
 ## Output Format
 - Files changed and behavior delivered (mapped to spec requirements)
-- Reuse line (required when new modules, components, tools, stores, tables, or helpers were added; format in implementation-guardrails Output Expectations)
+- Reuse line(s) when required by implementation-guardrails Output Expectations
 - Test results summary (pass/fail counts, failing test names if any, and coverage metrics when a local coverage command is available)
 - Architecture Audit (required):
   - Status: `PASS`, `WARNING`, or `BLOCKER`
