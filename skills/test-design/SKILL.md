@@ -1,7 +1,7 @@
 ---
 name: test-design
-version: 1.1.2
-last_updated: 2026-07-23
+version: 1.2.0
+last_updated: 2026-10-25
 description: Use when designing tests, building requirement-to-test matrices, selecting test types, certifying test coverage against a spec, or detecting test drift after spec changes.
 ---
 
@@ -237,6 +237,38 @@ describe('REQ-02: Invalid customer ID', () => {
 })
 ```
 
+## Mutation-Derived Input Rules
+
+These rules come from a 2026-10-25 mutation run across two TypeScript monorepos (~16k surviving mutants). Almost every survivor was a missing assertion, not a source bug: the code was right, and no test would have noticed it going wrong. Each rule names the input cases that kill the matching mutants. An F-ID points to `<AI_DEV_SHOP_ROOT>/skills/adversarial-test-design/references/testing-mistakes.md`, which explains the underlying mistake; this section adds only the input cases.
+
+- **AP1 Bare-failure assertion** (F1.2). The negative test checks only *that* the call failed. Assert the error class **and** its code. For HTTP, assert the status **and** the body's error code. For a user-visible message, also assert a stable phrase. A bare `toThrow()` or `ok: false` is a review reject.
+- **AP2 Singleton collections** (F4.3). Collection code is tested with 0–1 items or already-sorted input, so `some`↔`every`, a dropped sort and a flipped tie-break survive (`redirectUris.some(...)` → `every` survives when every test client has one URI). Use at least 3 items, with the one bad item first, then in the middle, then last, each as its own case. For order-dependent output, feed reverse-sorted input plus one equal-key tie with a stated expected order.
+- **AP3 Type-blind validators** (F6.2). Type guards (`typeof x === 'string'`, `isRecord`, `Number.isFinite`, `err.code === 'ENOENT'`) never receive the wrong type, so mutating them to `true` survives. Run one shared `HOSTILE` table through every validator and parser. Each value must produce the documented rejection, never a `TypeError`.
+
+  | Always | Shape swaps | Error helpers also get |
+  |---|---|---|
+  | `undefined`, `null`, `[]`, `{}`, `0`, `NaN`, `Infinity`, `""`, `"  "`, `true` | a string where an object is expected; an object where a string is expected | an `EACCES` error; a thrown string (and optionally other non-`Error` values) |
+
+- **AP4 Happy-string regex**. A regex is tested with one or two valid strings, so its anchors, quantifiers, classes and alternations are never pinned (dropping `^` from `/^[a-z0-9-]+$/` survives). Write one `it.each` table per regex covering:
+  - shortest valid, longest valid, max+1, and empty;
+  - leading, trailing (`"ok\n"`, `"ok!"`) and embedded junk;
+  - wrong case;
+  - each alternation branch;
+  - each quantifier at 0, 1 and 2 repeats.
+
+  Host, origin and path regexes also get `evil.<allowed>`, `<allowed>.evil.com`, and an extra leading or trailing path segment.
+- **AP5 Unasserted declarative contracts**. Declared data (input schemas, `required`, `additionalProperties`, permission names, annotations, manifests) can become `{}`, `[]` or `true` and nothing fails. Write one contract test per registry: for each entry, `toEqual` the full declaration against an **inline** expected literal, not a regenerated snapshot. Then validate one good input and one input with an extra key.
+- **AP6 Unpinned security defaults**. Default-deny values (deny-private-address flags, allowed-scheme lists, `allowedOrigins ?? []`, capability grants, privacy defaults, secret-file modes) can flip silently. Pin every exported policy or default object with `toEqual` against the full literal. Add one behavioural refusal per deny flag: private IP refused, `http:` refused, `data:` blocked, unknown origin rejected.
+- **AP7 Security guard with no negative test** (F6.2). An authn, authz, ownership, containment or token check runs only on its allow path. Write its deny tests **first**: unauthenticated, wrong token, wrong owner/principal/tenant, and path escape. Each asserts the specific denial (AP1). In review, for every `throw` or 401/403/404 inside a guard, name the test that triggers it.
+- **AP8 Whole-guard negatives** (F4.4). A compound guard (`a || b || c`) is tested only with inputs that break several clauses at once, so each operand set to `false` and every `||`↔`&&` swap survive. Start from one fully valid input. Write one case per clause that breaks **only** that clause (`{ ...valid, field: bad }`), plus the all-valid allow case.
+- **AP9 Limit tested without limit±1** (F6.2). Size, count, length and time limits are tested far from the edge, so `>`↔`>=` and `+1`↔`-1` survive. Generate `limit-1`, `limit` and `limit+1` from one helper, plus 0 and a negative value for numeric limits. Assert limit constants by value.
+- **AP10 Abort, cleanup and race paths never driven** (F6.2, F7.1). Every abortable or async API gets four tests: pre-aborted, aborted mid-flight, normal completion, and out-of-order resolution (the older request resolves after the newer one). Each asserts the result **and** that listeners and timers are released (listener count back to 0, no pending timers).
+- **AP11 Failure ports never injected** (F6.2). `catch {}`, fallback and fail-closed branches never run because no fake ever throws. For each injected port, write a throwing fake three ways: an `Error`, a thrown non-`Error` value, and a rejected promise. Assert the documented fallback or fail-closed result. An empty `catch` needs a test proving the swallow is intended.
+- **AP12 Unproven doubles and conformance suites** (F2.6). Fakes, in-memory repos and shared conformance suites are never shown to *fail* on a wrong adapter. Give each conformance suite a broken-adapter self-test: one deliberate defect per check, each expected to fail. Run every in-memory repo through the same contract suite as its real repo.
+- **AP13 Memoisation and identity unpinned**. Factory caches, build-once behaviour and DI token ids can be emptied silently. Assert `expect(createX(ports)).toBe(createX(ports))`, that the build step ran once, that different ports give a different instance, and that token ids are distinct and stable.
+
+Tests that are the only guard of an invariant but grep, hash or spawn the source (F1.4), and production files no test imports (F2.3), are code and process problems: see `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/testability-antipatterns.md`. For running the mutation tool itself, see `<AI_DEV_SHOP_ROOT>/harness-engineering/sensors/mutation-quality.md` § Run-Validity Pitfalls.
+
 ## Drift Detection
 
 CI must run the following check on every pull request:
@@ -253,7 +285,7 @@ This is the connective tissue that keeps specs, tests, and code in provable alig
 
 **Over-prescriptive internals**: Testing private methods, internal state, or implementation details creates brittle tests that break on refactoring without any behavior change.
 
-**Missing negative paths**: Every requirement that defines error behavior needs a test for that error. Untested error paths are where production failures live.
+**Missing negative paths**: Every requirement that defines error behavior needs a test that asserts that specific error. Which inputs those tests need is in § Mutation-Derived Input Rules.
 
 **Flaky tests**: A test that sometimes passes and sometimes fails is worse than no test — it erodes trust in the entire suite. Investigate immediately; do not leave flaky tests in the suite.
 

@@ -131,12 +131,73 @@ Mutation testing is expensive. The sensor enforces a timeout to prevent pipeline
 - If timeout is reached: kill the process, report partial results, classify as **Escalation** (inconclusive)
 - Projects may override timeouts in the `mutation_tests` slot of computational controls
 
+## Run-Validity Pitfalls
+
+A mutation score is only as valid as the run behind it. These pitfalls come from
+the same 2026-10-25 run as `<AI_DEV_SHOP_ROOT>/skills/test-design/SKILL.md`
+§ Mutation-Derived Input Rules, and each one produced scores that looked real and
+were not. Check them before reporting a score or routing a survivor. They are
+reporting guidance and do not change the gate tables.
+
+1. **Dry-run test count.** The tool's unmutated initial run must execute as many
+   tests as a plain run of the same suite. A lower count means part of the suite
+   did not load in the sandbox, and every mutant only that part covers shows as
+   uncovered. Trust no score until the counts match or the gap is explained.
+2. **Paths in the sandbox.** Tools that copy the project into a temp directory
+   break relative aliases, config `extends`, sibling-package paths and paths
+   derived from the module's own URL. Use absolute aliases, keep the temp
+   directory inside the package, link sibling packages into it, and run from the
+   package directory. (For StrykerJS: a relative `tempDirName: ".stryker-tmp"`,
+   and `cleanTempDir: false` when sibling packages are linked in.)
+3. **Incremental cache.** An incremental mode may not notice config, alias or
+   test-set changes, so a corrected rerun can still carry stale results. After
+   any such change, force a full run (for example StrykerJS `force`).
+4. **Collection errors are kills.** A mutant that breaks a module at import time
+   fails its test file before any test runs, and some tools score that as
+   survived. Count a collection or import error as a kill. Flag every mutant whose
+   tests-completed count is far below the dry run.
+5. **Exclusions.** Report every excluded operator and whether type checking was
+   off. Excluding string-literal mutants leaves error messages, permission
+   strings, ids and string-keyed allowlists unmeasured. With type checking off
+   the bias direction is unknown: a mutant can be killed by an incidental runtime
+   error. Do not call the score pessimistic or optimistic.
+6. **Ignored static mutants.** Mutants in module-level constants (limits, regex
+   tables, defaults) are often skipped for speed (for example StrykerJS
+   `ignoreStatic`). Report the ignored count next to every score.
+7. **False no-coverage.** Per-test coverage can misattribute when tests load
+   native drivers or aliased modules. Before calling a file untested, prove that
+   a test actually loads the instrumented file.
+8. **Scoped test sets.** A run against a narrowed test set misses kills from
+   tests outside it, so its scores are lower bounds. Report the narrowed test
+   scope and label its scores as lower bounds; a wider suite may kill more
+   mutants.
+9. **Timeouts.** A timed-out mutant counts as killed in the score. Two
+   safeguards apply:
+   - Always report the timeout count separately, including mutants marked
+     killed only because the test runner timed out.
+   - If timeouts are more than about 5% of a file's mutant results, re-run that
+     file with a longer timeout before trusting its score. A slow machine can
+     fake kills.
+
+   A default per-test timeout can fail the dry run, so raise it for mutation
+   runs. Retrying failed tests can hide flaky kills.
+10. **Red baselines.** A failing baseline forces tests out of the run, which
+    silently unmeasures what they guard. List every excluded test file next to
+    the source files it guards. A failing security pin is a finding to report,
+    not noise to exclude.
+11. **Process limits.** Code run in a child process is invisible to in-process
+    instrumentation: its mutants are unmeasured, not untested. Functions
+    serialised to strings (for a browser, say) can break instrumentation
+    instead. A whole-suite test set can make
+    the run many times slower than a scoped one, and static mutants, which run
+    against every test, are the slowest.
+
 ## What This Sensor Measures
 
 - **Mutation score**: percentage of injected mutants killed by the test suite
 - **Survived mutants**: list of mutations that tests did NOT catch (these are real coverage gaps)
 - **Equivalent mutants**: mutations that don't change observable behavior (excluded from score)
-- **Timeout mutants**: mutations where tests hung (counted as killed — the test noticed something)
+- **Timeout mutants**: mutations where tests hung (counted as killed — the test noticed something; always reported as a separate count, and a file with more than ~5% timeouts is re-run with a longer timeout before its score is trusted, see Run-Validity Pitfalls item 9)
 - **Per-file mutation scores**: for each touched file, individual score and survived mutant details
 
 ## Output Format
