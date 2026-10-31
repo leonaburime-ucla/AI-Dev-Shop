@@ -1,7 +1,7 @@
 ---
 name: ui-ux-design
-version: 1.6.2
-last_updated: 2026-08-23
+version: 1.7.0
+last_updated: 2026-10-30
 description: Use when creating frontend design systems, visual direction, component/state specs, responsive behavior, brand-aware UI guidance, premium/high-converting website polish, browser-backed UI iteration, or implementation-ready design handoff from a feature spec or existing product constraints.
 ---
 
@@ -47,6 +47,11 @@ description: Use when creating frontend design systems, visual direction, compon
   - `references/visual-storytelling.md` for narrative frames, visual proof, and data-storytelling methods
   - `references/openai-frontend-skill.md` for composition-first art direction and distinctive landing-page or branded-demo methods
   - `references/delight-and-motion.md` for contextual microcopy, micro-interactions, personality, and delight intensity
+  - `references/ui-animation.md` when animating anything (scroll reveals, text reveals,
+    transitions, pinned sections, micro-interactions): kUInetic-first library choice,
+    implementation defaults, and micro-interaction recipes
+  - `references/kuinetic-reference.md` with `ui-animation.md` when the page has kUInetic
+    (`data-kui`, `vendor/kuinetic/`, the `kuinetic` package): attributes, effect names, tiers
   - `references/inclusive-ai-imagery.md` for generated-imagery prompting and representation review
 - Treat accessibility, responsive behavior, and implementation clarity as default requirements.
 - Produce design output that Programmer, QA/E2E, and Code Inspection can execute without guessing.
@@ -141,6 +146,8 @@ When a design artifact is required, include:
 - Need narrative landing page, infographic, or campaign framing -> load `visual-storytelling.md`
 - Need visually strong landing-page composition, branded demo direction, or anti-generic UI guidance -> load `openai-frontend-skill.md`
 - Need delight, motion, or playful interaction guidance -> load `delight-and-motion.md`
+- Implementing any animation, scroll or text reveal, transition, or micro-interaction ->
+  load `ui-animation.md`; add `kuinetic-reference.md` when kUInetic is detected
 - Need AI-generated imagery or inclusive representation constraints -> load `inclusive-ai-imagery.md`
 - User explicitly requests Vercel Web Interface Guidelines or a fresh external-rule
   compliance audit -> load `vercel-web-design-guidelines` as supplemental evidence,

@@ -4,6 +4,8 @@ Use this reference when the product should feel lively, memorable, or distinctiv
 
 This file selects where delight and personality belong. `ui-loop.md` owns the final
 motion/restraint review and accessibility baseline.
+How to animate (timing, easing, kUInetic, micro-interaction recipes) lives in
+`ui-animation.md`.
 
 ## Default Rule
 
