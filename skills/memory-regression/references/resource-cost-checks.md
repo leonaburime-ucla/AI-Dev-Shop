@@ -2,7 +2,7 @@
 
 Seven checks for changes that add or alter recurring or retained work, plus the `Cost:` line that reports the result. Load with `SKILL.md` when a change hits a trigger in its When to Use list.
 
-Roles: Software Architect proposes the bounds, Programmer implements them and reports the cost, Code Inspection verifies the path that actually runs. Apply the checks to the changed paths only. Reuse the project's existing scheduler, cache, sampler, and benchmark harness; do not build new ones for this ([Before You Write](../../implementation-guardrails/SKILL.md#before-you-write)).
+Roles: Software Architect proposes the bounds, Programmer implements them and reports the cost, Code Inspection verifies the path that actually runs. Apply the checks to the changed paths only. Reuse the project's existing scheduler, cache, sampler, and benchmark harness where one exists; otherwise follow [Before You Write](../../implementation-guardrails/SKILL.md#before-you-write) and build the smallest one needed.
 
 Owned elsewhere, not restated here:
 - Leak patterns (listeners, timers, unbounded caches, unsupervised workers): [antipatterns.md](antipatterns.md)
@@ -57,15 +57,15 @@ Extends antipatterns #2 and #9.
 - After a write succeeds, or finds nothing changed, schedule the next one only if newer progress exists.
 - Retry transient storage failures during quiet periods with a positive minimum delay and a bounded or backed-off policy, never a tight loop.
 - On teardown, stop scheduling and clear timers before awaiting cleanup. A promise that resolves after teardown must not restart work for the retired owner.
-- Persist the terminal state immediately; never throttle the final write.
+- Persist the terminal state immediately; never throttle the final write. Keep writes serialized so an older snapshot write still in flight cannot finish afterwards and overwrite it, await the final commit before teardown, and reject stale writes or retries once the terminal state is saved.
 
 ## 6. Prove idle before reclaiming anything
 
 Applies before stopping, sleeping, or recycling a process, worker, view, or connection.
 - An HTTP response completing does not mean the work it started has finished. Publishing, exporting, uploading, and sending can continue afterwards.
-- Hold an activity count per request and release it exactly once, on whichever of finish or close comes first.
+- Track the response and the work separately. The response ends on `finish` or `close`, and `close` can mean the client disconnected early. The work the handler started stays active until it completes or is confirmed cancelled; release its activity hold exactly once, at that point.
 - Ask every owner of background work whether it is busy, not just the request layer.
-- After an asynchronous idle probe returns, check live activity again. Then close intake with no await between that check and the close, so new work cannot slip in before the graceful stop.
+- After an asynchronous idle probe returns, check live activity again. Then close intake with no await between that check and the close, so new work cannot slip in before the graceful stop. This only holds inside one process: when other processes or workers accept work, each owner must fence its own intake and confirm it is idle; a coordinator-side check alone is not enough.
 - A busy, failed, or unanswered probe defers reclamation.
 - Cancel pending restart work on explicit stop, delete, or quit.
 - When a process is replaced, the old process's exit handler must confirm identity before removing anything, so it cannot tear down its replacement's registration.

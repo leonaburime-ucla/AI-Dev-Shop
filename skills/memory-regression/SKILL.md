@@ -22,6 +22,7 @@ Automated detection and prevention of memory and resource leaks across all platf
 - Design, implementation, or review of a change that adds or alters any of the following (load `references/resource-cost-checks.md`):
   - polling, periodic refresh, checkpoints, or autosave
   - large or growing payloads, streams, or IPC
+  - concurrency or fan-out: parallel requests, worker pools, batch sizes
   - caches or memoization; retained history, logs, or queues
   - background workers, daemons, or child processes; timers or subscriptions
   - long-lived sessions or views

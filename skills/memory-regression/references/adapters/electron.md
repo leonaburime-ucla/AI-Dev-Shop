@@ -26,27 +26,29 @@ Electron desktop apps, including the servers, daemons, CLIs, and bridges the app
 
 ## Platform Gotchas
 
-1. **Run-as-node is part of the child's launch contract.** A child launched without the run-as-node setting opened a GUI window instead of speaking its protocol, so the parent timed out and the tools the child provided were missing. Set it where the child is launched, and keep it through any environment filtering or allowlisting. The run-as-node fuse can disable the variable in packaged builds, so verify it there. `utilityProcess` is a documented alternative for Node children.
+1. **Run-as-node is part of the child's launch contract.** When a child is launched with the Electron executable (`process.execPath`) to run as Node, it needs `ELECTRON_RUN_AS_NODE=1`. Without it the executable starts as the Electron app, not a Node process, so the child does not speak the protocol the parent expects. Set it where the child is launched, and keep it through any environment filtering or allowlisting. The run-as-node fuse can disable the variable in packaged builds, so verify it there. `utilityProcess` is a documented alternative for Node children, but it does not support piped stdin, so a stdin/stdout protocol child needs a different transport first.
 
 2. **Check which transport is actually used.** Some clients can connect over HTTP rather than spawning a stdio child. Confirm the real path before optimizing a child that may not run.
 
 3. **Hidden views still hold renderers.** A hidden window or guest view keeps its renderer process and application state. Releasing one is allowed only after explicit guards confirm nothing is lost (unsaved edits, in-progress uploads, active input). A timeout, failure, or unknown answer keeps the view. Restore route and scroll position when it is recreated. A view with no guards is not automatically safe to destroy.
 
-4. **Do not create a renderer to take a thumbnail.** Capture from an already-live, eligible view. After the capture resolves, recheck the view's identity, URL, and navigation state; if it is no longer eligible, keep the previous image.
+4. **Prefer a live view for thumbnails.** Capture from an already-live, eligible view. When no such view exists and [offscreen rendering](https://www.electronjs.org/docs/latest/tutorial/offscreen-rendering) is required, bound how many capture renderers run at once and close each one after its capture. After the capture resolves, recheck the view's identity, URL, and navigation state; if it is no longer eligible, keep the previous image.
 
-5. **Send version tokens over recurring IPC, not bytes.** IPC arguments are serialized on every send. Recurring messages carry a version token, and the receiver fetches image or payload bytes only when the token changes. Count serialization and image bytes in the cost estimate.
+5. **Don't resend unchanged payloads over recurring IPC.** IPC arguments are serialized on every send. For a large snapshot that is usually unchanged, send a version token and let the receiver fetch the bytes only when the token changes. For payloads that change on every send, or ordered stream events, keep sending the data. Compare total serialization, transfer, and latency before claiming a saving.
 
 6. **Share one sampler.** The main process holds one cached sample and one in-flight promise; renderers ask for it over IPC instead of each running their own polling. Invalidate PID-to-owner attribution whenever ownership changes, because PIDs are reused and processes get replaced.
 
-7. **Hidden documents own no polling timer.** Disposing a view removes its listeners and IPC subscriptions, and results that arrive afterwards must not restart its work.
+7. **Hidden documents pause visibility-only polling.** Polling that only refreshes what the user sees (meters, previews) stops while the document is hidden. Work that must continue, such as sync or job monitoring, belongs to an owner that outlives visibility (main or a worker), not to the hidden view's timer. Disposing a view removes its listeners and IPC subscriptions, and results that arrive afterwards must not restart its work.
 
-8. **Process replacement and teardown.** Share daemon infrastructure while keeping per-scope state separate. When a process is replaced, only the dead instance's registrations are withdrawn; the old exit handler must check identity so it cannot remove its replacement's. Cancel pending restart work on explicit stop, delete, or quit. A completed HTTP request does not prove a background process is idle (resource-cost-checks check 6).
+8. **Process replacement and teardown.** Share daemon infrastructure while keeping per-scope state separate. Apply [resource-cost-checks check 6](../resource-cost-checks.md#6-prove-idle-before-reclaiming-anything) to launched-process reclamation and replacement.
 
 9. **Units and platform limits.** [`process.getProcessMemoryInfo()`](https://www.electronjs.org/docs/latest/api/process#processgetprocessmemoryinfo) reports in kilobytes, and its fields depend on the platform; the docs explain why macOS provides no `residentSet`. Label every reading with metric, units, PID scope, and platform. Do not compare a footprint figure with an older RSS total, and never count a missing reading as zero.
 
 10. **Summed RSS double-counts.** Shared pages appear in every process that maps them. Prefer private or footprint figures per process over a total of RSS values.
 
-11. **Flags prove nothing alone.** A V8 or Chromium flag such as `--optimize-for-size` in source shows neither a saving nor acceptable latency. Measure the packaged runtime on representative work and on recovery after idle.
+11. **Closing a `BaseWindow` does not close its views.** A `WebContentsView`'s `webContents` survives the window closing and leaks unless the owner closes it explicitly ([resource management](https://www.electronjs.org/docs/latest/api/base-window#resource-management)).
+
+12. **Flags prove nothing alone.** A V8 or Chromium flag such as `--optimize-for-size` in source shows neither a saving nor acceptable latency. Measure the packaged runtime on representative work and on recovery after idle.
 
 ## Key API Surface
 
@@ -54,10 +56,13 @@ Electron desktop apps, including the servers, daemons, CLIs, and bridges the app
 // Pattern fragment: per-process attribution from the main process
 const { app, webContents } = require('electron');
 
-const byType = {};
-for (const m of app.getAppMetrics()) {          // Chromium-managed processes only
-  byType[m.type] = (byType[m.type] ?? 0) + m.memory.workingSetSize; // KB
-}
+// Chromium-managed processes only. Keep samples per PID; count by type
+// separately. Summing workingSetSize (resident memory) double-counts.
+const samples = app.getAppMetrics().map(m => ({
+  pid: m.pid, type: m.type, workingSetKB: m.memory.workingSetSize,
+}));
+const countByType = {};
+for (const s of samples) countByType[s.type] = (countByType[s.type] ?? 0) + 1;
 
 // Map each live view to its renderer PID
 const owners = webContents.getAllWebContents().map(wc => ({
@@ -89,22 +94,15 @@ ON FAILURE: renderer heap → browser.md; main or child heap → node.md
 
 ## Anti-Patterns (Things Agents Must Avoid)
 
-- Measuring a dev build and reporting it as the packaged result
-- Summing RSS across processes and calling it app memory
-- Treating a missing platform field as zero
-- Destroying a hidden view without guards, or recreating it without route and scroll state
-- Spawning a renderer only to capture a thumbnail
-- Resending image bytes on every recurring IPC message
-- Polling per renderer when main already samples
 - Using `ipcRenderer.sendSync` or blocking file I/O on the main process ([performance guide](https://www.electronjs.org/docs/latest/tutorial/performance))
 
 ## Common Electron Leak Sources
 
 - Hidden windows and guest views kept alive indefinitely
-- `ipcMain.handle` / `ipcMain.on` handlers and preload listeners never removed with their view
+- View-owned IPC registrations and preload listeners never removed with their view. Shared `ipcMain` handlers serve every renderer: they follow the service's lifetime, and disposing a view releases only that view's state
 - Child processes that outlive a quit, or are respawned after an explicit stop
 - Stale PID attribution after a process is replaced
-- Per-renderer timers still running while the document is hidden
+- Visibility-only timers still running while the document is hidden
 
 ## Failure Diagnosis
 
