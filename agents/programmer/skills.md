@@ -1,6 +1,6 @@
 # Programmer Agent
-- Version: 1.7.4
-- Last Updated: 2026-10-07
+- Version: 1.7.5
+- Last Updated: 2026-11-05
 
 ## Base Skills
 Base skills are the default standing context for every Programmer task.
@@ -47,6 +47,7 @@ Conditional skills are not standing context. Load only the subset explicitly act
 - `<AI_DEV_SHOP_ROOT>/skills/package-extensibility/SKILL.md` — activate when the change touches the public surface of a package with a **recorded** second consumer (exports, options types, entry map, deps). Submit candidate rows, behavioral probes, and diagnostics as an **advisory preview** and report the fork-distance delta in the handoff — Code Inspection owns the authoritative ledger, and a preview must never be restated as the result. A claimed seam whose evidence only compiles is `UNPROVEN` and scores as a fork; evidence is a **paired differential test** — treatment vs. a baseline with only the deviation removed, both reaching the assertion, asserting on package *output* rather than echoed input, plus one sentence naming why the difference is attributable to that behavior. Phase lists and identifier maps may be attached as navigation aids but **establish no completeness claim**; Code Inspection records its own trace and sweep
 - `<AI_DEV_SHOP_ROOT>/skills/expo-react-native/SKILL.md` — activate when implementing, debugging, upgrading, or configuring Expo/React Native apps; use it as the progressive-disclosure router for official Expo skills plus React Native performance rules
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — activate when the task adds or changes external I/O, telemetry, or instrumentation points
+- `<AI_DEV_SHOP_ROOT>/skills/memory-regression/SKILL.md` + `references/resource-cost-checks.md` — activate when the change touches polling or periodic refresh, checkpoints or autosave, large or growing payloads, caches or memoization, retained history/logs/queues, streams, background workers/daemons/child processes, timers or subscriptions, long-lived sessions or views, IPC, or any claimed memory/performance saving; implement the bounds, report the cost, and load the matching platform adapter
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — activate when implementation includes phased rollout, compatibility windows, or dual writes
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — activate when dispatched with `MIGRATION-*.md` context or other phased migration work
 - `<AI_DEV_SHOP_ROOT>/skills/data-engineering/SKILL.md` — activate when implementing ETL/ELT jobs, CDC flows, warehouse/lakehouse models, backfills, or data quality stages
@@ -121,6 +122,7 @@ Micro-level code quality priority: inside approved architectural boundaries, opt
 ## Output Format
 - Files changed and behavior delivered (mapped to spec requirements)
 - Reuse line(s) when required by implementation-guardrails Output Expectations
+- `Cost:` line(s) for the implemented recurring work and retention, per `skills/memory-regression/references/resource-cost-checks.md` — required only when that skill was loaded; otherwise omit (no N/A line)
 - Test results summary (pass/fail counts, failing test names if any, and coverage metrics when a local coverage command is available)
 - Architecture Audit (required):
   - Status: `PASS`, `WARNING`, or `BLOCKER`

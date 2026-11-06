@@ -1,8 +1,8 @@
 ---
 name: memory-regression
-version: 1.0.0
-last_updated: 2026-06-12
-description: Detect and prevent memory/resource leaks across web, backend, and mobile platforms using abstract bounded-growth assertions. Covers automated CI gating, diagnostic workflows, and programmer prevention patterns. Platform-agnostic core with adapter references per runtime.
+version: 1.1.0
+last_updated: 2026-11-05
+description: Detect and prevent memory/resource leaks across web, backend, and mobile platforms using abstract bounded-growth assertions. Covers automated CI gating, diagnostic workflows, programmer prevention patterns, and design/implementation/review-time resource-cost checks for recurring work and retention. Platform-agnostic core with adapter references per runtime.
 steward: qa-e2e
 activation: conditional
 ---
@@ -19,6 +19,13 @@ Automated detection and prevention of memory and resource leaks across all platf
 - Long-running service introduced or modified (background workers, event processors, connection pools)
 - Production signals indicate an escaped regression (OOM restarts, RSS slope, FD exhaustion)
 - Programmer is working on state-heavy, long-lived, or subscription-heavy components (load antipatterns pre-check)
+- Design, implementation, or review of a change that adds or alters any of the following (load `references/resource-cost-checks.md`):
+  - polling, periodic refresh, checkpoints, or autosave
+  - large or growing payloads, streams, or IPC
+  - caches or memoization; retained history, logs, or queues
+  - background workers, daemons, or child processes; timers or subscriptions
+  - long-lived sessions or views
+  - any claim that the change saves memory or improves performance
 
 ## Agent Activation
 
@@ -26,8 +33,9 @@ Automated detection and prevention of memory and resource leaks across all platf
 |---|---|---|
 | QA/e2e | Browser/mobile memory regression tests | SKILL.md + matching adapter |
 | Performance Engineering | Backend service memory under load | SKILL.md + matching adapter |
-| Programmer | Pre-implementation leak prevention | SKILL.md + `references/antipatterns.md` |
-| Software Architect | Structural review of skill changes | Required reviewer, not executor |
+| Software Architect | Design: proposes retention bounds, cadence, and validation; also required reviewer of structural changes to this skill | SKILL.md + `references/resource-cost-checks.md` + matching adapter |
+| Programmer | Implementation: leak prevention, implements bounds, reports `Cost:` | SKILL.md + `references/resource-cost-checks.md` + `references/antipatterns.md` + matching adapter |
+| Code Inspection | Review: verifies the path that actually runs and the `Cost:` evidence | SKILL.md + `references/resource-cost-checks.md` + matching adapter |
 
 ## Core Abstraction — Universal Bounded-Growth Assertion
 
@@ -197,6 +205,7 @@ If no tests exist in the target project yet, first establish a basic passing tes
 | iOS (Swift/ObjC) | `references/adapters/ios.md` |
 | Android (Kotlin/Java) | `references/adapters/android.md` |
 | GPU / Native (C/C++/Rust/Vulkan/Metal/OpenGL) | `references/adapters/gpu-native.md` |
+| Electron (main, renderers, launched children) | `references/adapters/electron.md` |
 
 When a planned adapter is needed but not yet written, agents should use the core abstraction from this SKILL.md and apply platform documentation directly. The core pattern (warmup → baseline → stress → cleanup → measure → assert) applies regardless of whether a detailed adapter exists.
 
@@ -205,5 +214,6 @@ When a planned adapter is needed but not yet written, agents should use the core
 | Reference | Purpose |
 |---|---|
 | `references/antipatterns.md` | Programmer prevention checklist — load before implementation |
+| `references/resource-cost-checks.md` | Design/implementation/review checks for recurring work and retention, plus the `Cost:` output line |
 | `references/failure-shape-diagnosis.md` | Growth pattern → root cause mapping |
 | `references/gating-promotion-criteria.md` | Detailed promotion workflow |

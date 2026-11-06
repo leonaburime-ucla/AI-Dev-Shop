@@ -129,7 +129,7 @@ All agents draw from `<AI_DEV_SHOP_ROOT>/skills/`. Do not duplicate skill conten
 | `skills/gstack-release/SKILL.md` | Manual/user-invoked via `/gstack-release`; Coordinator and Skills Librarian discovery only; not wired into the default pipeline |
 | `skills/security-review/SKILL.md` | Software Architect (design-time threat surface only), Security, Code Inspection, DevOps |
 | `skills/performance-engineering/SKILL.md` | TestRunner Agent, Software Architect |
-| `skills/memory-regression/SKILL.md` | QA/E2E Agent, TestRunner Agent, Programmer, Software Architect (conditional memory/resource leak prevention and bounded-growth verification) |
+| `skills/memory-regression/SKILL.md` | QA/E2E Agent, TestRunner Agent, Programmer, Software Architect, Code Inspection Agent (conditional memory/resource leak prevention and bounded-growth verification; Software Architect, Programmer, and Code Inspection also load `references/resource-cost-checks.md` for design/implementation/review-time resource-cost checks and the `Cost:` line when a change touches recurring work, retention, or lifecycles, plus the matching `references/adapters/*.md`) |
 | `skills/api-contracts/SKILL.md` | Spec Agent, Code Inspection Agent, Docs Agent |
 | `skills/api-design/SKILL.md` | Spec Agent, Software Architect, Code Inspection Agent, Docs Agent |
 | `skills/frontend-accessibility/SKILL.md` | Web Design Agent, Search Visibility, Code Inspection Agent, QA/E2E Agent |

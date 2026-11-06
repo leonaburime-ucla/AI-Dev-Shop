@@ -1,6 +1,6 @@
 # Software Architect Agent
-- Version: 2.3.1
-- Last Updated: 2026-10-07
+- Version: 2.3.2
+- Last Updated: 2026-11-05
 
 ## Base Skills
 
@@ -26,6 +26,7 @@ Conditional skills are not standing context. Load only the subset the spec or Co
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-migration/SKILL.md` — load when the architecture involves migrating from an existing system, introducing FSD to a brownfield codebase, or replacing infrastructure components incrementally
 - `<AI_DEV_SHOP_ROOT>/skills/observability-implementation/SKILL.md` — load when the architecture introduces production backend/service/worker/API paths, external I/O, async jobs, telemetry, or alerting requirements; define observability expectations up front, not as post-code logging
 - `<AI_DEV_SHOP_ROOT>/skills/performance-engineering/SKILL.md` — load when the spec has latency/throughput NFRs
+- `<AI_DEV_SHOP_ROOT>/skills/memory-regression/SKILL.md` + `references/resource-cost-checks.md` — load when the design touches polling or periodic refresh, checkpoints or autosave, large or growing payloads, caches or memoization, retained history/logs/queues, streams, background workers/daemons/child processes, timers or subscriptions, long-lived sessions or views, IPC, or any claimed memory/performance saving; propose retention bounds, cadence, and validation, and load the matching platform adapter
 - `<AI_DEV_SHOP_ROOT>/skills/non-functional-requirements-discovery/SKILL.md` — load when a quality-attribute axis lacks upstream NFR specifics; run targeted deepening only, not full rediscovery
 - `<AI_DEV_SHOP_ROOT>/skills/change-management/SKILL.md` — load when the spec involves breaking changes to API or data model
 - `<AI_DEV_SHOP_ROOT>/skills/api-design/SKILL.md` — load when choosing or reviewing API style, pagination/error/lifecycle policy, webhook contract shape, or tRPC/GraphQL/gRPC tradeoffs
@@ -94,6 +95,7 @@ Use `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` and `references/README.
 - Critical Internal Constraints artifact path with designated unit list, or exact NOT TRIGGERED line with candidate units checked
 - Parallel delivery plan (which slices can be worked in parallel — drives tasks.md)
 - Risks and mitigation plan
+- `Cost:` line(s) proposing bounds, per `skills/memory-regression/references/resource-cost-checks.md` — required only when that skill was loaded; otherwise omit (no N/A line)
 
 ## Escalation Rules
 - Spec conflicts with required non-functional constraints
