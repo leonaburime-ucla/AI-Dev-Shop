@@ -1,7 +1,7 @@
 ---
 name: postgresql
-version: 1.1.1
-last_updated: 2026-04-10
+version: 1.2.0
+last_updated: 2026-11-25
 description: Use when writing advanced PostgreSQL queries, implementing triggers, stored functions, full-text search, JSONB operations, partitioning, or diagnosing query performance. Applies to any PostgreSQL host (Supabase, RDS, Railway, Neon, self-hosted).
 ---
 
@@ -13,9 +13,9 @@ This skill owns design-time and query-shape scalability checks for PostgreSQL be
 
 Keep this file lean. Open references only when you need concrete syntax or deeper examples:
 
-- `references/querying-and-data-shapes.md` for table design defaults, CTEs, window functions, and JSONB
+- `references/querying-and-data-shapes.md` for table design defaults, CTEs, self-referencing trees, window functions, JSONB (including building JSON responses in SQL), and views/materialized views
 - `references/database-programmability.md` for triggers, stored functions, extensions, and full-text search
-- `references/performance-and-operations.md` for partitioning, `EXPLAIN ANALYZE`, performance anti-patterns, and transaction isolation
+- `references/performance-and-operations.md` for partitioning, `EXPLAIN ANALYZE`, performance anti-patterns, counting at scale, safe manual data changes, and transaction isolation
 
 ## Upstream References (Progressive Disclosure)
 
@@ -67,9 +67,9 @@ Apply these defaults before advanced query tuning:
 
 | Need | Open |
 |---|---|
-| Complex query shape, hierarchy traversal, JSON-heavy access patterns | `references/querying-and-data-shapes.md` |
+| Complex query shape, hierarchy traversal, JSON-heavy access or JSON response building, views/materialized views | `references/querying-and-data-shapes.md` |
 | Trigger behavior, PL/pgSQL, extensions, or search features | `references/database-programmability.md` |
-| Slow-query diagnosis, large-table strategy, or transaction semantics | `references/performance-and-operations.md` |
+| Slow-query diagnosis, large-table strategy, counting/aggregation, safe ad-hoc data changes, or transaction semantics | `references/performance-and-operations.md` |
 
 ## Core Anti-Patterns
 
@@ -80,6 +80,8 @@ Apply these defaults before advanced query tuning:
 - implicit type coercions across join keys
 - partitioning tables before size and query shape justify it
 - hiding application-owned business logic inside opaque triggers
+- fetching rows to count or aggregate in application code
+- ad-hoc `UPDATE`/`DELETE` outside an explicit transaction
 
 ## Host Notes
 

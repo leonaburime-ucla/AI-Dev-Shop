@@ -1,7 +1,7 @@
 ---
 name: sql-data-modeling
-version: 1.2.0
-last_updated: 2026-05-15
+version: 1.2.1
+last_updated: 2026-11-25
 description: Use when designing relational schemas, producing ERDs, planning migrations, selecting data types, defining constraints, or reasoning about normalization and indexing strategy. Platform-agnostic — applies to any SQL database.
 ---
 
@@ -15,6 +15,7 @@ Keep this file lean. Read it for the modeling contract, then load only the refer
 
 ## Version Notes
 
+- `1.2.1` adds enumeration strategy (CHECK vs lookup table vs native enum caveats), time-zone storage rules, PostgreSQL array-column guidance, schema-change discipline (migrations only, no production data in dev), and soft-delete patterns (`deleted_at`, active-rows views, partial unique indexes, legal-erasure limits).
 - `1.2.0` adds flat engine-specific design references for PostgreSQL, MySQL, and MariaDB index/capability caveats while keeping the core modeling contract platform-agnostic.
 - `1.1.2` makes the design-time scalability boundary explicit and adds an index-coverage hard gate for documented query patterns.
 - `1.1.1` clarifies that the lean `SKILL.md` is a routing layer, not a content reduction. The reference files now carry fuller examples for normalization, composite keys, and index design.
@@ -38,9 +39,9 @@ Start here, then load only the reference you need:
 
 - `references/modeling-and-normalization.md` for ERD rules, cardinality, normalization, and denormalization
 - `references/keys-constraints-and-indexes.md` for PK/FK design, constraints, junction tables, and index strategy
-- `references/migrations-and-lifecycle.md` for migration classification, soft vs hard delete, and timestamp lifecycle patterns
-- `references/conventions-and-data-types.md` for naming rules and type selection guidance
-- `references/postgresql-engine.md` for PostgreSQL-specific schema/index capabilities and caveats
+- `references/migrations-and-lifecycle.md` for schema-change discipline, migration classification, soft vs hard delete, and timestamp lifecycle patterns
+- `references/conventions-and-data-types.md` for naming rules, type selection, enumerations, and time zones
+- `references/postgresql-engine.md` for PostgreSQL-specific schema/index capabilities and caveats, including array columns
 - `references/mysql-engine.md` for MySQL-specific schema/index capabilities and caveats
 - `references/mariadb-engine.md` for MariaDB-specific schema/index capabilities and caveats
 
@@ -110,7 +111,7 @@ Before modeling, confirm:
 - Prefer explicit CHECK constraints for bounded domains and invariants.
 - Prefer indexing FK columns and high-value query predicates, but only when real access patterns justify it.
 - Prefer additive-first migrations over one-shot destructive changes.
-- Ledger and audit tables are append-only: correct mistakes with new reversing rows and block UPDATE/DELETE through database privileges or a trigger.
+- Ledger and audit tables are append-only: correct mistakes with new reversing rows and block UPDATE/DELETE through database privileges or a trigger. When append-only records hold personal data, define a separate, authorized erasure or expiry path (e.g. a privileged role that anonymizes or deletes) for legal erasure and retention limits (see `references/migrations-and-lifecycle.md`, Soft Delete vs Hard Delete).
 
 ## Common Failure Modes
 
@@ -122,6 +123,8 @@ Before modeling, confirm:
 - destructive migrations planned before compatibility rollout
 - soft delete added without query filtering discipline or partial indexes
 - timestamps added without a reliable `updated_at` maintenance path
+- array columns used as a substitute for FK-backed relationships
+- native enums for value sets that will change
 
 ## Compliance Checklist
 

@@ -52,6 +52,27 @@ CREATE INDEX idx_profiles_role ON profiles ((attrs ->> 'role'));
 - Use expression or generated-column B-tree indexes when queries repeatedly filter or sort on a known scalar path.
 - Keep core relational entities in tables. Use `jsonb` for optional or variable attributes.
 
+## Array Columns
+
+Arrays (`text[]`, `bigint[]`) fit small, bounded, value-like lists read with the parent row: tags, flags, allowed channels.
+
+```sql
+CREATE INDEX idx_posts_tags ON posts USING GIN (tags);
+
+SELECT id FROM posts WHERE tags @> ARRAY['postgres'];        -- contains all
+SELECT id FROM posts WHERE tags && ARRAY['sql', 'postgres'];  -- overlaps any
+```
+
+For a positive membership filter with a non-null search value, write `tags @> ARRAY[$1::text]` (cast to the actual element type, e.g. `$1::bigint` for `bigint[]`), not `$1 = ANY(tags)`: GIN `array_ops` supports `@>`, not scalar `= ANY(array)`. Do not substitute one for the other where null results matter (under `NOT` or in a `CHECK`): with a null element and no match, `ANY` returns `NULL` while `@>` returns false.
+
+An array is not a one-to-many relationship:
+
+- elements cannot carry FK constraints, so referenced rows can disappear silently
+- changing one element rewrites the array value and creates a new row version; if the array is GIN-indexed, the update also incurs index maintenance
+- per-element queries expand the array with `unnest()` or `generate_subscripts()`; the referenced table's key index can still support the join, but elements cannot have their own referencing-side B-tree index
+
+Use a child or junction table when elements reference other entities or need their own attributes, lifecycle, or constraints.
+
 ## Query-Pattern Examples
 
 ```text

@@ -109,6 +109,22 @@ Rules:
 - index the tenant boundary columns used in policies
 - avoid hidden tenant filters in application code as the only isolation layer
 
+## RLS Is the Boundary, Not the Query Filter
+
+- Exposed-table setup (enabling RLS, Data API grants): `skills/supabase-upstream/SKILL.md`. Put the strict authorization rules in policies even when the application also checks: app-layer checks can be bypassed (direct API calls with the anon key) or simply buggy, especially in generated code.
+- Use the caller's JWT for user-scoped requests so RLS runs under the caller's role. Requests executed as `service_role` without a user token bypass RLS and need separate authorization.
+- Add selective filters that express what the operation is meant to return; RLS enforces authorization independently. Policies act as implicit `WHERE` clauses evaluated per candidate row, so a matching explicit filter gives the planner a plain, index-friendly predicate. Use `.eq('user_id', userId)` for "my orders", never for an admin or tenant-wide listing, where it would silently drop rows the caller is authorized to see. Verify index use with the actual plan.
+
+```ts
+// "my orders" only
+const { data } = await supabase
+  .from('orders')
+  .select('id, total, created_at')
+  .eq('user_id', userId);
+```
+
+For the `(select auth.uid())` caching pattern in policy predicates, see `skills/supabase-postgres-best-practices/references/security-rls-performance.md`.
+
 ## Policy Testing
 
 ```sql

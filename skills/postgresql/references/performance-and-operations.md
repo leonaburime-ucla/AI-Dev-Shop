@@ -1,6 +1,6 @@
 # Performance and Operations
 
-Use this reference when diagnosing slow queries, planning for very large tables, or selecting transaction behavior.
+Use this reference when diagnosing slow queries, planning for very large tables, counting at scale, making manual data changes, or selecting transaction behavior.
 
 ## Partitioning
 
@@ -107,6 +107,58 @@ SELECT * FROM orders WHERE user_id NOT IN (SELECT id FROM banned_users);
 SELECT * FROM orders o
 WHERE NOT EXISTS (SELECT 1 FROM banned_users b WHERE b.id = o.user_id);
 ```
+
+## Counting and Aggregating
+
+Aggregate in SQL (`count(*)`, `sum()`, `GROUP BY`). Never fetch rows into application code to count or total them.
+
+Exact `count(*)` is not cheap on large tables: under MVCC, PostgreSQL must check visibility for every counted row. An unfiltered exact count scans the whole table or a covering index; a selective filter can restrict the scan. An index-only scan skips heap visits only on pages marked all-visible.
+
+```sql
+-- existence: stops at the first match
+SELECT EXISTS (SELECT 1 FROM orders WHERE user_id = $1);
+
+-- whole-table estimate; updated by VACUUM, ANALYZE, and some DDL (e.g. CREATE INDEX).
+-- On PG14+, -1 means unknown; NULLIF maps it to NULL.
+SELECT NULLIF(reltuples, -1)::bigint AS estimate FROM pg_class WHERE oid = 'orders'::regclass;
+
+-- capped filtered count: render "1000+" past the cap
+SELECT count(*) FROM (SELECT 1 FROM orders WHERE status = 'pending' LIMIT 1001) s;
+```
+
+- Use `EXISTS`, not `count(*) > 0`.
+- For UI totals on huge tables, show an estimate or a maintained counter:
+  - `reltuples` is relation-wide and ignores tenant filters and RLS. Use it only for whole-table totals the caller is authorized to see.
+  - For a filtered estimate, run `EXPLAIN SELECT 1 FROM … WHERE …` (no aggregate, no `LIMIT`) under the caller's effective role and read the row estimate. `EXPLAIN SELECT count(*)` reports one output row, not the match count.
+  - Maintain counters by trigger or scheduled job, scoped to the same authorization boundary as the rows. A single hot counter row becomes a write-contention point.
+
+## Safe Manual Data Changes
+
+Never run an ad-hoc `UPDATE` or `DELETE` against production outside an explicit transaction. Lock and review the exact rows first, then change only those rows:
+
+```sql
+BEGIN;
+
+-- 1. Preview and lock the matching rows; review this output
+SELECT id, status, created_at
+FROM orders
+WHERE status = 'pending' AND created_at < now() - interval '30 days'
+FOR UPDATE;
+
+-- 2. Change only the reviewed ids, not the original predicate
+UPDATE orders
+SET status = 'cancelled'
+WHERE id = ANY('{101,102,103}'::bigint[])   -- ids from step 1
+RETURNING id;
+
+-- 3. Returned ids identical to the reviewed ids?
+ROLLBACK;   -- if anything is off
+-- COMMIT;  -- only when the result is exactly what you expected
+```
+
+- Preview inside the transaction. Under `READ COMMITTED` each statement takes a fresh snapshot, so a preview run separately (or rerunning the predicate in the `UPDATE`) can match different rows; a matching row count does not prove the same rows changed.
+- Decide quickly: locked rows block concurrent writers until `COMMIT` or `ROLLBACK`. See `skills/supabase-postgres-best-practices/references/lock-short-transactions.md`.
+- In `psql`, `\set AUTOCOMMIT off` starts an implicit transaction before eligible commands (not e.g. `VACUUM`) when none is open; end it with `COMMIT` or `ROLLBACK`. `\set ON_ERROR_ROLLBACK interactive` uses savepoints so a failed statement in an open transaction does not abort it, for interactive input only (not scripts).
 
 ## Transaction Isolation Levels
 

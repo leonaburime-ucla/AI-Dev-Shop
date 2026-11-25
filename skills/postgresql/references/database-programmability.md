@@ -93,8 +93,19 @@ Enable extensions with `CREATE EXTENSION IF NOT EXISTS <name>`.
 | `pg_stat_statements` | Query execution stats | `pg_stat_statements` view |
 | `btree_gin` | GIN indexes for B-tree types | Multi-column GIN support |
 | `pg_partman` | Automated partition management | Time/range partition automation |
+| `pg_cron` | Scheduled jobs inside the database (matview refresh, cleanup, rollups) | `cron.schedule()`, `cron.unschedule()`; see note below |
+| `pgmq` | Durable message queue in Postgres tables | `pgmq.create()`, `pgmq.send()`, `pgmq.read()` (visibility timeout), `pgmq.archive()` |
+| `postgres_fdw` | Query tables on a remote PostgreSQL server as local foreign tables | `CREATE SERVER`, `CREATE USER MAPPING`, `IMPORT FOREIGN SCHEMA` |
+| `pg_jsonschema` | Validate `jsonb` against a JSON Schema (Supabase-maintained) | `jsonb_matches_schema(schema, value)` inside a `CHECK` constraint |
 
 Supabase enables `uuid-ossp`, `pgcrypto`, `pg_trgm`, and `unaccent` by default. Others must be enabled explicitly if the host supports them.
+
+Notes on the newer entries:
+
+- `pg_cron`: prefer it over a separate cron service for database-only jobs. On self-hosted PostgreSQL, add `pg_cron` to `shared_preload_libraries` and restart before `CREATE EXTENSION`. Jobs run as the scheduling role. Run history is recorded only when `cron.log_run` is on; then configure retention for `cron.job_run_details`.
+- `pgmq`: prefer it over a hand-rolled `SKIP LOCKED` queue table (`skills/supabase-postgres-best-practices/references/lock-skip-locked.md`) when you need visibility timeouts, redelivery of unacknowledged messages, and an archive API. Redelivery is not a retry policy: make handlers idempotent, and implement retry limits, backoff, or dead-letter handling when required.
+- `postgres_fdw`: filters, joins, and aggregates are pushed to the remote server only when deemed safe; otherwise rows are pulled across the network and processed locally. Every query pays network latency. Map each local role to a least-privilege remote role; when the connection supplies a `password` option, it lives in the user mapping (not needed for GSSAPI or PG18+ SCRAM pass-through). Check plans with `EXPLAIN VERBOSE` (shows the remote SQL).
+- Availability of `pg_cron`, `pgmq`, `postgres_fdw`, and `pg_jsonschema` varies by managed host; confirm before designing around them.
 
 ## Full-Text Search
 
