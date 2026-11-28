@@ -9,6 +9,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/experimental-validation/SKILL.md` — empirical comparison protocol when the runtime disclosure mandate fires and user approves
 - `<AI_DEV_SHOP_ROOT>/skills/coordination/SKILL.md` — routing logic, convergence policy, iteration budgets, escalation triggers, cycle summary format
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — conditional: load when applying Before You Write during brief construction for variant work (Dispatch Prompt Construction item 4)
+- `<AI_DEV_SHOP_ROOT>/skills/anti-over-engineering/SKILL.md` — conditional: load when a brief or plan makes a reuse, removal or replacement decision (smallest complete change, proof before a cut, production-LOC report)
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — conditional: load alongside implementation-guardrails (its required parent)
 - `<AI_DEV_SHOP_ROOT>/skills/context-engineering/SKILL.md` — context injection per agent, project knowledge file governance, token economics, compression strategies
 - `<AI_DEV_SHOP_ROOT>/skills/memory-systems/SKILL.md` — which project knowledge entries to inject per agent, memory governance, invalidate-don't-discard policy

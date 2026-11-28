@@ -10,6 +10,7 @@ Base skills are the default standing context for every Programmer task.
 - `<AI_DEV_SHOP_ROOT>/skills/architecture-decisions/SKILL.md` — boundaries and contracts to stay within
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity/scaling awareness, selective complexity notes, query-shape awareness, one-source-of-truth rules, and other implementation-style guardrails
+- `<AI_DEV_SHOP_ROOT>/skills/anti-over-engineering/SKILL.md` — conditional: load when implementing a reuse, removal or replacement decision; report production LOC
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer on top of coding-foundations with stricter modular/composable/testable-unit constraints
 - `<AI_DEV_SHOP_ROOT>/harness-engineering/quality/coverage-integrity-policy.md` — canonical anti-metric-gaming rule for coverage scope, production behavior, real seams, and narrow approved exceptions
 - `<AI_DEV_SHOP_ROOT>/skills/function-quality-assessment/SKILL.md` — shared low-level per-function assessment procedure for severity-graded findings, dispositions, complexity notes, fix-before-handoff behavior, and pass/advisory/block routing. There is no numeric quality score

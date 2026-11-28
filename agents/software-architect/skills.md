@@ -11,6 +11,7 @@
 - `<AI_DEV_SHOP_ROOT>/skills/design-patterns/SKILL.md` — pattern selection decision guide, 19+ pattern reference files (TypeScript examples, tradeoffs, failure modes), common pattern combinations; load specific pattern files from references/ as needed
 - `<AI_DEV_SHOP_ROOT>/skills/coding-foundations/SKILL.md` — tiny shared parent for explicit dependencies, decision/effect separation, mutation-by-exception, stable contracts, fail-fast defaults, and small readable units
 - `<AI_DEV_SHOP_ROOT>/skills/implementation-guardrails/SKILL.md` — child layer for complexity/scaling defaults, query-shape awareness, and maintainability guardrails that downstream implementers should inherit
+- `<AI_DEV_SHOP_ROOT>/skills/anti-over-engineering/SKILL.md` — conditional: load when a plan makes a reuse, removal or replacement decision
 - `<AI_DEV_SHOP_ROOT>/skills/testable-design-patterns/SKILL.md` — child layer with stricter modular/composable/testable-unit rules used to define downstream implementation constraints
 
 ## Conditional Skills
